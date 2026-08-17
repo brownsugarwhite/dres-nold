@@ -1,0 +1,29 @@
+# Abhängigkeiten
+node_modules/
+
+# Build-Ergebnis
+dist/
+.astro/
+
+# Zugangsdaten — NIEMALS committen
+.env
+.env.*
+!.env.example
+.dev.vars
+
+# Cloudflare
+.wrangler/
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Webflow-Referenzmaterial: liegt lokal vor, gehört nicht ins Repo
+# (große ZIP-Dateien und CDN-Downloads)
+docs/referenz/*.zip
+docs/referenz/original/

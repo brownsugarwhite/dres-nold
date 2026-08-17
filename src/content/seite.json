@@ -1,0 +1,15 @@
+{
+  "_hinweis_fuer_die_redaktion": "Angaben, die Google und soziale Netzwerke anzeigen, wenn die Seite gefunden oder geteilt wird. Der Titel sollte unter 60 Zeichen bleiben, die Beschreibung unter 160.",
+  "titel": "Dres. Nold – Zahnarztpraxis und Kieferorthopädie",
+  "beschreibung": "Ihre Zahnarztpraxis in Bietigheim für moderne Kieferorthopädie: Unsichtbare Zahnspangen, Invisalign, feste Spangen und individuelle Behandlungskonzepte für Kinder, Jugendliche und Erwachsene.",
+  "vorschaubild": "/bilder/vorschau.jpg",
+  "praxis": {
+    "name": "Dres. Nold – Zahnarztpraxis und Kieferorthopädie",
+    "strasse": "Rosenstraße 1",
+    "plz": "76467",
+    "ort": "Bietigheim",
+    "telefon": "07245 7171",
+    "fax": "07245 939269",
+    "email": "info@dres-nold.de"
+  }
+}

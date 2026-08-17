@@ -1,0 +1,101 @@
+/*
+  Design-Tokens für dres-nold.de
+  ------------------------------------------------------------------
+  Alle Gestaltungswerte stehen hier — und nur hier.
+  In Komponenten NIEMALS direkte Farbwerte, Schriftgrößen oder
+  Abstände schreiben, sondern immer diese Variablen verwenden.
+
+  Die Werte sind aus der Webflow-Vorlage abgeleitet und geben deren
+  Erscheinungsbild 1:1 wieder.
+*/
+
+:root {
+  /* --- Farben ---------------------------------------------------
+     Hausfarbe der Praxis ist das Aubergine #6c1a51.
+     Hinweis: Die Webflow-Vorlage enthält die Beinahe-Duplikate
+     #6b1a51 und #6a2051. Das sind Ungenauigkeiten der Vorlage —
+     hier gilt durchgängig #6c1a51. */
+  --farbe-primaer: #6c1a51;
+  --farbe-primaer-hell: #a3959f;
+  --farbe-dunkel: #554d53;
+
+  --farbe-text: #5c5e61;
+  --farbe-text-gedeckt: #758696;
+  --farbe-text-invers: #ffffff;
+
+  --farbe-flaeche: #ffffff;
+  --farbe-flaeche-gedeckt: #f4f2f3;
+  --farbe-linie: #dddddd;
+
+  /* Zustandsfarben für Hinweise und Formulare */
+  --farbe-hinweis: var(--farbe-primaer);
+  --farbe-fehler: #a4243b;
+  --farbe-erfolg: #2d6a4f;
+
+  /* --- Schrift --------------------------------------------------
+     Die Vorlage nutzt Myriad Pro über Adobe Typekit. Typekit entfällt
+     beim Umzug. Ersatz ist Source Sans 3 — vom selben Schriftgestalter
+     (Robert Slimbach), praktisch deckungsgleiche Proportionen, frei
+     lizenziert und selbst gehostet unter public/fonts/. */
+  --schrift: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Fließende Größen: passen sich stufenlos der Fensterbreite an */
+  --text-xs: clamp(0.78rem, 0.76rem + 0.1vw, 0.84rem);
+  --text-s: clamp(0.9rem, 0.87rem + 0.15vw, 1rem);
+  --text-m: clamp(1rem, 0.96rem + 0.2vw, 1.13rem);
+  --text-l: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.3rem + 1vw, 2.25rem);
+  --text-xxl: clamp(2rem, 1.6rem + 2vw, 3.5rem);
+
+  --gewicht-normal: 400;
+  --gewicht-halbfett: 600;
+  --gewicht-fett: 700;
+
+  --zeilenhoehe-eng: 1.2;
+  --zeilenhoehe-normal: 1.6;
+
+  /* --- Abstände -------------------------------------------------
+     Konsistentes Raster; Basis 8 px. */
+  --abstand-3xs: 0.25rem;
+  --abstand-2xs: 0.5rem;
+  --abstand-xs: 0.75rem;
+  --abstand-s: 1rem;
+  --abstand-m: 1.5rem;
+  --abstand-l: 2.5rem;
+  --abstand-xl: 4rem;
+  --abstand-2xl: 6rem;
+  --abstand-3xl: 9rem;
+
+  /* --- Layout ---------------------------------------------------- */
+  --breite-inhalt: 1200px;
+  --breite-text: 68ch;
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-rund: 999px;
+
+  /* --- Bewegung --------------------------------------------------
+     Die Dauern sind aus den Webflow-Interaktionen übernommen. */
+  --dauer-schnell: 200ms;
+  --dauer-normal: 400ms;
+  --dauer-langsam: 700ms;
+  --verlauf: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* --- Ebenen ---------------------------------------------------- */
+  --ebene-inhalt: 1;
+  --ebene-navigation: 100;
+  --ebene-hinweis: 200;
+  --ebene-menue: 300;
+}
+
+/*
+  Barrierefreiheit: Wer im Betriebssystem reduzierte Bewegung
+  eingestellt hat, bekommt keine Animationen. Verbindlich — jede
+  Animation muss diese Einstellung respektieren.
+*/
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dauer-schnell: 1ms;
+    --dauer-normal: 1ms;
+    --dauer-langsam: 1ms;
+  }
+}

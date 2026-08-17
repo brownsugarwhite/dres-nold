@@ -1,0 +1,19 @@
+{
+  "name": "dres-nold",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Website der Zahnarzt- und Kieferorthopädie-Praxis Dres. Nold, Bietigheim",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^5.6.1",
+    "@astrojs/sitemap": "^3.3.0",
+    "lottie-web": "^5.12.2",
+    "sharp": "^0.34.1"
+  }
+}

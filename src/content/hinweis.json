@@ -1,0 +1,9 @@
+{
+  "_hinweis_fuer_die_redaktion": "Notfall- und Vertretungshinweis. Erscheint automatisch im Zeitraum zwischen 'von' und 'bis' und verschwindet danach von selbst. Zum sofortigen Ausblenden 'aktiv' auf false setzen.",
+  "aktiv": false,
+  "titel": "Urlaubsvertretung",
+  "text": "Unsere Praxis ist vom 17. August bis 4. September 2026 geschlossen. Die Vertretungspraxis erreichen Sie über unseren Anrufbeantworter.",
+  "von": "2026-08-17",
+  "bis": "2026-09-04",
+  "stufe": "hinweis"
+}

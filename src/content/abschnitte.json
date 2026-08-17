@@ -1,0 +1,18 @@
+{
+  "_hinweis_fuer_die_redaktion": "Frei anlegbare Abschnitte, die im Praxis-Bereich erscheinen — ohne eigenen Menüeintrag. Je Abschnitt sind Bild, Link und PDF-Download optional. Reihenfolge über 'position', Ausblenden über 'aktiv'.",
+  "eintraege": [
+    {
+      "id": "beispiel",
+      "aktiv": false,
+      "position": 1,
+      "titel": "Beispielabschnitt",
+      "text": "Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.",
+      "bild": "",
+      "bild_alt": "",
+      "link_text": "",
+      "link_ziel": "",
+      "pdf_text": "",
+      "pdf_datei": ""
+    }
+  ]
+}

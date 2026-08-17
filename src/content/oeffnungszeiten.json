@@ -1,0 +1,25 @@
+{
+  "_hinweis_fuer_die_redaktion": "Drei getrennte Listen. Jede Zeile besteht aus einer Bezeichnung (meist der Tag) und den zugehörigen Zeiten.",
+  "zahnaerztlich": {
+    "titel": "Zahnärztliche Sprechstunde",
+    "zeilen": [
+      { "tag": "Montag, Dienstag, Donnerstag", "zeiten": "8:00 – 12:00 Uhr und 14:00 – 18:00 Uhr" },
+      { "tag": "Mittwoch", "zeiten": "8:00 – 12:00 Uhr" },
+      { "tag": "Freitag", "zeiten": "8:00 – 13:00 Uhr" }
+    ]
+  },
+  "kieferorthopaedisch": {
+    "titel": "Kieferorthopädische Sprechstunde",
+    "zeilen": [
+      { "tag": "Montag", "zeiten": "14:00 – 18:00 Uhr" },
+      { "tag": "Dienstag", "zeiten": "13:00 – 16:00 Uhr" }
+    ]
+  },
+  "telefonisch": {
+    "titel": "Telefonische Erreichbarkeit",
+    "zeilen": [
+      { "tag": "Montag bis Donnerstag", "zeiten": "8:00 – 12:00 Uhr und 14:00 – 18:00 Uhr" },
+      { "tag": "Freitag", "zeiten": "8:00 – 11:00 Uhr und 13:00 – 16:00 Uhr" }
+    ]
+  }
+}

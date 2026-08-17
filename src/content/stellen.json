@@ -1,0 +1,17 @@
+{
+  "_hinweis_fuer_die_redaktion": "Offene Stellen. Ist keine Stelle aktiv, blendet sich der gesamte Bereich auf der Seite automatisch aus.",
+  "titel": "Wir suchen Verstärkung",
+  "einleitung": "Sie möchten Teil unseres Teams werden? Wir freuen uns auf Ihre Bewerbung.",
+  "eintraege": [
+    {
+      "id": "beispiel",
+      "aktiv": false,
+      "position": 1,
+      "titel": "Zahnmedizinische Fachangestellte (m/w/d)",
+      "umfang": "Vollzeit oder Teilzeit",
+      "beschreibung": "Beschreibung der Stelle, der Aufgaben und dessen, was die Praxis bietet.",
+      "ansprechpartner": "Dr. Paul Nold",
+      "pdf_datei": ""
+    }
+  ]
+}
