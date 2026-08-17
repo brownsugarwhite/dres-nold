@@ -1,0 +1,40 @@
+---
+/**
+ * Seitenrahmen für alle Seiten.
+ * Enthält die Metadaten, die Schrifteinbindung und die globalen Stile.
+ */
+import seite from '../content/seite.json';
+import '../styles/tokens.css';
+import '../styles/global.css';
+
+interface Props {
+  titel?: string;
+  beschreibung?: string;
+}
+
+const { titel = seite.titel, beschreibung = seite.beschreibung } = Astro.props;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titel}</title>
+    <meta name="description" content={beschreibung} />
+
+    <meta property="og:title" content={titel} />
+    <meta property="og:description" content={beschreibung} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="canonical" href={Astro.url.href} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    {/* Keine externen Ressourcen — siehe CLAUDE.md. Schriften liegen unter public/fonts/. */}
+  </head>
+  <body>
+    <a class="sprungmarke" href="#inhalt">Zum Inhalt springen</a>
+    <slot />
+  </body>
+</html>

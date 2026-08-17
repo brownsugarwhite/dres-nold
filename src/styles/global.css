@@ -1,0 +1,80 @@
+/*
+  Globale Grundstile.
+  Alle Werte kommen aus tokens.css — hier stehen keine festen Farben
+  oder Größen.
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--schrift);
+  font-size: var(--text-m);
+  line-height: var(--zeilenhoehe-normal);
+  color: var(--farbe-text);
+  background: var(--farbe-flaeche);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  margin: 0 0 var(--abstand-s);
+  color: var(--farbe-primaer);
+  line-height: var(--zeilenhoehe-eng);
+  font-weight: var(--gewicht-halbfett);
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--text-xxl); }
+h2 { font-size: var(--text-xl); }
+h3 { font-size: var(--text-l); }
+
+p {
+  margin: 0 0 var(--abstand-s);
+  max-width: var(--breite-text);
+}
+
+a {
+  color: var(--farbe-primaer);
+  text-underline-offset: 0.2em;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Barrierefreiheit: Fokus muss immer deutlich sichtbar sein. */
+:focus-visible {
+  outline: 3px solid var(--farbe-primaer);
+  outline-offset: 2px;
+  border-radius: var(--radius-s);
+}
+
+/* Sprungmarke für Tastatur- und Screenreader-Nutzung.
+   Sichtbar, sobald sie den Fokus erhält. */
+.sprungmarke {
+  position: absolute;
+  left: var(--abstand-s);
+  top: calc(-1 * var(--abstand-xl));
+  z-index: var(--ebene-menue);
+  padding: var(--abstand-2xs) var(--abstand-s);
+  background: var(--farbe-primaer);
+  color: var(--farbe-text-invers);
+  border-radius: var(--radius-s);
+  text-decoration: none;
+  transition: top var(--dauer-schnell) var(--verlauf);
+}
+
+.sprungmarke:focus {
+  top: var(--abstand-s);
+}
+
+.inhalt {
+  width: min(100% - 2 * var(--abstand-m), var(--breite-inhalt));
+  margin-inline: auto;
+}

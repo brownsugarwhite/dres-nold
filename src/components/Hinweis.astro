@@ -1,0 +1,52 @@
+---
+/**
+ * Notfall- und Vertretungshinweis.
+ *
+ * Zeigt den Hinweis nur, wenn er aktiv geschaltet ist UND das heutige
+ * Datum im eingetragenen Zeitraum liegt. Dadurch verschwindet ein
+ * Urlaubshinweis von selbst, ohne dass jemand daran denken muss.
+ *
+ * Die Auswertung geschieht beim Erzeugen der Seite. Damit die Seite
+ * am Stichtag umschaltet, baut Cloudflare Pages sie einmal täglich neu.
+ */
+import daten from '../content/hinweis.json';
+
+function istSichtbar() {
+  if (!daten.aktiv) return false;
+
+  const heute = new Date().toISOString().slice(0, 10);
+  if (daten.von && heute < daten.von) return false;
+  if (daten.bis && heute > daten.bis) return false;
+
+  return true;
+}
+
+const sichtbar = istSichtbar();
+---
+
+{sichtbar && (
+  <section id="information" class="hinweis" role="region" aria-labelledby="hinweis-titel">
+    <div class="inhalt hinweis__innen">
+      <h2 id="hinweis-titel" class="hinweis__titel">{daten.titel}</h2>
+      <p class="hinweis__text">{daten.text}</p>
+    </div>
+  </section>
+)}
+
+<style>
+  .hinweis {
+    background: var(--farbe-primaer);
+    color: var(--farbe-text-invers);
+    padding-block: var(--abstand-m);
+  }
+
+  .hinweis__titel {
+    color: var(--farbe-text-invers);
+    font-size: var(--text-l);
+    margin-bottom: var(--abstand-3xs);
+  }
+
+  .hinweis__text {
+    margin: 0;
+  }
+</style>

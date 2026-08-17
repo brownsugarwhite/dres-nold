@@ -1,0 +1,78 @@
+---
+/**
+ * Startseite.
+ *
+ * STAND: Gerüst. Der eigentliche Nachbau der Abschnitte folgt in
+ * Phase 2 — siehe CLAUDE.md. Diese Seite zeigt vorerst nur, dass die
+ * Grundlage steht: Datenmodell, Design-Tokens und der Hinweis-
+ * Mechanismus funktionieren.
+ */
+import Basis from '../layouts/Basis.astro';
+import Hinweis from '../components/Hinweis.astro';
+import seite from '../content/seite.json';
+import oz from '../content/oeffnungszeiten.json';
+
+const { praxis } = seite;
+const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
+---
+
+<Basis>
+  <Hinweis />
+
+  <main id="inhalt" class="inhalt">
+    <h1>{praxis.name}</h1>
+    <p>
+      {praxis.strasse} · {praxis.plz} {praxis.ort} ·
+      <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
+    </p>
+
+    <h2>Öffnungszeiten</h2>
+    {listen.map((liste) => (
+      <section>
+        <h3>{liste.titel}</h3>
+        <dl class="zeiten">
+          {liste.zeilen.map((zeile) => (
+            <>
+              <dt>{zeile.tag}</dt>
+              <dd>{zeile.zeiten}</dd>
+            </>
+          ))}
+        </dl>
+      </section>
+    ))}
+
+    <p class="notiz">
+      Gerüst-Ansicht. Der vollständige Nachbau der Seite folgt in Phase 2.
+    </p>
+  </main>
+</Basis>
+
+<style>
+  main {
+    padding-block: var(--abstand-xl);
+  }
+
+  .zeiten {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--abstand-3xs) var(--abstand-m);
+    margin: 0 0 var(--abstand-m);
+  }
+
+  .zeiten dt {
+    font-weight: var(--gewicht-halbfett);
+  }
+
+  .zeiten dd {
+    margin: 0;
+  }
+
+  .notiz {
+    margin-top: var(--abstand-xl);
+    padding: var(--abstand-s);
+    background: var(--farbe-flaeche-gedeckt);
+    border-left: 4px solid var(--farbe-primaer-hell);
+    color: var(--farbe-text-gedeckt);
+    font-size: var(--text-s);
+  }
+</style>
