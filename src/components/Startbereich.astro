@@ -30,7 +30,6 @@ const { praxis } = seite;
         Die Kontur ist eine weiße Fläche mit ausgestanzter Schrift —
         dadurch scheint der Verlauf genau durch die Buchstaben.
       */}
-      <div class="logo__verlauf" aria-hidden="true"></div>
       <div class="logo__kontur" data-logo>
         <img
           class="logo__bild"
@@ -40,6 +39,7 @@ const { praxis } = seite;
           height="590"
         />
       </div>
+      <div class="logo__verlauf" aria-hidden="true"></div>
     </div>
 
     <div class="scrollhinweis" aria-hidden="true">
@@ -119,25 +119,25 @@ const { praxis } = seite;
      Lottie-Fläche minimal kleiner ausfällt. Das Verlaufsbild selbst
      ist 20 × 10 px und enthält nur Farbtöne ohne Struktur — seine
      genaue Größe ist deshalb unkritisch. */
-  /* Das Verlaufsbild liegt unter der Logo-Grafik und scheint durch
-     deren ausgesparte Schrift. Maße wie in der Vorlage (.div-block-29):
-     48vh × 32vh, vertikal zentriert. */
+  /* Verlaufsbild unter der Logo-Grafik — Maße und Versatz wie
+     .div-block-29 in der Vorlage. Beide Elemente stehen im normalen
+     Fluss, der negative Abstand schiebt den Verlauf hinter die Grafik. */
   .logo__verlauf {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     z-index: 10;
     width: 48vh;
-    height: 32vh;
-    max-width: 96%;
+    height: 27vh;
+    /* Etwas tiefer als in der Vorlage: Die weisse Flaeche der Grafik
+       reicht oben nicht ganz bis zum Rand, dort stuende der Verlauf
+       sonst frei. Die Schrift sitzt im unteren Teil und bleibt so
+       vollstaendig gefaerbt. */
+    margin-top: -31vh;
     background: url('/bilder/deko/verlauf.gif') center / cover no-repeat;
   }
 
   .logo__kontur {
-    position: absolute;
-    inset: 0;
     z-index: 20;
+    width: 100%;
+    height: 100%;
   }
 
   .logo__bild {
