@@ -1,62 +1,173 @@
 ---
 /**
- * Startseite.
+ * Startseite — One-Pager.
  *
- * STAND: Gerüst. Der eigentliche Nachbau der Abschnitte folgt in
- * Phase 2 — siehe CLAUDE.md. Diese Seite zeigt vorerst nur, dass die
- * Grundlage steht: Datenmodell, Design-Tokens und der Hinweis-
- * Mechanismus funktionieren.
+ * STAND: Prototyp. Die Gestaltung folgt in Phase 2 der Webflow-Vorlage;
+ * hier geht es zunächst darum, den Seitenwechsel zu den Leistungen zu
+ * zeigen. Siehe CLAUDE.md.
  */
 import Basis from '../layouts/Basis.astro';
 import Hinweis from '../components/Hinweis.astro';
+import LeistungKachel from '../components/LeistungKachel.astro';
 import seite from '../content/seite.json';
 import oz from '../content/oeffnungszeiten.json';
+import leistungen from '../content/leistungen.json';
+import team from '../content/team.json';
 
 const { praxis } = seite;
 const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
+
+const aktiv = leistungen.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
+const zahnmedizin = aktiv.filter((e) => e.kategorie === 'zahnmedizin');
+const kieferorthopaedie = aktiv.filter((e) => e.kategorie === 'kieferorthopaedie');
+
+const personen = team.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
+const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 ---
 
 <Basis>
   <Hinweis />
 
-  <main id="inhalt" class="inhalt">
-    <h1>{praxis.name}</h1>
-    <p>
-      {praxis.strasse} · {praxis.plz} {praxis.ort} ·
-      <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
-    </p>
+  <main id="inhalt">
+    <section class="inhalt kopf">
+      <h1>{praxis.name}</h1>
+      <p class="kopf__adresse">
+        {praxis.strasse} · {praxis.plz} {praxis.ort} ·
+        <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
+      </p>
+    </section>
 
-    <h2>Öffnungszeiten</h2>
-    {listen.map((liste) => (
-      <section>
-        <h3>{liste.titel}</h3>
-        <dl class="zeiten">
-          {liste.zeilen.map((zeile) => (
-            <>
-              <dt>{zeile.tag}</dt>
-              <dd>{zeile.zeiten}</dd>
-            </>
-          ))}
-        </dl>
-      </section>
-    ))}
+    <section id="leistungen" class="inhalt abschnitt">
+      <h2>Unsere Leistungen</h2>
+      <p class="abschnitt__einleitung">
+        Klicken Sie auf eine Leistung, um mehr zu erfahren.
+      </p>
 
-    <p class="notiz">
-      Gerüst-Ansicht. Der vollständige Nachbau der Seite folgt in Phase 2.
+      <h3 class="gruppe">Zahnmedizin</h3>
+      <div class="kacheln">
+        {zahnmedizin.map((l) => <LeistungKachel {...l} />)}
+      </div>
+
+      <h3 class="gruppe">Kieferorthopädie</h3>
+      <div class="kacheln">
+        {kieferorthopaedie.map((l) => <LeistungKachel {...l} />)}
+      </div>
+    </section>
+
+    <section id="team" class="inhalt abschnitt">
+      <h2>Unser Team</h2>
+      <div class="aerzte">
+        {aerzte.map((a) => (
+          <figure class="arzt">
+            <img src={a.foto} alt={a.foto_alt} width="300" height="400" loading="lazy" />
+            <figcaption>
+              <strong>{a.name}</strong>
+              <span>{a.funktion}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+      <p class="abschnitt__einleitung">
+        Dazu {personen.length - aerzte.length} Mitarbeiterinnen — die vollständige
+        Darstellung folgt beim Nachbau des Team-Abschnitts.
+      </p>
+    </section>
+
+    <section id="oz_anchor" class="inhalt abschnitt">
+      <h2>Öffnungszeiten</h2>
+      {listen.map((liste) => (
+        <div class="zeiten-block">
+          <h3 class="gruppe">{liste.titel}</h3>
+          <dl class="zeiten">
+            {liste.zeilen.map((z) => (
+              <>
+                <dt>{z.tag}</dt>
+                <dd>{z.zeiten}</dd>
+              </>
+            ))}
+          </dl>
+        </div>
+      ))}
+    </section>
+
+    <p class="inhalt notiz">
+      Prototyp-Ansicht. Sie zeigt den Seitenwechsel zu den Leistungen —
+      die Gestaltung nach Vorlage folgt in Phase 2.
     </p>
   </main>
 </Basis>
 
 <style>
-  main {
-    padding-block: var(--abstand-xl);
+  .kopf {
+    padding-block: var(--abstand-xl) var(--abstand-l);
+  }
+
+  .kopf__adresse {
+    color: var(--farbe-text-gedeckt);
+  }
+
+  .abschnitt {
+    padding-block: var(--abstand-l);
+  }
+
+  .abschnitt__einleitung {
+    color: var(--farbe-text-gedeckt);
+    margin-bottom: var(--abstand-m);
+  }
+
+  .gruppe {
+    margin-top: var(--abstand-m);
+    font-size: var(--text-m);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--farbe-text-gedeckt);
+  }
+
+  .kacheln {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: var(--abstand-s);
+    margin-bottom: var(--abstand-m);
+  }
+
+  .aerzte {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--abstand-m);
+    max-width: 46rem;
+  }
+
+  .arzt {
+    margin: 0;
+  }
+
+  .arzt img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: var(--radius-m);
+    margin-bottom: var(--abstand-2xs);
+  }
+
+  .arzt figcaption {
+    display: flex;
+    flex-direction: column;
+    font-size: var(--text-s);
+  }
+
+  .arzt figcaption span {
+    color: var(--farbe-text-gedeckt);
+  }
+
+  .zeiten-block {
+    margin-bottom: var(--abstand-m);
   }
 
   .zeiten {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: var(--abstand-3xs) var(--abstand-m);
-    margin: 0 0 var(--abstand-m);
+    margin: var(--abstand-2xs) 0 0;
   }
 
   .zeiten dt {
@@ -68,7 +179,7 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
   }
 
   .notiz {
-    margin-top: var(--abstand-xl);
+    margin-block: var(--abstand-xl);
     padding: var(--abstand-s);
     background: var(--farbe-flaeche-gedeckt);
     border-left: 4px solid var(--farbe-primaer-hell);

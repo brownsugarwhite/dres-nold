@@ -1,0 +1,123 @@
+/*
+  ÜBERGÄNGE ZWISCHEN DEN SEITEN
+  ==================================================================
+  Beim Öffnen einer Leistung erzeugt der Browser drei Ebenen, die sich
+  wie jedes andere Element mit CSS animieren lassen:
+
+    ::view-transition-group(name)   die Hülle — bewegt und skaliert sich
+    ::view-transition-old(name)     der alte Zustand (die Kachel)
+    ::view-transition-new(name)     der neue Zustand (die Seite)
+
+  Der Morph ist also nur die Voreinstellung, nicht die einzige Option.
+  Unten stehen vier Varianten. Genau EINE aktiv lassen, die anderen
+  auskommentiert stehen lassen — dann kann jederzeit umgeschaltet werden.
+
+  Zum Ausprobieren: die aktive Variante auskommentieren, eine andere
+  einkommentieren, Seite neu laden. Kein Neustart nötig.
+*/
+
+/* --- Tempo: gilt für alle Varianten ---------------------------- */
+::view-transition-group(*) {
+  animation-duration: var(--dauer-normal);
+  animation-timing-function: var(--verlauf);
+}
+
+/* ==================================================================
+   VARIANTE 1 — Morph  ·  AKTIV
+   Die Kachel wandert an ihren Platz und wächst zur Seite.
+   Der Browser berechnet den Weg selbst.
+   ================================================================== */
+
+::view-transition-old(*),
+::view-transition-new(*) {
+  /* Beide Zustände überblenden, während die Hülle sich bewegt.
+     mix-blend-mode: normal verhindert Farbstiche beim Kreuzen. */
+  mix-blend-mode: normal;
+}
+
+/* Der Inhalt der Zielseite blendet etwas später ein als die Hülle
+   wandert — das lässt die Bewegung ruhiger wirken. */
+::view-transition-new(*) {
+  animation-delay: 60ms;
+}
+
+/* ==================================================================
+   VARIANTE 2 — Von unten hereinfahren
+   Wie ein Fenster, das sich über die Seite schiebt (iOS-Gefühl).
+   Zum Aktivieren: Block einkommentieren und Variante 1 auskommentieren.
+   ==================================================================
+
+@keyframes von-unten {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes nach-unten {
+  from { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(100%); opacity: 0; }
+}
+
+::view-transition-new(root) { animation: von-unten var(--dauer-normal) var(--verlauf); }
+::view-transition-old(root) { animation: nach-unten var(--dauer-normal) var(--verlauf); }
+
+*/
+
+/* ==================================================================
+   VARIANTE 3 — Ruhige Kreuzblende
+   Kein Wandern, nur weiches Überblenden. Zurückhaltend und schnell.
+   ==================================================================
+
+::view-transition-group(*) {
+  animation-duration: var(--dauer-schnell);
+}
+::view-transition-old(*) { animation: blende-aus var(--dauer-schnell) var(--verlauf); }
+::view-transition-new(*) { animation: blende-ein var(--dauer-schnell) var(--verlauf); }
+
+@keyframes blende-aus { to   { opacity: 0; } }
+@keyframes blende-ein { from { opacity: 0; } }
+
+*/
+
+/* ==================================================================
+   VARIANTE 4 — Aus der Kachel heraus zoomen
+   Die Zielseite wächst leicht auf, während die Kachel verblasst.
+   ==================================================================
+
+@keyframes zoom-auf {
+  from { transform: scale(0.94); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+::view-transition-new(root) {
+  animation: zoom-auf var(--dauer-normal) var(--verlauf);
+  transform-origin: center;
+}
+::view-transition-old(root) {
+  animation: blende-aus var(--dauer-schnell) var(--verlauf);
+}
+@keyframes blende-aus { to { opacity: 0; } }
+
+*/
+
+/*
+  EINZELNE ELEMENTE ABWEICHEND BEHANDELN
+  ------------------------------------------------------------------
+  Jede Kachel hat einen eigenen Namen (leistung-prophylaxe usw.).
+  Damit lässt sich eine einzelne Leistung anders animieren als die
+  übrigen — etwa langsamer:
+
+    ::view-transition-group(leistung-implantate) {
+      animation-duration: var(--dauer-langsam);
+    }
+
+  ÜBER CSS HINAUS
+  ------------------------------------------------------------------
+  Reicht CSS nicht, greift JavaScript am Übergang an:
+
+    document.addEventListener('astro:before-swap', (e) => {
+      // e.viewTransition.ready  — Übergang steht bereit
+      // e.viewTransition.finished — Übergang ist fertig
+    });
+
+  Darauf ließe sich jede Animationsbibliothek aufsetzen. Bisher nicht
+  nötig — und solange es nicht nötig ist, bleibt es draußen.
+*/

@@ -1,0 +1,76 @@
+---
+/**
+ * Kachel einer Leistung auf der Startseite.
+ *
+ * Der `transition:name` verbindet diese Kachel mit dem gleichnamigen
+ * Element auf der Zielseite. Der Browser morpht dann beim Klick das
+ * eine ins andere — Position, Größe und Form berechnet er selbst.
+ */
+interface Props {
+  id: string;
+  titel: string;
+  kurz: string;
+  icon: string;
+}
+const { id, titel, kurz, icon } = Astro.props;
+---
+
+<a class="kachel" href={`/leistungen/${id}/`} transition:name={`leistung-${id}`}>
+  <img class="kachel__icon" src={icon} alt="" width="64" height="64" />
+  <h3 class="kachel__titel">{titel}</h3>
+  <p class="kachel__kurz">{kurz}</p>
+  <span class="kachel__mehr" aria-hidden="true">Mehr erfahren →</span>
+</a>
+
+<style>
+  .kachel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--abstand-2xs);
+    padding: var(--abstand-m);
+    background: var(--farbe-flaeche);
+    border: 1px solid var(--farbe-linie);
+    border-radius: var(--radius-m);
+    text-decoration: none;
+    color: var(--farbe-text);
+    transition:
+      border-color var(--dauer-schnell) var(--verlauf),
+      transform var(--dauer-schnell) var(--verlauf);
+  }
+
+  .kachel:hover,
+  .kachel:focus-visible {
+    border-color: var(--farbe-primaer);
+    transform: translateY(-2px);
+  }
+
+  .kachel__icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    object-fit: contain;
+  }
+
+  .kachel__titel {
+    margin: 0;
+    font-size: var(--text-l);
+  }
+
+  .kachel__kurz {
+    margin: 0;
+    font-size: var(--text-s);
+    color: var(--farbe-text-gedeckt);
+    /* Anriss auf drei Zeilen begrenzen */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .kachel__mehr {
+    margin-top: auto;
+    padding-top: var(--abstand-2xs);
+    font-size: var(--text-s);
+    font-weight: var(--gewicht-halbfett);
+    color: var(--farbe-primaer);
+  }
+</style>

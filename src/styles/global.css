@@ -78,3 +78,16 @@ img {
   width: min(100% - 2 * var(--abstand-m), var(--breite-inhalt));
   margin-inline: auto;
 }
+
+/*
+  Seitenwechsel-Animation.
+  Wer im Betriebssystem reduzierte Bewegung eingestellt hat, bekommt
+  einen harten Wechsel ohne Übergang.
+*/
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

@@ -3,9 +3,11 @@
  * Seitenrahmen für alle Seiten.
  * Enthält die Metadaten, die Schrifteinbindung und die globalen Stile.
  */
+import { ClientRouter } from 'astro:transitions';
 import seite from '../content/seite.json';
 import '../styles/tokens.css';
 import '../styles/global.css';
+import '../styles/uebergaenge.css';
 
 interface Props {
   titel?: string;
@@ -30,6 +32,14 @@ const { titel = seite.titel, beschreibung = seite.beschreibung } = Astro.props;
 
     <link rel="canonical" href={Astro.url.href} />
     <link rel="sitemap" href="/sitemap-index.xml" />
+
+    {/*
+      Sanfte Seitenwechsel. Nutzt die native View-Transitions-Funktion des
+      Browsers, wo vorhanden (Chrome, Edge, Safari) — dort morphen die
+      Leistungskacheln ins Vollbild. In Firefox greift ein Überblenden.
+      Ohne JavaScript wird schlicht die Seite gewechselt.
+    */}
+    <ClientRouter />
 
     {/* Keine externen Ressourcen — siehe CLAUDE.md. Schriften liegen unter public/fonts/. */}
   </head>
