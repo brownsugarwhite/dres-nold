@@ -24,15 +24,23 @@ const { praxis } = seite;
 <div class="startbereich" data-startbereich>
   <div class="startbereich__mitte">
     <div class="logo">
-      {/* Die Logo-Kontur — Lottie, darunter das statische Bild als Rückfall */}
-      <div class="logo__kontur" data-logo>
-        <img
-          class="logo__bild"
-          src="/icons/logo.svg"
-          alt={praxis.name}
-          width="434"
-          height="295"
-        />
+      {/*
+        Zwei exakt deckungsgleiche Ebenen:
+        unten der bewegte Verlauf, darüber die Lottie-Kontur.
+        Die Kontur ist eine weiße Fläche mit ausgestanzter Schrift —
+        dadurch scheint der Verlauf genau durch die Buchstaben.
+      */}
+      <div class="logo__flaeche">
+        <div class="logo__verlauf" aria-hidden="true"></div>
+        <div class="logo__kontur" data-logo>
+          <img
+            class="logo__bild"
+            src="/icons/logo.svg"
+            alt={praxis.name}
+            width="868"
+            height="590"
+          />
+        </div>
       </div>
     </div>
 
@@ -83,6 +91,7 @@ const { praxis } = seite;
     position: relative;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
     width: 50vh;
     height: 40vh;
@@ -94,11 +103,29 @@ const { praxis } = seite;
     will-change: transform, opacity;
   }
 
-  .logo__kontur {
+  /* Trägt das Seitenverhältnis der Lottie-Grafik (868:590).
+     Nur so deckt die Kontur den Verlauf dahinter vollständig ab —
+     sonst bleiben Ränder frei und der Verlauf schaut hervor. */
+  .logo__flaeche {
     position: relative;
-    z-index: 20;
     width: 100%;
-    height: 100%;
+    aspect-ratio: 868 / 590;
+  }
+
+  .logo__verlauf {
+    position: absolute;
+    /* Etwas eingerückt: Die weißen Flächen der Lottie-Grafik decken den
+       Verlauf ab, reichen an den Rändern aber nicht ganz aus. Ohne die
+       Einrückung schaut oben und unten ein Farbstreifen hervor. */
+    inset: 12% 0 6%;
+    z-index: 10;
+    background: url('/bilder/deko/verlauf.gif') center / cover no-repeat;
+  }
+
+  .logo__kontur {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
   }
 
   .logo__bild {

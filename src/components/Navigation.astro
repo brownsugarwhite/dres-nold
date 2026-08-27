@@ -31,7 +31,10 @@ const punkte = navi.eintraege
   .sort((a, b) => a.position - b.position);
 
 const kopf = punkte.filter((e) => e.in_kopfleiste);
-const fuss = punkte.filter((e) => e.in_fussleiste);
+// Die Symbolleiste unten hat in der Vorlage eine eigene Reihenfolge
+const fuss = punkte
+  .filter((e) => e.in_fussleiste)
+  .sort((a, b) => (a.position_fussleiste ?? 99) - (b.position_fussleiste ?? 99));
 
 const dienste = leistungen.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
 const zahnmedizin = dienste.filter((e) => e.kategorie === 'zahnmedizin');
@@ -124,11 +127,14 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
 
 {/* Symbolleiste am unteren Rand — oben auf der Seite sichtbar */}
 <nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff">
-  {fuss.map((e) => (
-    <a class="fussknopf" href={e.ziel}>
-      <img class="fussknopf__symbol" src={e.icon} alt="" width="32" height="32" />
-      <span class="fussknopf__text">{e.titel}</span>
-    </a>
+  {fuss.map((e, i) => (
+    <>
+      <a class="fussknopf" href={e.ziel}>
+        <img class="fussknopf__symbol" src={e.icon} alt="" width="32" height="32" />
+        <span class="fussknopf__text">{e.titel}</span>
+      </a>
+      {i < fuss.length - 1 && <span class="punkt punkt--fuss" aria-hidden="true"></span>}
+    </>
   ))}
 </nav>
 
@@ -375,6 +381,11 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
   :global(body[data-gescrollt]) .fussleiste { transform: translateY(110px); }
 
   /* ---------- Punkte als Trenner ---------- */
+  .punkt--fuss {
+    align-self: center;
+    margin-bottom: var(--abstand-s);
+  }
+
   .punkt {
     flex: none;
     width: 3px;
