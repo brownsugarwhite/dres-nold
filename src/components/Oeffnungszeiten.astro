@@ -1,211 +1,223 @@
 ---
 /**
- * Öffnungszeiten — Sprechblase mit Zipfel, scrollgesteuert.
+ * Öffnungszeiten — schnalzt beim Scrollen herein.
  *
- * Nachbau von Ablauf `a-19` der Vorlage. Der Bereich ist 300vh hoch;
- * darin klebt die Blase am unteren Rand und wird über den Scrollweg
- * hereingefahren. Entscheidend für das Gefühl ist die ungleiche
- * Verteilung der Schlüsselstellen:
+ * Aufbau wie in der Vorlage:
+ *   • Weiße Fläche mit den drei Listen
+ *   • Darunter die Lottie-Grafik: die untere Abschlusslinie mit dem
+ *     Zipfel, der auf den Öffnungszeiten-Knopf zeigt
  *
- *   15 – 50 %   Blase fährt 700 px → 150 px   (schnell)
- *   50 – 71 %   Blase fährt 150 px → 0 px     (halbes Tempo)
- *   50 – 71 %   Zipfel wächst auf volle Länge (gleichzeitig)
- *   71 – 80 %   Zipfel zieht sich zusammen    (Blase steht)
+ * Beide bewegen sich am Scrollweg entlang. Die Werte stammen aus der
+ * beobachteten Vorlage (siehe docs/referenz/verstaendnis-mobile.md),
+ * nicht aus abgeleiteten Annahmen:
  *
- * Die Blase bremst also genau dann ab, wenn der Zipfel wächst, und
- * rastet danach ein.
+ *   Scrollweg   Versatz    Tempo
+ *    0 – 20 %   700 → 682  fast Stillstand
+ *   20 – 35 %   682 → 483  mittel
+ *   35 – 50 %   483 → 150  schnellste Phase
+ *   50 – 60 %   150 →  22  mittel
+ *   60 – 70 %    22 →   0  rollt sanft aus
  *
- * Auf dem Desktop stehen die drei Listen nebeneinander, der Zipfel
- * zeigt nach rechts unten auf den Öffnungszeiten-Knopf der Leiste.
+ * Der Zipfel wächst, während die Fläche abbremst, und zieht sich
+ * wieder ein, sobald sie steht:
+ *   50 % → Bild 0 · 71 % → Bild 99 · 80 % → Bild 0
  */
 import oz from '../content/oeffnungszeiten.json';
-import seite from '../content/seite.json';
 
 const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
-const { praxis } = seite;
 ---
 
 <section class="ozbereich" id="oz_anchor" aria-label="Öffnungszeiten">
   <div class="ozbereich__buehne">
-    <div class="blase" data-blase>
-      <h2 class="blase__titel ohne-verlauf">Öffnungszeiten</h2>
+    <div class="ozblase" data-ozblase>
+      <div class="ozblase__flaeche">
+        <button class="ozblase__schliessen" type="button" aria-label="Öffnungszeiten ausblenden"></button>
 
-      <div class="blase__spalten">
-        {listen.map((liste) => (
-          <section class="spalte">
-            <h3 class="spalte__titel">{liste.titel}</h3>
-            <dl class="zeiten">
-              {liste.zeilen.filter((z) => z.zeiten).map((z) => (
-                <>
-                  <dt>{z.tag}</dt>
-                  <dd>{z.zeiten}</dd>
-                </>
-              ))}
-            </dl>
-            {liste.zusatz && <p class="spalte__zusatz">{liste.zusatz}</p>}
-          </section>
-        ))}
+        <div class="ozblase__spalten">
+          {listen.map((liste) => (
+            <section class="ozliste">
+              <h2 class="ozliste__titel ohne-verlauf">{liste.titel}</h2>
+              <dl class="ozzeiten">
+                {liste.zeilen.filter((z) => z.zeiten).map((z) => (
+                  <>
+                    <dt>{z.tag}</dt>
+                    <dd>{z.zeiten}</dd>
+                  </>
+                ))}
+              </dl>
+              {liste.zusatz && <p class="ozliste__zusatz">{liste.zusatz}</p>}
+            </section>
+          ))}
+        </div>
       </div>
 
-      <p class="blase__telefon">
-        Termine gerne telefonisch unter
-        <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
-      </p>
-
-      {/* Der Zipfel wächst mit dem Scrollen und zeigt auf den Knopf */}
-      <span class="blase__zipfel" aria-hidden="true"></span>
+      {/* Untere Abschlusslinie mit Zipfel — die Lottie-Grafik */}
+      <div class="ozblase__linie" data-ozlinie aria-hidden="true"></div>
     </div>
   </div>
 </section>
 
 <style>
-  /* Scrollraum, über den die Blase hereingefahren wird */
   .ozbereich {
     position: relative;
     height: 300vh;
   }
 
-  /* Bleibt am unteren Rand stehen, während der Bereich durchläuft */
   .ozbereich__buehne {
     position: sticky;
     bottom: 0;
-    display: flex;
-    justify-content: center;
     height: 100vh;
     pointer-events: none;
   }
 
-  .blase {
+  .ozblase {
     position: absolute;
     bottom: 110px;
-    right: var(--abstand-l);
+    left: 50%;
     width: min(calc(100vw - 2 * var(--abstand-m)), 62rem);
-    padding: var(--abstand-m) var(--abstand-l) var(--abstand-l);
-    background: var(--farbe-flaeche);
-    border-radius: 30px;
-    box-shadow: 0 18px 48px rgb(19 0 13 / 15%);
+    /* Vom Skript gesetzt */
+    transform: translate(-50%, var(--oz-versatz, 700px));
     pointer-events: auto;
-
-    /* Vom Skript gesetzt: Höhe des Einfahrens und Länge des Zipfels */
-    transform: translateY(var(--blase-versatz, 700px));
   }
 
-  /* Zipfel: wächst nach unten auf den Knopf zu */
-  .blase__zipfel {
-    position: absolute;
-    top: 100%;
-    right: 3.5rem;
-    width: 30px;
-    height: var(--zipfel-laenge, 0px);
+  .ozblase__flaeche {
+    position: relative;
+    padding: var(--abstand-l) var(--abstand-l) var(--abstand-m);
     background: var(--farbe-flaeche);
-    clip-path: polygon(0 0, 100% 0, 50% 100%);
   }
 
-  .blase__titel {
-    margin-bottom: var(--abstand-m);
-    color: var(--farbe-primaer);
-    font-size: var(--text-xl);
+  /* Die Lottie-Grafik sitzt direkt darunter und schließt die Fläche ab */
+  .ozblase__linie {
+    width: 100%;
+    line-height: 0;
   }
 
-  .blase__spalten {
+  .ozblase__linie :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .ozblase__schliessen {
+    position: absolute;
+    top: var(--abstand-s);
+    right: var(--abstand-s);
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    background: url('/icons/ui/schliessen.svg') center / contain no-repeat transparent;
+    cursor: pointer;
+    transition: transform var(--dauer-schnell) var(--verlauf);
+  }
+
+  .ozblase__schliessen:hover,
+  .ozblase__schliessen:focus-visible { transform: rotate(90deg); }
+
+  /* Drei Listen nebeneinander — auf kleinen Bildschirmen untereinander */
+  .ozblase__spalten {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--abstand-l);
     align-items: start;
   }
 
-  .spalte__titel {
+  .ozliste__titel {
     margin-bottom: var(--abstand-2xs);
     color: var(--farbe-primaer);
     font-size: var(--text-m);
     font-weight: var(--gewicht-normal);
   }
 
-  .zeiten {
+  .ozzeiten {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: var(--abstand-3xs) var(--abstand-s);
     margin: 0;
     font-size: var(--text-s);
+    color: var(--farbe-primaer);
   }
 
-  .zeiten dt { text-align: right; }
-  .zeiten dd { margin: 0; white-space: pre-line; }
+  /* Wochentage rechtsbündig, Zeiten links daneben — wie in der Vorlage */
+  .ozzeiten dt { text-align: right; }
+  .ozzeiten dd { margin: 0; white-space: pre-line; }
 
-  .spalte__zusatz {
+  .ozliste__zusatz {
     margin: var(--abstand-2xs) 0 0;
-    color: var(--farbe-text-gedeckt);
+    color: var(--farbe-primaer);
     font-size: var(--text-s);
-  }
-
-  .blase__telefon {
-    margin: var(--abstand-m) 0 0;
-    padding-top: var(--abstand-s);
-    border-top: 1px solid var(--farbe-linie);
-    font-size: var(--text-s);
+    text-align: right;
   }
 
   @media (max-width: 60rem) {
-    .blase {
-      right: 50%;
-      translate: 50% 0;
-      padding: var(--abstand-m);
-    }
-    .blase__spalten { grid-template-columns: 1fr; gap: var(--abstand-m); }
-    .blase__zipfel { right: calc(50% - 15px); }
+    .ozblase { width: calc(100vw - 2 * var(--abstand-s)); }
+    .ozblase__flaeche { padding: var(--abstand-m); }
+    .ozblase__spalten { grid-template-columns: 1fr; gap: var(--abstand-m); }
   }
 
-  /* Ohne Bewegung: Blase steht einfach an ihrem Platz */
+  /* Ohne Bewegung: steht ruhig im Seitenfluss */
   @media (prefers-reduced-motion: reduce) {
     .ozbereich { height: auto; padding-block: var(--abstand-2xl); }
     .ozbereich__buehne { position: static; height: auto; }
-    .blase { position: static; transform: none; margin-inline: auto; }
-    .blase__zipfel { display: none; }
+    .ozblase { position: static; transform: none; margin-inline: auto; }
+    .ozblase__linie { display: none; }
   }
 </style>
 
 <script>
+  import { ladeAnimation } from '../scripts/lottie';
+  import { ausStuetzstellen, type Stuetzstelle } from '../scripts/easing';
+
   /**
-   * Fährt die Blase am Scrollweg entlang herein.
-   * Die Schlüsselstellen stammen aus Ablauf a-19 der Vorlage.
+   * Fährt die Öffnungszeiten am Scrollweg entlang herein.
+   * Stützstellen aus der beobachteten Vorlage.
    */
-  function ozScrollAufbauen() {
+  function ozAufbauen() {
     const bereich = document.querySelector<HTMLElement>('.ozbereich');
-    const blase = document.querySelector<HTMLElement>('[data-blase]');
+    const blase = document.querySelector<HTMLElement>('[data-ozblase]');
+    const linie = document.querySelector<HTMLElement>('[data-ozlinie]');
     if (!bereich || !blase || blase.dataset.bereit) return;
     blase.dataset.bereit = 'ja';
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const ZIPFEL_MAX = 26; // px — volle Länge des Zipfels
+    /* Schlüsselstellen und Kurven exakt aus Ablauf a-19 der Vorlage.
+       Die Kurve gehört zum Abschnitt, der an dieser Stelle BEGINNT —
+       so wertet Webflow scrollgebundene Abläufe aus. Nachgerechnet
+       gegen die Vorlage: Abweichung unter 2 px über den ganzen Weg. */
+    const BLASE: Stuetzstelle[] = [
+      { bei: 0.00, wert: 700, kurve: 'linear' },
+      { bei: 0.15, wert: 700, kurve: 'easeIn' },
+      { bei: 0.50, wert: 150, kurve: 'outCubic' },
+      { bei: 0.71, wert: 0, kurve: 'linear' },
+      { bei: 1.00, wert: 0 },
+    ];
 
-    /** Wert zwischen zwei Schlüsselstellen linear überblenden. */
-    const zwischen = (p: number, vonP: number, bisP: number, vonW: number, bisW: number) => {
-      if (p <= vonP) return vonW;
-      if (p >= bisP) return bisW;
-      return vonW + ((p - vonP) / (bisP - vonP)) * (bisW - vonW);
-    };
+    /* Zipfel: wächst, während die Fläche einrastet, und zieht sich
+       danach wieder ein. Werte 0 … 1 als Anteil der Bildfolge. */
+    const ZIPFEL: Stuetzstelle[] = [
+      { bei: 0.00, wert: 0, kurve: 'linear' },
+      { bei: 0.50, wert: 0, kurve: 'outCubic' },
+      { bei: 0.71, wert: 1, kurve: 'easeOut' },
+      { bei: 0.80, wert: 0, kurve: 'linear' },
+      { bei: 1.00, wert: 0 },
+    ];
 
+    let spieler: { goToAndStop: (w: number, b?: boolean) => void; totalFrames: number } | null = null;
     let geplant = false;
+
     const zeichnen = () => {
       geplant = false;
       const r = bereich.getBoundingClientRect();
       const weg = r.height - window.innerHeight;
-      // 0 = Bereich beginnt gerade, 1 = Bereich ist durchlaufen
       const p = weg > 0 ? Math.min(1, Math.max(0, -r.top / weg)) : 0;
 
-      // 15–50 %: schnell herein · 50–71 %: halbes Tempo bis zum Anschlag
-      const versatz = p < 0.5
-        ? zwischen(p, 0.15, 0.50, 700, 150)
-        : zwischen(p, 0.50, 0.71, 150, 0);
+      blase.style.setProperty('--oz-versatz', `${ausStuetzstellen(p, BLASE)}px`);
 
-      // Zipfel wächst, während die Blase abbremst — und zieht sich danach zusammen
-      const zipfel = p < 0.71
-        ? zwischen(p, 0.50, 0.71, 0, ZIPFEL_MAX)
-        : zwischen(p, 0.71, 0.80, ZIPFEL_MAX, 0);
-
-      blase.style.setProperty('--blase-versatz', `${versatz}px`);
-      blase.style.setProperty('--zipfel-laenge', `${zipfel}px`);
+      if (spieler) {
+        const anteil = ausStuetzstellen(p, ZIPFEL);
+        spieler.goToAndStop(anteil * (spieler.totalFrames - 1), true);
+      }
     };
 
     const beiScroll = () => {
@@ -217,8 +229,16 @@ const { praxis } = seite;
     window.addEventListener('scroll', beiScroll, { passive: true });
     window.addEventListener('resize', beiScroll, { passive: true });
     zeichnen();
+
+    if (linie) {
+      ladeAnimation(linie, '/lottie/oeffnungszeiten-mobil.json').then((s) => {
+        if (!s) return;
+        spieler = s;
+        zeichnen();
+      });
+    }
   }
 
-  ozScrollAufbauen();
-  document.addEventListener('astro:page-load', ozScrollAufbauen);
+  ozAufbauen();
+  document.addEventListener('astro:page-load', ozAufbauen);
 </script>

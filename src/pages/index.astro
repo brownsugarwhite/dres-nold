@@ -35,6 +35,8 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 
   <Navigation />
 
+  <Oeffnungszeiten />
+
   <main id="inhalt" class="seiteninhalt">
     <section class="inhalt kopf">
       <h1>{praxis.name}</h1>
@@ -80,7 +82,6 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
       </p>
     </section>
 
-    <Oeffnungszeiten />
 
     <section class="inhalt abschnitt" hidden>
       <h2>Öffnungszeiten</h2>
