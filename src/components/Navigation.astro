@@ -127,13 +127,13 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
 
 {/* Symbolleiste am unteren Rand — oben auf der Seite sichtbar */}
 <nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff">
-  {fuss.map((e, i) => (
+  {fuss.map((e) => (
     <>
-      <a class="fussknopf" href={e.ziel}>
+      <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
         <img class="fussknopf__symbol" src={e.icon} alt="" width="32" height="32" />
         <span class="fussknopf__text">{e.titel}</span>
       </a>
-      {i < fuss.length - 1 && <span class="punkt punkt--fuss" aria-hidden="true"></span>}
+      <span class="punkt punkt--fuss" data-nach={e.id} aria-hidden="true"></span>
     </>
   ))}
 </nav>
@@ -384,6 +384,17 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
   .punkt--fuss {
     align-self: center;
     margin-bottom: var(--abstand-s);
+  }
+
+  /* Der Punkt hinter dem jeweils letzten Knopf entfällt.
+     Auf kleinen Bildschirmen ist das „Team", auf dem Desktop
+     wandert „Öffnungszeiten" ans rechte Ende. */
+  .punkt--fuss[data-nach='team'] { display: none; }
+
+  @media (min-width: 60rem) {
+    .fussknopf[data-punkt='zeiten'] { order: 10; }
+    .punkt--fuss[data-nach='zeiten'] { display: none; }
+    .punkt--fuss[data-nach='team'] { display: block; order: 9; }
   }
 
   .punkt {
