@@ -1,0 +1,190 @@
+---
+/**
+ * Öffnungszeiten-Panel.
+ *
+ * Fährt von links herein, wenn in einer der Leisten auf
+ * „Öffnungszeiten" geklickt wird — nach den Abläufen `OZ desktop in`
+ * (a-32) und `OZ desktop close` (a-33): 700 ms, outCubic hinein,
+ * inCubic hinaus.
+ *
+ * Zweispaltig: links die Wochentage, rechts die Zeiten. Ein Tag ohne
+ * Zeiten wird ausgelassen.
+ */
+import oz from '../content/oeffnungszeiten.json';
+import seite from '../content/seite.json';
+
+const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
+const { praxis } = seite;
+---
+
+<div class="oeffnungszeiten" data-oeffnungszeiten hidden>
+  <div class="oz-panel" role="dialog" aria-modal="true" aria-labelledby="oz-titel">
+    <button class="oz-schliessen" type="button" aria-label="Öffnungszeiten schließen"></button>
+
+    <h2 class="oz-titel ohne-verlauf" id="oz-titel">Öffnungszeiten</h2>
+
+    {listen.map((liste) => (
+      <section class="oz-liste">
+        <h3 class="oz-liste__titel">{liste.titel}</h3>
+        <dl class="oz-zeiten">
+          {liste.zeilen
+            .filter((z) => z.zeiten)
+            .map((z) => (
+              <>
+                <dt>{z.tag}</dt>
+                <dd>{z.zeiten}</dd>
+              </>
+            ))}
+        </dl>
+        {liste.zusatz && <p class="oz-zusatz">{liste.zusatz}</p>}
+      </section>
+    ))}
+
+    <p class="oz-telefon">
+      Termine gerne telefonisch unter
+      <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
+    </p>
+  </div>
+</div>
+
+<style>
+  .oeffnungszeiten {
+    position: fixed;
+    inset: 0;
+    z-index: var(--ebene-hinweis);
+    display: flex;
+    align-items: center;
+    background: rgb(19 0 13 / 40%);
+  }
+
+  .oeffnungszeiten[hidden] { display: none; }
+
+  .oz-panel {
+    position: relative;
+    width: min(100%, 600px);
+    max-height: 100vh;
+    padding: var(--abstand-l) var(--abstand-l) var(--abstand-m);
+    overflow-y: auto;
+    background: var(--farbe-flaeche) url('/icons/ui/box-oeffnungszeiten.svg') center / cover no-repeat;
+    /* Fährt von links herein — Werte aus a-32 / a-33 */
+    transform: translateX(-100vw);
+    transition: transform 700ms cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  .oeffnungszeiten[data-offen] .oz-panel {
+    transform: translateX(0);
+  }
+
+  .oz-schliessen {
+    position: absolute;
+    top: var(--abstand-m);
+    right: var(--abstand-m);
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    background: url('/icons/ui/schliessen.svg') center / contain no-repeat transparent;
+    cursor: pointer;
+    transition: transform var(--dauer-schnell) var(--verlauf);
+  }
+
+  .oz-schliessen:hover,
+  .oz-schliessen:focus-visible { transform: rotate(90deg); }
+
+  .oz-titel {
+    margin-bottom: var(--abstand-m);
+    padding-right: var(--abstand-l);
+    color: var(--farbe-primaer);
+  }
+
+  .oz-liste { margin-bottom: var(--abstand-m); }
+
+  .oz-liste__titel {
+    margin-bottom: var(--abstand-2xs);
+    font-size: var(--text-m);
+    color: var(--farbe-primaer);
+  }
+
+  .oz-zeiten {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--abstand-3xs) var(--abstand-m);
+    margin: 0;
+  }
+
+  .oz-zeiten dt { font-weight: var(--gewicht-normal); }
+  .oz-zeiten dd { margin: 0; white-space: pre; }
+
+  .oz-zusatz {
+    margin: var(--abstand-2xs) 0 0;
+    color: var(--farbe-text-gedeckt);
+    font-size: var(--text-s);
+  }
+
+  .oz-telefon {
+    margin: var(--abstand-m) 0 0;
+    padding-top: var(--abstand-s);
+    border-top: 1px solid var(--farbe-linie);
+    font-size: var(--text-s);
+  }
+
+  @media (max-width: 40rem) {
+    .oz-panel { padding: var(--abstand-m); }
+    .oz-zeiten { grid-template-columns: 1fr; gap: 0; }
+    .oz-zeiten dd { margin-bottom: var(--abstand-2xs); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .oz-panel { transition: none; }
+  }
+</style>
+
+<script>
+  /**
+   * Öffnet und schließt das Öffnungszeiten-Panel.
+   * Ausgelöst von jedem Link, der auf #oz_anchor zeigt.
+   */
+  function oeffnungszeitenAufbauen() {
+    const kasten = document.querySelector<HTMLElement>('[data-oeffnungszeiten]');
+    if (!kasten || kasten.dataset.bereit) return;
+    kasten.dataset.bereit = 'ja';
+
+    let zuletztFokussiert: HTMLElement | null = null;
+
+    const oeffnen = () => {
+      zuletztFokussiert = document.activeElement as HTMLElement | null;
+      kasten.hidden = false;
+      // Zwei Bilder abwarten: Erst muss der Browser den Ausgangszustand
+      // gezeichnet haben, sonst springt das Panel ohne Bewegung herein.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          kasten.dataset.offen = 'ja';
+          kasten.querySelector<HTMLButtonElement>('.oz-schliessen')?.focus();
+        });
+      });
+    };
+
+    const schliessen = () => {
+      delete kasten.dataset.offen;
+      const fertig = () => { kasten.hidden = true; };
+      // Nach dem Hinausfahren ausblenden
+      const dauer = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700;
+      window.setTimeout(fertig, dauer);
+      zuletztFokussiert?.focus();
+    };
+
+    // Jeder Verweis auf #oz_anchor öffnet das Panel
+    document.querySelectorAll<HTMLAnchorElement>('a[href$="#oz_anchor"]').forEach((a) => {
+      a.addEventListener('click', (e) => { e.preventDefault(); oeffnen(); });
+    });
+
+    kasten.querySelector('.oz-schliessen')?.addEventListener('click', schliessen);
+    kasten.addEventListener('click', (e) => { if (e.target === kasten) schliessen(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !kasten.hidden) schliessen();
+    });
+  }
+
+  oeffnungszeitenAufbauen();
+  document.addEventListener('astro:page-load', oeffnungszeitenAufbauen);
+</script>

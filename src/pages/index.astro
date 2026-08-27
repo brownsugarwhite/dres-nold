@@ -7,6 +7,7 @@
  * zeigen. Siehe CLAUDE.md.
  */
 import Startbereich from '../components/Startbereich.astro';
+import Oeffnungszeiten from '../components/Oeffnungszeiten.astro';
 import Navigation from '../components/Navigation.astro';
 import Basis from '../layouts/Basis.astro';
 import Hinweis from '../components/Hinweis.astro';
@@ -33,6 +34,7 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
   <Startbereich />
 
   <Navigation />
+  <Oeffnungszeiten />
 
   <main id="inhalt" class="seiteninhalt">
     <section class="inhalt kopf">

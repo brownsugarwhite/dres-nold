@@ -1,25 +1,69 @@
 {
-  "_hinweis_fuer_die_redaktion": "Drei getrennte Listen. Jede Zeile besteht aus einer Bezeichnung (meist der Tag) und den zugehörigen Zeiten.",
+  "_hinweis_fuer_die_redaktion": "Drei Listen mit den Sprechzeiten. Jede Zeile ist ein Wochentag mit seinen Zeiten; mehrere Zeitspannen an einem Tag durch drei Leerzeichen trennen. Ein Tag ohne Zeiten wird ausgeblendet. \"zusatz\" erscheint als Fußnote unter der Liste — leer lassen, wenn nicht gebraucht.",
   "zahnaerztlich": {
     "titel": "Zahnärztliche Sprechstunde",
     "zeilen": [
-      { "tag": "Montag, Dienstag, Donnerstag", "zeiten": "8:00 – 12:00 Uhr und 14:00 – 18:00 Uhr" },
-      { "tag": "Mittwoch", "zeiten": "8:00 – 12:00 Uhr" },
-      { "tag": "Freitag", "zeiten": "8:00 – 13:00 Uhr" }
-    ]
+      {
+        "tag": "Montag",
+        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+      },
+      {
+        "tag": "Dienstag",
+        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+      },
+      {
+        "tag": "Mittwoch",
+        "zeiten": "8.00 - 12.00 Uhr"
+      },
+      {
+        "tag": "Donnerstag",
+        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+      },
+      {
+        "tag": "Freitag",
+        "zeiten": "8.00 - 13.00 Uhr"
+      }
+    ],
+    "zusatz": "...und nach Vereinbarung"
   },
   "kieferorthopaedisch": {
     "titel": "Kieferorthopädische Sprechstunde",
     "zeilen": [
-      { "tag": "Montag", "zeiten": "14:00 – 18:00 Uhr" },
-      { "tag": "Dienstag", "zeiten": "13:00 – 16:00 Uhr" }
-    ]
+      {
+        "tag": "Mittwoch",
+        "zeiten": "14.00 - 18.00 Uhr"
+      },
+      {
+        "tag": "Freitag",
+        "zeiten": "13.00 - 16.00 Uhr"
+      }
+    ],
+    "zusatz": "...und nach Vereinbarung"
   },
   "telefonisch": {
     "titel": "Telefonische Erreichbarkeit",
     "zeilen": [
-      { "tag": "Montag bis Donnerstag", "zeiten": "8:00 – 12:00 Uhr und 14:00 – 18:00 Uhr" },
-      { "tag": "Freitag", "zeiten": "8:00 – 11:00 Uhr und 13:00 – 16:00 Uhr" }
-    ]
+      {
+        "tag": "Montag",
+        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+      },
+      {
+        "tag": "Dienstag",
+        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+      },
+      {
+        "tag": "Mittwoch",
+        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+      },
+      {
+        "tag": "Donnerstag",
+        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+      },
+      {
+        "tag": "Freitag",
+        "zeiten": "8.00 - 11.00 Uhr   13.00 - 16.00 Uhr"
+      }
+    ],
+    "zusatz": ""
   }
 }
