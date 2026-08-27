@@ -1,12 +1,13 @@
 {
-  "_hinweis_fuer_die_redaktion": "Die Menüpunkte. \"ziel\" beginnend mit # springt auf der Startseite, sonst normale Adresse. Der Punkt Leistungen klappt automatisch die Leistungen aus leistungen.json auf — dort gepflegte Einträge erscheinen hier von selbst.",
+  "_hinweis_fuer_die_redaktion": "Die Menüpunkte. \"ziel\" beginnend mit # springt auf der Startseite, sonst normale Adresse. Der Punkt Leistungen klappt automatisch die Leistungen aus leistungen.json auf — dort gepflegte Einträge erscheinen hier von selbst. Die Symbole liegen unter public/icons/navigation/.",
   "eintraege": [
     {
       "id": "praxis",
       "aktiv": true,
       "position": 1,
       "titel": "Praxis",
-      "ziel": "#praxis"
+      "ziel": "#praxis",
+      "icon": "/icons/navigation/praxis.svg"
     },
     {
       "id": "leistungen",
@@ -14,35 +15,40 @@
       "position": 2,
       "titel": "Leistungen",
       "ziel": "#leistungen",
-      "aufklappen": "leistungen"
+      "aufklappen": "leistungen",
+      "icon": "/icons/navigation/leistungen.svg"
     },
     {
       "id": "team",
       "aktiv": true,
       "position": 3,
       "titel": "Team",
-      "ziel": "#team"
+      "ziel": "#team",
+      "icon": "/icons/navigation/team.svg"
     },
     {
       "id": "neuigkeiten",
       "aktiv": true,
       "position": 4,
       "titel": "Neuigkeiten",
-      "ziel": "#neuigkeiten"
+      "ziel": "#neuigkeiten",
+      "icon": "/icons/navigation/neuigkeiten.svg"
     },
     {
       "id": "kontakt",
       "aktiv": true,
       "position": 5,
       "titel": "Kontakt",
-      "ziel": "#contact"
+      "ziel": "#contact",
+      "icon": "/icons/navigation/kontakt.svg"
     },
     {
       "id": "zeiten",
       "aktiv": true,
       "position": 6,
       "titel": "Öffnungszeiten",
-      "ziel": "#oz_anchor"
+      "ziel": "#oz_anchor",
+      "icon": "/icons/navigation/oeffnungszeiten.svg"
     }
   ]
 }
