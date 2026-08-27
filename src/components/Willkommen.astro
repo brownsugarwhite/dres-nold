@@ -1,0 +1,32 @@
+---
+/**
+ * Begrüßung zwischen Öffnungszeiten und Galerie.
+ * Trägt wie alle Überschriften im Inhalt den bewegten Verlauf.
+ */
+import seite from '../content/seite.json';
+const { praxis } = seite;
+---
+
+<section class="willkommen" id="praxis">
+  <h1 class="willkommen__titel">
+    Willkommen in unserer<br />Praxis {praxis.name.replace('Dres. Nold – Zahnarztpraxis und Kieferorthopädie', 'Dres. Nold')}
+  </h1>
+</section>
+
+<style>
+  .willkommen {
+    display: flex;
+    justify-content: center;
+    padding-block: var(--abstand-2xl) var(--abstand-xl);
+    background: var(--farbe-flaeche);
+  }
+
+  .willkommen__titel {
+    max-width: 1000px;
+    margin: 0;
+    font-size: clamp(2rem, 1.2rem + 3.4vw, 3.75rem);
+    font-weight: var(--gewicht-halbfett);
+    line-height: 100%;
+    text-align: center;
+  }
+</style>

@@ -1,0 +1,81 @@
+---
+/**
+ * Praxisbilder als endlos gleitendes Band.
+ *
+ * Die Vorlage nutzt Swiper mit `autoplay.delay: 1` und `speed: 5000` —
+ * also keinen klickbaren Slider, sondern ein ruhig durchlaufendes Band.
+ * Hier mit einer CSS-Animation nachgebaut: kein Framework, kein
+ * JavaScript, gleiche Wirkung.
+ *
+ * Die Bilder werden doppelt ausgegeben, damit der Übergang nahtlos ist.
+ */
+import galerie from '../content/galerie.json';
+
+const bilder = galerie.eintraege
+  .filter((e) => e.aktiv)
+  .sort((a, b) => a.position - b.position);
+---
+
+{bilder.length > 0 && (
+  <section class="galerie" id="galerie" aria-label="Einblicke in unsere Praxis">
+    <div class="galerie__band">
+      {[...bilder, ...bilder].map((b, i) => (
+        <figure class="galerie__bild">
+          <img
+            src={b.bild}
+            alt={i < bilder.length ? b.alt : ''}
+            aria-hidden={i >= bilder.length ? 'true' : undefined}
+            loading="lazy"
+            width="1323"
+            height="1050"
+          />
+        </figure>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .galerie {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .galerie__band {
+    display: flex;
+    width: max-content;
+    /* Ruhig durchlaufend — die Dauer ergibt sich aus der Bildanzahl,
+       damit das Tempo unabhängig davon gleich bleibt. */
+    animation: galerie-lauf 60s linear infinite;
+  }
+
+  .galerie__bild {
+    flex: none;
+    width: min(38vw, 30rem);
+    margin: 0;
+  }
+
+  .galerie__bild img {
+    display: block;
+    width: 100%;
+    height: min(38vw, 30rem);
+    object-fit: cover;
+  }
+
+  /* Das Band ist doppelt bestückt — nach der halben Strecke
+     sieht es wieder aus wie am Anfang. */
+  @keyframes galerie-lauf {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .galerie:hover .galerie__band,
+  .galerie:focus-within .galerie__band {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .galerie__band { animation: none; }
+    .galerie { overflow-x: auto; }
+  }
+</style>

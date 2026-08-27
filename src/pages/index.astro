@@ -8,6 +8,8 @@
  */
 import Startbereich from '../components/Startbereich.astro';
 import Oeffnungszeiten from '../components/Oeffnungszeiten.astro';
+import Willkommen from '../components/Willkommen.astro';
+import Galerie from '../components/Galerie.astro';
 import Navigation from '../components/Navigation.astro';
 import Basis from '../layouts/Basis.astro';
 import Hinweis from '../components/Hinweis.astro';
@@ -38,13 +40,9 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
   <Oeffnungszeiten />
 
   <main id="inhalt" class="seiteninhalt">
-    <section class="inhalt kopf">
-      <h1>{praxis.name}</h1>
-      <p class="kopf__adresse">
-        {praxis.strasse} · {praxis.plz} {praxis.ort} ·
-        <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
-      </p>
-    </section>
+    <Willkommen />
+    <Galerie />
+
 
     <section id="leistungen" class="inhalt abschnitt">
       <h2>Unsere Leistungen</h2>
@@ -100,10 +98,6 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
       ))}
     </section>
 
-    <p class="inhalt notiz">
-      Prototyp-Ansicht. Sie zeigt den Seitenwechsel zu den Leistungen —
-      die Gestaltung nach Vorlage folgt in Phase 2.
-    </p>
   </main>
 </Basis>
 
@@ -115,13 +109,7 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
     background: var(--farbe-flaeche);
   }
 
-  .kopf {
-    padding-block: var(--abstand-xl) var(--abstand-l);
-  }
 
-  .kopf__adresse {
-    color: var(--farbe-text-gedeckt);
-  }
 
   .abschnitt {
     padding-block: var(--abstand-l);
