@@ -5,6 +5,7 @@
  */
 import { ClientRouter } from 'astro:transitions';
 import seite from '../content/seite.json';
+import '../styles/schrift.css';
 import '../styles/tokens.css';
 import '../styles/global.css';
 import '../styles/uebergaenge.css';
@@ -29,6 +30,8 @@ const { titel = seite.titel, beschreibung = seite.beschreibung } = Astro.props;
     <meta property="og:description" content={beschreibung} />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preload" href="/fonts/source-sans-3-normal.woff2" as="font" type="font/woff2" crossorigin />
 
     <link rel="canonical" href={Astro.url.href} />
     <link rel="sitemap" href="/sitemap-index.xml" />
