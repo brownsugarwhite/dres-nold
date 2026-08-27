@@ -1,9 +1,11 @@
 {
-  "_hinweis_fuer_die_redaktion": "Notfall- und Vertretungshinweis. Erscheint automatisch im Zeitraum zwischen 'von' und 'bis' und verschwindet danach von selbst. Zum sofortigen Ausblenden 'aktiv' auf false setzen.",
-  "aktiv": false,
-  "titel": "Urlaubsvertretung",
-  "text": "Unsere Praxis ist vom 17. August bis 4. September 2026 geschlossen. Die Vertretungspraxis erreichen Sie über unseren Anrufbeantworter.",
+  "_hinweis_fuer_die_redaktion": "Hinweis-Sprechblase, die sich beim Öffnen der Seite meldet — für Urlaub, Vertretung oder Notfälle. Erscheint automatisch zwischen 'von' und 'bis' und verschwindet danach von selbst. Zum sofortigen Ausblenden 'aktiv' auf false setzen. Im Text sind Absätze, Aufzählungen und Hervorhebungen möglich. Der Knopf 'mehr erfahren' erscheint nur, wenn ein Ziel eingetragen ist.",
+  "aktiv": true,
+  "titel": "Urlaub",
+  "text": "<p>Liebe Patienten,</p><p>unsere Praxis ist vom 17. August bis einschließlich 04. September 2026 geschlossen!</p><p>Über unsere Anrufbeantworteransage können Sie die jeweils zuständige Vertretungspraxis erfahren.</p><p>Wir wünschen Ihnen eine schöne Sommerzeit!</p><p>Ihre Praxis Dres. Nold</p>",
   "von": "2026-08-17",
   "bis": "2026-09-04",
-  "stufe": "hinweis"
+  "mehr_erfahren_text": "",
+  "mehr_erfahren_ziel": "",
+  "einmal_pro_besuch": true
 }

@@ -92,7 +92,7 @@ Alle Inhalte liegen als JSON unter `src/content/`. Jede Datei entspricht einem B
 
 | Datei | Inhalt | Besonderheit |
 |---|---|---|
-| `hinweis.json` | Notfall-/Vertretungshinweis | Zeitgesteuert: `von`/`bis` — erscheint und verschwindet automatisch |
+| `hinweis.json` | Hinweis-Sprechblase (Urlaub, Vertretung, Notfall) | Zeitgesteuert über `von`/`bis` — erscheint und verschwindet automatisch |
 | `oeffnungszeiten.json` | 3 Listen: zahnärztlich, kieferorthopädisch, telefonisch | |
 | `leistungen.json` | 11 Leistungen mit Icon, Titel, Kurztext, Rich-Text | Kategorie `zahnmedizin` oder `kieferorthopaedie`; `id` = Adresse, **unveränderlich** |
 | `neuigkeiten.json` | Beiträge mit Datum, Bild, Text, PDF-Anhängen | `id` = Adresse; Text erlaubt Absätze, Aufzählungen, Tabellen |
@@ -198,6 +198,22 @@ Damit funktioniert der Übergang praktisch überall. Ein Zusatz-Fallback ist nic
 - Die Zielseite muss vollständig und sinnvoll sein, auch wenn sie direkt aufgerufen wird
 - Die Übergänge selbst stehen in `src/styles/uebergaenge.css` und sind frei anpassbar
 
+
+---
+
+## Die Hinweis-Sprechblase
+
+Nachbau des Info-Popups der Webflow-Seite und die wichtigste Funktion für die Praxis: weiße Sprechblase mit Zipfel, daneben das News-Symbol in Weiß, über abgedunkeltem Hintergrund (`#13000d99`).
+
+**Verhalten:**
+- Erscheint beim Öffnen der Seite, sofern `aktiv` gesetzt ist **und** das heutige Datum zwischen `von` und `bis` liegt
+- Ein Urlaubshinweis verschwindet dadurch von selbst — niemand muss daran denken
+- Wurde sie weggeklickt, bleibt sie für diesen Besuch fort (nur im Browser des Besuchers vermerkt, nichts wird übertragen)
+- Ändert sich Titel oder Zeitraum, meldet sie sich erneut
+- Schließen per Knopf, Klick auf den Hintergrund oder Escape-Taste; das Schließkreuz dreht sich beim Zeigen (aus `a-34`/`a-35`)
+- Optional ein runder „mehr erfahren"-Knopf, wenn ein Ziel eingetragen ist
+
+**Wichtig:** Die Auswertung geschieht beim Erzeugen der Seite. Damit sie am Stichtag umschaltet, muss Cloudflare Pages die Seite einmal täglich neu bauen — in Phase 8 als automatische Aufgabe einzurichten.
 
 ---
 

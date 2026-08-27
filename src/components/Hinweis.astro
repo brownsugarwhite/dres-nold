@@ -1,52 +1,222 @@
 ---
 /**
- * Notfall- und Vertretungshinweis.
+ * Hinweis-Sprechblase für Urlaub, Vertretung oder Notfälle.
  *
- * Zeigt den Hinweis nur, wenn er aktiv geschaltet ist UND das heutige
- * Datum im eingetragenen Zeitraum liegt. Dadurch verschwindet ein
- * Urlaubshinweis von selbst, ohne dass jemand daran denken muss.
+ * Nachbau des Info-Popups der Webflow-Seite: weiße Sprechblase mit
+ * Zipfel, daneben das News-Symbol, über einem abgedunkelten Hintergrund.
  *
- * Die Auswertung geschieht beim Erzeugen der Seite. Damit die Seite
- * am Stichtag umschaltet, baut Cloudflare Pages sie einmal täglich neu.
+ * Sichtbar nur, wenn der Hinweis aktiv geschaltet ist UND das heutige
+ * Datum im eingetragenen Zeitraum liegt. Ein Urlaubshinweis verschwindet
+ * dadurch von selbst — niemand muss daran denken.
+ *
+ * Maße und Farben stammen aus der Vorlage (siehe docs/referenz/).
  */
 import daten from '../content/hinweis.json';
 
-function istSichtbar() {
-  if (!daten.aktiv) return false;
+const heute = new Date().toISOString().slice(0, 10);
+const sichtbar =
+  daten.aktiv &&
+  (!daten.von || heute >= daten.von) &&
+  (!daten.bis || heute <= daten.bis);
 
-  const heute = new Date().toISOString().slice(0, 10);
-  if (daten.von && heute < daten.von) return false;
-  if (daten.bis && heute > daten.bis) return false;
-
-  return true;
-}
-
-const sichtbar = istSichtbar();
+// Kennung des Hinweises: ändert sich der Text, meldet sich die Blase erneut
+const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
 ---
 
 {sichtbar && (
-  <section id="information" class="hinweis" role="region" aria-labelledby="hinweis-titel">
-    <div class="inhalt hinweis__innen">
-      <h2 id="hinweis-titel" class="hinweis__titel">{daten.titel}</h2>
-      <p class="hinweis__text">{daten.text}</p>
+  <div
+    class="hinweis"
+    id="information"
+    data-kennung={kennung}
+    data-einmalig={daten.einmal_pro_besuch ? 'ja' : 'nein'}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="hinweis-titel"
+    hidden
+  >
+    <div class="hinweis__blase-umgebung">
+      <img class="hinweis__symbol" src="/icons/navigation/neuigkeiten.svg" alt="" width="80" height="80" />
+      <img class="hinweis__zipfel" src="/icons/ui/sprechblase-zipfel.png" alt="" width="30" height="100" />
+
+      <div class="hinweis__blase">
+        <button class="hinweis__schliessen" type="button" aria-label="Hinweis schließen"></button>
+        <h2 class="hinweis__titel" id="hinweis-titel">{daten.titel}</h2>
+        <div class="hinweis__text" set:html={daten.text} />
+
+        {daten.mehr_erfahren_ziel && (
+          <div class="hinweis__mehr">
+            <a class="hinweis__knopf" href={daten.mehr_erfahren_ziel}>
+              {daten.mehr_erfahren_text || 'mehr erfahren'}
+            </a>
+          </div>
+        )}
+      </div>
     </div>
-  </section>
+  </div>
 )}
 
 <style>
   .hinweis {
-    background: var(--farbe-primaer);
-    color: var(--farbe-text-invers);
-    padding-block: var(--abstand-m);
+    position: fixed;
+    inset: 0;
+    z-index: var(--ebene-hinweis);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Aubergine, stark abgedunkelt — Wert aus der Vorlage */
+    background-color: #13000d99;
+    padding: var(--abstand-m);
+  }
+
+  .hinweis[hidden] { display: none; }
+
+  .hinweis__blase-umgebung {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    max-width: var(--breite-inhalt);
+    padding-inline: var(--abstand-l);
+  }
+
+  .hinweis__symbol {
+    flex: none;
+    width: 5rem;
+    height: 5rem;
+    /* Symbol weiß einfärben — wie in der Vorlage */
+    filter: brightness(0) invert(1);
+  }
+
+  .hinweis__zipfel {
+    flex: none;
+    width: 30px;
+    height: 100px;
+    margin-left: 5px;
+    object-fit: contain;
+    object-position: right bottom;
+  }
+
+  .hinweis__blase {
+    position: relative;
+    background: var(--farbe-flaeche);
+    border-radius: 30px;
+    padding: var(--abstand-m) var(--abstand-l) var(--abstand-l);
+    max-width: 34rem;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .hinweis__schliessen {
+    position: absolute;
+    top: var(--abstand-m);
+    right: var(--abstand-m);
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    background: url('/icons/ui/schliessen.svg') center / contain no-repeat transparent;
+    cursor: pointer;
+    /* Dreht sich beim Zeigen — wie in der Vorlage (a-34 / a-35) */
+    transition: transform var(--dauer-schnell) var(--verlauf);
+  }
+
+  .hinweis__schliessen:hover,
+  .hinweis__schliessen:focus-visible {
+    transform: rotate(90deg);
   }
 
   .hinweis__titel {
-    color: var(--farbe-text-invers);
-    font-size: var(--text-l);
-    margin-bottom: var(--abstand-3xs);
+    margin-bottom: var(--abstand-s);
+    padding-right: var(--abstand-l);
   }
 
-  .hinweis__text {
-    margin: 0;
+  .hinweis__text :global(p) {
+    margin-bottom: var(--abstand-2xs);
+  }
+
+  .hinweis__text :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .hinweis__mehr {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: var(--abstand-s);
+  }
+
+  .hinweis__knopf {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    border-radius: var(--radius-rund);
+    background: var(--farbe-primaer);
+    color: var(--farbe-text-invers);
+    font-weight: var(--gewicht-halbfett);
+    text-align: center;
+    text-decoration: none;
+    line-height: var(--zeilenhoehe-eng);
+  }
+
+  @media (max-width: 40rem) {
+    .hinweis__blase-umgebung {
+      flex-direction: column;
+      padding-inline: 0;
+    }
+    .hinweis__zipfel { display: none; }
+    .hinweis__symbol { margin-bottom: var(--abstand-s); }
   }
 </style>
+
+<script>
+  /**
+   * Zeigt die Sprechblase kurz nach dem Laden.
+   * Wurde sie in diesem Besuch schon weggeklickt, bleibt sie fort —
+   * gespeichert wird das nur im Browser des Besuchers.
+   */
+  function hinweisAufbauen() {
+    const kasten = document.querySelector<HTMLElement>('.hinweis');
+    if (!kasten || kasten.dataset.bereit) return;
+    kasten.dataset.bereit = 'ja';
+
+    const kennung = kasten.dataset.kennung ?? 'hinweis';
+    const einmalig = kasten.dataset.einmalig === 'ja';
+
+    let schonGesehen = false;
+    try {
+      schonGesehen = einmalig && sessionStorage.getItem(kennung) === 'gesehen';
+    } catch {
+      // Manche Browser verbieten den Zugriff — dann eben immer zeigen.
+    }
+    if (schonGesehen) return;
+
+    // Merken, wohin der Fokus nach dem Schließen zurückkehrt
+    const zuletztFokussiert = document.activeElement as HTMLElement | null;
+
+    const schliessen = () => {
+      kasten.hidden = true;
+      try { sessionStorage.setItem(kennung, 'gesehen'); } catch { /* egal */ }
+      zuletztFokussiert?.focus();
+    };
+
+    kasten.hidden = false;
+    kasten.querySelector<HTMLButtonElement>('.hinweis__schliessen')?.focus();
+
+    kasten.querySelector('.hinweis__schliessen')?.addEventListener('click', schliessen);
+
+    // Klick auf den abgedunkelten Hintergrund schließt ebenfalls
+    kasten.addEventListener('click', (e) => {
+      if (e.target === kasten) schliessen();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !kasten.hidden) schliessen();
+    });
+  }
+
+  hinweisAufbauen();
+  // Nach einem Seitenwechsel erneut aufbauen
+  document.addEventListener('astro:page-load', hinweisAufbauen);
+</script>

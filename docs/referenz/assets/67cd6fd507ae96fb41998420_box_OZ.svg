@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 588.8 545.8" style="enable-background:new 0 0 588.8 545.8;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:url(#SVGID_1_);}
+	.st1{fill:url(#SVGID_2_);}
+	.st2{fill:#FFFFFF;}
+	.st3{fill:none;stroke:#6C1A51;stroke-miterlimit:10;}
+	.st4{fill:none;stroke:#6C1A51;stroke-miterlimit:10;stroke-dasharray:1.0027,2.0053;}
+	.st5{fill:none;stroke:#6C1A51;stroke-miterlimit:10;stroke-dasharray:0.9956,1.9913;}
+	.st6{fill:none;stroke:#6C1A51;stroke-miterlimit:10;stroke-dasharray:0.9894,1.9788;}
+	.st7{fill:none;stroke:#6C1A51;stroke-miterlimit:10;stroke-dasharray:1.0093,2.0186;}
+	.st8{fill:none;stroke:#6C1A51;stroke-miterlimit:10;stroke-dasharray:1.0035,2.0071;}
+	.st9{fill:none;stroke:#6C1A51;stroke-miterlimit:10;stroke-dasharray:1.0047,2.0093;}
+	.st10{fill:none;stroke:#6C1A51;stroke-miterlimit:10;stroke-dasharray:0.9956,1.9912;}
+</style>
+<g id="Ebene_3">
+	
+		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="509.3032" y1="257.7857" x2="259.2163" y2="463.9883" gradientTransform="matrix(1 0 0 -1 0 546)">
+		<stop  offset="0" style="stop-color:#000000;stop-opacity:0"/>
+		<stop  offset="1" style="stop-color:#000000;stop-opacity:5.000000e-02"/>
+	</linearGradient>
+	<polygon class="st0" points="399.7,14.7 583.7,198.7 583.7,532.7 393.7,342.7 	"/>
+	
+		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="311.5312" y1="55.3283" x2="260.4818" y2="275.262" gradientTransform="matrix(1 0 0 -1 0 546)">
+		<stop  offset="0" style="stop-color:#000000;stop-opacity:0"/>
+		<stop  offset="1" style="stop-color:#000000;stop-opacity:3.000000e-02"/>
+	</linearGradient>
+	<polygon class="st1" points="393.7,342.7 15.7,346.7 110.6,441.6 99.7,476.7 155.7,532.7 583.7,532.7 	"/>
+	<g>
+		<polygon class="st2" points="399.7,14.7 11.7,9.7 15.6,347.2 137.3,345.9 99.7,473.7 152.8,345.8 393.9,343.2 		"/>
+		<g>
+			<polyline class="st3" points="399.7,15.2 399.7,14.7 399.2,14.7 			"/>
+			<line class="st4" x1="397.2" y1="14.7" x2="13.2" y2="9.7"/>
+			<polyline class="st3" points="12.2,9.7 11.7,9.7 11.7,10.2 			"/>
+			<line class="st5" x1="11.7" y1="12.2" x2="15.6" y2="345.7"/>
+			<polyline class="st3" points="15.6,346.7 15.6,347.2 16.1,347.2 			"/>
+			<line class="st6" x1="18.1" y1="347.2" x2="135.8" y2="345.9"/>
+			<polyline class="st3" points="136.8,345.9 137.3,345.9 137.2,346.4 			"/>
+			<line class="st7" x1="136.6" y1="348.3" x2="100.1" y2="472.3"/>
+			<polyline class="st3" points="99.8,473.2 99.7,473.7 99.9,473.2 			"/>
+			<line class="st8" x1="100.7" y1="471.4" x2="152.2" y2="347.2"/>
+			<polyline class="st3" points="152.6,346.3 152.8,345.8 153.3,345.8 			"/>
+			<line class="st9" x1="155.3" y1="345.8" x2="392.4" y2="343.2"/>
+			<polyline class="st3" points="393.4,343.2 393.9,343.2 393.9,342.7 			"/>
+			<line class="st10" x1="393.9" y1="340.7" x2="399.7" y2="16.2"/>
+		</g>
+	</g>
+</g>
+</svg>
