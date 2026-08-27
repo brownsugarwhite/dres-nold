@@ -119,15 +119,18 @@ const { praxis } = seite;
      Lottie-Fläche minimal kleiner ausfällt. Das Verlaufsbild selbst
      ist 20 × 10 px und enthält nur Farbtöne ohne Struktur — seine
      genaue Größe ist deshalb unkritisch. */
+  /* Das Verlaufsbild liegt unter der Logo-Grafik und scheint durch
+     deren ausgesparte Schrift. Maße wie in der Vorlage (.div-block-29):
+     48vh × 32vh, vertikal zentriert. */
   .logo__verlauf {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
-    /* Anteilig zum Logo, damit das Verhältnis auf jeder Größe stimmt */
-    width: 88%;
-    height: 66%;
+    width: 48vh;
+    height: 32vh;
+    max-width: 96%;
     background: url('/bilder/deko/verlauf.gif') center / cover no-repeat;
   }
 
