@@ -60,13 +60,20 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 <style>
   .ozbereich {
     position: relative;
+    /* Über Startbereich (10) und Inhalt (5) — wie .oz-container
+       in der Vorlage, die dort auf Ebene 30 liegt. */
+    z-index: 30;
     height: 300vh;
   }
 
+  /* Bleibt stehen, während der Bereich durchläuft.
+     Oben klebend statt unten — bottom-sticky greift nur, wenn kein
+     Vorfahre den Überlauf beschneidet, und ist damit brüchiger. */
   .ozbereich__buehne {
     position: sticky;
-    bottom: 0;
+    top: 0;
     height: 100vh;
+    height: 100dvh;
     pointer-events: none;
   }
 
