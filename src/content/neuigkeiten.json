@@ -1,0 +1,25 @@
+{
+  "_hinweis_fuer_die_redaktion": "Neuigkeiten aus der Praxis, neueste zuerst. Jeder Beitrag bekommt eine eigene Adresse unter /neuigkeiten/<id>. Im Text sind Absätze, Aufzählungen und Tabellen möglich. Unter \"dateien\" lassen sich PDFs zum Herunterladen anhängen.",
+  "titel": "Neuigkeiten",
+  "einleitung": "Aktuelles aus unserer Praxis.",
+  "eintraege": [
+    {
+      "id": "beispielbeitrag",
+      "aktiv": false,
+      "position": 1,
+      "datum": "2026-08-27",
+      "titel": "Beispielbeitrag",
+      "kurz": "Kurzer Anrisstext, der in der Übersicht erscheint.",
+      "bild": "",
+      "bild_alt": "",
+      "inhalt": "<p>Der Fließtext des Beitrags. Absätze, <strong>Hervorhebungen</strong>, Aufzählungen und Tabellen sind möglich.</p>",
+      "dateien": [
+        {
+          "titel": "Beispieldokument",
+          "datei": "",
+          "beschreibung": ""
+        }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,9 @@
 
 Website der Zahnarzt- und Kieferorthopädie-Praxis **Dres. Nold**, Rosenstraße 1, 76467 Bietigheim.
 
-Dieses Projekt ersetzt die bisherige Webflow-Seite durch einen eigenen, kostenfrei betreibbaren Nachbau. **Optik und Animationen bleiben 1:1 erhalten**, der Unterbau ist vollständig neu und sauber geschrieben.
+Dieses Projekt ersetzt die bisherige Webflow-Seite durch einen eigenen, kostenfrei betreibbaren Nachbau.
+
+**Gestaltung und Animationen der Startseite bleiben 1:1 erhalten**, der Unterbau ist vollständig neu. Hinzu kommen gegenüber der Webflow-Fassung: eigene Seiten für jede Leistung, ein Neuigkeiten-Bereich und ein aufklappbares Menü.
 
 ---
 
@@ -41,6 +43,7 @@ Redaktion ──► dres-nold.de/login
 | Seitengenerator | **Astro** | Erzeugt statisches HTML ohne Framework-Ballast; ideal für eine Info-Seite |
 | Styling | **Eigenes CSS mit Tokens** | Kein Tailwind, kein generierter Code — lesbar und nachvollziehbar |
 | Animationen | **CSS + Intersection Observer** | Ersetzt Webflows Interaktions-Engine und jQuery |
+| Seitenwechsel | **View Transitions API** | Leistungen und Beiträge morphen ins Vollbild — echte Seiten, die sich wie eine App anfühlen |
 | Hosting | **Cloudflare Pages** | Kostenlos, unbegrenzte Bandbreite, serverseitige Funktionen möglich |
 | Login | **Cloudflare Access** | Fertiger Dienst, kostenlos bis 50 Nutzer, kein eigenes Passwort-System |
 | Analytics | **Cloudflare Web Analytics** | Cookielos → **kein Cookie-Banner nötig** |
@@ -91,8 +94,10 @@ Alle Inhalte liegen als JSON unter `src/content/`. Jede Datei entspricht einem B
 |---|---|---|
 | `hinweis.json` | Notfall-/Vertretungshinweis | Zeitgesteuert: `von`/`bis` — erscheint und verschwindet automatisch |
 | `oeffnungszeiten.json` | 3 Listen: zahnärztlich, kieferorthopädisch, telefonisch | |
-| `leistungen.json` | Leistungen mit Icon, Titel, Rich-Text | Kategorie `zahnmedizin` oder `kieferorthopaedie` |
-| `team.json` | Mitarbeitende mit Foto, Name, Funktion | Sortierung über `position` |
+| `leistungen.json` | 11 Leistungen mit Icon, Titel, Kurztext, Rich-Text | Kategorie `zahnmedizin` oder `kieferorthopaedie`; `id` = Adresse, **unveränderlich** |
+| `neuigkeiten.json` | Beiträge mit Datum, Bild, Text, PDF-Anhängen | `id` = Adresse; Text erlaubt Absätze, Aufzählungen, Tabellen |
+| `navigation.json` | Menüpunkte und Reihenfolge | Leistungen klappen automatisch auf |
+| `team.json` | 15 Personen mit Foto, Name, Funktion | `gruppe`: `aerzte` oder `team`; Sortierung über `position` |
 | `galerie.json` | Praxisbilder | Alternativtexte sind **Pflicht** (Barrierefreiheit) |
 | `abschnitte.json` | Frei anlegbare Abschnitte im Praxis-Bereich | Ohne eigenen Menüeintrag; Bild, Link *oder* PDF-Download |
 | `stellen.json` | Stellenanzeigen | Bereich blendet sich aus, wenn leer |
@@ -134,14 +139,50 @@ docs/
 
 ## Die Seite im Überblick
 
-Ein One-Pager mit Ankern plus zwei Rechtsseiten:
+**Startseite** (`/`) ist und bleibt ein One-Pager mit Ankern:
 
-`#start` · `#oz_anchor` (Öffnungszeiten) · `#galerie` · `#information` (Hinweis) · `#leistungen` · `#team` · `#contact`
-sowie `/datenschutz` und `/impressum`.
+`#start` · `#oz_anchor` (Öffnungszeiten) · `#galerie` · `#information` (Hinweis) · `#praxis` · `#leistungen` (Kachelübersicht) · `#team` · `#neuigkeiten` · `#contact`
 
-Die Navigation zeigt: Praxis · Leistungen · Team · Kontakt · Öffnungszeiten · Telefon 07245 7171
+**Unterseiten** — von der Startseite aus als Vollbild geöffnet, aber mit eigener Adresse:
+
+| Adresse | Inhalt |
+|---|---|
+| `/leistungen/<id>` | 11 Leistungen, je eine Seite |
+| `/neuigkeiten/<id>` | Beiträge |
+| `/impressum`, `/datenschutz` | Rechtsseiten |
+
+Die Leistungs-Adressen stehen fest und dürfen nicht mehr geändert werden:
+`prophylaxe` · `zahnerhaltung` · `wurzelkanalbehandlung` · `parodontitis` · `zahnersatz` · `implantate` · `3d-roentgen` · `bleaching` · `intraoralscanner` · `kieferorthopaedie-kinder` · `kieferorthopaedie-erwachsene`
+
+**Navigation:** Praxis · Leistungen ▾ · Team · Neuigkeiten · Kontakt · Öffnungszeiten · Telefon 07245 7171
+
+Der Punkt *Leistungen* klappt zweispaltig auf — links Zahnmedizin (9), rechts Kieferorthopädie (2), jeweils mit Symbol. Die Einträge kommen automatisch aus `leistungen.json`.
 
 **Kontakt:** Rosenstraße 1, 76467 Bietigheim · Tel. 07245 7171 · Fax 07245 939269 · info@dres-nold.de
+
+---
+
+## Seitenwechsel: Vollbild statt neue Seite
+
+Eine Leistung oder ein Beitrag soll sich beim Anklicken **ins Vollbild vergrößern** — wie in einer App, nicht wie ein Seitenwechsel.
+
+Umgesetzt wird das mit der **View Transitions API**, nicht mit nachgeladenen Inhalten. Der entscheidende Unterschied:
+
+| | Nachgeladenes Overlay | View Transitions (gewählt) |
+|---|---|---|
+| Eigene Adresse | nur nachgebildet | echt |
+| Auffindbar bei Google | nein | ja — 11 zusätzliche Seiten |
+| Ohne JavaScript | leer | funktioniert |
+| Zurück-Taste | muss nachgebaut werden | funktioniert von selbst |
+| Teilen und Drucken | unzuverlässig | zuverlässig |
+
+Jede Leistung ist also **eine echte Seite**, die sich beim Öffnen aus ihrer Kachel heraus ins Vollbild morpht. Technisch geschieht das über zusammengehörige `view-transition-name`-Paare auf Kachel und Zielseite.
+
+**Regeln dafür:**
+- In Browsern ohne Unterstützung wird schlicht die Seite gewechselt — kein Bruch, nur ohne Übergang
+- Bei `prefers-reduced-motion` entfällt die Bewegung ersatzlos
+- Die Zielseite muss vollständig und sinnvoll sein, auch wenn sie direkt aufgerufen wird
+
 
 ---
 

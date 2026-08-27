@@ -1,0 +1,40 @@
+{
+  "_hinweis_fuer_die_redaktion": "Praxisbilder für den Bildlauf. Der Alternativtext beschreibt das Bild für blinde Besucher und ist Pflicht.",
+  "eintraege": [
+    {
+      "id": "bild-2",
+      "aktiv": true,
+      "position": 1,
+      "bild": "/bilder/galerie/gallery02.jpg",
+      "alt": "Blick in die Praxisräume"
+    },
+    {
+      "id": "bild-3",
+      "aktiv": true,
+      "position": 2,
+      "bild": "/bilder/galerie/gallery03.jpg",
+      "alt": "Blick in die Praxisräume"
+    },
+    {
+      "id": "bild-4",
+      "aktiv": true,
+      "position": 3,
+      "bild": "/bilder/galerie/gallery04.jpg",
+      "alt": "Blick in die Praxisräume"
+    },
+    {
+      "id": "bild-5",
+      "aktiv": true,
+      "position": 4,
+      "bild": "/bilder/galerie/gallery05.jpg",
+      "alt": "Blick in die Praxisräume"
+    },
+    {
+      "id": "bild-6",
+      "aktiv": true,
+      "position": 5,
+      "bild": "/bilder/galerie/gallery06.jpg",
+      "alt": "Blick in die Praxisräume"
+    }
+  ]
+}

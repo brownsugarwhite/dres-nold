@@ -1,0 +1,170 @@
+{
+  "_hinweis_fuer_die_redaktion": "Ärzte und Mitarbeitende. \"gruppe\" ist entweder \"aerzte\" oder \"team\". Reihenfolge über \"position\". Ausscheidende auf aktiv:false setzen statt löschen — so bleibt das Foto erhalten, falls sie zurückkommen.",
+  "eintraege": [
+    {
+      "id": "paul",
+      "aktiv": true,
+      "position": 1,
+      "gruppe": "aerzte",
+      "name": "Dr. Paul Nold",
+      "funktion": "Zahnarzt",
+      "zusatz": "",
+      "foto": "/bilder/team/paul.jpg",
+      "foto_alt": "Porträtfoto von Dr. Paul Nold"
+    },
+    {
+      "id": "sarah",
+      "aktiv": true,
+      "position": 2,
+      "gruppe": "aerzte",
+      "name": "Dr. Sarah Buchgeister-Nold",
+      "funktion": "Zahnärztin",
+      "zusatz": "",
+      "foto": "/bilder/team/sarah.jpg",
+      "foto_alt": "Porträtfoto von Dr. Sarah Buchgeister-Nold"
+    },
+    {
+      "id": "inge",
+      "aktiv": true,
+      "position": 3,
+      "gruppe": "aerzte",
+      "name": "Dr. Inge Wilhelm-Nold",
+      "funktion": "Fachzahnärztin für Kieferorthopädie",
+      "zusatz": "",
+      "foto": "/bilder/team/inge.jpg",
+      "foto_alt": "Porträtfoto von Dr. Inge Wilhelm-Nold"
+    },
+    {
+      "id": "adriana",
+      "aktiv": true,
+      "position": 4,
+      "gruppe": "team",
+      "name": "Adriana",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "zusatz": "Zahnärztliche Assistenz",
+      "foto": "/bilder/team/adriana.jpg",
+      "foto_alt": "Porträtfoto von Adriana"
+    },
+    {
+      "id": "anne",
+      "aktiv": true,
+      "position": 5,
+      "gruppe": "team",
+      "name": "Anne",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "zusatz": "Zahnärztliche & kieferorthopädische Assistenz",
+      "foto": "/bilder/team/anne.jpg",
+      "foto_alt": "Porträtfoto von Anne"
+    },
+    {
+      "id": "carmen",
+      "aktiv": true,
+      "position": 6,
+      "gruppe": "team",
+      "name": "Carmen",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "zusatz": "Zahnärztliche Assistenz",
+      "foto": "/bilder/team/carmen.jpg",
+      "foto_alt": "Porträtfoto von Carmen"
+    },
+    {
+      "id": "dzeni",
+      "aktiv": true,
+      "position": 7,
+      "gruppe": "team",
+      "name": "Dzeni",
+      "funktion": "Zahnärztliche Assistenz",
+      "zusatz": "Materialmanagement",
+      "foto": "/bilder/team/dzeni.jpg",
+      "foto_alt": "Porträtfoto von Dzeni"
+    },
+    {
+      "id": "francesca",
+      "aktiv": true,
+      "position": 8,
+      "gruppe": "team",
+      "name": "Francesca",
+      "funktion": "Zahnärztliche Assistenz",
+      "zusatz": "Verwaltung",
+      "foto": "/bilder/team/francesca.jpg",
+      "foto_alt": "Porträtfoto von Francesca"
+    },
+    {
+      "id": "jessica",
+      "aktiv": true,
+      "position": 9,
+      "gruppe": "team",
+      "name": "Jessica",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "zusatz": "Zahnärztliche & kieferorthopädische Assistenz",
+      "foto": "/bilder/team/jessica.jpg",
+      "foto_alt": "Porträtfoto von Jessica"
+    },
+    {
+      "id": "lisa",
+      "aktiv": true,
+      "position": 10,
+      "gruppe": "team",
+      "name": "Lisa",
+      "funktion": "Auszubildende",
+      "zusatz": "Zahnärztliche & kieferorthopädische Assistenz",
+      "foto": "/bilder/team/lisa.jpg",
+      "foto_alt": "Porträtfoto von Lisa"
+    },
+    {
+      "id": "martina",
+      "aktiv": true,
+      "position": 11,
+      "gruppe": "team",
+      "name": "Martina",
+      "funktion": "Zahnärztliche & kieferorthopädische Laborarbeiten",
+      "zusatz": "",
+      "foto": "/bilder/team/martina.jpg",
+      "foto_alt": "Porträtfoto von Martina"
+    },
+    {
+      "id": "olga",
+      "aktiv": true,
+      "position": 12,
+      "gruppe": "team",
+      "name": "Olga",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "zusatz": "Prophylaxe",
+      "foto": "/bilder/team/olga.jpg",
+      "foto_alt": "Porträtfoto von Olga"
+    },
+    {
+      "id": "petra",
+      "aktiv": true,
+      "position": 13,
+      "gruppe": "team",
+      "name": "Petra",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "zusatz": "Rezeption",
+      "foto": "/bilder/team/petra.jpg",
+      "foto_alt": "Porträtfoto von Petra"
+    },
+    {
+      "id": "verena",
+      "aktiv": true,
+      "position": 14,
+      "gruppe": "team",
+      "name": "Verena",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "zusatz": "Rezeption",
+      "foto": "/bilder/team/verena.jpg",
+      "foto_alt": "Porträtfoto von Verena"
+    },
+    {
+      "id": "vlora",
+      "aktiv": true,
+      "position": 15,
+      "gruppe": "team",
+      "name": "Vlora",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "zusatz": "Zahnärztliche & kieferorthopädische Assistenz",
+      "foto": "/bilder/team/vlora.jpg",
+      "foto_alt": "Porträtfoto von Vlora"
+    }
+  ]
+}

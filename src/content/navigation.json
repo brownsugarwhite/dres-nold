@@ -1,0 +1,48 @@
+{
+  "_hinweis_fuer_die_redaktion": "Die Menüpunkte. \"ziel\" beginnend mit # springt auf der Startseite, sonst normale Adresse. Der Punkt Leistungen klappt automatisch die Leistungen aus leistungen.json auf — dort gepflegte Einträge erscheinen hier von selbst.",
+  "eintraege": [
+    {
+      "id": "praxis",
+      "aktiv": true,
+      "position": 1,
+      "titel": "Praxis",
+      "ziel": "#praxis"
+    },
+    {
+      "id": "leistungen",
+      "aktiv": true,
+      "position": 2,
+      "titel": "Leistungen",
+      "ziel": "#leistungen",
+      "aufklappen": "leistungen"
+    },
+    {
+      "id": "team",
+      "aktiv": true,
+      "position": 3,
+      "titel": "Team",
+      "ziel": "#team"
+    },
+    {
+      "id": "neuigkeiten",
+      "aktiv": true,
+      "position": 4,
+      "titel": "Neuigkeiten",
+      "ziel": "#neuigkeiten"
+    },
+    {
+      "id": "kontakt",
+      "aktiv": true,
+      "position": 5,
+      "titel": "Kontakt",
+      "ziel": "#contact"
+    },
+    {
+      "id": "zeiten",
+      "aktiv": true,
+      "position": 6,
+      "titel": "Öffnungszeiten",
+      "ziel": "#oz_anchor"
+    }
+  ]
+}
