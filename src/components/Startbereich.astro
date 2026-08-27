@@ -30,17 +30,15 @@ const { praxis } = seite;
         Die Kontur ist eine weiße Fläche mit ausgestanzter Schrift —
         dadurch scheint der Verlauf genau durch die Buchstaben.
       */}
-      <div class="logo__flaeche">
-        <div class="logo__verlauf" aria-hidden="true"></div>
-        <div class="logo__kontur" data-logo>
-          <img
-            class="logo__bild"
-            src="/icons/logo.svg"
-            alt={praxis.name}
-            width="868"
-            height="590"
-          />
-        </div>
+      <div class="logo__verlauf" aria-hidden="true"></div>
+      <div class="logo__kontur" data-logo>
+        <img
+          class="logo__bild"
+          src="/icons/logo.svg"
+          alt={praxis.name}
+          width="868"
+          height="590"
+        />
       </div>
     </div>
 
@@ -103,22 +101,25 @@ const { praxis } = seite;
     will-change: transform, opacity;
   }
 
-  /* Trägt das Seitenverhältnis der Lottie-Grafik (868:590).
-     Nur so deckt die Kontur den Verlauf dahinter vollständig ab —
-     sonst bleiben Ränder frei und der Verlauf schaut hervor. */
-  .logo__flaeche {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 868 / 590;
-  }
+  /* Der bewegte Verlauf, der die Schrift des Logos einfärbt.
 
+     Die Lottie-Grafik darüber ist eine weiße Fläche mit ausgesparter
+     Schrift — der Verlauf scheint also genau durch die Buchstaben.
+     Entscheidend ist nur, dass er die weiße Fläche nirgends überragt,
+     sonst steht er als Farbstreifen daneben.
+
+     Die Vorlage nutzt 48vh × 32vh; hier etwas knapper, weil unsere
+     Lottie-Fläche minimal kleiner ausfällt. Das Verlaufsbild selbst
+     ist 20 × 10 px und enthält nur Farbtöne ohne Struktur — seine
+     genaue Größe ist deshalb unkritisch. */
   .logo__verlauf {
     position: absolute;
-    /* Etwas eingerückt: Die weißen Flächen der Lottie-Grafik decken den
-       Verlauf ab, reichen an den Rändern aber nicht ganz aus. Ohne die
-       Einrückung schaut oben und unten ein Farbstreifen hervor. */
-    inset: 12% 0 6%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 10;
+    width: 47vh;
+    height: 30vh;
     background: url('/bilder/deko/verlauf.gif') center / cover no-repeat;
   }
 
