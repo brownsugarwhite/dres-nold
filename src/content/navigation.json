@@ -1,13 +1,15 @@
 {
-  "_hinweis_fuer_die_redaktion": "Die Menüpunkte. \"ziel\" beginnend mit # springt auf der Startseite, sonst normale Adresse. Der Punkt Leistungen klappt automatisch die Leistungen aus leistungen.json auf — dort gepflegte Einträge erscheinen hier von selbst. Die Symbole liegen unter public/icons/navigation/.",
+  "_hinweis_fuer_die_redaktion": "Die Menüpunkte. \"ziel\" beginnend mit # springt auf der Startseite, sonst normale Adresse. \"in_kopfleiste\" steuert die Leiste oben, \"in_fussleiste\" die Symbolleiste am unteren Rand. Der Punkt Leistungen klappt automatisch die Einträge aus leistungen.json auf. Die Symbole liegen unter public/icons/navigation/.",
   "eintraege": [
     {
       "id": "praxis",
       "aktiv": true,
       "position": 1,
       "titel": "Praxis",
-      "ziel": "#praxis",
-      "icon": "/icons/navigation/praxis.svg"
+      "ziel": "#galerie",
+      "icon": "/icons/navigation/praxis.svg",
+      "in_kopfleiste": true,
+      "in_fussleiste": true
     },
     {
       "id": "leistungen",
@@ -16,7 +18,9 @@
       "titel": "Leistungen",
       "ziel": "#leistungen",
       "aufklappen": "leistungen",
-      "icon": "/icons/navigation/leistungen.svg"
+      "icon": "/icons/navigation/leistungen.svg",
+      "in_kopfleiste": true,
+      "in_fussleiste": true
     },
     {
       "id": "team",
@@ -24,7 +28,9 @@
       "position": 3,
       "titel": "Team",
       "ziel": "#team",
-      "icon": "/icons/navigation/team.svg"
+      "icon": "/icons/navigation/team.svg",
+      "in_kopfleiste": true,
+      "in_fussleiste": true
     },
     {
       "id": "neuigkeiten",
@@ -32,7 +38,9 @@
       "position": 4,
       "titel": "Neuigkeiten",
       "ziel": "#neuigkeiten",
-      "icon": "/icons/navigation/neuigkeiten.svg"
+      "icon": "/icons/navigation/neuigkeiten.svg",
+      "in_kopfleiste": true,
+      "in_fussleiste": true
     },
     {
       "id": "kontakt",
@@ -40,7 +48,9 @@
       "position": 5,
       "titel": "Kontakt",
       "ziel": "#contact",
-      "icon": "/icons/navigation/kontakt.svg"
+      "icon": "/icons/navigation/kontakt.svg",
+      "in_kopfleiste": true,
+      "in_fussleiste": true
     },
     {
       "id": "zeiten",
@@ -48,7 +58,9 @@
       "position": 6,
       "titel": "Öffnungszeiten",
       "ziel": "#oz_anchor",
-      "icon": "/icons/navigation/oeffnungszeiten.svg"
+      "icon": "/icons/navigation/oeffnungszeiten.svg",
+      "in_kopfleiste": false,
+      "in_fussleiste": true
     }
   ]
 }

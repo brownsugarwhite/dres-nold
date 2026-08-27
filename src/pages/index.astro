@@ -6,6 +6,7 @@
  * hier geht es zunächst darum, den Seitenwechsel zu den Leistungen zu
  * zeigen. Siehe CLAUDE.md.
  */
+import Navigation from '../components/Navigation.astro';
 import Basis from '../layouts/Basis.astro';
 import Hinweis from '../components/Hinweis.astro';
 import LeistungKachel from '../components/LeistungKachel.astro';
@@ -27,6 +28,8 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 
 <Basis>
   <Hinweis />
+
+  <Navigation />
 
   <main id="inhalt">
     <section class="inhalt kopf">

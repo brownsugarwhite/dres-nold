@@ -8,6 +8,7 @@
  * Beim Aufruf von der Startseite morpht die zugehörige Kachel in diese
  * Seite hinein: möglich durch den gemeinsamen `transition:name`.
  */
+import Navigation from '../../components/Navigation.astro';
 import Basis from '../../layouts/Basis.astro';
 import daten from '../../content/leistungen.json';
 import seite from '../../content/seite.json';
@@ -29,6 +30,8 @@ const naechste = alle[i + 1];
   titel={`${leistung.titel} – ${seite.praxis.name}`}
   beschreibung={leistung.kurz}
 >
+  <Navigation />
+
   <article class="leistung" transition:name={`leistung-${leistung.id}`}>
     <header class="leistung__kopf">
       <a class="leistung__zurueck" href="/#leistungen">

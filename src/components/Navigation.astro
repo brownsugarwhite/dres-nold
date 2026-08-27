@@ -1,0 +1,469 @@
+---
+/**
+ * Navigation — Nachbau der Webflow-Vorlage.
+ *
+ * Zwei Leisten, die beim Scrollen die Rollen tauschen:
+ *
+ *   Ganz oben auf der Seite   Kontaktzeile (40 px) sichtbar,
+ *                             Symbolleiste am unteren Rand sichtbar,
+ *                             Kopfleiste eingefahren (Höhe 0)
+ *
+ *   Nach dem Scrollen         Kontaktzeile eingefahren,
+ *                             Kopfleiste (80 px) ausgefahren,
+ *                             Symbolleiste 110 px nach unten hinaus
+ *
+ * Werte aus den Abläufen `schnalz in` (a-26) und `schnalz out` (a-16):
+ * 300 ms, easeOut.
+ *
+ * Neu gegenüber der Vorlage: Der Punkt „Leistungen" klappt zweispaltig
+ * auf und listet die Einträge aus leistungen.json.
+ */
+import navi from '../content/navigation.json';
+import leistungen from '../content/leistungen.json';
+import seite from '../content/seite.json';
+import neuigkeiten from '../content/neuigkeiten.json';
+
+const { praxis } = seite;
+
+const hatNeuigkeiten = neuigkeiten.eintraege.some((e) => e.aktiv);
+const punkte = navi.eintraege
+  .filter((e) => e.aktiv && (e.id !== 'neuigkeiten' || hatNeuigkeiten))
+  .sort((a, b) => a.position - b.position);
+
+const kopf = punkte.filter((e) => e.in_kopfleiste);
+const fuss = punkte.filter((e) => e.in_fussleiste);
+
+const dienste = leistungen.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
+const zahnmedizin = dienste.filter((e) => e.kategorie === 'zahnmedizin');
+const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaedie');
+---
+
+{/* Kontaktzeile — oben auf der Seite sichtbar */}
+<div class="kontaktzeile" data-leiste="kontakt">
+  <div class="kontaktzeile__inhalt">
+    <span class="kontaktzeile__text">{praxis.strasse}</span>
+    <span class="punkt" aria-hidden="true"></span>
+    <span class="kontaktzeile__text">{praxis.plz} {praxis.ort}</span>
+    <span class="punkt punkt--ab-tablet" aria-hidden="true"></span>
+    <span class="kontaktzeile__text kontaktzeile__text--ab-tablet">
+      <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
+    </span>
+    <span class="punkt" aria-hidden="true"></span>
+    <span class="kontaktzeile__text">
+      <a href={`mailto:${praxis.email}`}>{praxis.email}</a>
+    </span>
+  </div>
+</div>
+
+{/* Kopfleiste — fährt beim Scrollen ein */}
+<header class="kopfleiste" data-leiste="kopf">
+  <nav class="kopfleiste__inhalt" aria-label="Hauptnavigation">
+    <a class="logo" href="/" aria-label={`${praxis.name} — zur Startseite`}>
+      <img src="/icons/logo.svg" alt="" width="80" height="80" />
+    </a>
+    <span class="punkt" aria-hidden="true"></span>
+
+    {kopf.map((e, i) => (
+      <>
+        {e.id === 'leistungen' ? (
+          <div class="aufklapp" data-aufklapp>
+            <button class="menuepunkt menuepunkt--knopf" type="button" aria-expanded="false" aria-controls="leistungsmenue">
+              <span class="menuepunkt__rolle">
+                <span class="menuepunkt__text">{e.titel}</span>
+                <span class="menuepunkt__text" aria-hidden="true">{e.titel}</span>
+              </span>
+            </button>
+
+            <div class="aufklapp__inhalt" id="leistungsmenue" hidden>
+              <div class="aufklapp__spalten">
+                <div class="aufklapp__spalte">
+                  <h2 class="aufklapp__titel">Zahnmedizin</h2>
+                  <ul class="aufklapp__liste">
+                    {zahnmedizin.map((l) => (
+                      <li>
+                        <a class="aufklapp__eintrag" href={`/leistungen/${l.id}/`}>
+                          <img src={l.icon} alt="" width="28" height="28" />
+                          <span>{l.titel}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="aufklapp__spalte">
+                  <h2 class="aufklapp__titel">Kieferorthopädie</h2>
+                  <ul class="aufklapp__liste">
+                    {kieferorthopaedie.map((l) => (
+                      <li>
+                        <a class="aufklapp__eintrag" href={`/leistungen/${l.id}/`}>
+                          <img src={l.icon} alt="" width="28" height="28" />
+                          <span>{l.titel}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <a class="aufklapp__alle" href="/#leistungen">Alle Leistungen im Überblick</a>
+            </div>
+          </div>
+        ) : (
+          <a class="menuepunkt" href={e.ziel}>
+            <span class="menuepunkt__rolle">
+              <span class="menuepunkt__text">{e.titel}</span>
+              <span class="menuepunkt__text" aria-hidden="true">{e.titel}</span>
+            </span>
+          </a>
+        )}
+        {i < kopf.length - 1 && <span class="punkt" aria-hidden="true"></span>}
+      </>
+    ))}
+  </nav>
+</header>
+
+{/* Symbolleiste am unteren Rand — oben auf der Seite sichtbar */}
+<nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff">
+  {fuss.map((e) => (
+    <a class="fussknopf" href={e.ziel}>
+      <img class="fussknopf__symbol" src={e.icon} alt="" width="32" height="32" />
+      <span class="fussknopf__text">{e.titel}</span>
+    </a>
+  ))}
+</nav>
+
+<style>
+  /* ---------- Kontaktzeile ---------- */
+  .kontaktzeile {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    width: 100%;
+    height: 40px;
+    overflow: hidden;
+    transition: height var(--dauer-normal) var(--verlauf);
+  }
+
+  .kontaktzeile__inhalt {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--abstand-2xs);
+    width: 60%;
+    max-width: 700px;
+    height: 40px;
+  }
+
+  .kontaktzeile__text {
+    display: flex;
+    align-items: center;
+    color: var(--farbe-primaer);
+    font-size: var(--text-xs);
+    font-weight: 300;
+    white-space: nowrap;
+  }
+
+  .kontaktzeile__text a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .kontaktzeile__text a:hover,
+  .kontaktzeile__text a:focus-visible {
+    text-decoration: underline;
+  }
+
+  /* ---------- Kopfleiste ---------- */
+  .kopfleiste {
+    position: sticky;
+    top: 0;
+    z-index: var(--ebene-navigation);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    height: 0;
+    background: var(--farbe-flaeche);
+    overflow: hidden;
+    transition: height var(--dauer-normal) var(--verlauf);
+  }
+
+  .kopfleiste__inhalt {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: var(--abstand-2xs);
+    width: 60%;
+    max-width: 700px;
+    height: 80px;
+  }
+
+  .logo img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+  }
+
+  /* ---------- Menüpunkte mit Text-Roll ----------
+     Zwei identische Texte übereinander; beim Zeigen rollt der Block
+     um genau eine Höhe hoch. Aus Ablauf a-18 (300 ms, easeInOut). */
+  .menuepunkt {
+    display: block;
+    height: 80px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--farbe-primaer);
+    font: inherit;
+    text-decoration: none;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .menuepunkt__rolle {
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--dauer-normal) var(--verlauf);
+  }
+
+  .menuepunkt__text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    flex: none;
+  }
+
+  .menuepunkt:hover .menuepunkt__rolle,
+  .menuepunkt:focus-visible .menuepunkt__rolle,
+  .aufklapp[data-offen] .menuepunkt__rolle {
+    transform: translateY(-80px);
+  }
+
+  /* ---------- Aufklappmenü ---------- */
+  .aufklapp {
+    position: relative;
+  }
+
+  .aufklapp__inhalt {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--ebene-menue);
+    min-width: 34rem;
+    padding: var(--abstand-m);
+    background: var(--farbe-flaeche);
+    border: 1px solid var(--farbe-linie);
+    border-radius: var(--radius-m);
+    box-shadow: 0 12px 32px rgb(19 0 13 / 12%);
+  }
+
+  .aufklapp__inhalt[hidden] { display: none; }
+
+  .aufklapp__spalten {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--abstand-m);
+  }
+
+  .aufklapp__titel {
+    margin-bottom: var(--abstand-2xs);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--farbe-text-gedeckt);
+  }
+
+  .aufklapp__liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .aufklapp__eintrag {
+    display: flex;
+    align-items: center;
+    gap: var(--abstand-2xs);
+    padding: var(--abstand-3xs) var(--abstand-2xs);
+    border-radius: var(--radius-s);
+    color: var(--farbe-text);
+    font-size: var(--text-s);
+    text-decoration: none;
+    transition: background-color var(--dauer-schnell) var(--verlauf);
+  }
+
+  .aufklapp__eintrag img {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex: none;
+    object-fit: contain;
+  }
+
+  .aufklapp__eintrag:hover,
+  .aufklapp__eintrag:focus-visible {
+    background: var(--farbe-flaeche-gedeckt);
+    color: var(--farbe-primaer);
+  }
+
+  .aufklapp__alle {
+    display: block;
+    margin-top: var(--abstand-s);
+    padding-top: var(--abstand-2xs);
+    border-top: 1px solid var(--farbe-linie);
+    font-size: var(--text-s);
+    font-weight: var(--gewicht-halbfett);
+    color: var(--farbe-primaer);
+  }
+
+  /* ---------- Symbolleiste unten ---------- */
+  .fussleiste {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: var(--ebene-navigation);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: var(--abstand-m);
+    width: 100%;
+    padding: var(--abstand-2xs) var(--abstand-s) var(--abstand-xs);
+    background: rgb(255 255 255 / 80%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--farbe-linie);
+    transition: transform var(--dauer-normal) var(--verlauf);
+  }
+
+  .fussknopf {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--abstand-3xs);
+    color: var(--farbe-primaer);
+    font-size: var(--text-xs);
+    text-decoration: none;
+  }
+
+  .fussknopf__symbol {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+  }
+
+  .fussknopf:hover .fussknopf__text,
+  .fussknopf:focus-visible .fussknopf__text {
+    text-decoration: underline;
+  }
+
+  /* ---------- Zustand „gescrollt" ----------
+     Gesetzt vom Skript, sobald der Startbereich verlassen wird. */
+  :global(body[data-gescrollt]) .kontaktzeile { height: 0; }
+  :global(body[data-gescrollt]) .kopfleiste { height: 80px; }
+  :global(body[data-gescrollt]) .fussleiste { transform: translateY(110px); }
+
+  /* ---------- Punkte als Trenner ---------- */
+  .punkt {
+    flex: none;
+    width: 3px;
+    height: 3px;
+    border-radius: var(--radius-rund);
+    background: var(--farbe-dunkel);
+  }
+
+  /* ---------- Kleine Bildschirme ---------- */
+  @media (max-width: 60rem) {
+    .kontaktzeile__inhalt,
+    .kopfleiste__inhalt { width: 100%; padding-inline: var(--abstand-s); }
+    .punkt--ab-tablet,
+    .kontaktzeile__text--ab-tablet { display: none; }
+    .aufklapp__inhalt { min-width: min(90vw, 28rem); }
+    .aufklapp__spalten { grid-template-columns: 1fr; }
+    .fussleiste { gap: var(--abstand-s); }
+    .fussknopf__text { font-size: 0.7rem; }
+  }
+</style>
+
+<script>
+  /**
+   * Verhalten der Navigation.
+   *
+   * 1. Leistenwechsel beim Scrollen: Sobald der Startbereich verlassen
+   *    wird, trägt <body> die Markierung `data-gescrollt`. Alles Weitere
+   *    erledigt CSS. Der Wechsel wird mit einem Puffer geschaltet, damit
+   *    die Leisten an der Schwelle nicht flackern.
+   *
+   * 2. Aufklappmenü unter „Leistungen": öffnet per Klick, schließt per
+   *    Escape, Klick nach außen oder wenn der Fokus den Bereich verlässt.
+   */
+  function navigationAufbauen() {
+    // ---- Leistenwechsel ----
+    const AUS = 120; // ab hier gilt die Seite als gescrollt
+    const EIN = 60;  // erst darunter wieder zurück
+    let gescrollt = false;
+    let geplant = false;
+
+    const pruefen = () => {
+      geplant = false;
+      const y = window.scrollY;
+      if (!gescrollt && y > AUS) {
+        gescrollt = true;
+        document.body.dataset.gescrollt = 'ja';
+      } else if (gescrollt && y < EIN) {
+        gescrollt = false;
+        delete document.body.dataset.gescrollt;
+      }
+    };
+
+    const beiScroll = () => {
+      if (geplant) return;
+      geplant = true;
+      requestAnimationFrame(pruefen);
+    };
+
+    window.removeEventListener('scroll', beiScroll);
+    window.addEventListener('scroll', beiScroll, { passive: true });
+    pruefen();
+
+    // ---- Aufklappmenü ----
+    document.querySelectorAll<HTMLElement>('[data-aufklapp]').forEach((huelle) => {
+      if (huelle.dataset.bereit) return;
+      huelle.dataset.bereit = 'ja';
+
+      const knopf = huelle.querySelector<HTMLButtonElement>('button[aria-expanded]');
+      const inhalt = huelle.querySelector<HTMLElement>('.aufklapp__inhalt');
+      if (!knopf || !inhalt) return;
+
+      const setzen = (offen: boolean) => {
+        knopf.setAttribute('aria-expanded', String(offen));
+        inhalt.hidden = !offen;
+        if (offen) huelle.dataset.offen = 'ja';
+        else delete huelle.dataset.offen;
+      };
+
+      knopf.addEventListener('click', () => {
+        setzen(knopf.getAttribute('aria-expanded') !== 'true');
+      });
+
+      // Schließen, wenn der Fokus den Bereich verlässt
+      huelle.addEventListener('focusout', (e) => {
+        const ziel = e.relatedTarget as Node | null;
+        if (!ziel || !huelle.contains(ziel)) setzen(false);
+      });
+
+      // Schließen bei Klick außerhalb
+      document.addEventListener('click', (e) => {
+        if (!huelle.contains(e.target as Node)) setzen(false);
+      });
+
+      // Schließen mit Escape, Fokus zurück auf den Knopf
+      huelle.addEventListener('keydown', (e) => {
+        if ((e as KeyboardEvent).key === 'Escape') {
+          setzen(false);
+          knopf.focus();
+        }
+      });
+    });
+  }
+
+  navigationAufbauen();
+  document.addEventListener('astro:page-load', navigationAufbauen);
+</script>
