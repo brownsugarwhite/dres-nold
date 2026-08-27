@@ -8,6 +8,8 @@
     ::view-transition-old(name)     der alte Zustand (die Kachel)
     ::view-transition-new(name)     der neue Zustand (die Seite)
 
+  Unterstützt von Chrome 111+, Safari 18+ und Firefox 144+.
+
   Der Morph ist also nur die Voreinstellung, nicht die einzige Option.
   Unten stehen vier Varianten. Genau EINE aktiv lassen, die anderen
   auskommentiert stehen lassen — dann kann jederzeit umgeschaltet werden.

@@ -43,7 +43,7 @@ Redaktion ──► dres-nold.de/login
 | Seitengenerator | **Astro** | Erzeugt statisches HTML ohne Framework-Ballast; ideal für eine Info-Seite |
 | Styling | **Eigenes CSS mit Tokens** | Kein Tailwind, kein generierter Code — lesbar und nachvollziehbar |
 | Animationen | **CSS + Intersection Observer** | Ersetzt Webflows Interaktions-Engine und jQuery |
-| Seitenwechsel | **View Transitions API** | Leistungen und Beiträge morphen ins Vollbild — echte Seiten, die sich wie eine App anfühlen |
+| Seitenwechsel | **Astro ClientRouter + View Transitions** | Leistungen und Beiträge morphen ins Vollbild — echte Seiten, die sich wie eine App anfühlen |
 | Hosting | **Cloudflare Pages** | Kostenlos, unbegrenzte Bandbreite, serverseitige Funktionen möglich |
 | Login | **Cloudflare Access** | Fertiger Dienst, kostenlos bis 50 Nutzer, kein eigenes Passwort-System |
 | Analytics | **Cloudflare Web Analytics** | Cookielos → **kein Cookie-Banner nötig** |
@@ -178,10 +178,25 @@ Umgesetzt wird das mit der **View Transitions API**, nicht mit nachgeladenen Inh
 
 Jede Leistung ist also **eine echte Seite**, die sich beim Öffnen aus ihrer Kachel heraus ins Vollbild morpht. Technisch geschieht das über zusammengehörige `view-transition-name`-Paare auf Kachel und Zielseite.
 
+### Browser-Unterstützung
+
+Astros `ClientRouter` lädt die Zielseite und tauscht den Inhalt **im selben Dokument** aus — dasselbe Prinzip, nach dem auch Barba.js arbeitet. Maßgeblich ist deshalb `Document.startViewTransition`, nicht die CSS-Variante `@view-transition`:
+
+| Browser | Morph ab |
+|---|---|
+| Chrome / Edge | 111 (März 2023) |
+| Safari / iOS | 18 (September 2024) |
+| Firefox | 144 (Oktober 2025) |
+
+Damit funktioniert der Übergang praktisch überall. Ein Zusatz-Fallback ist nicht nötig.
+
+*Nicht verwechseln:* Die rein per CSS gesteuerte Variante `@view-transition` (ohne JavaScript, echter Dokumentwechsel) beherrscht Firefox noch nicht. Sie kommt hier nicht zum Einsatz.
+
 **Regeln dafür:**
-- In Browsern ohne Unterstützung wird schlicht die Seite gewechselt — kein Bruch, nur ohne Übergang
+- In noch älteren Browsern wird schlicht die Seite gewechselt — kein Bruch, nur ohne Übergang
 - Bei `prefers-reduced-motion` entfällt die Bewegung ersatzlos
 - Die Zielseite muss vollständig und sinnvoll sein, auch wenn sie direkt aufgerufen wird
+- Die Übergänge selbst stehen in `src/styles/uebergaenge.css` und sind frei anpassbar
 
 
 ---

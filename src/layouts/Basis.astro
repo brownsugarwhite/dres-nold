@@ -34,10 +34,14 @@ const { titel = seite.titel, beschreibung = seite.beschreibung } = Astro.props;
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     {/*
-      Sanfte Seitenwechsel. Nutzt die native View-Transitions-Funktion des
-      Browsers, wo vorhanden (Chrome, Edge, Safari) — dort morphen die
-      Leistungskacheln ins Vollbild. In Firefox greift ein Überblenden.
-      Ohne JavaScript wird schlicht die Seite gewechselt.
+      Sanfte Seitenwechsel. Der Router lädt die Zielseite und tauscht den
+      Inhalt im selben Dokument aus — dabei morphen die Leistungskacheln
+      ins Vollbild.
+
+      Unterstützt von Chrome 111+, Safari 18+ und Firefox 144+, also
+      praktisch überall. In noch älteren Browsern wird schlicht die Seite
+      gewechselt — ohne Übergang, aber ohne Fehler. Ohne JavaScript
+      ebenfalls: normaler Seitenwechsel, alle Inhalte vollständig.
     */}
     <ClientRouter />
 
