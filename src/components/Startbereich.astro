@@ -34,8 +34,6 @@ const { praxis } = seite;
           height="295"
         />
       </div>
-      {/* Animierter Verlauf, der hinter der Kontur durchscheint */}
-      <div class="logo__verlauf" aria-hidden="true"></div>
     </div>
 
     <div class="scrollhinweis" aria-hidden="true">
@@ -109,28 +107,12 @@ const { praxis } = seite;
     object-fit: contain;
   }
 
-  /* Läuft die Lottie-Animation, tritt das statische Bild zurück
-     und der Verlauf dahinter wird sichtbar */
+  /* Läuft die Lottie-Animation, tritt das statische Bild zurück */
   .logo__kontur[data-lottie-bereit] .logo__bild {
     display: none;
   }
 
-  .logo__kontur[data-lottie-bereit] ~ .logo__verlauf {
-    visibility: visible;
-  }
 
-  /* Der animierte Verlauf hinter der Kontur.
-     Bleibt verborgen, solange die Kontur ihn nicht maskiert — sonst
-     stünde ein offener Farbkasten auf der Seite. */
-  .logo__verlauf {
-    position: relative;
-    z-index: 10;
-    visibility: hidden;
-    width: 48vh;
-    height: 32vh;
-    margin-top: -36vh;
-    background: url('/bilder/deko/verlauf.gif') center / cover no-repeat;
-  }
 
   /* Scroll-Hinweis darunter */
   .scrollhinweis {
