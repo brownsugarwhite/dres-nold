@@ -91,3 +91,43 @@ img {
     animation: none !important;
   }
 }
+
+/*
+  ANIMIERTER VERLAUF IN ÜBERSCHRIFTEN
+  ==================================================================
+  Wie in der Vorlage: Ein bewegtes Verlaufsbild wird durch die Buchstaben
+  hindurch sichtbar (`background-clip: text`).
+
+  Gilt für Überschriften im Inhaltsbereich. Ausgenommen sind Überschriften
+  in Bedienelementen — dort würde der Verlauf die Lesbarkeit stören;
+  sie tragen die Klasse `.ohne-verlauf`.
+
+  Wichtig: `color` bleibt gesetzt. Beherrscht ein Browser den Effekt
+  nicht oder erzwingt das Betriebssystem eigene Farben, ist der Text
+  weiterhin lesbar — er verliert nur den Verlauf.
+*/
+main h1,
+main h2 {
+  color: var(--farbe-primaer);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  main h1:not(.ohne-verlauf),
+  main h2:not(.ohne-verlauf) {
+    background: url('/bilder/deko/verlauf.gif') center / cover no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Erzwingt das Betriebssystem eigene Farben (Kontrastmodus),
+   tritt der Verlauf zurück. */
+@media (forced-colors: active) {
+  main h1,
+  main h2 {
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    color: CanvasText;
+  }
+}

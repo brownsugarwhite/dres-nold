@@ -38,6 +38,7 @@ const zahnmedizin = dienste.filter((e) => e.kategorie === 'zahnmedizin');
 const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaedie');
 ---
 
+<div class="navigation">
 {/* Kontaktzeile — oben auf der Seite sichtbar */}
 <div class="kontaktzeile" data-leiste="kontakt">
   <div class="kontaktzeile__inhalt">
@@ -119,6 +120,7 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
     ))}
   </nav>
 </header>
+</div>
 
 {/* Symbolleiste am unteren Rand — oben auf der Seite sichtbar */}
 <nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff">
@@ -131,6 +133,22 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
 </nav>
 
 <style>
+  /* ---------- Umschlag beider Leisten ----------
+     Oben fixiert, volle Breite, mit Weichzeichner und der Punktlinie
+     am unteren Rand — wie in der Vorlage (.nav). */
+  .navigation {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: var(--ebene-navigation);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background: rgb(255 255 255 / 80%) url('/bilder/deko/punktlinie.png') 0 100% repeat-x;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
   /* ---------- Kontaktzeile ---------- */
   .kontaktzeile {
     display: flex;
@@ -173,15 +191,11 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
 
   /* ---------- Kopfleiste ---------- */
   .kopfleiste {
-    position: sticky;
-    top: 0;
-    z-index: var(--ebene-navigation);
     display: flex;
     justify-content: center;
     align-items: flex-start;
     width: 100%;
     height: 0;
-    background: var(--farbe-flaeche);
     overflow: hidden;
     transition: height var(--dauer-normal) var(--verlauf);
   }

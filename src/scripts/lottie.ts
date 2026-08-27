@@ -12,6 +12,7 @@
 type Spieler = {
   goToAndStop: (wert: number, istBild?: boolean) => void;
   playSegments: (bereich: [number, number], sofort?: boolean) => void;
+  addEventListener: (name: string, rueckruf: () => void) => void;
   destroy: () => void;
   totalFrames: number;
 };
@@ -42,7 +43,17 @@ export async function ladeAnimation(
       path: pfad,
     }) as Spieler;
 
-    // Das statische Ersatzbild ausblenden, sobald die Animation steht
+    // Erst wenn die Animation wirklich steht, ist `totalFrames` gesetzt
+    // und das Bild gezeichnet. Vorher gäbe es einen leeren Kasten.
+    await new Promise<void>((fertig) => {
+      let erledigt = false;
+      const einmal = () => { if (!erledigt) { erledigt = true; fertig(); } };
+      spieler.addEventListener('DOMLoaded', einmal);
+      // Sicherheitsnetz, falls das Ereignis ausbleibt
+      setTimeout(einmal, 3000);
+    });
+
+    // Das statische Ersatzbild ausblenden, jetzt steht die Animation
     behaelter.dataset.lottieBereit = 'ja';
     return spieler;
   } catch {
