@@ -6,6 +6,7 @@
  * hier geht es zunächst darum, den Seitenwechsel zu den Leistungen zu
  * zeigen. Siehe CLAUDE.md.
  */
+import Startbereich from '../components/Startbereich.astro';
 import Navigation from '../components/Navigation.astro';
 import Basis from '../layouts/Basis.astro';
 import Hinweis from '../components/Hinweis.astro';
@@ -29,9 +30,11 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 <Basis>
   <Hinweis />
 
+  <Startbereich />
+
   <Navigation />
 
-  <main id="inhalt">
+  <main id="inhalt" class="seiteninhalt">
     <section class="inhalt kopf">
       <h1>{praxis.name}</h1>
       <p class="kopf__adresse">
@@ -101,6 +104,13 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 </Basis>
 
 <style>
+  /* Der Inhalt schiebt sich über den fixierten Startbereich */
+  .seiteninhalt {
+    position: relative;
+    z-index: 5;
+    background: var(--farbe-flaeche);
+  }
+
   .kopf {
     padding-block: var(--abstand-xl) var(--abstand-l);
   }

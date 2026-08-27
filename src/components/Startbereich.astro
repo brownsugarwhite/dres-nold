@@ -1,0 +1,157 @@
+---
+/**
+ * Startbereich — das große Logo beim Öffnen der Seite.
+ *
+ * Nachbau aus der Vorlage:
+ *   .landing     Logo, am Bildschirm fixiert, füllt die Höhe
+ *   .start_space Weiße Fläche darunter (130vh) — schafft den Scrollweg,
+ *                über den das Logo animiert wird
+ *   .fixedbg     Grauer Grund mit Symbolmuster dahinter
+ *
+ * Ablauf `a-7` (PAGE_SCROLL): Über die ersten 10 % des Scrollwegs
+ * skaliert das Logo auf 1,3, wandert 30 px nach unten, spielt dabei
+ * seine Lottie-Animation ab und blendet aus.
+ *
+ * Ohne JavaScript und bei reduzierter Bewegung steht das statische
+ * Logo — die Seite ist nie leer.
+ */
+import seite from '../content/seite.json';
+const { praxis } = seite;
+---
+
+<div class="grund" aria-hidden="true"></div>
+
+<div class="startbereich" data-startbereich>
+  <div class="startbereich__mitte">
+    <div class="startbereich__logo" data-logo>
+      {/* Statisches Logo — sichtbar, bis (und falls) die Animation lädt */}
+      <img
+        class="startbereich__logo-bild"
+        src="/icons/logo.svg"
+        alt={praxis.name}
+        width="434"
+        height="295"
+      />
+    </div>
+  </div>
+</div>
+
+{/* Schafft den Scrollweg, über den das Logo animiert wird */}
+<div class="startraum" aria-hidden="true"></div>
+
+<style>
+  .grund {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: #f3f3f3 url('/bilder/deko/icon-hintergrund.png') center / 600px;
+  }
+
+  .startbereich {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    pointer-events: none;
+  }
+
+  .startbereich__mitte {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .startbereich__logo {
+    /* Leicht nach oben versetzt — Wert aus der Vorlage */
+    margin-top: -100px;
+    width: min(70vw, 434px);
+    /* Wird vom Skript am Scrollfortschritt entlang gesetzt */
+    transform: scale(var(--logo-groesse, 1)) translateY(var(--logo-versatz, 0px));
+    opacity: var(--logo-deckkraft, 1);
+    will-change: transform, opacity;
+  }
+
+  .startbereich__logo-bild {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Läuft die Lottie-Animation, tritt das statische Bild zurück */
+  .startbereich__logo[data-lottie-bereit] .startbereich__logo-bild {
+    display: none;
+  }
+
+  .startraum {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 130vh;
+    height: 130dvh;
+    background: var(--farbe-flaeche);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .startbereich__logo {
+      transform: none;
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  import { ladeAnimation, anScrollKoppeln } from '../scripts/lottie';
+
+  function startbereichAufbauen() {
+    const bereich = document.querySelector<HTMLElement>('[data-startbereich]');
+    const logo = document.querySelector<HTMLElement>('[data-logo]');
+    if (!bereich || !logo || logo.dataset.bereit) return;
+    logo.dataset.bereit = 'ja';
+
+    const wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (wenigerBewegung) return;
+
+    /** Anteil des Startbereichs, der bereits weggescrollt ist (0 … 1). */
+    const fortschritt = () => {
+      const weg = window.innerHeight * 1.3; // Höhe von .startraum
+      return weg > 0 ? window.scrollY / weg : 0;
+    };
+
+    let geplant = false;
+    const zeichnen = () => {
+      geplant = false;
+      // Die Vorlage nutzt die ersten 10 % des Scrollwegs
+      const p = Math.min(1, Math.max(0, fortschritt() / 0.1));
+      logo.style.setProperty('--logo-groesse', String(1 + 0.3 * p));
+      logo.style.setProperty('--logo-versatz', `${30 * p}px`);
+      logo.style.setProperty('--logo-deckkraft', String(1 - p));
+      // Ist es ganz ausgeblendet, aus dem Weg nehmen
+      bereich.style.visibility = p >= 1 ? 'hidden' : '';
+    };
+
+    const beiScroll = () => {
+      if (geplant) return;
+      geplant = true;
+      requestAnimationFrame(zeichnen);
+    };
+
+    window.addEventListener('scroll', beiScroll, { passive: true });
+    window.addEventListener('resize', beiScroll, { passive: true });
+    zeichnen();
+
+    // Lottie-Logo nachladen und ebenfalls an den Scrollweg koppeln
+    ladeAnimation(logo, '/lottie/logo.json').then((spieler) => {
+      if (spieler) anScrollKoppeln(spieler, () => fortschritt() / 0.1);
+    });
+  }
+
+  startbereichAufbauen();
+  document.addEventListener('astro:page-load', startbereichAufbauen);
+</script>
