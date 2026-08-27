@@ -129,11 +129,11 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
 <nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff">
   {fuss.map((e) => (
     <>
-      <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
+      <a class="fussknopf" href={e.ziel} data-punkt={e.id} data-klein={e.in_fussleiste_klein ? "ja" : "nein"}>
         <img class="fussknopf__symbol" src={e.icon} alt="" width="32" height="32" />
         <span class="fussknopf__text">{e.titel}</span>
       </a>
-      <span class="punkt punkt--fuss" data-nach={e.id} aria-hidden="true"></span>
+      <span class="punkt punkt--fuss" data-nach={e.id} data-klein={e.in_fussleiste_klein ? "ja" : "nein"} aria-hidden="true"></span>
     </>
   ))}
 </nav>
@@ -392,6 +392,10 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
   .punkt--fuss[data-nach='team'] { display: none; }
 
   @media (min-width: 60rem) {
+    /* Telefonnummer steht dort in der Kontaktzeile */
+    .fussknopf[data-punkt='telefon'],
+    .punkt--fuss[data-nach='telefon'] { display: none; }
+
     .fussknopf[data-punkt='zeiten'] { order: 10; }
     .punkt--fuss[data-nach='zeiten'] { display: none; }
     .punkt--fuss[data-nach='team'] { display: block; order: 9; }
@@ -409,8 +413,21 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
   @media (max-width: 60rem) {
     .kontaktzeile__inhalt,
     .kopfleiste__inhalt { width: 100%; padding-inline: var(--abstand-s); }
+    /* Ohne Telefonnummer — dafür steht sie unten als eigener Knopf */
     .punkt--ab-tablet,
     .kontaktzeile__text--ab-tablet { display: none; }
+
+    /* Nur drei Knöpfe, in eigener Reihenfolge:
+       Kontakt · Telefon · Öffnungszeiten */
+    .fussknopf[data-klein='nein'],
+    .punkt--fuss[data-klein='nein'] { display: none; }
+
+    .fussknopf[data-punkt='kontakt'] { order: 1; }
+    .punkt--fuss[data-nach='kontakt'] { order: 2; display: block; }
+    .fussknopf[data-punkt='telefon'] { order: 3; }
+    .punkt--fuss[data-nach='telefon'] { order: 4; display: block; }
+    .fussknopf[data-punkt='zeiten'] { order: 5; }
+    .punkt--fuss[data-nach='zeiten'] { display: none; }
     .aufklapp__inhalt { min-width: min(90vw, 28rem); }
     .aufklapp__spalten { grid-template-columns: 1fr; }
     .fussleiste { gap: var(--abstand-s); }

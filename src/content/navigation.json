@@ -1,5 +1,5 @@
 {
-  "_hinweis_fuer_die_redaktion": "Die Menüpunkte. \"ziel\" beginnend mit # springt auf der Startseite, sonst normale Adresse. \"position\" ordnet die Leiste oben, \"position_fussleiste\" die Symbolleiste unten — beide haben in der Vorlage eine unterschiedliche Reihenfolge. \"in_kopfleiste\" und \"in_fussleiste\" steuern, wo ein Punkt überhaupt erscheint. Der Punkt Leistungen klappt automatisch die Einträge aus leistungen.json auf.",
+  "_hinweis_fuer_die_redaktion": "Die Menüpunkte. \"ziel\" beginnend mit # springt auf der Startseite, sonst normale Adresse. \"position\" ordnet die Leiste oben, \"position_fussleiste\" die Symbolleiste unten — beide haben in der Vorlage eine unterschiedliche Reihenfolge. \"in_kopfleiste\" und \"in_fussleiste\" steuern, wo ein Punkt überhaupt erscheint. Der Punkt Leistungen klappt automatisch die Einträge aus leistungen.json auf. \"in_fussleiste_klein\" steuert, welche Knöpfe auf Handys erscheinen — dort ist nur Platz für drei.",
   "eintraege": [
     {
       "id": "praxis",
@@ -10,7 +10,8 @@
       "icon": "/icons/navigation/praxis.svg",
       "in_kopfleiste": true,
       "in_fussleiste": true,
-      "position_fussleiste": 3
+      "position_fussleiste": 3,
+      "in_fussleiste_klein": false
     },
     {
       "id": "leistungen",
@@ -22,7 +23,8 @@
       "icon": "/icons/navigation/leistungen.svg",
       "in_kopfleiste": true,
       "in_fussleiste": true,
-      "position_fussleiste": 4
+      "position_fussleiste": 4,
+      "in_fussleiste_klein": false
     },
     {
       "id": "team",
@@ -33,7 +35,8 @@
       "icon": "/icons/navigation/team.svg",
       "in_kopfleiste": true,
       "in_fussleiste": true,
-      "position_fussleiste": 5
+      "position_fussleiste": 5,
+      "in_fussleiste_klein": false
     },
     {
       "id": "neuigkeiten",
@@ -44,7 +47,8 @@
       "icon": "/icons/navigation/neuigkeiten.svg",
       "in_kopfleiste": true,
       "in_fussleiste": true,
-      "position_fussleiste": 6
+      "position_fussleiste": 6,
+      "in_fussleiste_klein": false
     },
     {
       "id": "kontakt",
@@ -55,7 +59,8 @@
       "icon": "/icons/navigation/kontakt.svg",
       "in_kopfleiste": true,
       "in_fussleiste": true,
-      "position_fussleiste": 2
+      "position_fussleiste": 2,
+      "in_fussleiste_klein": true
     },
     {
       "id": "zeiten",
@@ -66,7 +71,21 @@
       "icon": "/icons/navigation/oeffnungszeiten.svg",
       "in_kopfleiste": false,
       "in_fussleiste": true,
-      "position_fussleiste": 1
+      "position_fussleiste": 1,
+      "in_fussleiste_klein": true
+    },
+    {
+      "id": "telefon",
+      "aktiv": true,
+      "position": 99,
+      "titel": "07245 7171",
+      "ziel": "tel:072457171",
+      "icon": "/icons/navigation/telefon.svg",
+      "in_kopfleiste": false,
+      "in_fussleiste": true,
+      "position_fussleiste": 1.5,
+      "nur_klein": true,
+      "in_fussleiste_klein": true
     }
   ]
 }

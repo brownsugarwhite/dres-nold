@@ -91,10 +91,17 @@ const { praxis } = seite;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 50vh;
-    height: 40vh;
+    /* Auch die Fensterbreite begrenzen — sonst ragt das Logo auf
+       Handys seitlich hinaus (50vh sind dort breiter als der Schirm). */
+    width: min(50vh, 84vw);
+    height: min(40vh, 67vw);
     margin-top: -100px;
     margin-left: -50px;
+    /* Auf schmalen Schirmen mittig statt versetzt */
+    @media (max-width: 40rem) {
+      margin-left: 0;
+      margin-top: -40px;
+    }
     /* Wird vom Skript am Scrollfortschritt entlang gesetzt */
     transform: scale(var(--logo-groesse, 1)) translateY(var(--logo-versatz, 0px));
     opacity: var(--logo-deckkraft, 1);
@@ -118,8 +125,9 @@ const { praxis } = seite;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
-    width: 47vh;
-    height: 30vh;
+    /* Anteilig zum Logo, damit das Verhältnis auf jeder Größe stimmt */
+    width: 88%;
+    height: 66%;
     background: url('/bilder/deko/verlauf.gif') center / cover no-repeat;
   }
 
