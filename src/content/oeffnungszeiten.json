@@ -1,27 +1,32 @@
 {
-  "_hinweis_fuer_die_redaktion": "Drei Listen mit den Sprechzeiten. Jede Zeile ist ein Wochentag mit seinen Zeiten; mehrere Zeitspannen an einem Tag durch drei Leerzeichen trennen. Ein Tag ohne Zeiten wird ausgeblendet. \"zusatz\" erscheint als Fußnote unter der Liste — leer lassen, wenn nicht gebraucht.",
+  "_hinweis_fuer_die_redaktion": "Drei Listen mit den Sprechzeiten. Jede Zeile ist ein Wochentag mit bis zu zwei Zeitspannen — \"vormittag\" und \"nachmittag\". Ist \"nachmittag\" leer, bleibt die Spalte frei. Ein Tag ohne Zeiten wird ganz ausgeblendet. \"zusatz\" erscheint als Fußnote unter der Liste.",
   "zahnaerztlich": {
     "titel": "Zahnärztliche Sprechstunde",
     "zeilen": [
       {
         "tag": "Montag",
-        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+        "vormittag": "8.00 - 12.00 Uhr",
+        "nachmittag": "14.00 - 18.00 Uhr"
       },
       {
         "tag": "Dienstag",
-        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+        "vormittag": "8.00 - 12.00 Uhr",
+        "nachmittag": "14.00 - 18.00 Uhr"
       },
       {
         "tag": "Mittwoch",
-        "zeiten": "8.00 - 12.00 Uhr"
+        "vormittag": "8.00 - 12.00 Uhr",
+        "nachmittag": ""
       },
       {
         "tag": "Donnerstag",
-        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+        "vormittag": "8.00 - 12.00 Uhr",
+        "nachmittag": "14.00 - 18.00 Uhr"
       },
       {
         "tag": "Freitag",
-        "zeiten": "8.00 - 13.00 Uhr"
+        "vormittag": "8.00 - 13.00 Uhr",
+        "nachmittag": ""
       }
     ],
     "zusatz": ""
@@ -31,11 +36,13 @@
     "zeilen": [
       {
         "tag": "Mittwoch",
-        "zeiten": "14.00 - 18.00 Uhr"
+        "vormittag": "14.00 - 18.00 Uhr",
+        "nachmittag": ""
       },
       {
         "tag": "Freitag",
-        "zeiten": "13.00 - 16.00 Uhr"
+        "vormittag": "13.00 - 16.00 Uhr",
+        "nachmittag": ""
       }
     ],
     "zusatz": "...und nach Vereinbarung"
@@ -45,23 +52,28 @@
     "zeilen": [
       {
         "tag": "Montag",
-        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+        "vormittag": "8.00 - 12.00 Uhr",
+        "nachmittag": "14.00 - 18.00 Uhr"
       },
       {
         "tag": "Dienstag",
-        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+        "vormittag": "8.00 - 12.00 Uhr",
+        "nachmittag": "14.00 - 18.00 Uhr"
       },
       {
         "tag": "Mittwoch",
-        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+        "vormittag": "8.00 - 12.00 Uhr",
+        "nachmittag": "14.00 - 18.00 Uhr"
       },
       {
         "tag": "Donnerstag",
-        "zeiten": "8.00 - 12.00 Uhr   14.00 - 18.00 Uhr"
+        "vormittag": "8.00 - 12.00 Uhr",
+        "nachmittag": "14.00 - 18.00 Uhr"
       },
       {
         "tag": "Freitag",
-        "zeiten": "8.00 - 11.00 Uhr   13.00 - 16.00 Uhr"
+        "vormittag": "8.00 - 11.00 Uhr",
+        "nachmittag": "13.00 - 16.00 Uhr"
       }
     ],
     "zusatz": ""

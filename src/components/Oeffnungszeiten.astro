@@ -37,14 +37,19 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
           {listen.map((liste) => (
             <section class="ozliste">
               <h2 class="ozliste__titel ohne-verlauf">{liste.titel}</h2>
-              <dl class="ozzeiten">
-                {liste.zeilen.filter((z) => z.zeiten).map((z) => (
-                  <>
-                    <dt>{z.tag}</dt>
-                    <dd>{z.zeiten}</dd>
-                  </>
-                ))}
-              </dl>
+              <table class="ozzeiten">
+                <tbody>
+                  {liste.zeilen
+                    .filter((z) => z.vormittag || z.nachmittag)
+                    .map((z) => (
+                      <tr>
+                        <th scope="row">{z.tag}</th>
+                        <td>{z.vormittag}</td>
+                        <td>{z.nachmittag}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
               {liste.zusatz && <p class="ozliste__zusatz">{liste.zusatz}</p>}
             </section>
           ))}
@@ -92,8 +97,11 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 
   .ozblase__flaeche {
     position: relative;
-    padding: var(--abstand-l) var(--abstand-l) var(--abstand-m);
+    padding: var(--abstand-m) var(--abstand-l);
     background: var(--farbe-flaeche);
+    /* Nie höher als das Fenster — abzüglich Leiste und Zipfel */
+    max-height: calc(100vh - 190px);
+    overflow-y: auto;
   }
 
   /* Die Lottie-Grafik sitzt direkt darunter und schließt die Fläche ab */
@@ -139,18 +147,29 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     font-weight: var(--gewicht-normal);
   }
 
+  /* Wochentag, Vormittag, Nachmittag — drei Spalten, damit die
+     Zeitangaben nicht umbrechen. In der Vorlage stehen sie ebenso
+     nebeneinander. */
   .ozzeiten {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: var(--abstand-3xs) var(--abstand-s);
-    margin: 0;
+    border-collapse: collapse;
     font-size: var(--text-s);
     color: var(--farbe-primaer);
   }
 
-  /* Wochentage rechtsbündig, Zeiten links daneben — wie in der Vorlage */
-  .ozzeiten dt { text-align: right; }
-  .ozzeiten dd { margin: 0; white-space: pre-line; }
+  .ozzeiten th,
+  .ozzeiten td {
+    padding: 0.1rem 0;
+    font-weight: var(--gewicht-normal);
+    white-space: nowrap;
+    vertical-align: baseline;
+  }
+
+  .ozzeiten th {
+    text-align: right;
+    padding-right: var(--abstand-s);
+  }
+
+  .ozzeiten td + td { padding-left: var(--abstand-xs); }
 
   .ozliste__zusatz {
     margin: var(--abstand-2xs) 0 0;
