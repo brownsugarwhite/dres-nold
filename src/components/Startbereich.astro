@@ -133,7 +133,11 @@ const { praxis } = seite;
     z-index: 10;
     width: 96%;
     height: 67%;
-    background: url('/bilder/deko/verlauf.gif') center / cover no-repeat;
+    /* Das Bild ist nur 20 x 10 px gross; seine aeussersten Pixelreihen
+       sind deutlich heller als die Mitte. Beim Vergroessern wuerden sie
+       als heller Saum sichtbar — deshalb wird ueber den Rand hinaus
+       skaliert, sodass nur der gleichmaessige Kern zu sehen ist. */
+    background: url('/bilder/deko/verlauf.gif') center / 150% 210% no-repeat;
   }
 
   .logo__kontur {
