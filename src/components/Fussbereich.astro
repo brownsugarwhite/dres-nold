@@ -1,0 +1,53 @@
+---
+/**
+ * Fußbereich mit den Rechtsverweisen.
+ * In der Vorlage ein einzelner Verweis „Datenschutz & Impressum";
+ * hier getrennt, weil beides eigene Seiten sind.
+ */
+---
+<footer class="fuss">
+  <nav class="fuss__links" aria-label="Rechtliches">
+    <a href="/datenschutz/">Datenschutz</a>
+    <span class="punkt" aria-hidden="true"></span>
+    <a href="/impressum/">Impressum</a>
+  </nav>
+</footer>
+
+<style>
+  /* .div-block-31: 100 px hoch, Punktlinie oben */
+  .fuss {
+    position: relative;
+    z-index: 40;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    background: var(--farbe-flaeche) url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
+    background-size: auto 1px;
+  }
+
+  .fuss__links {
+    display: flex;
+    align-items: center;
+    gap: var(--abstand-s);
+    font-size: var(--text-s);
+  }
+
+  .fuss__links a {
+    color: var(--farbe-text);
+    text-decoration: none;
+  }
+
+  .fuss__links a:hover,
+  .fuss__links a:focus-visible {
+    color: var(--farbe-primaer);
+    text-decoration: underline;
+  }
+
+  .punkt {
+    width: 3px;
+    height: 3px;
+    border-radius: var(--radius-rund);
+    background: var(--farbe-dunkel);
+  }
+</style>

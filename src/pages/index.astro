@@ -10,6 +10,9 @@ import Startbereich from '../components/Startbereich.astro';
 import Oeffnungszeiten from '../components/Oeffnungszeiten.astro';
 import Willkommen from '../components/Willkommen.astro';
 import Galerie from '../components/Galerie.astro';
+import Team from '../components/Team.astro';
+import Kontakt from '../components/Kontakt.astro';
+import Fussbereich from '../components/Fussbereich.astro';
 import Navigation from '../components/Navigation.astro';
 import Basis from '../layouts/Basis.astro';
 import Hinweis from '../components/Hinweis.astro';
@@ -61,24 +64,6 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
       </div>
     </section>
 
-    <section id="team" class="inhalt abschnitt">
-      <h2>Unser Team</h2>
-      <div class="aerzte">
-        {aerzte.map((a) => (
-          <figure class="arzt">
-            <img src={a.foto} alt={a.foto_alt} width="300" height="400" loading="lazy" />
-            <figcaption>
-              <strong>{a.name}</strong>
-              <span>{a.funktion}</span>
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-      <p class="abschnitt__einleitung">
-        Dazu {personen.length - aerzte.length} Mitarbeiterinnen — die vollständige
-        Darstellung folgt beim Nachbau des Team-Abschnitts.
-      </p>
-    </section>
 
 
     <section class="inhalt abschnitt" hidden>
@@ -99,6 +84,10 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
     </section>
 
   </main>
+
+  <Team />
+  <Kontakt />
+  <Fussbereich />
 </Basis>
 
 <style>

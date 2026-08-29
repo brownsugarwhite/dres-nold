@@ -1,0 +1,136 @@
+---
+/**
+ * Kontakt — Adresse zweispaltig, darunter der Kartenausschnitt.
+ *
+ * Maße aus dem Stylesheet der Vorlage:
+ *   .contact       60 px oben, 200 px unten Innenabstand
+ *   .div-block-27  30 px Abstand über der Adresse
+ *   .text-block-4  rechtsbündig, 20 px, Gewicht 300, Zeilenhöhe 26 px
+ *   .text-block-5  linksbündig, gleiche Schrift
+ *
+ * Kein Briefumschlag — der gehörte zu einem früheren Provisorium
+ * und wird durch den Neuigkeiten-Bereich ersetzt.
+ */
+import seite from '../content/seite.json';
+const { praxis } = seite;
+const kartenZiel = 'https://www.google.com/maps/search/?api=1&query=' +
+  encodeURIComponent(`${praxis.strasse}, ${praxis.plz} ${praxis.ort}`);
+---
+
+<section class="kontakt" id="contact">
+  <h2 class="kontakt__titel">So erreichen Sie uns</h2>
+
+  <div class="kontakt__adresse">
+    <address class="kontakt__spalte kontakt__spalte--rechts">
+      <strong>Praxis {praxis.name.split('–')[0].trim()}</strong><br />
+      {praxis.strasse}<br />
+      {praxis.plz} {praxis.ort}
+    </address>
+
+    <address class="kontakt__spalte kontakt__spalte--links">
+      Telefon <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a><br />
+      Fax {praxis.fax}<br />
+      <a class="kontakt__mail" href={`mailto:${praxis.email}`}>{praxis.email}</a>
+    </address>
+  </div>
+
+  <a class="kontakt__karte" href={kartenZiel} target="_blank" rel="noopener">
+    <span class="kontakt__kartentext">Zu Google Maps</span>
+    <img src="/bilder/deko/karte.png" alt="Lageplan der Praxis in Bietigheim" width="875" height="325" loading="lazy" />
+  </a>
+</section>
+
+<style>
+  /* .contact: 60 px oben, 200 px unten */
+  .kontakt {
+    position: relative;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding-block: 60px 200px;
+  }
+
+  .kontakt__titel {
+    margin-bottom: 0;
+    text-align: center;
+  }
+
+  /* .div-block-27: 30 px Abstand darüber */
+  .kontakt__adresse {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 30px;
+  }
+
+  /* .text-block-4 / -5: 20 px, Gewicht 300, Zeilenhöhe 26 px */
+  .kontakt__spalte {
+    color: var(--farbe-text);
+    font-size: 20px;
+    font-weight: 300;
+    font-style: normal;
+    line-height: 26px;
+  }
+
+  .kontakt__spalte--rechts {
+    text-align: right;
+    margin-inline: 18px 40px;
+  }
+
+  .kontakt__spalte--links {
+    text-align: left;
+    margin-left: 40px;
+  }
+
+  .kontakt__spalte a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .kontakt__spalte a:hover,
+  .kontakt__spalte a:focus-visible { text-decoration: underline; }
+
+  .kontakt__mail {
+    font-weight: var(--gewicht-halbfett);
+    color: var(--farbe-primaer);
+  }
+
+  /* Kartenausschnitt, 46 px unter der Adresse */
+  .kontakt__karte {
+    position: relative;
+    display: block;
+    width: min(100% - 2 * var(--abstand-m), 875px);
+    margin-top: 46px;
+  }
+
+  .kontakt__karte img {
+    width: 100%;
+    height: auto;
+  }
+
+  /* .text-block-13: 18 px, Gewicht 600 */
+  .kontakt__kartentext {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 1em;
+    color: #505050;
+    font-size: 18px;
+    font-weight: 600;
+    transition: font-size var(--dauer-schnell) var(--verlauf);
+  }
+
+  .kontakt__karte:hover .kontakt__kartentext,
+  .kontakt__karte:focus-visible .kontakt__kartentext {
+    font-size: 20px;
+  }
+
+  @media (max-width: 767px) {
+    .kontakt { padding-block: 40px 120px; }
+    .kontakt__adresse { flex-direction: column; align-items: center; gap: var(--abstand-s); }
+    .kontakt__spalte--rechts,
+    .kontakt__spalte--links { text-align: center; margin: 0; }
+  }
+</style>

@@ -1,0 +1,140 @@
+---
+/**
+ * Team — Gruppenfoto mit Überschrift, darunter die Porträts.
+ *
+ * Maße aus dem Stylesheet der Vorlage:
+ *   .team-header-container  Höhe 580 px, überlappungsfrei beschnitten
+ *   .team-container         100 px oben, 140 px unten Innenabstand
+ *   .team-image             Höhe 260 px, Bildausschnitt oben ausgerichtet
+ */
+import team from '../content/team.json';
+
+const personen = team.eintraege
+  .filter((e) => e.aktiv)
+  .sort((a, b) => a.position - b.position);
+const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
+const mitarbeitende = personen.filter((e) => e.gruppe === 'team');
+---
+
+<section class="team" id="team">
+  <div class="team__kopf">
+    <div class="team__bild" role="img" aria-label="Das Ärzteteam der Praxis Dres. Nold"></div>
+    <h2 class="team__titel ohne-verlauf">Wir freuen uns auf Sie</h2>
+  </div>
+
+  <div class="team__inhalt inhalt">
+    <div class="team__reihe">
+      {aerzte.map((a) => (
+        <figure class="person">
+          <img class="person__bild" src={a.foto} alt={a.foto_alt} width="300" height="260" loading="lazy" />
+          <figcaption class="person__text">
+            <strong class="person__name">{a.name}</strong>
+            <span class="person__funktion">{a.funktion}</span>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <div class="team__reihe team__reihe--klein">
+      {mitarbeitende.map((m) => (
+        <figure class="person">
+          <img class="person__bild" src={m.foto} alt={m.foto_alt} width="300" height="260" loading="lazy" />
+          <figcaption class="person__text">
+            <strong class="person__name">{m.name}</strong>
+            <span class="person__funktion">{m.funktion}</span>
+            {m.zusatz && <span class="person__zusatz">{m.zusatz}</span>}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .team {
+    position: relative;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background: var(--farbe-flaeche);
+  }
+
+  /* .team-header-container: 580 px hoch, Bild formatfüllend */
+  .team__kopf {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 580px;
+    overflow: hidden;
+  }
+
+  .team__bild {
+    position: absolute;
+    inset: 0;
+    background: url('/bilder/aerzteteam.webp') center / cover no-repeat;
+  }
+
+  .team__titel {
+    position: relative;
+    margin: 0;
+    color: var(--farbe-text-invers);
+    font-size: clamp(2rem, 1rem + 4vw, 4.5rem);
+    font-weight: var(--gewicht-halbfett);
+    text-align: center;
+  }
+
+  /* .team-container: 100 px oben, 140 px unten */
+  .team__inhalt {
+    padding-block: 100px 140px;
+  }
+
+  .team__reihe {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .team__reihe--klein {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  .person { margin: 0; }
+
+  /* .team-image: 260 px hoch, Ausschnitt oben ausgerichtet */
+  .person__bild {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    object-position: 50% 0;
+    background: var(--farbe-flaeche);
+  }
+
+  .person__text {
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--abstand-2xs);
+  }
+
+  .person__name {
+    color: var(--farbe-primaer);
+    font-weight: var(--gewicht-halbfett);
+  }
+
+  .person__funktion,
+  .person__zusatz {
+    color: var(--farbe-text);
+    font-size: var(--text-s);
+    font-weight: 300;
+  }
+
+  @media (max-width: 767px) {
+    .team__kopf { height: 380px; }
+    .team__inhalt { padding-block: 60px 80px; }
+  }
+</style>
