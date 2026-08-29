@@ -83,7 +83,7 @@
       "icon": "/icons/navigation/telefon.svg",
       "in_kopfleiste": false,
       "in_fussleiste": true,
-      "position_fussleiste": 1.5,
+      "position_fussleiste": 2.5,
       "nur_klein": true,
       "in_fussleiste_klein": true
     }

@@ -36,7 +36,7 @@ const kopf = punkte.filter((e) => e.in_kopfleiste);
    per CSS zu verschieben (fehleranfällig bei den Trennpunkten) werden
    beide Listen erzeugt und per Umbruchpunkt umgeschaltet. */
 const fussGross = punkte
-  .filter((e) => e.in_fussleiste && e.id !== 'telefon')
+  .filter((e) => e.in_fussleiste)
   .sort((a, b) => (a.position_fussleiste ?? 99) - (b.position_fussleiste ?? 99))
   .filter((e) => e.id !== 'zeiten')
   .concat(punkte.filter((e) => e.id === 'zeiten'));   // Öffnungszeiten ans Ende
