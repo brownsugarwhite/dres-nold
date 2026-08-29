@@ -235,12 +235,36 @@ const { praxis } = seite;
     zeichnen();
 
     // Lottie-Logo nachladen und ebenfalls an den Scrollweg koppeln
-    // Bild 0 zeigt das Logo, Bild 99 ist leer. Beim Scrollen läuft die
-    // Animation vorwärts und gibt den Blick frei — wie in Ablauf a-7.
+    /*
+      Ladeanimation (Ablauf a-24):
+      Das Logo startet bei Bild 99 — dort ist die Grafik leer. Über
+      2500 ms fährt sie auf Bild 0, wodurch das Logo erscheint.
+      Erst danach folgt sie dem Scrollweg (Ablauf a-7).
+    */
     ladeAnimation(logo, '/lottie/logo.json').then((spieler) => {
       if (!spieler) return;
-      spieler.goToAndStop(0, true);
-      anScrollKoppeln(spieler, () => fortschritt() / 0.1);
+
+      const letztes = spieler.totalFrames - 1;
+      spieler.goToAndStop(letztes, true);
+
+      const DAUER = 2500;
+      let start: number | null = null;
+      let fertig = false;
+
+      const einblenden = (jetzt: number) => {
+        if (start === null) start = jetzt;
+        const p = Math.min(1, (jetzt - start) / DAUER);
+        // Weiche Kurve wie in der Vorlage
+        const weich = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+        spieler.goToAndStop(letztes * (1 - weich), true);
+        if (p < 1) requestAnimationFrame(einblenden);
+        else {
+          fertig = true;
+          // Ab jetzt folgt das Logo dem Scrollweg
+          anScrollKoppeln(spieler, () => fortschritt() / 0.1);
+        }
+      };
+      requestAnimationFrame(einblenden);
     });
   }
 
