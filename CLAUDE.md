@@ -2,6 +2,27 @@
 
 Website der Zahnarzt- und Kieferorthopädie-Praxis **Dres. Nold**, Rosenstraße 1, 76467 Bietigheim.
 
+---
+
+> ## ⚠ Zuerst lesen: `docs/entscheidungen.md`
+>
+> Dort stehen Florians Festlegungen — **sie haben Vorrang vor allem
+> anderen**, auch vor der alten Seite. Vor jedem Arbeitsschritt lesen.
+>
+> Die wichtigsten, weil hier schon gegen sie gearbeitet wurde:
+>
+> - **Leistungen sind eigene Seiten** unter `/leistungen/<id>`, die sich
+>   beim Öffnen ins Vollbild morphen. **Nicht** die Aufklapp-Liste der
+>   alten Seite nachbauen.
+> - **Öffnungszeiten** verwenden auf allen Größen die mobile Lösung
+>   (Blase mit Zipfel). **Nicht** die zwei Kästen der Desktop-Vorlage.
+> - **Kein Briefumschlag** im Kontakt.
+>
+> `docs/referenz/` beschreibt, was die alte Seite tut — als Nachschlage-
+> werk, nicht als Vorgabe. Bei Widerspruch gilt `entscheidungen.md`.
+
+---
+
 Dieses Projekt ersetzt die bisherige Webflow-Seite durch einen eigenen, kostenfrei betreibbaren Nachbau.
 
 **Gestaltung und Animationen der Startseite bleiben 1:1 erhalten**, der Unterbau ist vollständig neu. Hinzu kommen gegenüber der Webflow-Fassung: eigene Seiten für jede Leistung, ein Neuigkeiten-Bereich und ein aufklappbares Menü.

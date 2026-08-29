@@ -16,9 +16,21 @@
       "dateien": []
     },
     {
+      "id": "praxis-bleibt-erreichbar",
+      "aktiv": true,
+      "position": 2,
+      "datum": "2026-08-15",
+      "titel": "Auch im Urlaub für Sie erreichbar",
+      "kurz": "Während unserer Sommerpause vom 17. August bis 4. September erreichen Sie über unseren Anrufbeantworter die zuständige Vertretungspraxis.",
+      "bild": "/bilder/galerie/gallery05.jpg",
+      "bild_alt": "Empfangsbereich der Praxis",
+      "inhalt": "<p>Unsere Praxis bleibt vom 17. August bis einschließlich 4. September geschlossen. Damit Sie in dieser Zeit nicht ohne Ansprechpartner sind, haben wir folgendes eingerichtet:</p><table><thead><tr><th>Anliegen</th><th>So erreichen Sie uns</th></tr></thead><tbody><tr><td>Akute Beschwerden</td><td>Anrufbeantworter nennt die Vertretungspraxis</td></tr><tr><td>Terminwünsche</td><td>E-Mail an info@dres-nold.de</td></tr><tr><td>Rezepte und Unterlagen</td><td>ab dem 5. September wieder in der Praxis</td></tr></tbody></table><p>Bitte beachten Sie, dass E-Mails erst nach unserer Rückkehr beantwortet werden. Bei akuten Beschwerden rufen Sie bitte an.</p>",
+      "dateien": []
+    },
+    {
       "id": "beispielbeitrag",
       "aktiv": false,
-      "position": 2,
+      "position": 3,
       "datum": "2026-08-01",
       "titel": "Beispielbeitrag (ausgeblendet)",
       "kurz": "Dieser Beitrag ist ausgeblendet und dient als Vorlage zum Kopieren.",
