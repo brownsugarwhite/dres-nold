@@ -31,14 +31,29 @@ const punkte = navi.eintraege
   .sort((a, b) => a.position - b.position);
 
 const kopf = punkte.filter((e) => e.in_kopfleiste);
-// Die Symbolleiste unten hat in der Vorlage eine eigene Reihenfolge
-const fuss = punkte
-  .filter((e) => e.in_fussleiste)
-  .sort((a, b) => (a.position_fussleiste ?? 99) - (b.position_fussleiste ?? 99));
+/* Die Symbolleiste unten hat in der Vorlage eine eigene Reihenfolge —
+   und auf Handys eine andere als auf dem Desktop. Statt die Reihenfolge
+   per CSS zu verschieben (fehleranfällig bei den Trennpunkten) werden
+   beide Listen erzeugt und per Umbruchpunkt umgeschaltet. */
+const fussGross = punkte
+  .filter((e) => e.in_fussleiste && e.id !== 'telefon')
+  .sort((a, b) => (a.position_fussleiste ?? 99) - (b.position_fussleiste ?? 99))
+  .filter((e) => e.id !== 'zeiten')
+  .concat(punkte.filter((e) => e.id === 'zeiten'));   // Öffnungszeiten ans Ende
+
+const fussKlein = ['kontakt', 'telefon', 'zeiten']
+  .map((id) => punkte.find((e) => e.id === id))
+  .filter(Boolean);
 
 const dienste = leistungen.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
-const zahnmedizin = dienste.filter((e) => e.kategorie === 'zahnmedizin');
-const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaedie');
+
+/* Die Kategorien kommen aus dem Inhaltsmodell — die Praxis kann dort
+   eigene anlegen. Leere Kategorien erscheinen nicht. */
+const kategorien = (leistungen.kategorien ?? [])
+  .filter((k) => k.aktiv)
+  .sort((a, b) => a.position - b.position)
+  .map((k) => ({ ...k, eintraege: dienste.filter((e) => e.kategorie === k.id) }))
+  .filter((k) => k.eintraege.length > 0);
 ---
 
 <div class="navigation">
@@ -96,34 +111,26 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
             </button>
 
             <div class="aufklapp__inhalt" id="leistungsmenue" hidden>
+              <span class="aufklapp__linie" aria-hidden="true"></span>
+
               <div class="aufklapp__spalten">
-                <div class="aufklapp__spalte">
-                  <h2 class="aufklapp__titel">Zahnmedizin</h2>
-                  <ul class="aufklapp__liste">
-                    {zahnmedizin.map((l) => (
-                      <li>
-                        <a class="aufklapp__eintrag" href={`/leistungen/${l.id}/`}>
-                          <img src={l.icon} alt="" width="28" height="28" />
-                          <span>{l.titel}</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div class="aufklapp__spalte">
-                  <h2 class="aufklapp__titel">Kieferorthopädie</h2>
-                  <ul class="aufklapp__liste">
-                    {kieferorthopaedie.map((l) => (
-                      <li>
-                        <a class="aufklapp__eintrag" href={`/leistungen/${l.id}/`}>
-                          <img src={l.icon} alt="" width="28" height="28" />
-                          <span>{l.titel}</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {kategorien.map((k, i) => (
+                  <div class="aufklapp__spalte" style={`--stufe: ${i}`}>
+                    <h2 class="aufklapp__titel">{k.titel}</h2>
+                    <ul class="aufklapp__liste">
+                      {k.eintraege.map((l) => (
+                        <li>
+                          <a class="aufklapp__eintrag" href={`/leistungen/${l.id}/`}>
+                            <img src={l.icon} alt="" width="28" height="28" />
+                            <span>{l.titel}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
               </div>
+
               <a class="aufklapp__alle" href="/#leistungen">Alle Leistungen im Überblick</a>
             </div>
           </div>
@@ -162,16 +169,28 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
 
 {/* Symbolleiste am unteren Rand — oben auf der Seite sichtbar */}
 <nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff">
-  <div class="fussleiste__inhalt">
-  {fuss.map((e) => (
-    <>
-      <a class="fussknopf" href={e.ziel} data-punkt={e.id} data-klein={e.in_fussleiste_klein ? "ja" : "nein"}>
-        <img class="fussknopf__symbol" src={e.icon} alt="" width="32" height="32" />
-        <span class="fussknopf__text">{e.titel}</span>
-      </a>
-      <span class="punkt punkt--fuss" data-nach={e.id} data-klein={e.in_fussleiste_klein ? "ja" : "nein"} aria-hidden="true"></span>
-    </>
-  ))}
+  <div class="fussleiste__inhalt fussleiste__inhalt--gross">
+    {fussGross.map((e, i) => (
+      <>
+        <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
+          <img class="fussknopf__symbol" src={e.icon} alt="" width="60" height="60" />
+          <span class="fussknopf__text">{e.titel}</span>
+        </a>
+        {i < fussGross.length - 1 && <span class="punkt punkt--fuss" aria-hidden="true"></span>}
+      </>
+    ))}
+  </div>
+
+  <div class="fussleiste__inhalt fussleiste__inhalt--klein">
+    {fussKlein.map((e, i) => (
+      <>
+        <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
+          <img class="fussknopf__symbol" src={e.icon} alt="" width="60" height="60" />
+          <span class="fussknopf__text">{e.titel}</span>
+        </a>
+        {i < fussKlein.length - 1 && <span class="punkt punkt--fuss" aria-hidden="true"></span>}
+      </>
+    ))}
   </div>
 </nav>
 
@@ -242,6 +261,11 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
     overflow: hidden;
     transition: height 300ms cubic-bezier(0, 0, 0.58, 1);
   }
+
+  /* Das Aufklappmenü ragt aus der Leiste heraus — solange es offen ist,
+     darf sie den Überlauf nicht beschneiden. */
+  .navigation:has(.aufklapp[data-offen]) .kopfleiste,
+  .navigation:has(.aufklapp[data-offen]) { overflow: visible; }
 
   .kopfleiste__inhalt {
     display: flex;
@@ -397,25 +421,71 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
     position: relative;
   }
 
+  /* Klappt unter dem Menüpunkt auf. Solange die Leiste unten steht
+     (Seite ganz oben), öffnet es nach oben; sobald sie oben klebt,
+     nach unten. */
   .aufklapp__inhalt {
     position: absolute;
-    top: 100%;
+    bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
     z-index: var(--ebene-menue);
-    min-width: 34rem;
+    min-width: 46rem;
     padding: var(--abstand-m);
     background: var(--farbe-flaeche);
-    border: 1px solid var(--farbe-linie);
-    border-radius: var(--radius-m);
+    box-shadow: 0 -12px 32px rgb(19 0 13 / 12%);
+  }
+
+  :global(body[data-gescrollt]) .aufklapp__inhalt {
+    top: 100%;
+    bottom: auto;
     box-shadow: 0 12px 32px rgb(19 0 13 / 12%);
   }
 
   .aufklapp__inhalt[hidden] { display: none; }
 
+  /* Die gestrichelte Linie fährt aus dem Menüpunkt heraus —
+     nach oben, wenn das Menü unten steht, sonst nach unten. */
+  .aufklapp__linie {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
+    background-size: auto 1px;
+    transform: scaleX(0);
+    transform-origin: 50% 50%;
+    transition: transform 300ms cubic-bezier(0, 0, 0.58, 1);
+  }
+
+  :global(body[data-gescrollt]) .aufklapp__linie { top: 0; bottom: auto; }
+
+  .aufklapp[data-offen] .aufklapp__linie { transform: scaleX(1); }
+
+  /* Die Spalten erscheinen nacheinander von links nach rechts */
+  .aufklapp__spalte {
+    opacity: 0;
+    transform: translateX(-16px);
+    transition:
+      opacity 300ms cubic-bezier(0, 0, 0.58, 1),
+      transform 300ms cubic-bezier(0, 0, 0.58, 1);
+    transition-delay: calc(120ms + var(--stufe, 0) * 90ms);
+  }
+
+  .aufklapp[data-offen] .aufklapp__spalte {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aufklapp__linie { transform: scaleX(1); transition: none; }
+    .aufklapp__spalte { opacity: 1; transform: none; transition: none; }
+  }
+
   .aufklapp__spalten {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--abstand-m);
   }
 
@@ -486,6 +556,8 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
   }
 
   /* .nav-bottom-wrapper: feste Breite 700px, Höhe 110px */
+  .fussleiste__inhalt--klein { display: none; }
+
   .fussleiste__inhalt {
     display: flex;
     justify-content: space-between;
@@ -545,13 +617,6 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
   .punkt--fuss[data-nach='team'] { display: none; }
 
   @media (min-width: 992px) {
-    /* Telefonnummer steht dort in der Kontaktzeile */
-    .fussknopf[data-punkt='telefon'],
-    .punkt--fuss[data-nach='telefon'] { display: none; }
-
-    .fussknopf[data-punkt='zeiten'] { order: 10; }
-    .punkt--fuss[data-nach='zeiten'] { display: none; }
-    .punkt--fuss[data-nach='team'] { display: block; order: 9; }
   }
 
   /* .dot: 3 × 3 px, schwarz */
@@ -568,7 +633,9 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
   @media (max-width: 991px) {
     .kontaktzeile__inhalt,
     .kopfleiste__inhalt { width: 90%; }
-    .fussleiste__inhalt { width: 90%; }
+    .fussleiste__inhalt--klein { display: none; }
+
+  .fussleiste__inhalt { width: 90%; }
 
     /* Ohne Telefonnummer — die steht unten als eigener Knopf */
     .punkt--ab-tablet,
@@ -595,13 +662,6 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
 
   /* ---------- Ab Tablet ---------- */
   @media (min-width: 992px) {
-    /* Telefonnummer steht dort in der Kontaktzeile */
-    .fussknopf[data-punkt='telefon'],
-    .punkt--fuss[data-nach='telefon'] { display: none; }
-
-    .fussknopf[data-punkt='zeiten'] { order: 10; }
-    .punkt--fuss[data-nach='zeiten'] { display: none; }
-    .punkt--fuss[data-nach='team'] { display: block; order: 9; }
   }
 </style>
 
@@ -678,6 +738,14 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
 
       knopf.addEventListener('click', () => {
         setzen(knopf.getAttribute('aria-expanded') !== 'true');
+      });
+
+      // Auf Zeigegeräten öffnet auch das Überfahren
+      huelle.addEventListener('pointerenter', (e) => {
+        if ((e as PointerEvent).pointerType === 'mouse') setzen(true);
+      });
+      huelle.addEventListener('pointerleave', (e) => {
+        if ((e as PointerEvent).pointerType === 'mouse') setzen(false);
       });
 
       // Schließen, wenn der Fokus den Bereich verlässt
