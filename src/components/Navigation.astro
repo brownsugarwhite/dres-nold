@@ -62,7 +62,24 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
 {/* Kopfleiste — fährt beim Scrollen ein */}
 <header class="kopfleiste" data-leiste="kopf">
   <nav class="kopfleiste__inhalt" aria-label="Hauptnavigation">
-    <a class="logo" href="/" aria-label={`${praxis.name} — zur Startseite`}>
+    {/* Auf Handys: Logo und Menü-Knopf statt der Menüpunkte */}
+    <div class="kopfleiste__mobil">
+      <a class="logo" href="/" aria-label={`${praxis.name} — zur Startseite`}>
+        <img src="/icons/logo.svg" alt="" width="80" height="80" />
+      </a>
+      <button
+        class="menueknopf"
+        type="button"
+        data-menueknopf
+        aria-expanded="false"
+        aria-controls="mobilmenue"
+        aria-label="Menü öffnen"
+      >
+        <span class="menueknopf__lottie" data-menuelottie aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <a class="logo logo--desktop" href="/" aria-label={`${praxis.name} — zur Startseite`}>
       <img src="/icons/logo.svg" alt="" width="80" height="80" />
     </a>
     <span class="punkt" aria-hidden="true"></span>
@@ -122,6 +139,18 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
       </>
     ))}
   </nav>
+
+  {/* Ausklappmenü für Handys — Höhe 0 → 338 px (Ablauf a-25) */}
+  <div class="mobilmenue" id="mobilmenue" data-mobilmenue>
+    <div class="mobilmenue__inhalt">
+      {fuss.map((e) => (
+        <a class="mobilmenue__punkt" href={e.ziel}>
+          <img src={e.icon} alt="" width="40" height="40" />
+          <span>{e.titel}</span>
+        </a>
+      ))}
+    </div>
+  </div>
 </header>
 </div>
 
@@ -217,6 +246,66 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
     height: 80px;
   }
 
+  /* .nav-buttons-mobile / -desktop: beide 80 px hoch */
+  .kopfleiste__mobil {
+    display: none;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 80px;
+    overflow: hidden;
+  }
+
+  /* .lottie-animation-3: 50 × 50 */
+  .menueknopf {
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .menueknopf__lottie {
+    display: block;
+    width: 50px;
+    height: 50px;
+    /* Rückfall ohne Lottie: drei Striche */
+    background:
+      linear-gradient(var(--farbe-primaer), var(--farbe-primaer)) center 14px / 26px 2px no-repeat,
+      linear-gradient(var(--farbe-primaer), var(--farbe-primaer)) center 24px / 26px 2px no-repeat,
+      linear-gradient(var(--farbe-primaer), var(--farbe-primaer)) center 34px / 26px 2px no-repeat;
+  }
+
+  .menueknopf__lottie[data-lottie-bereit] { background: none; }
+
+  /* .mobile-expend: Höhe 0 → 338 px, 700 ms easeInOut */
+  .mobilmenue {
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    transition: height 700ms cubic-bezier(0.42, 0, 0.58, 1);
+  }
+
+  .navigation[data-menue-offen] .mobilmenue { height: 338px; }
+
+  .mobilmenue__inhalt {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--abstand-m);
+    padding: var(--abstand-m);
+  }
+
+  .mobilmenue__punkt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--abstand-3xs);
+    color: var(--farbe-primaer);
+    font-size: var(--text-s);
+    text-decoration: none;
+  }
+
   .logo img {
     width: 80px;
     height: 80px;
@@ -242,7 +331,8 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
   .menuepunkt__rolle {
     display: flex;
     flex-direction: column;
-    transition: transform var(--dauer-normal) var(--verlauf);
+    /* Ablauf a-18: 300 ms, easeInOut */
+    transition: transform 300ms cubic-bezier(0.42, 0, 0.58, 1);
   }
 
   .menuepunkt__text {
@@ -419,15 +509,44 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
   }
 
   /* ---------- Kleine Bildschirme ---------- */
+  /* ---------- Kleine Bildschirme (Umbruchpunkt der Vorlage) ---------- */
   @media (max-width: 991px) {
     .kontaktzeile__inhalt,
-    .kopfleiste__inhalt {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 60%;
-    max-width: 700px;
-    height: 80px;
+    .kopfleiste__inhalt { width: 90%; }
+    .fussleiste__inhalt { width: 90%; }
+
+    /* Ohne Telefonnummer — die steht unten als eigener Knopf */
+    .punkt--ab-tablet,
+    .kontaktzeile__text--ab-tablet { display: none; }
+
+    /* Statt der Menüpunkte: Logo mit Menü-Knopf */
+    .kopfleiste__mobil { display: flex; }
+    .logo--desktop,
+    .menuepunkt,
+    .aufklapp { display: none; }
+    .kopfleiste__inhalt > .punkt { display: none; }
+
+    /* Untere Leiste: nur Kontakt · Telefon · Öffnungszeiten */
+    .fussknopf[data-klein='nein'],
+    .punkt--fuss[data-klein='nein'] { display: none; }
+
+    .fussknopf[data-punkt='kontakt'] { order: 1; }
+    .punkt--fuss[data-nach='kontakt'] { order: 2; display: block; }
+    .fussknopf[data-punkt='telefon'] { order: 3; }
+    .punkt--fuss[data-nach='telefon'] { order: 4; display: block; }
+    .fussknopf[data-punkt='zeiten'] { order: 5; }
+    .punkt--fuss[data-nach='zeiten'] { display: none; }
+  }
+
+  /* ---------- Ab Tablet ---------- */
+  @media (min-width: 992px) {
+    /* Telefonnummer steht dort in der Kontaktzeile */
+    .fussknopf[data-punkt='telefon'],
+    .punkt--fuss[data-nach='telefon'] { display: none; }
+
+    .fussknopf[data-punkt='zeiten'] { order: 10; }
+    .punkt--fuss[data-nach='zeiten'] { display: none; }
+    .punkt--fuss[data-nach='team'] { display: block; order: 9; }
   }
 </style>
 
@@ -525,6 +644,48 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
         }
       });
     });
+
+    // ---- Mobiles Ausklappmenü ----
+    // Ablauf a-25 / a-27: Höhe 0 ↔ 338 px in 700 ms, der Lottie-Knopf
+    // läuft dabei in 600 ms von Bild 0 auf 99 und zurück.
+    const menueknopf = document.querySelector<HTMLButtonElement>('[data-menueknopf]');
+    const navigation = document.querySelector<HTMLElement>('.navigation');
+    const lottieKasten = document.querySelector<HTMLElement>('[data-menuelottie]');
+
+    if (menueknopf && navigation && !menueknopf.dataset.bereit) {
+      menueknopf.dataset.bereit = 'ja';
+      let knopfSpieler: { playSegments: (b: [number, number], s?: boolean) => void; totalFrames: number } | null = null;
+
+      if (lottieKasten) {
+        import('../scripts/lottie').then(({ ladeAnimation }) => {
+          ladeAnimation(lottieKasten, '/lottie/menue-button.json').then((s) => { knopfSpieler = s as never; });
+        });
+      }
+
+      menueknopf.addEventListener('click', () => {
+        const offen = navigation.hasAttribute('data-menue-offen');
+        if (offen) {
+          navigation.removeAttribute('data-menue-offen');
+          menueknopf.setAttribute('aria-expanded', 'false');
+          menueknopf.setAttribute('aria-label', 'Menü öffnen');
+          knopfSpieler?.playSegments([knopfSpieler.totalFrames - 1, 0], true);
+        } else {
+          navigation.setAttribute('data-menue-offen', 'ja');
+          menueknopf.setAttribute('aria-expanded', 'true');
+          menueknopf.setAttribute('aria-label', 'Menü schließen');
+          knopfSpieler?.playSegments([0, knopfSpieler.totalFrames - 1], true);
+        }
+      });
+
+      // Ein Klick auf einen Menüpunkt schließt wieder (wie in a-27)
+      document.querySelectorAll('.mobilmenue__punkt').forEach((a) => {
+        a.addEventListener('click', () => {
+          navigation.removeAttribute('data-menue-offen');
+          menueknopf.setAttribute('aria-expanded', 'false');
+          knopfSpieler?.playSegments([knopfSpieler.totalFrames - 1, 0], true);
+        });
+      });
+    }
   }
 
   navigationAufbauen();

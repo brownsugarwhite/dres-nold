@@ -122,22 +122,24 @@ const { praxis } = seite;
   /* Verlaufsbild unter der Logo-Grafik — Maße und Versatz wie
      .div-block-29 in der Vorlage. Beide Elemente stehen im normalen
      Fluss, der negative Abstand schiebt den Verlauf hinter die Grafik. */
+  /* Verlaufsbild unter der Logo-Grafik. Absolut positioniert und
+     anteilig bemessen — Prozentwerte bei margin-top beziehen sich auf
+     die Breite des Elternelements, nicht auf die Höhe. */
   .logo__verlauf {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -46%);
     z-index: 10;
-    width: 48vh;
-    height: 27vh;
-    /* Etwas tiefer als in der Vorlage: Die weisse Flaeche der Grafik
-       reicht oben nicht ganz bis zum Rand, dort stuende der Verlauf
-       sonst frei. Die Schrift sitzt im unteren Teil und bleibt so
-       vollstaendig gefaerbt. */
-    margin-top: -31vh;
+    width: 96%;
+    height: 67%;
     background: url('/bilder/deko/verlauf.gif') center / cover no-repeat;
   }
 
   .logo__kontur {
+    position: absolute;
+    inset: 0;
     z-index: 20;
-    width: 100%;
-    height: 100%;
   }
 
   .logo__bild {
