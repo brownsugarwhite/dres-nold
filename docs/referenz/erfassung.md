@@ -62,12 +62,14 @@ Nur unterhalb des Umbruchpunkts aktiv. 300vh Scrollraum, Blase fährt
 von unten herein, Lottie-Zipfel wächst und zieht sich wieder ein.
 Werte siehe `verstaendnis-mobile.md`.
 
-### Was im bisherigen Nachbau falsch ist
+### Hinweis zur Umsetzung
 
-- Die scrollgesteuerte Blase läuft bei uns auf **allen** Größen
-- Auf dem Desktop müssten es **zwei versetzte Kästen per Klick** sein
-- Der Knopf ist bei uns ein Anker statt eines Auslösers
-- Die Kopplung des Menüwechsels an den Öffnungszeiten-Bereich gilt nur mobil
+Florian hat entschieden, **auf allen Größen die mobile Lösung** zu
+verwenden — scrollgesteuerte Blase mit Zipfel, auf dem Desktop mit drei
+Listen nebeneinander und dem Knopf rechts außen. Die beiden versetzten
+Kästen der Desktop-Vorlage werden **nicht** nachgebaut.
+
+Siehe `docs/entscheidungen.md`.
 
 ---
 
@@ -133,12 +135,12 @@ Ein Verweis „Datenschutz & Impressum".
 
 # Was im bisherigen Nachbau nicht stimmt
 
+*(Nur echte Abweichungen — bewusste Entscheidungen stehen in `docs/entscheidungen.md`.)*
+
 | Bereich | Vorlage | Nachbau |
 |---|---|---|
 | Logo | erscheint über Ladeanimation `a-24` | steht sofort da |
-| Öffnungszeiten Desktop | zwei versetzte Kästen, per Klick | scrollgesteuerte Blase |
-| Öffnungszeiten-Knopf | Auslöser (`href="#"`) | Anker auf `#oz_anchor` |
-| Leistungen | aufklappbare Liste mit Eckwinkeln | Kachelraster |
+| Leistungen | aufklappbare Liste mit Eckwinkeln | Kachelraster — Layout noch offen, Inhalte kommen auf eigene Seiten |
 | Team | Gruppenfoto mit weißer Überschrift darauf | schlichte Porträtreihe |
 | Kontakt | Adresse zweispaltig + Kartenausschnitt | fehlt ganz |
 | Grauer Grund | sichtbar im Kontaktbereich | nur unterhalb der Öffnungszeiten |
