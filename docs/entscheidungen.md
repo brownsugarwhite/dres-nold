@@ -16,6 +16,10 @@ mit Lottie-Zipfel, nicht die beiden versetzten Kästen der Desktop-Vorlage.
 - Die drei Listen stehen auf dem Desktop **nebeneinander**, mobil untereinander
 - Der Öffnungszeiten-Knopf steht auf dem Desktop **rechts außen**,
   mobil links (dort nur drei Knöpfe)
+- Die **Telefonnummer erscheint nur auf Handys** in der Symbolleiste;
+  auf dem Desktop steht sie in der Kontaktzeile oben. Auf dem Desktop
+  also sechs Knöpfe: Kontakt · Praxis · Leistungen · Team ·
+  Neuigkeiten · Öffnungszeiten
 - Zipfel und Menüwechsel exakt getaktet wie in der mobilen Vorlage
 - Der Bereich sitzt direkt nach dem Logobereich
 - Der graue Symbolgrund erst unterhalb der Öffnungszeiten
