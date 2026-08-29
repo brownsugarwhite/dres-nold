@@ -1,0 +1,147 @@
+---
+/**
+ * Einzelseite eines Beitrags — eigene Adresse, mit Morph-Übergang
+ * aus der Übersicht heraus.
+ */
+import Basis from '../../layouts/Basis.astro';
+import Navigation from '../../components/Navigation.astro';
+import Fussbereich from '../../components/Fussbereich.astro';
+import daten from '../../content/neuigkeiten.json';
+import seite from '../../content/seite.json';
+
+export function getStaticPaths() {
+  return daten.eintraege
+    .filter((e) => e.aktiv)
+    .map((e) => ({ params: { id: e.id }, props: { beitrag: e } }));
+}
+
+const { beitrag } = Astro.props;
+const alsDatum = (iso: string) =>
+  iso ? new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
+const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
+---
+
+<Basis titel={`${beitrag.titel} – ${seite.praxis.name}`} beschreibung={beitrag.kurz}>
+  <Navigation />
+
+  <main id="inhalt" class="beitragsseite">
+    <article class="beitrag" transition:name={`beitrag-${beitrag.id}`}>
+      <a class="beitrag__zurueck" href="/#neuigkeiten">
+        <span aria-hidden="true">←</span> Alle Neuigkeiten
+      </a>
+
+      {beitrag.datum && (
+        <time class="beitrag__datum" datetime={beitrag.datum}>{alsDatum(beitrag.datum)}</time>
+      )}
+      <h1 class="beitrag__titel">{beitrag.titel}</h1>
+
+      {beitrag.bild && (
+        <img class="beitrag__bild" src={beitrag.bild} alt={beitrag.bild_alt || ''} width="900" height="500" />
+      )}
+
+      <div class="beitrag__inhalt" set:html={beitrag.inhalt} />
+
+      {anhaenge.length > 0 && (
+        <section class="anhaenge">
+          <h2 class="anhaenge__titel ohne-verlauf">Zum Herunterladen</h2>
+          <ul class="anhaenge__liste">
+            {anhaenge.map((d) => (
+              <li>
+                <a class="anhang" href={d.datei} download>
+                  <span class="anhang__name">{d.titel}</span>
+                  {d.beschreibung && <span class="anhang__text">{d.beschreibung}</span>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </article>
+  </main>
+
+  <Fussbereich />
+</Basis>
+
+<style>
+  .beitragsseite {
+    position: relative;
+    z-index: 40;
+    padding-block: 140px 100px;
+    background: var(--farbe-flaeche);
+  }
+
+  .beitrag {
+    width: min(100% - 2 * var(--abstand-m), 46rem);
+    margin-inline: auto;
+  }
+
+  .beitrag__zurueck {
+    display: inline-block;
+    margin-bottom: var(--abstand-m);
+    color: var(--farbe-text-gedeckt);
+    font-size: var(--text-s);
+    text-decoration: none;
+  }
+
+  .beitrag__zurueck:hover,
+  .beitrag__zurueck:focus-visible { color: var(--farbe-primaer); }
+
+  .beitrag__datum {
+    display: block;
+    color: var(--farbe-text-gedeckt);
+    font-size: var(--text-s);
+  }
+
+  .beitrag__titel { margin-bottom: var(--abstand-m); }
+
+  .beitrag__bild {
+    width: 100%;
+    height: auto;
+    margin-bottom: var(--abstand-m);
+  }
+
+  /* Vom Redaktionssystem geliefertes HTML */
+  .beitrag__inhalt :global(p) { margin-bottom: var(--abstand-s); }
+  .beitrag__inhalt :global(ul),
+  .beitrag__inhalt :global(ol) { margin: 0 0 var(--abstand-m); padding-left: var(--abstand-m); }
+  .beitrag__inhalt :global(li) { margin-bottom: var(--abstand-3xs); }
+  .beitrag__inhalt :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--abstand-m);
+  }
+  .beitrag__inhalt :global(th),
+  .beitrag__inhalt :global(td) {
+    padding: var(--abstand-2xs) var(--abstand-xs);
+    border-bottom: 1px solid var(--farbe-linie);
+    text-align: left;
+  }
+  .beitrag__inhalt :global(th) { font-weight: var(--gewicht-halbfett); color: var(--farbe-primaer); }
+
+  .anhaenge {
+    margin-top: var(--abstand-xl);
+    padding-top: var(--abstand-m);
+    border-top: 1px solid var(--farbe-linie);
+  }
+
+  .anhaenge__titel { font-size: var(--text-m); color: var(--farbe-primaer); }
+
+  .anhaenge__liste { list-style: none; margin: 0; padding: 0; }
+
+  .anhang {
+    display: flex;
+    flex-direction: column;
+    gap: var(--abstand-3xs);
+    padding: var(--abstand-xs);
+    border: 1px solid var(--farbe-linie);
+    border-radius: var(--radius-s);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .anhang:hover,
+  .anhang:focus-visible { border-color: var(--farbe-primaer); }
+
+  .anhang__name { font-weight: var(--gewicht-halbfett); color: var(--farbe-primaer); }
+  .anhang__text { font-size: var(--text-s); color: var(--farbe-text-gedeckt); }
+</style>

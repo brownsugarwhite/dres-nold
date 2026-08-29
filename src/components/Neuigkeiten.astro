@@ -1,0 +1,120 @@
+---
+/**
+ * Neuigkeiten — Übersicht auf der Startseite.
+ *
+ * Neu gegenüber der Vorlage. Blendet sich samt Menüpunkt aus, wenn kein
+ * Beitrag aktiv ist. Jeder Beitrag hat eine eigene Adresse und öffnet
+ * sich mit demselben Morph-Übergang wie die Leistungen.
+ */
+import daten from '../content/neuigkeiten.json';
+
+const beitraege = daten.eintraege
+  .filter((e) => e.aktiv)
+  .sort((a, b) => (b.datum || '').localeCompare(a.datum || ''));
+
+const alsDatum = (iso: string) =>
+  iso ? new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
+---
+
+{beitraege.length > 0 && (
+  <section class="neuigkeiten" id="neuigkeiten">
+    <h2 class="neuigkeiten__titel">{daten.titel}</h2>
+    {daten.einleitung && <p class="neuigkeiten__einleitung">{daten.einleitung}</p>}
+
+    <div class="neuigkeiten__liste inhalt">
+      {beitraege.map((b) => (
+        <article class="beitrag" transition:name={`beitrag-${b.id}`}>
+          <a class="beitrag__link" href={`/neuigkeiten/${b.id}/`}>
+            {b.bild && (
+              <img class="beitrag__bild" src={b.bild} alt={b.bild_alt || ''} width="600" height="360" loading="lazy" />
+            )}
+            <div class="beitrag__text">
+              {b.datum && <time class="beitrag__datum" datetime={b.datum}>{alsDatum(b.datum)}</time>}
+              <h3 class="beitrag__titel">{b.titel}</h3>
+              {b.kurz && <p class="beitrag__kurz">{b.kurz}</p>}
+              <span class="beitrag__mehr" aria-hidden="true">Weiterlesen →</span>
+            </div>
+          </a>
+        </article>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .neuigkeiten {
+    position: relative;
+    z-index: 40;
+    padding-block: 60px 100px;
+    background: var(--farbe-flaeche);
+  }
+
+  .neuigkeiten__titel { text-align: center; }
+
+  .neuigkeiten__einleitung {
+    max-width: none;
+    margin-bottom: var(--abstand-l);
+    color: var(--farbe-text);
+    font-size: 20px;
+    font-weight: 300;
+    text-align: center;
+  }
+
+  .neuigkeiten__liste {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: var(--abstand-l);
+  }
+
+  .beitrag { margin: 0; }
+
+  .beitrag__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .beitrag__bild {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    margin-bottom: var(--abstand-s);
+  }
+
+  .beitrag__text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--abstand-3xs);
+  }
+
+  .beitrag__datum {
+    color: var(--farbe-text-gedeckt);
+    font-size: var(--text-xs);
+  }
+
+  .beitrag__titel {
+    margin: 0;
+    font-size: var(--text-l);
+    color: var(--farbe-primaer);
+  }
+
+  .beitrag__kurz {
+    margin: 0;
+    color: var(--farbe-text);
+    font-size: var(--text-s);
+  }
+
+  .beitrag__mehr {
+    margin-top: auto;
+    padding-top: var(--abstand-2xs);
+    color: var(--farbe-primaer);
+    font-size: var(--text-s);
+    font-weight: var(--gewicht-halbfett);
+  }
+
+  .beitrag__link:hover .beitrag__mehr,
+  .beitrag__link:focus-visible .beitrag__mehr { text-decoration: underline; }
+</style>
