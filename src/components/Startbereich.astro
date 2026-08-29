@@ -51,8 +51,14 @@ const { praxis } = seite;
   </div>
 </div>
 
-{/* Schafft den Scrollweg, über den das Logo animiert wird */}
-<div class="startraum" aria-hidden="true"></div>
+{/*
+  In der Vorlage folgt hier `.start_space` mit 130vh — der Scrollweg,
+  über den das Logo animiert wird. Bei uns entfällt er: Ablauf a-7
+  hängt an PAGE_SCROLL, das Logo rechnet also mit dem gesamten
+  Dokument, und die 350vh der Öffnungszeiten liegen ohnehin davor.
+  Stünde der Raum trotzdem hier, wäre er nach den Öffnungszeiten eine
+  bildschirmfüllende leere Fläche vor der Begrüßung.
+*/}
 
 <style>
   .grund {
@@ -188,15 +194,6 @@ const { praxis } = seite;
     width: 40px;
     height: 20px;
     background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
-  }
-
-  .startraum {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    height: 130vh;
-    height: 130dvh;
-    background: var(--farbe-flaeche);
   }
 
   @media (prefers-reduced-motion: reduce) {

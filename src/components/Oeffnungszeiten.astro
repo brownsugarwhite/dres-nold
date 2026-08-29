@@ -92,7 +92,11 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
   .ozraum {
     position: relative;
     z-index: 2;
-    height: 350vh;
+    /* 264 px kürzer als der Bereich darüber: so viel steht unter der
+       Blase für den ausgefahrenen Zipfel frei. Ist er wieder
+       eingezogen, wäre das nur leerer Raum vor der Begrüßung —
+       der folgende Inhalt rückt deshalb um diesen Betrag auf. */
+    height: calc(350vh - 264px);
     background: var(--farbe-flaeche);
   }
 
