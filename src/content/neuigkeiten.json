@@ -1,18 +1,30 @@
 {
-  "_hinweis_fuer_die_redaktion": "Neuigkeiten aus der Praxis, neueste zuerst. Jeder Beitrag bekommt eine eigene Adresse unter /neuigkeiten/<id>. Im Text sind Absätze, Aufzählungen und Tabellen möglich. Unter \"dateien\" lassen sich PDFs zum Herunterladen anhängen.",
+  "_hinweis_fuer_die_redaktion": "Neuigkeiten aus der Praxis, neueste zuerst. Jeder Beitrag bekommt eine eigene Adresse unter /neuigkeiten/<id>. Die id nach dem Anlegen nicht mehr ändern. Im Text sind Absätze, Hervorhebungen, Aufzählungen und Tabellen möglich. Unter \"dateien\" lassen sich PDFs zum Herunterladen anhängen. Ist kein Beitrag aktiv, verschwindet der ganze Bereich samt Menüpunkt von der Seite.",
   "titel": "Neuigkeiten",
   "einleitung": "Aktuelles aus unserer Praxis.",
   "eintraege": [
     {
+      "id": "neue-behandlungseinheit",
+      "aktiv": true,
+      "position": 1,
+      "datum": "2026-08-29",
+      "titel": "Unsere neue Behandlungseinheit",
+      "kurz": "Seit dieser Woche behandeln wir in Zimmer 2 an einer neuen Einheit — leiser, bequemer und mit besserer Sicht für Sie auf dem Monitor.",
+      "bild": "/bilder/galerie/gallery03.jpg",
+      "bild_alt": "Behandlungszimmer der Praxis",
+      "inhalt": "<p>Seit dieser Woche steht in Zimmer 2 eine neue Behandlungseinheit. Sie arbeitet spürbar leiser als die bisherige und lässt sich feiner auf Ihre Sitzposition einstellen.</p><p>Was sich für Sie ändert:</p><ul><li>Ruhigerer Lauf der Instrumente</li><li>Bequemere Liegeposition, besonders bei längeren Behandlungen</li><li>Ein Monitor, auf dem wir Ihnen Aufnahmen direkt zeigen können</li></ul><p>Wenn Sie Fragen dazu haben, sprechen Sie uns gerne beim nächsten Termin an.</p>",
+      "dateien": []
+    },
+    {
       "id": "beispielbeitrag",
       "aktiv": false,
-      "position": 1,
-      "datum": "2026-08-27",
-      "titel": "Beispielbeitrag",
-      "kurz": "Kurzer Anrisstext, der in der Übersicht erscheint.",
+      "position": 2,
+      "datum": "2026-08-01",
+      "titel": "Beispielbeitrag (ausgeblendet)",
+      "kurz": "Dieser Beitrag ist ausgeblendet und dient als Vorlage zum Kopieren.",
       "bild": "",
       "bild_alt": "",
-      "inhalt": "<p>Der Fließtext des Beitrags. Absätze, <strong>Hervorhebungen</strong>, Aufzählungen und Tabellen sind möglich.</p>",
+      "inhalt": "<p>Fließtext des Beitrags. <strong>Hervorhebungen</strong>, Aufzählungen und Tabellen sind möglich.</p>",
       "dateien": [
         {
           "titel": "Beispieldokument",
