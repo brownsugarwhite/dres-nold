@@ -122,9 +122,20 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     pointer-events: none;
   }
 
+  /* Maße der Lottie-Grafik `oz_box_mobile.json`, nachgemessen:
+       Artboard        600 × 400
+       Abschlusslinie  bei y = 246
+       Zipfelspitze    bei y = 400 (voll ausgefahren), x = 520
+     Die Spitze fährt also 154 px aus. Genau so weit steigt die Blase
+     zwischen 50 % und 71 % (150 px) — deshalb steht die Spitze
+     während dieser Phase still. Das funktioniert nur, wenn die Grafik
+     in ihrer ursprünglichen HÖHE steht; in der Breite darf sie
+     gestreckt werden. */
   .ozblase {
     position: absolute;
-    bottom: 110px;
+    /* 110 px Leistenhöhe + 154 px Zipfellänge: so trifft die voll
+       ausgefahrene Spitze genau die Oberkante der Symbolleiste. */
+    bottom: 264px;
     left: 50%;
     width: min(calc(100vw - 2 * var(--abstand-m)), 62rem);
     /* Vom Skript gesetzt */
@@ -141,16 +152,31 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     overflow-y: auto;
   }
 
-  /* Die Lottie-Grafik sitzt direkt darunter und schließt die Fläche ab */
+  /* Die Grafik hängt an der Unterkante der Fläche, ohne Platz zu
+     brauchen: die Abschlusslinie (y = 246) liegt genau auf der Kante,
+     der Zipfelbereich ragt 154 px darunter hinaus. */
   .ozblase__linie {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: -246px;
     width: 100%;
+    height: 400px;
     line-height: 0;
+    pointer-events: none;
+    /* Die Grafik enthält oberhalb der Linie eine große weiße Fläche —
+       in der Vorlage IST das der Kasten. Bei uns zeichnet ihn die
+       Fläche darüber selbst, deshalb wird alles oberhalb der Linie
+       weggeschnitten. 238 px statt 246, weil die Linie leicht schräg
+       verläuft (rechts 241, links 259) und nicht angeschnitten werden
+       darf. */
+    clip-path: inset(238px 0 0 0);
   }
 
   .ozblase__linie :global(svg) {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
   }
 
   .ozblase__schliessen {
@@ -252,6 +278,22 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     /* Schlüsselstellen aus a-19. Die Kurve gehört zum Abschnitt, der an
        dieser Stelle beginnt. Vor der ersten Stelle hält Webflow den
        ersten Wert — daher die Stütze bei 0 %. */
+    /* Der Startwert der Vorlage ist 700 px. Er reicht dort, weil die
+       Blase nur rund 400 px hoch ist. Unsere Listen stehen auf schmalen
+       Schirmen untereinander, die Blase wird dadurch höher — dann muss
+       der Startwert mitwachsen, sonst schaut sie beim Laden schon
+       herein. Die Strecke ab 50 % (150 → 0) bleibt unangetastet: an ihr
+       hängt, dass die Zipfelspitze stillsteht. */
+    const RUHELAGE = 264; // bottom-Wert der Blase
+    let start = 700;
+
+    const startBestimmen = () => {
+      const hoch = blase.getBoundingClientRect().height;
+      start = Math.max(700, RUHELAGE + hoch + 40);
+      BLASE[0].wert = start;
+      BLASE[1].wert = start;
+    };
+
     const BLASE: Stuetzstelle[] = [
       { bei: 0.00, wert: 700, kurve: 'linear' },
       { bei: 0.15, wert: 700, kurve: 'easeIn' },
@@ -259,6 +301,7 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
       { bei: 0.71, wert: 0, kurve: 'linear' },
       { bei: 1.00, wert: 0 },
     ];
+    startBestimmen();
 
     /* Der Zipfel fährt aus, während die Blase einrastet, und zieht sich
        danach wieder ein. Werte als Anteil der Bildfolge (99 % = 0.99). */
@@ -315,11 +358,13 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     };
 
     window.addEventListener('scroll', anstossen, { passive: true });
-    window.addEventListener('resize', anstossen, { passive: true });
+    window.addEventListener('resize', () => { startBestimmen(); anstossen(); }, { passive: true });
     zeichnen();
 
     if (linie) {
-      ladeAnimation(linie, '/lottie/oeffnungszeiten-mobil.json').then((s) => {
+      /* 'none': in der Breite auf die Blase gestreckt, in der Höhe
+         unverändert. Nur so bleibt der Zipfel 154 px lang. */
+      ladeAnimation(linie, '/lottie/oeffnungszeiten-mobil.json', { verhaeltnis: 'none' }).then((s) => {
         if (!s) return;
         spieler = s;
         zeichnen();

@@ -27,8 +27,15 @@ const { praxis } = seite;
 const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 
 const aktiv = leistungen.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
-const zahnmedizin = aktiv.filter((e) => e.kategorie === 'zahnmedizin');
-const kieferorthopaedie = aktiv.filter((e) => e.kategorie === 'kieferorthopaedie');
+
+/* Die Gruppen kommen aus den Kategorien der Inhaltsdatei, nicht aus
+   fest verdrahteten Namen — legt die Praxis dort eine an, erscheint
+   sie hier von selbst. Leere Kategorien bleiben aus. */
+const gruppen = (leistungen.kategorien ?? [])
+  .filter((k) => k.aktiv)
+  .sort((a, b) => a.position - b.position)
+  .map((k) => ({ ...k, eintraege: aktiv.filter((e) => e.kategorie === k.id) }))
+  .filter((k) => k.eintraege.length > 0);
 
 const personen = team.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
 const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
@@ -62,15 +69,14 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
         Klicken Sie auf eine Leistung, um mehr zu erfahren.
       </p>
 
-      <h3 class="gruppe">Zahnmedizin</h3>
-      <div class="kacheln">
-        {zahnmedizin.map((l) => <LeistungKachel {...l} />)}
-      </div>
-
-      <h3 class="gruppe">Kieferorthopädie</h3>
-      <div class="kacheln">
-        {kieferorthopaedie.map((l) => <LeistungKachel {...l} />)}
-      </div>
+      {gruppen.map((g) => (
+        <>
+          <h3 class="gruppe" id={`leistungen-${g.id}`}>{g.titel}</h3>
+          <div class="kacheln">
+            {g.eintraege.map((l) => <LeistungKachel {...l} />)}
+          </div>
+        </>
+      ))}
     </section>
 
 

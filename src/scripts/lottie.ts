@@ -27,7 +27,14 @@ const wenigerBewegung = () =>
 export async function ladeAnimation(
   behaelter: HTMLElement,
   pfad: string,
-  optionen: { schleife?: boolean; automatisch?: boolean } = {},
+  optionen: {
+    schleife?: boolean;
+    automatisch?: boolean;
+    /** Seitenverhältnis: 'none' streckt die Grafik auf die Breite des
+        Behälters, ohne sie in der Höhe mitzuskalieren. Nötig, wenn ein
+        Maß der Grafik in Bildpunkten stimmen muss. */
+    verhaeltnis?: string;
+  } = {},
 ): Promise<Spieler | null> {
   if (wenigerBewegung()) return null;
 
@@ -41,6 +48,9 @@ export async function ladeAnimation(
       loop: optionen.schleife ?? false,
       autoplay: optionen.automatisch ?? false,
       path: pfad,
+      rendererSettings: optionen.verhaeltnis
+        ? { preserveAspectRatio: optionen.verhaeltnis }
+        : undefined,
     }) as Spieler;
 
     // Erst wenn die Animation wirklich steht, ist `totalFrames` gesetzt

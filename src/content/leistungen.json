@@ -136,6 +136,16 @@
       "kurz": "Eine optisch unauffällige Lösung für gerade Zähne stellt die Behandlung mit dünnen Schienen, sogenannten Alignern, dar.",
       "icon": "/icons/kieferorthopaedie-erwachsene.svg",
       "inhalt": "<p>Eine optisch unauffällige Lösung für gerade Zähne stellt die Behandlung mit dünnen Schienen, sogenannten Alignern, dar. Nach einem dreidimensionalen, digitalen Abdruck der Zähne (Scan) können durch eine computersimulierte Darstellung der Zähne in ihrer Anfangs- und Endposition Arzt und Patient schon vorab dreidimensional die therapeutisch gewünschte Zahnstellung betrachten und besprechen. </p><p>Die Aligner werden individuell angefertigt und dem Patienten im Verlauf der Behandlung in mehreren Schritten ausgehändigt. Der Patient muss diese Tag und Nacht 22 Stunden tragen und lediglich beim Essen und Trinken und zur Reinigung herausnehmen. Somit werden die Zähne nach und nach in die therapeutisch angestrebte Wunschposition gerückt.</p><p>Ob bei Ihnen eine Behandlung mit Alignern möglich ist, wie das Behandlungsergebnis aussehen könnte und wie lange eine mögliche Behandlung dauern würde, besprechen wir gerne ausführlich mit Ihnen in unserer Praxis.</p><p>Unser Ziel ist es, durch die entsprechende Wahl der Apparatur bei jedem Patienten individuell den bestmöglichen Behandlungserfolg mit Hilfe modernster Technik zu ermöglichen.</p><p>‍</p><p>Einige unserer Leistungen im Überblick:</p><ul><li>Nahezu unsichtbare Twin-Aligner (Schienen der Firma Orthocaps) oder herausnehmbare Apparaturen bei leichten Fehlstellungen</li><li>Festsitzende Apparaturen über einen Teilbereich der Zähne bei präprothetischen Korrekturen für eine geplante prothetische Versorgung</li><li>Bei ausgeprägter Fehlstellung auch eine kieferorthopädisch-kieferchirurgische Kombinations-therapie mit festsitzenden Apparaturen und chirurgischem Eingriff in Zusammenarbeit mit erfahrenen Kieferchirurgen</li><li>Schnarcherschienen bei nächtlichem Schnarchen</li><li>Festsitzende Apparaturen, auf Wunsch auch mit optisch unauffälligen Keramikbrackets<br/>‍</li></ul><p>Ausführliche Beratung und Eingehen auf den individuellen Patientenwunsch sind für uns selbstverständlich.<br/></p>"
+    },
+    {
+      "id": "beispielleistung",
+      "aktiv": true,
+      "position": 12,
+      "kategorie": "sonstige",
+      "titel": "Beispielleistung",
+      "kurz": "Platzhalter — zeigt, wie eine weitere Leistung im Raster und als eigene Seite aussieht. Vor dem Start ersetzen oder auf „aktiv: false“ setzen.",
+      "icon": "/icons/intraoralscanner.svg",
+      "inhalt": "<p>Dieser Eintrag ist ein Platzhalter. Er steht hier, damit sich prüfen lässt, wie sich eine zusätzliche Leistung im Kachelraster und auf einer eigenen Seite verhält.</p><p>Vor der Veröffentlichung entweder durch eine echte Leistung ersetzen oder über <em>aktiv</em> ausblenden.</p>"
     }
   ]
 }
