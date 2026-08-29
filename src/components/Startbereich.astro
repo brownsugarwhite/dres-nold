@@ -103,9 +103,10 @@ const { praxis } = seite;
       margin-top: -40px;
     }
     /* Wird vom Skript am Scrollfortschritt entlang gesetzt */
+    /* Nur skalieren und verschieben. Das Ausblenden geschieht in der
+       Lottie-Animation selbst, nicht über die Deckkraft. */
     transform: scale(var(--logo-groesse, 1)) translateY(var(--logo-versatz, 0px));
-    opacity: var(--logo-deckkraft, 1);
-    will-change: transform, opacity;
+    will-change: transform;
   }
 
   /* Der bewegte Verlauf, der die Schrift des Logos einfärbt.
@@ -122,22 +123,27 @@ const { praxis } = seite;
   /* Verlaufsbild unter der Logo-Grafik — Maße und Versatz wie
      .div-block-29 in der Vorlage. Beide Elemente stehen im normalen
      Fluss, der negative Abstand schiebt den Verlauf hinter die Grafik. */
-  /* Verlaufsbild unter der Logo-Grafik. Absolut positioniert und
-     anteilig bemessen — Prozentwerte bei margin-top beziehen sich auf
-     die Breite des Elternelements, nicht auf die Höhe. */
+  /* Verlaufsbild unter der Logo-Grafik, wie in Webflow: Cover,
+     Position 50 % / 50 %, kein Tile.
+
+     Die Vorlage nutzt 48vh × 32vh, also 96 % × 80 % des Containers.
+     Hier steht die Höhe auf 67 %, weil die weiße Fläche der Lottie-
+     Grafik unter `lottie-web` weniger abdeckt als unter Webflows
+     eigener Einbindung — bei 80 % stünde der Verlauf oben und unten
+     als heller Saum über.
+
+     Mit einer Lottie-Datei, deren weiße Fläche bis an den Rand reicht,
+     kann hier wieder auf 80 % gestellt werden. */
   .logo__verlauf {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -46%);
+    transform: translate(-50%, -50%);
     z-index: 10;
     width: 96%;
     height: 67%;
-    /* Das Bild ist nur 20 x 10 px gross; seine aeussersten Pixelreihen
-       sind deutlich heller als die Mitte. Beim Vergroessern wuerden sie
-       als heller Saum sichtbar — deshalb wird ueber den Rand hinaus
-       skaliert, sodass nur der gleichmaessige Kern zu sehen ist. */
-    background: url('/bilder/deko/verlauf.gif') center / 150% 210% no-repeat;
+    /* Wie in Webflow eingestellt: Cover, Position 50 % / 50 %, kein Tile */
+    background: url('/bilder/deko/verlauf.gif') 50% 50% / cover no-repeat;
   }
 
   .logo__kontur {
@@ -192,10 +198,7 @@ const { praxis } = seite;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .startbereich__logo {
-      transform: none;
-      opacity: 1;
-    }
+    .logo { transform: none; }
   }
 </style>
 
@@ -225,7 +228,6 @@ const { praxis } = seite;
       const p = Math.min(1, Math.max(0, fortschritt() / 0.1));
       huelle?.style.setProperty('--logo-groesse', String(1 + 0.3 * p));
       huelle?.style.setProperty('--logo-versatz', `${30 * p}px`);
-      huelle?.style.setProperty('--logo-deckkraft', String(1 - p));
       // Ist es ganz ausgeblendet, aus dem Weg nehmen
       bereich.style.visibility = p >= 1 ? 'hidden' : '';
     };
