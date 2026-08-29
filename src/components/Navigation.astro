@@ -104,7 +104,7 @@ const kategorien = (leistungen.kategorien ?? [])
     {kopf.map((e, i) => (
       <>
         {e.id === 'leistungen' ? (
-          <div class="aufklapp" data-aufklapp>
+          <div class="aufklapp" data-aufklapp data-richtung="runter">
             <button class="menuepunkt menuepunkt--knopf" type="button" aria-expanded="false" aria-controls="leistungsmenue">
               <span class="menuepunkt__rolle">
                 <span class="menuepunkt__text">{e.titel}</span>
@@ -117,23 +117,13 @@ const kategorien = (leistungen.kategorien ?? [])
 
               <div class="aufklapp__spalten">
                 {kategorien.map((k, i) => (
-                  <div class="aufklapp__spalte" style={`--stufe: ${i}`}>
-                    <h2 class="aufklapp__titel">{k.titel}</h2>
-                    <ul class="aufklapp__liste">
-                      {k.eintraege.map((l) => (
-                        <li>
-                          <a class="aufklapp__eintrag" href={`/leistungen/${l.id}/`}>
-                            <img src={l.icon} alt="" width="28" height="28" />
-                            <span>{l.titel}</span>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <a class="oberpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}`}>
+                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="60" height="60" />}
+                    <span class="oberpunkt__titel">{k.titel}</span>
+                    {k.kurz && <span class="oberpunkt__kurz">{k.kurz}</span>}
+                  </a>
                 ))}
               </div>
-
-              <a class="aufklapp__alle" href="/#leistungen">Alle Leistungen im Überblick</a>
             </div>
           </div>
         ) : (
@@ -153,11 +143,38 @@ const kategorien = (leistungen.kategorien ?? [])
   <div class="mobilmenue" id="mobilmenue" data-mobilmenue>
     <div class="mobilmenue__inhalt">
       {punkte.map((e) => (
-        <a class="mobilmenue__punkt" href={e.ziel}>
-          <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
-          <span class="mobilmenue__text">{e.titel}</span>
-        </a>
+        e.id === 'leistungen' ? (
+          <button class="mobilmenue__punkt mobilmenue__punkt--knopf" type="button" data-mobilleistungen>
+            <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
+            <span class="mobilmenue__text">{e.titel}</span>
+            <span class="mobilmenue__pfeil" aria-hidden="true">›</span>
+          </button>
+        ) : (
+          <a class="mobilmenue__punkt" href={e.ziel}>
+            <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
+            <span class="mobilmenue__text">{e.titel}</span>
+          </a>
+        )
       ))}
+    </div>
+
+    {/* Unterebene: erscheint beim Tippen auf „Leistungen“ */}
+    <div class="unterebene" data-unterebene hidden>
+      <button class="unterebene__zurueck" type="button" data-unterebeneZurueck>
+        <span aria-hidden="true">‹</span> Zurück
+      </button>
+      <h2 class="unterebene__titel">Leistungen</h2>
+      <div class="unterebene__liste">
+        {kategorien.map((k, i) => (
+          <a class="unterebene__punkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}`}>
+            {k.icon && <img class="mobilmenue__symbol" src={k.icon} alt="" width="60" height="60" />}
+            <span class="unterebene__text">
+              <span class="unterebene__name">{k.titel}</span>
+              {k.kurz && <span class="unterebene__kurz">{k.kurz}</span>}
+            </span>
+          </a>
+        ))}
+      </div>
     </div>
 
     {/* .div-block-30: Punktlinie oben, 40 px hoch */}
@@ -174,10 +191,33 @@ const kategorien = (leistungen.kategorien ?? [])
   <div class="fussleiste__inhalt fussleiste__inhalt--gross">
     {fussGross.map((e, i) => (
       <>
-        <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
-          <img class="fussknopf__symbol" src={e.icon} alt="" width="60" height="60" />
-          <span class="fussknopf__text">{e.titel}</span>
-        </a>
+        {e.id === 'leistungen' ? (
+          <div class="aufklapp" data-aufklapp data-richtung="hoch">
+            <button class="fussknopf fussknopf--knopf" type="button" aria-expanded="false" aria-controls="leistungsmenue-unten">
+              <img class="fussknopf__symbol" src={e.icon} alt="" width="60" height="60" />
+              <span class="fussknopf__text">{e.titel}</span>
+            </button>
+
+            <div class="aufklapp__inhalt" id="leistungsmenue-unten" hidden>
+              <span class="aufklapp__linie" aria-hidden="true"></span>
+
+              <div class="aufklapp__spalten">
+                {kategorien.map((k, i) => (
+                  <a class="oberpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}`}>
+                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="60" height="60" />}
+                    <span class="oberpunkt__titel">{k.titel}</span>
+                    {k.kurz && <span class="oberpunkt__kurz">{k.kurz}</span>}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
+            <img class="fussknopf__symbol" src={e.icon} alt="" width="60" height="60" />
+            <span class="fussknopf__text">{e.titel}</span>
+          </a>
+        )}
         {i < fussGross.length - 1 && <span class="punkt punkt--fuss" aria-hidden="true"></span>}
       </>
     ))}
@@ -269,6 +309,8 @@ const kategorien = (leistungen.kategorien ?? [])
   .navigation:has(.aufklapp[data-offen]) .kopfleiste,
   .navigation:has(.aufklapp[data-offen]) { overflow: visible; }
 
+  .fussleiste:has(.aufklapp[data-offen]) { overflow: visible; }
+
   .kopfleiste__inhalt {
     display: flex;
     justify-content: space-around;
@@ -313,6 +355,7 @@ const kategorien = (leistungen.kategorien ?? [])
 
   /* .mobile-expend: Höhe 0 → 338 px, 700 ms easeInOut */
   .mobilmenue {
+    position: relative;
     width: 100%;
     height: 0;
     overflow: hidden;
@@ -351,6 +394,102 @@ const kategorien = (leistungen.kategorien ?? [])
   .mobilmenue__text {
     font-size: 18px;
     font-weight: 400;
+  }
+
+  /* Beim Tippen auf „Leistungen“ faden die übrigen Punkte aus … */
+  .mobilmenue[data-unterebene-offen] .mobilmenue__inhalt {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 250ms cubic-bezier(0, 0, 0.58, 1);
+  }
+
+  .mobilmenue__inhalt {
+    opacity: 1;
+    transition: opacity 250ms cubic-bezier(0, 0, 0.58, 1);
+  }
+
+  .mobilmenue__punkt--knopf {
+    width: 100%;
+    border: 0;
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .mobilmenue__pfeil {
+    margin-left: auto;
+    font-size: 24px;
+    color: var(--farbe-text-gedeckt);
+  }
+
+  /* … und die Unterebene schiebt sich von oben herein */
+  .unterebene {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    padding: 20px 5% 0;
+  }
+
+  .unterebene[hidden] { display: none; }
+
+  .unterebene__zurueck {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--farbe-text-gedeckt);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* Überschrift gleitet von oben herein */
+  .unterebene__titel {
+    margin: var(--abstand-2xs) 0 var(--abstand-m);
+    color: var(--farbe-primaer);
+    font-size: 24px;
+    transform: translateY(-16px);
+    opacity: 0;
+    transition:
+      transform 350ms cubic-bezier(0, 0, 0.58, 1),
+      opacity 350ms cubic-bezier(0, 0, 0.58, 1);
+  }
+
+  .unterebene__liste { display: flex; flex-direction: column; }
+
+  /* Die Kategorien erscheinen nacheinander */
+  .unterebene__punkt {
+    display: flex;
+    align-items: center;
+    gap: var(--abstand-s);
+    padding: var(--abstand-2xs) 0;
+    color: var(--farbe-primaer);
+    text-decoration: none;
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 300ms cubic-bezier(0, 0, 0.58, 1),
+      transform 300ms cubic-bezier(0, 0, 0.58, 1);
+    transition-delay: calc(200ms + var(--stufe, 0) * 90ms);
+  }
+
+  .mobilmenue[data-unterebene-offen] .unterebene__titel {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .mobilmenue[data-unterebene-offen] .unterebene__punkt {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .unterebene__text { display: flex; flex-direction: column; }
+  .unterebene__name { font-size: 18px; }
+  .unterebene__kurz { color: var(--farbe-text); font-size: 14px; font-weight: 300; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .unterebene__titel,
+    .unterebene__punkt { transition: none; }
   }
 
   /* .div-block-30: Punktlinie oben, 40 px hoch */
@@ -428,19 +567,23 @@ const kategorien = (leistungen.kategorien ?? [])
      nach unten. */
   .aufklapp__inhalt {
     position: absolute;
-    bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
     z-index: var(--ebene-menue);
-    min-width: 46rem;
+    min-width: 34rem;
     padding: var(--abstand-m);
     background: var(--farbe-flaeche);
+  }
+
+  /* Untere Leiste: das Feld steht über der Leiste */
+  .aufklapp[data-richtung='hoch'] .aufklapp__inhalt {
+    bottom: 100%;
     box-shadow: 0 -12px 32px rgb(19 0 13 / 12%);
   }
 
-  :global(body[data-gescrollt]) .aufklapp__inhalt {
+  /* Obere Leiste: darunter */
+  .aufklapp[data-richtung='runter'] .aufklapp__inhalt {
     top: 100%;
-    bottom: auto;
     box-shadow: 0 12px 32px rgb(19 0 13 / 12%);
   }
 
@@ -452,37 +595,42 @@ const kategorien = (leistungen.kategorien ?? [])
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 0;
     height: 1px;
     background: url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
     background-size: auto 1px;
-    transform: scaleX(0);
-    transform-origin: 50% 50%;
-    transition: transform 300ms cubic-bezier(0, 0, 0.58, 1);
+    transition:
+      top 300ms cubic-bezier(0, 0, 0.58, 1),
+      bottom 300ms cubic-bezier(0, 0, 0.58, 1);
   }
 
-  :global(body[data-gescrollt]) .aufklapp__linie { top: 0; bottom: auto; }
+  /* Sie startet an der Leiste und fährt an die andere Kante des Feldes —
+     nach oben, wenn die Leiste unten steht, sonst nach unten. */
+  .aufklapp[data-richtung='hoch'] .aufklapp__linie { bottom: 0; }
+  .aufklapp[data-richtung='hoch'][data-offen] .aufklapp__linie { bottom: calc(100% - 1px); }
 
-  .aufklapp[data-offen] .aufklapp__linie { transform: scaleX(1); }
+  .aufklapp[data-richtung='runter'] .aufklapp__linie { top: 0; }
+  .aufklapp[data-richtung='runter'][data-offen] .aufklapp__linie { top: calc(100% - 1px); }
 
-  /* Die Spalten erscheinen nacheinander von links nach rechts */
-  .aufklapp__spalte {
+  /* Die Oberpunkte erscheinen nacheinander von links nach rechts */
+  .oberpunkt {
     opacity: 0;
     transform: translateX(-16px);
     transition:
       opacity 300ms cubic-bezier(0, 0, 0.58, 1),
-      transform 300ms cubic-bezier(0, 0, 0.58, 1);
-    transition-delay: calc(120ms + var(--stufe, 0) * 90ms);
+      transform 300ms cubic-bezier(0, 0, 0.58, 1),
+      background-color var(--dauer-schnell) var(--verlauf);
+    transition-delay: calc(120ms + var(--stufe, 0) * 90ms), calc(120ms + var(--stufe, 0) * 90ms), 0ms;
   }
 
-  .aufklapp[data-offen] .aufklapp__spalte {
+  .aufklapp[data-offen] .oberpunkt {
     opacity: 1;
     transform: translateX(0);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .aufklapp__linie { transform: scaleX(1); transition: none; }
-    .aufklapp__spalte { opacity: 1; transform: none; transition: none; }
+    .aufklapp__linie,
+    .oberpunkt { transition: none; }
+    .oberpunkt { opacity: 1; transform: none; }
   }
 
   .aufklapp__spalten {
@@ -491,53 +639,38 @@ const kategorien = (leistungen.kategorien ?? [])
     gap: var(--abstand-m);
   }
 
-  .aufklapp__titel {
-    margin-bottom: var(--abstand-2xs);
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--farbe-text-gedeckt);
-  }
-
-  .aufklapp__liste {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .aufklapp__eintrag {
+  /* Ein Oberpunkt je Kategorie — Symbol, Titel, Kurztext */
+  .oberpunkt {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: var(--abstand-2xs);
-    padding: var(--abstand-3xs) var(--abstand-2xs);
-    border-radius: var(--radius-s);
-    color: var(--farbe-text);
-    font-size: var(--text-s);
+    gap: var(--abstand-3xs);
+    padding: var(--abstand-s);
+    border-radius: var(--radius-m);
+    color: var(--farbe-primaer);
+    text-align: center;
     text-decoration: none;
-    transition: background-color var(--dauer-schnell) var(--verlauf);
   }
 
-  .aufklapp__eintrag img {
-    width: 1.75rem;
-    height: 1.75rem;
-    flex: none;
+  .oberpunkt:hover,
+  .oberpunkt:focus-visible { background: var(--farbe-flaeche-gedeckt); }
+
+  .oberpunkt__symbol {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 5px;
     object-fit: contain;
   }
 
-  .aufklapp__eintrag:hover,
-  .aufklapp__eintrag:focus-visible {
-    background: var(--farbe-flaeche-gedeckt);
-    color: var(--farbe-primaer);
+  .oberpunkt__titel {
+    font-size: 16px;
+    font-weight: var(--gewicht-halbfett);
   }
 
-  .aufklapp__alle {
-    display: block;
-    margin-top: var(--abstand-s);
-    padding-top: var(--abstand-2xs);
-    border-top: 1px solid var(--farbe-linie);
-    font-size: var(--text-s);
-    font-weight: var(--gewicht-halbfett);
-    color: var(--farbe-primaer);
+  .oberpunkt__kurz {
+    color: var(--farbe-text);
+    font-size: 14px;
+    font-weight: 300;
   }
 
   /* ---------- Symbolleiste unten ---------- */
@@ -558,8 +691,6 @@ const kategorien = (leistungen.kategorien ?? [])
   }
 
   /* .nav-bottom-wrapper: feste Breite 700px, Höhe 110px */
-  .fussleiste__inhalt--klein { display: none; }
-
   .fussleiste__inhalt {
     display: flex;
     justify-content: space-between;
@@ -567,6 +698,24 @@ const kategorien = (leistungen.kategorien ?? [])
     width: 700px;
     max-width: 700px;
     height: 110px;
+  }
+
+  /* Die kurze Fassung gilt erst ab der Handybreite (siehe unten) */
+  .fussleiste__inhalt--klein { display: none; }
+
+  .fussknopf--knopf {
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  /* Über die volle Leistenhöhe, damit das Aufklappfeld bündig an der
+     Punktlinie der Leiste ansetzt und die Linie von dort losfährt */
+  .fussleiste .aufklapp {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
   }
 
   /* .nav-bottom-button: 4 px Abstand nach oben */
@@ -634,10 +783,12 @@ const kategorien = (leistungen.kategorien ?? [])
   /* ---------- Kleine Bildschirme (Umbruchpunkt der Vorlage) ---------- */
   @media (max-width: 991px) {
     .kontaktzeile__inhalt,
-    .kopfleiste__inhalt { width: 90%; }
-    .fussleiste__inhalt--klein { display: none; }
+    .kopfleiste__inhalt,
+    .fussleiste__inhalt { width: 90%; }
 
-  .fussleiste__inhalt { width: 90%; }
+    /* Auf Handys die kurze Leiste statt der langen */
+    .fussleiste__inhalt--gross { display: none; }
+    .fussleiste__inhalt--klein { display: flex; }
 
     /* Ohne Telefonnummer — die steht unten als eigener Knopf */
     .punkt--ab-tablet,
@@ -733,9 +884,18 @@ const kategorien = (leistungen.kategorien ?? [])
 
       const setzen = (offen: boolean) => {
         knopf.setAttribute('aria-expanded', String(offen));
-        inhalt.hidden = !offen;
-        if (offen) huelle.dataset.offen = 'ja';
-        else delete huelle.dataset.offen;
+        if (offen) {
+          inhalt.hidden = false;
+          // Zwei Bilder abwarten, sonst springt das Feld ohne Übergang auf
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            if (knopf.getAttribute('aria-expanded') === 'true') huelle.dataset.offen = 'ja';
+          }));
+        } else {
+          delete huelle.dataset.offen;
+          window.setTimeout(() => {
+            if (knopf.getAttribute('aria-expanded') !== 'true') inhalt.hidden = true;
+          }, 300);
+        }
       };
 
       knopf.addEventListener('click', () => {
@@ -800,6 +960,27 @@ const kategorien = (leistungen.kategorien ?? [])
           menueknopf.setAttribute('aria-label', 'Menü schließen');
           knopfSpieler?.playSegments([0, knopfSpieler.totalFrames - 1], true);
         }
+      });
+
+      // Unterebene „Leistungen“ öffnen und schließen
+      const menue = document.querySelector<HTMLElement>('[data-mobilmenue]');
+      const unter = document.querySelector<HTMLElement>('[data-unterebene]');
+      const knopfLeistungen = document.querySelector<HTMLButtonElement>('[data-mobilleistungen]');
+      const zurueck = document.querySelector<HTMLButtonElement>('[data-unterebeneZurueck]');
+
+      knopfLeistungen?.addEventListener('click', () => {
+        if (!menue || !unter) return;
+        unter.hidden = false;
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          menue.setAttribute('data-unterebene-offen', 'ja');
+        }));
+      });
+
+      zurueck?.addEventListener('click', () => {
+        if (!menue || !unter) return;
+        menue.removeAttribute('data-unterebene-offen');
+        window.setTimeout(() => { unter.hidden = true; }, 300);
+        knopfLeistungen?.focus();
       });
 
       // Ein Klick auf einen Menüpunkt schließt wieder (wie in a-27)

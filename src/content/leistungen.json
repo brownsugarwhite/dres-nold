@@ -1,23 +1,29 @@
 {
-  "_hinweis_fuer_die_redaktion": "Leistungen und ihre Kategorien. Die Kategorien erscheinen im Aufklappmenü unter „Leistungen“ als Spalten — neue lassen sich hier anlegen. Jede Leistung bekommt eine eigene Adresse unter /leistungen/<id>; die id nach dem Anlegen nicht mehr ändern, sonst gehen Verlinkungen und die Google-Platzierung verloren. „kurz“ ist der Anrisstext auf der Kachel.",
+  "_hinweis_fuer_die_redaktion": "Leistungen und ihre Kategorien. Die Kategorien erscheinen im Aufklappmenü unter „Leistungen“ mit Symbol, Titel und Kurztext — neue lassen sich hier anlegen. Jede Leistung bekommt eine eigene Adresse unter /leistungen/<id>; die id nach dem Anlegen nicht mehr ändern, sonst gehen Verlinkungen und die Google-Platzierung verloren. „kurz“ ist bei Leistungen der Anrisstext auf der Kachel, bei Kategorien die Zeile unter dem Titel im Menü.",
   "kategorien": [
     {
       "id": "zahnaerztlich",
       "titel": "Zahnärztliche Leistungen",
       "position": 1,
-      "aktiv": true
+      "aktiv": true,
+      "kurz": "Vorsorge, Zahnerhalt und Zahnersatz",
+      "icon": "/icons/prophylaxe.svg"
     },
     {
       "id": "kieferorthopaedie",
       "titel": "Kieferorthopädie",
       "position": 2,
-      "aktiv": true
+      "aktiv": true,
+      "kurz": "Zahnspangen für Kinder und Erwachsene",
+      "icon": "/icons/kieferorthopaedie-kinder.svg"
     },
     {
       "id": "sonstige",
       "titel": "Sonstige Leistungen",
       "position": 3,
-      "aktiv": true
+      "aktiv": true,
+      "kurz": "Digitale Diagnostik und Ästhetik",
+      "icon": "/icons/3d-roentgen.svg"
     }
   ],
   "eintraege": [
