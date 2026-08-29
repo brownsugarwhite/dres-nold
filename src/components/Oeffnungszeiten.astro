@@ -1,31 +1,55 @@
 ---
 /**
- * Öffnungszeiten — schnalzt beim Scrollen herein.
+ * Öffnungszeiten — schnalzen beim Scrollen von unten herein.
  *
- * Aufbau wie in der Vorlage:
- *   • Weiße Fläche mit den drei Listen
- *   • Darunter die Lottie-Grafik: die untere Abschlusslinie mit dem
- *     Zipfel, der auf den Öffnungszeiten-Knopf zeigt
+ * Aufbau wie in der Vorlage (`.oz` / `.oz-container` / `.div-block-28`):
+ *   • Ein 350vh hoher Bereich ganz am Seitenanfang
+ *   • Darin eine Bühne, die über die volle Strecke stehen bleibt und
+ *     ihren Überlauf abschneidet — die Blase ist unsichtbar, solange
+ *     sie noch unterhalb steht
+ *   • Die Blase selbst ruht 110 px über dem unteren Rand, also genau
+ *     über der Symbolleiste, und wird vom Scrollweg dorthin gefahren
+ *   • Darunter die Lottie-Grafik mit dem Zipfel
  *
- * Beide bewegen sich am Scrollweg entlang. Die Werte stammen aus der
- * beobachteten Vorlage (siehe docs/referenz/verstaendnis-mobile.md),
- * nicht aus abgeleiteten Annahmen:
+ * Alle Werte stammen aus Ablauf `a-19` („oz test") der Vorlage:
  *
- *   Scrollweg   Versatz    Tempo
- *    0 – 20 %   700 → 682  fast Stillstand
- *   20 – 35 %   682 → 483  mittel
- *   35 – 50 %   483 → 150  schnellste Phase
- *   50 – 60 %   150 →  22  mittel
- *   60 – 70 %    22 →   0  rollt sanft aus
+ *   bei 15 %   Blase  y = 700 px      Kurve easeIn   ⟶ holt Schwung
+ *   bei 50 %   Blase  y = 150 px      Kurve outCubic ⟶ bremst ab
+ *              Zipfel Bild 0
+ *   bei 71 %   Blase  y =   0 px      — steht
+ *              Zipfel Bild 99         Kurve easeOut
+ *   bei 80 %   Zipfel Bild 0
  *
- * Der Zipfel wächst, während die Fläche abbremst, und zieht sich
- * wieder ein, sobald sie steht:
- *   50 % → Bild 0 · 71 % → Bild 99 · 80 % → Bild 0
+ * Die Kurve gehört jeweils zu dem Abschnitt, der an dieser Stelle
+ * BEGINNT — so wertet Webflow scrollgebundene Abläufe aus. Daher das
+ * Wechselspiel, das die Vorlage lebendig macht: die erste Bewegung
+ * nach oben zieht mit easeIn an, der Rest läuft mit outCubic aus,
+ * und der Zipfel schnalzt mit easeOut zurück.
+ *
+ * Wichtig ist außerdem, WIE der Fortschritt gezählt wird: nicht über
+ * den sichtbaren Bereich, sondern wie Webflows „while scrolling in
+ * view" über einen 350vh hohen Streifen am Dokumentanfang. Beim Laden
+ * sind dadurch schon ~22 % zurückgelegt (siehe scripts/scrollwege.ts).
  */
 import oz from '../content/oeffnungszeiten.json';
 
 const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 ---
+
+{/*
+  Zwei Ebenen, weil sie an verschiedenen Stellen im Stapel liegen
+  müssen: die weiße Fläche unter dem Logo, die Blase darüber.
+
+    Ebene  1  grauer Symbolgrund (fest im Fenster)
+    Ebene  2  diese weiße Fläche — nimmt den Platz im Fluss ein
+    Ebene 10  der Logobereich (fest im Fenster)
+    Ebene 30  die Öffnungszeiten-Blase
+
+  Der graue Grund wird dadurch erst unterhalb sichtbar
+  (docs/entscheidungen.md), das Logo bleibt aber sichtbar, während
+  die Blase darüber hereinfährt.
+*/}
+<div class="ozraum" aria-hidden="true"></div>
 
 <section class="ozbereich" id="oz_anchor" aria-label="Öffnungszeiten">
   <div class="ozbereich__buehne">
@@ -63,15 +87,25 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 </section>
 
 <style>
-  .ozbereich {
+  /* Nimmt den Platz im Seitenfluss ein und deckt den grauen Grund ab.
+     Höhe von `.trigger-oz-scroll` / `.oz` in der mobilen Vorlage. */
+  .ozraum {
     position: relative;
-    /* Über Startbereich (10) und Inhalt (5) — wie .oz-container
-       in der Vorlage, die dort auf Ebene 30 liegt. */
-    z-index: 30;
-    height: 300vh;
-    /* Weiß bis hierher — der graue Symbolgrund wird erst unterhalb
-       der Öffnungszeiten sichtbar. */
+    z-index: 2;
+    height: 350vh;
     background: var(--farbe-flaeche);
+  }
+
+  /* Liegt deckungsgleich darüber, aber auf Ebene 30 — wie
+     `.oz-container` in der Vorlage. Außerhalb des Flusses, damit die
+     weiße Fläche darunter dieselbe Strecke belegt und nicht doppelt. */
+  .ozbereich {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    width: 100%;
+    height: 350vh;
   }
 
   /* Bleibt stehen, während der Bereich durchläuft.
@@ -82,6 +116,9 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     top: 0;
     height: 100vh;
     height: 100dvh;
+    /* Wie `.oz-container` auf Mobile: schneidet ab, was noch unterhalb
+       steht — sonst schöbe sich die Blase über die Symbolleiste. */
+    overflow: hidden;
     pointer-events: none;
   }
 
@@ -187,7 +224,8 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 
   /* Ohne Bewegung: steht ruhig im Seitenfluss */
   @media (prefers-reduced-motion: reduce) {
-    .ozbereich { height: auto; padding-block: var(--abstand-2xl); }
+    .ozraum { display: none; }
+    .ozbereich { position: static; height: auto; padding-block: var(--abstand-2xl); }
     .ozbereich__buehne { position: static; height: auto; }
     .ozblase { position: static; transform: none; margin-inline: auto; }
     .ozblase__linie { display: none; }
@@ -197,10 +235,10 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 <script>
   import { ladeAnimation } from '../scripts/lottie';
   import { ausStuetzstellen, type Stuetzstelle } from '../scripts/easing';
+  import { OZ_WEG, beimScrollenSichtbar, nachziehen } from '../scripts/scrollwege';
 
   /**
-   * Fährt die Öffnungszeiten am Scrollweg entlang herein.
-   * Stützstellen aus der beobachteten Vorlage.
+   * Fährt die Öffnungszeiten am Scrollweg entlang herein — Ablauf a-19.
    */
   function ozAufbauen() {
     const bereich = document.querySelector<HTMLElement>('.ozbereich');
@@ -211,10 +249,9 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    /* Schlüsselstellen und Kurven exakt aus Ablauf a-19 der Vorlage.
-       Die Kurve gehört zum Abschnitt, der an dieser Stelle BEGINNT —
-       so wertet Webflow scrollgebundene Abläufe aus. Nachgerechnet
-       gegen die Vorlage: Abweichung unter 2 px über den ganzen Weg. */
+    /* Schlüsselstellen aus a-19. Die Kurve gehört zum Abschnitt, der an
+       dieser Stelle beginnt. Vor der ersten Stelle hält Webflow den
+       ersten Wert — daher die Stütze bei 0 %. */
     const BLASE: Stuetzstelle[] = [
       { bei: 0.00, wert: 700, kurve: 'linear' },
       { bei: 0.15, wert: 700, kurve: 'easeIn' },
@@ -223,41 +260,62 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
       { bei: 1.00, wert: 0 },
     ];
 
-    /* Zipfel: wächst, während die Fläche einrastet, und zieht sich
-       danach wieder ein. Werte 0 … 1 als Anteil der Bildfolge. */
+    /* Der Zipfel fährt aus, während die Blase einrastet, und zieht sich
+       danach wieder ein. Werte als Anteil der Bildfolge (99 % = 0.99). */
     const ZIPFEL: Stuetzstelle[] = [
       { bei: 0.00, wert: 0, kurve: 'linear' },
       { bei: 0.50, wert: 0, kurve: 'outCubic' },
-      { bei: 0.71, wert: 1, kurve: 'easeOut' },
+      { bei: 0.71, wert: 0.99, kurve: 'easeOut' },
       { bei: 0.80, wert: 0, kurve: 'linear' },
       { bei: 1.00, wert: 0 },
     ];
 
     let spieler: { goToAndStop: (w: number, b?: boolean) => void; totalFrames: number } | null = null;
-    let geplant = false;
+
+    /** Der Wert, der gezeichnet wird — läuft dem Scrollwert nach. */
+    let p = ziel();
+    let laeuft = false;
+    let zuletzt = 0;
+
+    /** Scrollwert wie Webflows „while scrolling in view". */
+    function ziel(): number {
+      return beimScrollenSichtbar(OZ_WEG, bereich!.getBoundingClientRect().top);
+    }
 
     const zeichnen = () => {
-      geplant = false;
-      const r = bereich.getBoundingClientRect();
-      const weg = r.height - window.innerHeight;
-      const p = weg > 0 ? Math.min(1, Math.max(0, -r.top / weg)) : 0;
-
       blase.style.setProperty('--oz-versatz', `${ausStuetzstellen(p, BLASE)}px`);
-
       if (spieler) {
         const anteil = ausStuetzstellen(p, ZIPFEL);
         spieler.goToAndStop(anteil * (spieler.totalFrames - 1), true);
       }
     };
 
-    const beiScroll = () => {
-      if (geplant) return;
-      geplant = true;
-      requestAnimationFrame(zeichnen);
+    /* Eigene Schleife statt reinem Scroll-Ereignis: Der Nachlauf muss
+       auch dann noch weiterlaufen, wenn das Scrollen längst aufgehört
+       hat. Sie hält an, sobald der Wert das Ziel erreicht hat. */
+    const schritt = (jetzt: number) => {
+      const dt = zuletzt ? Math.min(100, jetzt - zuletzt) : 16.7;
+      zuletzt = jetzt;
+
+      const z = ziel();
+      p = nachziehen(p, z, dt);
+      if (Math.abs(z - p) < 0.0002) p = z;
+
+      zeichnen();
+
+      if (p !== z) requestAnimationFrame(schritt);
+      else laeuft = false;
     };
 
-    window.addEventListener('scroll', beiScroll, { passive: true });
-    window.addEventListener('resize', beiScroll, { passive: true });
+    const anstossen = () => {
+      if (laeuft) return;
+      laeuft = true;
+      zuletzt = 0;
+      requestAnimationFrame(schritt);
+    };
+
+    window.addEventListener('scroll', anstossen, { passive: true });
+    window.addEventListener('resize', anstossen, { passive: true });
     zeichnen();
 
     if (linie) {

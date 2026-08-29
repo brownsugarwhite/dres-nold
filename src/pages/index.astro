@@ -37,11 +37,19 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 <Basis>
   <Hinweis />
 
+  {/*
+    Reihenfolge wie in der Vorlage: `.oz` steht VOR dem Logobereich im
+    Seitenfluss und beginnt damit am Dokumentanfang. Nur so fährt die
+    Blase über das fest stehende Logo hinweg herein. Der Logobereich
+    selbst liegt fest im Fenster und nimmt keinen Platz im Fluss ein;
+    im Fluss folgt nach den 350vh der Öffnungszeiten nur noch sein
+    weißer Startraum (130vh).
+  */}
+  <Oeffnungszeiten />
+
   <Startbereich />
 
   <Navigation />
-
-  <Oeffnungszeiten />
 
   <main id="inhalt" class="seiteninhalt">
     <Willkommen />
