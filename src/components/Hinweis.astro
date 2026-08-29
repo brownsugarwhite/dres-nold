@@ -64,13 +64,28 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
     align-items: center;
     justify-content: center;
     /* Aubergine, stark abgedunkelt — Wert aus der Vorlage */
+    /* Ablauf a-36: Hintergrund dunkelt in 500 ms nach */
     background-color: #13000d99;
     padding: var(--abstand-m);
+    transition: background-color 500ms linear;
   }
+
+  .hinweis[data-schliesst] { background-color: rgb(255 255 255 / 0%); }
 
   .hinweis[hidden] { display: none; }
 
+  .hinweis[data-offen] .hinweis__blase-umgebung { transform: translateX(0); }
+
+  .hinweis[data-schliesst] .hinweis__blase-umgebung {
+    transform: translateX(-100vw);
+    transition: transform 800ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+
+  /* Ablauf a-36: fährt von links herein, 800 ms outCubic mit
+     400 ms Verzögerung. a-30 schließt in 800 ms inCubic. */
   .hinweis__blase-umgebung {
+    transform: translateX(-100vw);
+    transition: transform 800ms cubic-bezier(0.215, 0.61, 0.355, 1) 400ms;
     display: flex;
     align-items: flex-start;
     width: 100%;
@@ -116,7 +131,8 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
     background: url('/icons/ui/schliessen.svg') center / contain no-repeat transparent;
     cursor: pointer;
     /* Dreht sich beim Zeigen — wie in der Vorlage (a-34 / a-35) */
-    transition: transform var(--dauer-schnell) var(--verlauf);
+    /* Ablauf a-34 / a-35: 300 ms, outQuad */
+    transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
   .hinweis__schliessen:hover,
@@ -195,13 +211,22 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
     // Merken, wohin der Fokus nach dem Schließen zurückkehrt
     const zuletztFokussiert = document.activeElement as HTMLElement | null;
 
+    const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const schliessen = () => {
-      kasten.hidden = true;
       try { sessionStorage.setItem(kennung, 'gesehen'); } catch { /* egal */ }
+      if (ruhig) { kasten.hidden = true; zuletztFokussiert?.focus(); return; }
+      kasten.removeAttribute('data-offen');
+      kasten.setAttribute('data-schliesst', 'ja');
+      window.setTimeout(() => { kasten.hidden = true; kasten.removeAttribute('data-schliesst'); }, 800);
       zuletztFokussiert?.focus();
     };
 
     kasten.hidden = false;
+    // Zwei Bilder abwarten, damit der Ausgangszustand gezeichnet ist
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      kasten.setAttribute('data-offen', 'ja');
+    }));
     kasten.querySelector<HTMLButtonElement>('.hinweis__schliessen')?.focus();
 
     kasten.querySelector('.hinweis__schliessen')?.addEventListener('click', schliessen);

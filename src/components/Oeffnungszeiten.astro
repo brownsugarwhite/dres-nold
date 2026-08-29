@@ -126,7 +126,8 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     border: 0;
     background: url('/icons/ui/schliessen.svg') center / contain no-repeat transparent;
     cursor: pointer;
-    transition: transform var(--dauer-schnell) var(--verlauf);
+    /* Ablauf a-34 / a-35: 300 ms, outQuad */
+    transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
   .ozblase__schliessen:hover,

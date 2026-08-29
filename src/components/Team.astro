@@ -17,8 +17,8 @@ const mitarbeitende = personen.filter((e) => e.gruppe === 'team');
 ---
 
 <section class="team" id="team">
-  <div class="team__kopf">
-    <div class="team__bild" role="img" aria-label="Das Ärzteteam der Praxis Dres. Nold"></div>
+  <div class="team__kopf" data-teamkopf>
+    <div class="team__bild" data-teambild role="img" aria-label="Das Ärzteteam der Praxis Dres. Nold"></div>
     <h2 class="team__titel ohne-verlauf">Wir freuen uns auf Sie</h2>
   </div>
 
@@ -26,7 +26,7 @@ const mitarbeitende = personen.filter((e) => e.gruppe === 'team');
     <div class="team__reihe">
       {aerzte.map((a) => (
         <figure class="person">
-          <img class="person__bild" src={a.foto} alt={a.foto_alt} width="300" height="260" loading="lazy" />
+          <img class="person__bild" data-personbild src={a.foto} alt={a.foto_alt} width="300" height="260" loading="lazy" />
           <figcaption class="person__text">
             <strong class="person__name">{a.name}</strong>
             <span class="person__funktion">{a.funktion}</span>
@@ -38,7 +38,7 @@ const mitarbeitende = personen.filter((e) => e.gruppe === 'team');
     <div class="team__reihe team__reihe--klein">
       {mitarbeitende.map((m) => (
         <figure class="person">
-          <img class="person__bild" src={m.foto} alt={m.foto_alt} width="300" height="260" loading="lazy" />
+          <img class="person__bild" data-personbild src={m.foto} alt={m.foto_alt} width="300" height="260" loading="lazy" />
           <figcaption class="person__text">
             <strong class="person__name">{m.name}</strong>
             <span class="person__funktion">{m.funktion}</span>
@@ -73,10 +73,13 @@ const mitarbeitende = personen.filter((e) => e.gruppe === 'team');
     overflow: hidden;
   }
 
+  /* Ablauf a-3: wandert von −20 px auf 120 px und wächst dabei
+     von 1 auf 1,1 — ein ruhiger Tiefeneffekt beim Scrollen. */
   .team__bild {
     position: absolute;
-    inset: 0;
+    inset: -10% 0;
     background: url('/bilder/aerzteteam.webp') center / cover no-repeat;
+    transform: translateY(var(--kopf-versatz, -20px)) scale(var(--kopf-groesse, 1));
   }
 
   .team__titel {
@@ -107,13 +110,20 @@ const mitarbeitende = personen.filter((e) => e.gruppe === 'team');
   .person { margin: 0; }
 
   /* .team-image: 260 px hoch, Ausschnitt oben ausgerichtet */
+  /* Ablauf a-2: Höhe 80 % → 100 %, Skalierung 1,2 → 1 über die
+     ersten 90 % des Scrollwegs. Der Bildausschnitt beruhigt sich,
+     während die Person ins Bild kommt. */
   .person__bild {
     width: 100%;
     height: 260px;
     object-fit: cover;
     object-position: 50% 0;
     background: var(--farbe-flaeche);
+    transform: scale(var(--person-groesse, 1));
+    transform-origin: 50% 0;
   }
+
+  .person { overflow: hidden; }
 
   .person__text {
     display: flex;
@@ -133,8 +143,65 @@ const mitarbeitende = personen.filter((e) => e.gruppe === 'team');
     font-weight: 300;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .team__bild { transform: none; }
+    .person__bild { transform: none; }
+  }
+
   @media (max-width: 767px) {
     .team__kopf { height: 380px; }
     .team__inhalt { padding-block: 60px 80px; }
   }
 </style>
+
+<script>
+  /**
+   * Bewegungen im Team-Abschnitt, Werte aus den Abläufen der Vorlage.
+   *
+   *   a-3  Gruppenfoto: −20 px → 120 px, Skalierung 1 → 1,1
+   *   a-2  Porträts:    Skalierung 1,2 → 1 über die ersten 90 %
+   */
+  function teamAufbauen() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const kopf = document.querySelector<HTMLElement>('[data-teamkopf]');
+    const bild = document.querySelector<HTMLElement>('[data-teambild]');
+    const portraets = [...document.querySelectorAll<HTMLElement>('[data-personbild]')];
+    if (!kopf || kopf.dataset.bereit) return;
+    kopf.dataset.bereit = 'ja';
+
+    /** Anteil, zu dem ein Element den Blickbereich durchlaufen hat (0 … 1). */
+    const anteil = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      const weg = window.innerHeight + r.height;
+      return Math.min(1, Math.max(0, (window.innerHeight - r.top) / weg));
+    };
+
+    let geplant = false;
+    const zeichnen = () => {
+      geplant = false;
+
+      const p = anteil(kopf);
+      bild?.style.setProperty('--kopf-versatz', `${-20 + 140 * p}px`);
+      bild?.style.setProperty('--kopf-groesse', String(1 + 0.1 * p));
+
+      portraets.forEach((b) => {
+        const q = Math.min(1, anteil(b) / 0.9);
+        b.style.setProperty('--person-groesse', String(1.2 - 0.2 * q));
+      });
+    };
+
+    const beiScroll = () => {
+      if (geplant) return;
+      geplant = true;
+      requestAnimationFrame(zeichnen);
+    };
+
+    window.addEventListener('scroll', beiScroll, { passive: true });
+    window.addEventListener('resize', beiScroll, { passive: true });
+    zeichnen();
+  }
+
+  teamAufbauen();
+  document.addEventListener('astro:page-load', teamAufbauen);
+</script>
