@@ -139,19 +139,25 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
       </>
     ))}
   </nav>
-
+</header>
   {/* Ausklappmenü für Handys — Höhe 0 → 338 px (Ablauf a-25) */}
   <div class="mobilmenue" id="mobilmenue" data-mobilmenue>
     <div class="mobilmenue__inhalt">
-      {fuss.map((e) => (
+      {punkte.map((e) => (
         <a class="mobilmenue__punkt" href={e.ziel}>
-          <img src={e.icon} alt="" width="40" height="40" />
-          <span>{e.titel}</span>
+          <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
+          <span class="mobilmenue__text">{e.titel}</span>
         </a>
       ))}
     </div>
+
+    {/* .div-block-30: Punktlinie oben, 40 px hoch */}
+    <div class="mobilmenue__recht">
+      <a href="/datenschutz/">Datenschutz</a>
+      <a href="/impressum/">Impressum</a>
+    </div>
   </div>
-</header>
+
 </div>
 
 {/* Symbolleiste am unteren Rand — oben auf der Seite sichtbar */}
@@ -287,24 +293,61 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
     transition: height 700ms cubic-bezier(0.42, 0, 0.58, 1);
   }
 
-  .navigation[data-menue-offen] .mobilmenue { height: 338px; }
+  .navigation[data-menue-offen] .mobilmenue { height: 100vh; }
 
+  /* .menu-button-container: 90 % Breite, 20 px Abstand oben.
+     Als Liste untereinander statt zweizeilig — die Leistungen
+     bekommen später Unterpunkte. */
   .mobilmenue__inhalt {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--abstand-m);
-    padding: var(--abstand-m);
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    margin: 20px auto 0;
   }
 
   .mobilmenue__punkt {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: var(--abstand-3xs);
+    gap: var(--abstand-s);
+    padding: var(--abstand-2xs) 0;
     color: var(--farbe-primaer);
-    font-size: var(--text-s);
     text-decoration: none;
   }
+
+  /* Symbolgröße wie in der unteren Leiste */
+  .mobilmenue__symbol {
+    flex: none;
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+  }
+
+  .mobilmenue__text {
+    font-size: 18px;
+    font-weight: 400;
+  }
+
+  /* .div-block-30: Punktlinie oben, 40 px hoch */
+  .mobilmenue__recht {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--abstand-l);
+    width: 100%;
+    height: 40px;
+    margin-top: var(--abstand-m);
+    background: url('/bilder/deko/punktlinie.png') 50% 0 repeat-x;
+    background-size: auto 1px;
+  }
+
+  .mobilmenue__recht a {
+    color: var(--farbe-text);
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  .mobilmenue__recht a:hover,
+  .mobilmenue__recht a:focus-visible { color: var(--farbe-primaer); }
 
   .logo img {
     width: 80px;
@@ -452,19 +495,30 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
     height: 110px;
   }
 
+  /* .nav-bottom-button: 4 px Abstand nach oben */
   .fussknopf {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
-    gap: var(--abstand-3xs);
+    margin-top: 4px;
     color: var(--farbe-primaer);
-    font-size: var(--text-xs);
     text-decoration: none;
   }
 
+  /* .nav-bottom-button-txt: 14 px, Gewicht 400 */
+  .fussknopf__text {
+    color: var(--farbe-primaer);
+    font-size: 14px;
+    font-weight: 400;
+    text-align: center;
+  }
+
+  /* .nav-bottom-button-icon: 60 × 60 px, 5 px Abstand nach unten */
   .fussknopf__symbol {
-    width: 2rem;
-    height: 2rem;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 5px;
     object-fit: contain;
   }
 
@@ -500,12 +554,13 @@ const kieferorthopaedie = dienste.filter((e) => e.kategorie === 'kieferorthopaed
     .punkt--fuss[data-nach='team'] { display: block; order: 9; }
   }
 
+  /* .dot: 3 × 3 px, schwarz */
   .punkt {
     flex: none;
     width: 3px;
     height: 3px;
-    border-radius: var(--radius-rund);
-    background: var(--farbe-dunkel);
+    border-radius: 50%;
+    background: #000;
   }
 
   /* ---------- Kleine Bildschirme ---------- */
