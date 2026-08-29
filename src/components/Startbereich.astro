@@ -104,9 +104,12 @@ const { praxis } = seite;
     }
     /* Wird vom Skript am Scrollfortschritt entlang gesetzt */
     /* Nur skalieren und verschieben. Das Ausblenden geschieht in der
-       Lottie-Animation selbst, nicht über die Deckkraft. */
+       Lottie-Animation selbst, nicht über die Deckkraft.
+
+       Kein `will-change`: Das erzeugt eine eigene Zeichenebene, deren
+       Kanten der Browser bei krummen Positionen weichzeichnet — genau
+       das ergab den hellen Saum um das Verlaufsbild. */
     transform: scale(var(--logo-groesse, 1)) translateY(var(--logo-versatz, 0px));
-    will-change: transform;
   }
 
   /* Der bewegte Verlauf, der die Schrift des Logos einfärbt.
@@ -126,14 +129,9 @@ const { praxis } = seite;
   /* Verlaufsbild unter der Logo-Grafik, wie in Webflow: Cover,
      Position 50 % / 50 %, kein Tile.
 
-     Die Vorlage nutzt 48vh × 32vh, also 96 % × 80 % des Containers.
-     Hier steht die Höhe auf 67 %, weil die weiße Fläche der Lottie-
-     Grafik unter `lottie-web` weniger abdeckt als unter Webflows
-     eigener Einbindung — bei 80 % stünde der Verlauf oben und unten
-     als heller Saum über.
+     Maße wie in der Vorlage: 48vh × 32vh, also 96 % × 80 %.
 
-     Mit einer Lottie-Datei, deren weiße Fläche bis an den Rand reicht,
-     kann hier wieder auf 80 % gestellt werden. */
+     Maße wie in der Vorlage: 48vh × 32vh, also 96 % × 80 %. */
   .logo__verlauf {
     position: absolute;
     top: 50%;
@@ -141,7 +139,7 @@ const { praxis } = seite;
     transform: translate(-50%, -50%);
     z-index: 10;
     width: 96%;
-    height: 67%;
+    height: 80%;
     /* Wie in Webflow eingestellt: Cover, Position 50 % / 50 %, kein Tile */
     background: url('/bilder/deko/verlauf.gif') 50% 50% / cover no-repeat;
   }
