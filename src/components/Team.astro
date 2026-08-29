@@ -79,8 +79,22 @@ const mitarbeitende = personen.filter((e) => e.gruppe === 'team');
     position: absolute;
     inset: -10% 0;
     background: url('/bilder/aerzteteam.webp') center / cover no-repeat;
-    transform: translateY(var(--kopf-versatz, -20px)) scale(var(--kopf-groesse, 1));
+    transform:
+      translateX(var(--kopf-fahrt, -50%))
+      translateY(var(--kopf-versatz, -20px))
+      scale(var(--kopf-groesse, 1));
+    /* Ablauf a-22: fährt beim Hereinscrollen in 5 s von −50 % auf 0 %.
+       a-23 setzt beim Verlassen wieder zurück. */
+    transition: --kopf-fahrt 5000ms cubic-bezier(0.42, 0, 0.58, 1);
   }
+
+  @property --kopf-fahrt {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: -50%;
+  }
+
+  .team__kopf[data-sichtbar] .team__bild { --kopf-fahrt: 0%; }
 
   .team__titel {
     position: relative;
@@ -200,6 +214,17 @@ const mitarbeitende = personen.filter((e) => e.gruppe === 'team');
     window.addEventListener('scroll', beiScroll, { passive: true });
     window.addEventListener('resize', beiScroll, { passive: true });
     zeichnen();
+
+    /* Abläufe a-22 / a-23: Sobald der Kopfbereich ins Bild kommt, fährt
+       das Foto in 5 Sekunden von −50 % auf 0 %. Verlässt er das Bild,
+       springt es zurück, damit die Fahrt beim nächsten Mal erneut läuft. */
+    const beobachter = new IntersectionObserver((eintraege) => {
+      eintraege.forEach((e) => {
+        if (e.isIntersecting) kopf.setAttribute('data-sichtbar', 'ja');
+        else kopf.removeAttribute('data-sichtbar');
+      });
+    }, { threshold: 0.1 });
+    beobachter.observe(kopf);
   }
 
   teamAufbauen();

@@ -15,7 +15,7 @@ interface Props {
 const { id, titel, kurz, icon } = Astro.props;
 ---
 
-<a class="kachel" href={`/leistungen/${id}/`} transition:name={`leistung-${id}`}>
+<a class="kachel" data-kachel href={`/leistungen/${id}/`} transition:name={`leistung-${id}`}>
   <img class="kachel__icon" src={icon} alt="" width="64" height="64" />
   <h3 class="kachel__titel">{titel}</h3>
   <p class="kachel__kurz">{kurz}</p>
@@ -33,6 +33,11 @@ const { id, titel, kurz, icon } = Astro.props;
     border-radius: var(--radius-m);
     text-decoration: none;
     color: var(--farbe-text);
+    /* Ablauf a-8: Über den Scrollweg wächst die Kachel von 0,9 auf 1
+       und ihr Grund hellt von #f1f1f1 auf Weiß auf — am Ende wieder
+       zurück. Die Werte setzt das Skript. */
+    transform: scale(var(--kachel-groesse, 1));
+    background-color: var(--kachel-grund, #fff);
     transition:
       border-color var(--dauer-schnell) var(--verlauf),
       transform var(--dauer-schnell) var(--verlauf);
@@ -41,7 +46,11 @@ const { id, titel, kurz, icon } = Astro.props;
   .kachel:hover,
   .kachel:focus-visible {
     border-color: var(--farbe-primaer);
-    transform: translateY(-2px);
+    transform: scale(var(--kachel-groesse, 1)) translateY(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kachel { transform: none; background-color: #fff; }
   }
 
   .kachel__icon {
@@ -74,3 +83,63 @@ const { id, titel, kurz, icon } = Astro.props;
     color: var(--farbe-primaer);
   }
 </style>
+
+<script>
+  /**
+   * Ablauf a-8: Die Kacheln wachsen beim Hereinscrollen von 0,9 auf 1
+   * und hellen dabei von #f1f1f1 auf Weiß auf; am Ende des Scrollwegs
+   * gehen beide Werte zurück.
+   *
+   *   0 %   Skalierung 0,9 · Grund #f1f1f1
+   *  30 %   Skalierung 1   · Grund Weiß
+   *  75 %   unverändert
+   * 100 %   Skalierung 0,9 · Grund #f1f1f1
+   */
+  function kachelnAufbauen() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const kacheln = [...document.querySelectorAll<HTMLElement>('[data-kachel]')];
+    if (!kacheln.length || kacheln[0].dataset.bereit) return;
+    kacheln.forEach((k) => { k.dataset.bereit = 'ja'; });
+
+    const zwischen = (p: number, vonP: number, bisP: number, vonW: number, bisW: number) => {
+      if (p <= vonP) return vonW;
+      if (p >= bisP) return bisW;
+      return vonW + ((p - vonP) / (bisP - vonP)) * (bisW - vonW);
+    };
+
+    let geplant = false;
+    const zeichnen = () => {
+      geplant = false;
+      kacheln.forEach((k) => {
+        const r = k.getBoundingClientRect();
+        const weg = window.innerHeight + r.height;
+        const p = Math.min(1, Math.max(0, (window.innerHeight - r.top) / weg));
+
+        const groesse = p < 0.3 ? zwischen(p, 0, 0.3, 0.9, 1)
+                      : p > 0.75 ? zwischen(p, 0.75, 1, 1, 0.9)
+                      : 1;
+        // 241 → 255 → 241
+        const ton = Math.round(p < 0.3 ? zwischen(p, 0, 0.3, 241, 255)
+                             : p > 0.75 ? zwischen(p, 0.75, 1, 255, 241)
+                             : 255);
+
+        k.style.setProperty('--kachel-groesse', groesse.toFixed(3));
+        k.style.setProperty('--kachel-grund', `rgb(${ton},${ton},${ton})`);
+      });
+    };
+
+    const beiScroll = () => {
+      if (geplant) return;
+      geplant = true;
+      requestAnimationFrame(zeichnen);
+    };
+
+    window.addEventListener('scroll', beiScroll, { passive: true });
+    window.addEventListener('resize', beiScroll, { passive: true });
+    zeichnen();
+  }
+
+  kachelnAufbauen();
+  document.addEventListener('astro:page-load', kachelnAufbauen);
+</script>

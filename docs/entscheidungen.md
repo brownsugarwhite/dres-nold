@@ -27,8 +27,8 @@ mit Lottie-Zipfel, nicht die beiden versetzten Kästen der Desktop-Vorlage.
 Im Menü ein zweispaltiges Aufklappmenü — links Zahnmedizin,
 rechts Kieferorthopädie. Die Übersicht bleibt auf der Startseite.
 
-Layout der Übersicht: noch offen, Florian schaut sich die Aufteilung
-noch an.
+**Layout der Übersicht: Kachelraster bleibt.** Nicht die Aufklapp-Liste
+der Vorlage nachbauen. Feinschliff später.
 
 ## Neuigkeiten
 
@@ -36,6 +36,15 @@ Neuer Bereich, den es in der Vorlage nicht gibt. Chronologisch, neueste
 zuerst. Je Beitrag: Bild, Überschrift, Fließtext mit Aufzählungen **und
 Tabellen**, dazu PDF-Anhänge zum Herunterladen, möglichst mit Vorschau.
 Blendet sich samt Menüpunkt aus, wenn kein Beitrag aktiv ist.
+
+## Entfallene Abläufe der Vorlage
+
+Diese Animationen werden bewusst **nicht** nachgebaut:
+
+| Ablauf | Grund |
+|---|---|
+| `a-32` / `a-33` | Öffnungszeiten Desktop — ersetzt durch die mobile Lösung |
+| `a-37` / `a-38` | Info-Bereich ein/aus — ersetzt durch den Neuigkeiten-Bereich |
 
 ## Kontakt
 
