@@ -114,19 +114,22 @@ const { praxis } = seite;
     align-items: center;
     /* Das Logo wächst über seine MASSE, nicht über `transform`.
 
-       Ein `transform`, das bei jedem Bild neu gesetzt wird, lässt den
-       Browser eine eigene Zeichenebene anlegen: Er rastert sie einmal
-       und skaliert dann das fertige Bild. Dabei werden die Kanten
-       weichgezeichnet — und weil der Verlauf nur wenige Bildpunkte
-       hinter dem Rand der weißen Lottie-Fläche liegt, entsteht genau
-       dort der helle Saum. Beim Laden steht der Wert auf 1, es gibt
-       keine Ebene, und alles ist scharf; er erscheint erst beim
-       Scrollen. (Dasselbe hatte zuvor `will-change` ausgelöst.)
+       Die Vorlage skaliert hier den ganzen Kasten per `transform`, und
+       dort sieht es richtig aus. Bei uns nicht: Mit `transform` — egal
+       ob `scale` oder wie in Webflow `translate3d` + `scale3d` — legt
+       der Browser für das Logo eine eigene Zeichenebene an, und der
+       Verlauf tritt am Rand der weißen Lottie-Fläche hervor. Ohne
+       `transform` ist er bei sonst gleicher Geometrie sauber. Nachweis
+       (1280 × 900, Fortschritt 0,20 / 0,48 / 0,70 / 0,90): die weiße
+       Fläche deckt den Verlauf in beiden Fällen um 9 bis 11 px ab —
+       sichtbar wird er trotzdem nur mit `transform`.
 
-       Über Breite und Höhe wird stattdessen jedes Bild neu gesetzt und
-       damit auch neu gezeichnet: die Lottie-Grafik als Vektor, der
-       Verlauf über `cover`. Beides bleibt scharf. Der Aufwand ist
-       vertretbar — es geht um ein einzelnes Element. */
+       Woran es in Webflow anders liegt, konnte ich nicht klären. Über
+       Breite und Höhe wird jedes Bild neu gezeichnet statt skaliert:
+       die Lottie-Grafik als Vektor, der Verlauf über `cover`. Die
+       Bewegung ist dieselbe — das Logo wächst von 1 auf 1,3 um seine
+       Mitte, weil `.startbereich__mitte` es zentriert hält. Der Aufwand
+       ist vertretbar, es geht um ein einzelnes Element. */
     width: calc(var(--logo-breite, 50vh) * var(--logo-groesse, 1));
     height: calc(var(--logo-hoehe, 40vh) * var(--logo-groesse, 1));
     margin-top: -100px;
