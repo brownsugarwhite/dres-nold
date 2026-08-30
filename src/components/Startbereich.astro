@@ -114,22 +114,27 @@ const { praxis } = seite;
     align-items: center;
     /* Das Logo wächst über seine MASSE, nicht über `transform`.
 
-       Die Vorlage skaliert hier den ganzen Kasten per `transform`, und
-       dort sieht es richtig aus. Bei uns nicht: Mit `transform` — egal
-       ob `scale` oder wie in Webflow `translate3d` + `scale3d` — legt
-       der Browser für das Logo eine eigene Zeichenebene an, und der
-       Verlauf tritt am Rand der weißen Lottie-Fläche hervor. Ohne
-       `transform` ist er bei sonst gleicher Geometrie sauber. Nachweis
-       (1280 × 900, Fortschritt 0,20 / 0,48 / 0,70 / 0,90): die weiße
-       Fläche deckt den Verlauf in beiden Fällen um 9 bis 11 px ab —
-       sichtbar wird er trotzdem nur mit `transform`.
+       Die Vorlage nimmt hier `transform`. Bei uns zeigt sich damit ein
+       heller Saum um das Verlaufsbild — und zwar erst beim Scrollen,
+       nicht beim Laden. Gegenprobe, bei der ALLES gleich blieb (gleiches
+       Lottie-Bild, gleiches `cover`, gleiche Maße, gleiche Scrollstelle)
+       und nur der Skalierungsfaktor wechselte:
 
-       Woran es in Webflow anders liegt, konnte ich nicht klären. Über
-       Breite und Höhe wird jedes Bild neu gezeichnet statt skaliert:
-       die Lottie-Grafik als Vektor, der Verlauf über `cover`. Die
-       Bewegung ist dieselbe — das Logo wächst von 1 auf 1,3 um seine
-       Mitte, weil `.startbereich__mitte` es zentriert hält. Der Aufwand
-       ist vertretbar, es geht um ein einzelnes Element. */
+           transform: scale(1.15)  →  Saum da
+           transform: scale(1)     →  Saum weg
+
+       Es liegt also nicht am Bild und nicht am Lottie-Bild, sondern an
+       der Vergrößerung: Der Browser rastert die Zeichenebene einmal und
+       skaliert dann das fertige Bild; die Kanten werden dabei
+       weichgezeichnet. Beim Laden steht der Faktor auf 1, es gibt keine
+       Skalierung — deshalb war es dort immer sauber. Dasselbe hatte
+       zuvor schon `will-change: transform` ausgelöst.
+
+       Über Breite und Höhe wird jedes Bild neu gezeichnet statt ein
+       fertiges Bild skaliert. Die Bewegung ist dieselbe — das Logo
+       wächst von 1 auf 1,3 um seine Mitte, weil `.startbereich__mitte`
+       es zentriert hält. Der Aufwand ist vertretbar, es geht um ein
+       einzelnes Element. */
     width: calc(var(--logo-breite, 50vh) * var(--logo-groesse, 1));
     height: calc(var(--logo-hoehe, 40vh) * var(--logo-groesse, 1));
     margin-top: -100px;
@@ -154,7 +159,11 @@ const { praxis } = seite;
     height: calc(var(--verlauf-hoehe, 32vh) * var(--logo-groesse, 1));
     margin-top: calc(var(--verlauf-versatz, -36vh) * var(--logo-groesse, 1));
     flex: none;
-    /* Wie in Webflow eingestellt: Cover, Position 50 % / 50 %, kein Tile */
+    /* Wie in Webflow eingestellt: Cover, Position 50 % / 50 %, kein Tile.
+
+       Das GIF ist nur 20 × 10 px groß und wird hier rund 30-fach
+       vergrößert. Solange das Logo nicht über `transform` skaliert wird,
+       zeichnet der Browser es sauber bis an die Kante. */
     background: url('/bilder/deko/verlauf.gif') 50% 50% / cover no-repeat;
     /* Ohne die Lottie-Grafik gibt es keine weiße Fläche, die ihn
        abdeckt — dann stünde hier ein farbiger Kasten hinter dem
