@@ -51,16 +51,16 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 */}
 <div class="ozraum" aria-hidden="true"></div>
 
-<section class="ozbereich" id="oz_anchor" aria-label="Öffnungszeiten">
+<section class="ozbereich" id="oz_anchor" aria-labelledby="oz-titel">
   <div class="ozbereich__buehne">
     <div class="ozblase" data-ozblase>
       <div class="ozblase__flaeche">
-        <button class="ozblase__schliessen" type="button" aria-label="Öffnungszeiten ausblenden"></button>
+        <h2 class="ozblase__titel" id="oz-titel">Sprechstunden</h2>
 
         <div class="ozblase__spalten">
           {listen.map((liste) => (
             <section class="ozliste">
-              <h2 class="ozliste__titel ohne-verlauf">{liste.titel}</h2>
+              <h3 class="ozliste__titel ohne-verlauf">{liste.titel}</h3>
               <table class="ozzeiten">
                 <tbody>
                   {liste.zeilen
@@ -183,27 +183,22 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     height: 100%;
   }
 
-  .ozblase__schliessen {
-    position: absolute;
-    top: var(--abstand-s);
-    right: var(--abstand-s);
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    border: 0;
-    background: url('/icons/ui/schliessen.svg') center / contain no-repeat transparent;
-    cursor: pointer;
-    /* Ablauf a-34 / a-35: 300 ms, outQuad */
-    transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Überschrift über allen drei Listen */
+  .ozblase__titel {
+    margin: 0 0 var(--abstand-m);
+    color: var(--farbe-primaer);
+    font-size: var(--text-l);
+    font-weight: var(--gewicht-halbfett);
   }
-
-  .ozblase__schliessen:hover,
-  .ozblase__schliessen:focus-visible { transform: rotate(90deg); }
 
   /* Drei Listen nebeneinander — auf kleinen Bildschirmen untereinander */
   .ozblase__spalten {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    /* Jede Spalte nimmt die Breite, die ihre Zeiten brauchen; der Rest
+       verteilt sich als Abstand dazwischen. Mit festen Dritteln wurde
+       die breiteste Spalte abgeschnitten. */
+    grid-template-columns: repeat(3, auto);
+    justify-content: space-between;
     gap: var(--abstand-l);
     align-items: start;
   }
