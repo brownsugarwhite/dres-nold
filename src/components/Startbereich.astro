@@ -90,70 +90,107 @@ const { praxis } = seite;
     height: 100%;
   }
 
-  /* Logo — Maße aus der Vorlage (.logo, .logo-wrapper) */
+  /* Logo — Aufbau und Maße wie in der Vorlage.
+
+     Beide Ebenen stehen im Fluss untereinander: erst die Lottie-Grafik,
+     dann der Verlauf, den ein negativer Abstand wieder hinaufzieht. Er
+     sitzt dadurch NICHT mittig — und, was entscheidend ist, sein
+     Versatz bezieht sich auf die tatsächliche Höhe der Grafik.
+
+     Ab 479 px steht die Grafik auf `height: auto`, ist also nur so hoch,
+     wie ihr Seitenverhältnis es vorgibt (868 : 590), und nicht so hoch
+     wie das Logo. Genau darum darf der Verlauf dort nicht mittig oder
+     mit festem Abstand gesetzt werden: Er stünde unten heraus, sobald
+     sich das Logo beim Scrollen auflöst und die weiße Fläche schrumpft.
+     Das war die Ursache des sichtbaren Verlaufsrands.
+
+     Die Vorlage wechselt bei 767 und 479 nicht nur die Einheit von vh
+     auf vw, sondern auch das Seitenverhältnis des Logos. */
   .logo {
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    /* Auch die Fensterbreite begrenzen — sonst ragt das Logo auf
-       Handys seitlich hinaus (50vh sind dort breiter als der Schirm). */
-    width: min(50vh, 84vw);
-    height: min(40vh, 67vw);
+    /* Das Logo wächst über seine MASSE, nicht über `transform`.
+
+       Ein `transform`, das bei jedem Bild neu gesetzt wird, lässt den
+       Browser eine eigene Zeichenebene anlegen: Er rastert sie einmal
+       und skaliert dann das fertige Bild. Dabei werden die Kanten
+       weichgezeichnet — und weil der Verlauf nur wenige Bildpunkte
+       hinter dem Rand der weißen Lottie-Fläche liegt, entsteht genau
+       dort der helle Saum. Beim Laden steht der Wert auf 1, es gibt
+       keine Ebene, und alles ist scharf; er erscheint erst beim
+       Scrollen. (Dasselbe hatte zuvor `will-change` ausgelöst.)
+
+       Über Breite und Höhe wird stattdessen jedes Bild neu gesetzt und
+       damit auch neu gezeichnet: die Lottie-Grafik als Vektor, der
+       Verlauf über `cover`. Beides bleibt scharf. Der Aufwand ist
+       vertretbar — es geht um ein einzelnes Element. */
+    width: calc(var(--logo-breite, 50vh) * var(--logo-groesse, 1));
+    height: calc(var(--logo-hoehe, 40vh) * var(--logo-groesse, 1));
     margin-top: -100px;
     margin-left: -50px;
-    /* Auf schmalen Schirmen mittig statt versetzt */
-    @media (max-width: 40rem) {
-      margin-left: 0;
-      margin-top: -40px;
-    }
-    /* Wird vom Skript am Scrollfortschritt entlang gesetzt */
-    /* Nur skalieren und verschieben. Das Ausblenden geschieht in der
-       Lottie-Animation selbst, nicht über die Deckkraft.
-
-       Kein `will-change`: Das erzeugt eine eigene Zeichenebene, deren
-       Kanten der Browser bei krummen Positionen weichzeichnet — genau
-       das ergab den hellen Saum um das Verlaufsbild. */
-    transform: scale(var(--logo-groesse, 1));
   }
 
-  /* Der bewegte Verlauf, der die Schrift des Logos einfärbt.
+  /* `.lottie-animation-2`: weiße Fläche mit ausgesparter Schrift */
+  .logo__kontur {
+    position: relative;
+    z-index: 20;
+    width: 100%;
+    height: var(--kontur-hoehe, 100%);
+    flex: none;
+  }
 
-     Die Lottie-Grafik darüber ist eine weiße Fläche mit ausgesparter
-     Schrift — der Verlauf scheint also genau durch die Buchstaben.
-     Entscheidend ist nur, dass er die weiße Fläche nirgends überragt,
-     sonst steht er als Farbstreifen daneben.
-
-     Die Vorlage nutzt 48vh × 32vh; hier etwas knapper, weil unsere
-     Lottie-Fläche minimal kleiner ausfällt. Das Verlaufsbild selbst
-     ist 20 × 10 px und enthält nur Farbtöne ohne Struktur — seine
-     genaue Größe ist deshalb unkritisch. */
-  /* Verlaufsbild unter der Logo-Grafik — Maße und Versatz wie
-     .div-block-29 in der Vorlage. Beide Elemente stehen im normalen
-     Fluss, der negative Abstand schiebt den Verlauf hinter die Grafik. */
-  /* Verlaufsbild unter der Logo-Grafik, wie in Webflow: Cover,
-     Position 50 % / 50 %, kein Tile.
-
-     Maße wie in der Vorlage: 48vh × 32vh, also 96 % × 80 %.
-
-     Maße wie in der Vorlage: 48vh × 32vh, also 96 % × 80 %. */
+  /* `.div-block-29`: der bewegte Verlauf, der durch die Buchstaben
+     scheint. Der negative Abstand zieht ihn hinter die Grafik. */
   .logo__verlauf {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
     z-index: 10;
-    width: 96%;
-    height: 80%;
+    width: calc(var(--verlauf-breite, 48vh) * var(--logo-groesse, 1));
+    height: calc(var(--verlauf-hoehe, 32vh) * var(--logo-groesse, 1));
+    margin-top: calc(var(--verlauf-versatz, -36vh) * var(--logo-groesse, 1));
+    flex: none;
     /* Wie in Webflow eingestellt: Cover, Position 50 % / 50 %, kein Tile */
     background: url('/bilder/deko/verlauf.gif') 50% 50% / cover no-repeat;
+    /* Ohne die Lottie-Grafik gibt es keine weiße Fläche, die ihn
+       abdeckt — dann stünde hier ein farbiger Kasten hinter dem
+       statischen Ersatzbild. */
+    visibility: hidden;
   }
 
-  .logo__kontur {
-    position: absolute;
-    inset: 0;
-    z-index: 20;
+  .logo:has(.logo__kontur[data-lottie-bereit]) .logo__verlauf {
+    visibility: visible;
+  }
+
+  @media (max-width: 991px) {
+    .logo { margin-left: -40px; }
+  }
+
+  @media (max-width: 767px) {
+    .logo {
+      --logo-breite: 50vw;
+      --logo-hoehe: 40vw;
+      --verlauf-breite: 48vw;
+      --verlauf-hoehe: 31vw;
+      --verlauf-versatz: -35vw;
+      margin-left: -30px;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .logo {
+      --logo-breite: 80vw;
+      --logo-hoehe: 60vw;
+      --verlauf-breite: 78vw;
+      --verlauf-hoehe: 50vw;
+      --verlauf-versatz: -53vw;
+      /* `.lottie-animation-2 { height: auto }` der Vorlage */
+      --kontur-hoehe: auto;
+      margin-top: -180px;
+      margin-left: -4px;
+    }
+    .logo__kontur { aspect-ratio: 868 / 590; }
   }
 
   .logo__bild {
@@ -197,7 +234,7 @@ const { praxis } = seite;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .logo,
+    .logo { --logo-groesse: 1; }
     .scrollhinweis { transform: none; opacity: 1; }
   }
 </style>
