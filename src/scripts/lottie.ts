@@ -79,13 +79,16 @@ export async function ladeAnimation(
 export function anScrollKoppeln(
   spieler: Spieler,
   fortschritt: () => number,
+  /** Anteil der Bildfolge, der am Ende erreicht wird (Vorgabe: alles).
+      Webflow trägt hier Prozentwerte ein — meist 99, nicht 100. */
+  bis = 1,
 ): () => void {
   let geplant = false;
 
   const aktualisieren = () => {
     geplant = false;
     const p = Math.min(1, Math.max(0, fortschritt()));
-    spieler.goToAndStop(p * (spieler.totalFrames - 1), true);
+    spieler.goToAndStop(p * bis * (spieler.totalFrames - 1), true);
   };
 
   const beiScroll = () => {

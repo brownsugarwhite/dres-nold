@@ -310,7 +310,12 @@ const { praxis } = seite;
     ladeAnimation(logo, '/lottie/logo.json').then((spieler) => {
       if (!spieler) return;
 
-      const letztes = spieler.totalFrames - 1;
+      /* Die Vorlage arbeitet mit Prozentwerten und trägt hier 99 ein,
+         nicht 100 — sowohl für den Startwert der Ladeanimation
+         (`data-ix2-initial-state="99"`) als auch für das Ende von
+         Ablauf a-7. */
+      const ENDE = 0.99;
+      const letztes = (spieler.totalFrames - 1) * ENDE;
       spieler.goToAndStop(letztes, true);
 
       const DAUER = 2500;
@@ -327,7 +332,7 @@ const { praxis } = seite;
         else {
           fertig = true;
           // Ab jetzt folgt das Logo dem Scrollweg
-          anScrollKoppeln(spieler, () => fortschritt() / 0.1);
+          anScrollKoppeln(spieler, () => fortschritt() / 0.1, ENDE);
         }
       };
       requestAnimationFrame(einblenden);
