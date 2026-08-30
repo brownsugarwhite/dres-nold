@@ -175,6 +175,16 @@ const { praxis } = seite;
     visibility: visible;
   }
 
+  /* Am Ende von Ablauf a-7 hat sich die weiße Fläche der Lottie-Grafik
+     aufgelöst. Der Verlauf liegt dann frei und steht als Kasten da.
+     Gemessen: bis Fortschritt 0,995 deckt die Fläche noch, bei 1,0
+     nicht mehr. Er wird deshalb kurz vorher herausgenommen — sichtbar
+     sind zu dem Zeitpunkt ohnehin nur noch einzelne Splitter der
+     Buchstaben. */
+  .logo[data-ende]:has(.logo__kontur[data-lottie-bereit]) .logo__verlauf {
+    visibility: hidden;
+  }
+
   @media (max-width: 991px) {
     .logo { margin-left: -40px; }
   }
@@ -286,6 +296,12 @@ const { praxis } = seite;
       hinweis?.style.setProperty('--hinweis-groesse', String(1 - 0.2 * p));
       hinweis?.style.setProperty('--hinweis-versatz', `${30 * p}px`);
       hinweis?.style.setProperty('--hinweis-deckkraft', String(1 - p));
+      // Kurz vor Schluss löst sich die weiße Fläche auf — dann darf der
+      // Verlauf nicht mehr stehen bleiben
+      if (huelle) {
+        if (p >= 0.99) huelle.dataset.ende = 'ja';
+        else delete huelle.dataset.ende;
+      }
       // Ist es ganz ausgeblendet, aus dem Weg nehmen (bei 10,0001 %)
       bereich.style.visibility = p >= 1 ? 'hidden' : '';
     };
