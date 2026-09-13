@@ -1,0 +1,13 @@
+# Lokale Entwicklung mit `npx wrangler pages dev dist`.
+# Kopie als `.dev.vars` anlegen (git-ignoriert) und Werte eintragen.
+
+# Schaltet die Anmeldepflicht der Redaktion lokal ab (nie online setzen!)
+ENTWICKLUNG=1
+
+# GitHub-Token für die Redaktion (Fine-grained, nur dieses Repo,
+# Contents: Read and write). Zum Testen möglichst einen eigenen Zweig:
+GITHUB_TOKEN=
+GITHUB_BRANCH=redaktion-test
+
+# Kontaktformular
+RESEND_API_KEY=

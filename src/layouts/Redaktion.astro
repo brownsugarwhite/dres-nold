@@ -1,0 +1,46 @@
+---
+/**
+ * Seitenrahmen der Redaktionsoberfläche (/admin/…).
+ *
+ * Bewusst ohne die Skripte und Übergänge der öffentlichen Seite: ein
+ * schlichtes Werkzeug. Zugang nur nach Anmeldung über Cloudflare Access
+ * (functions/_middleware.ts).
+ */
+import '../styles/schrift.css';
+import '../styles/tokens.css';
+import '../styles/global.css';
+import '../admin/redaktion.css';
+
+interface Props {
+  titel: string;
+}
+const { titel } = Astro.props;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{titel} – Redaktion dres-nold.de</title>
+  </head>
+  <body>
+    <div class="redaktion">
+      <header class="redaktion__kopf">
+        <a class="redaktion__marke" href="/admin/">
+          <img src="/icons/logo.svg" alt="" width="44" height="44" />
+          Redaktion dres-nold.de
+        </a>
+        <nav class="redaktion__links" aria-label="Redaktion">
+          <a href="/admin/">Übersicht</a>
+          <a href="/" target="_blank" rel="noopener">Seite ansehen</a>
+          <a href="/cdn-cgi/access/logout">Abmelden</a>
+        </nav>
+      </header>
+      <main id="inhalt">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

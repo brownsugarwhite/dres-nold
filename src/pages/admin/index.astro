@@ -1,0 +1,29 @@
+---
+/**
+ * Übersicht der Redaktion: ein Kasten je Bereich.
+ */
+import Redaktion from '../../layouts/Redaktion.astro';
+import { bereiche, reihenfolge } from '../../admin/bereiche';
+---
+
+<Redaktion titel="Übersicht">
+  <h1>Was möchten Sie ändern?</h1>
+  <p class="redaktion__einleitung">
+    Nach dem Speichern ist eine Änderung nach etwa einer Minute im Internet
+    sichtbar. Jeder Stand wird gesichert und lässt sich wiederherstellen.
+  </p>
+
+  <ul class="bereiche">
+    {reihenfolge.map((id) => (
+      <li>
+        <a class="bereich" href={`/admin/${id}/`}>
+          <img src={bereiche[id].symbol} alt="" width="44" height="44" />
+          <span>
+            <span class="bereich__titel">{bereiche[id].titel}</span>
+            <span class="bereich__text">{bereiche[id].beschreibung}</span>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Redaktion>

@@ -22,6 +22,19 @@
         "4330"
       ],
       "port": 4330
+    },
+    {
+      "name": "dres-nold-functions",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "wrangler",
+        "pages",
+        "dev",
+        "dist",
+        "--port",
+        "8788"
+      ],
+      "port": 8788
     }
   ]
 }

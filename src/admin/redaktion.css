@@ -1,0 +1,280 @@
+/*
+  Gestaltung der Redaktionsoberfläche. Nutzt die Tokens der Seite,
+  ist aber bewusst schlicht: ein Werkzeug, keine Schauseite.
+*/
+body {
+  background: var(--farbe-flaeche-gedeckt);
+}
+
+.redaktion {
+  width: min(100% - 2 * var(--abstand-m), 60rem);
+  margin-inline: auto;
+  padding-block: var(--abstand-m) var(--abstand-2xl);
+}
+
+.redaktion__kopf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--abstand-s) var(--abstand-m);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--abstand-m);
+  padding-bottom: var(--abstand-s);
+  border-bottom: 1px solid var(--farbe-linie);
+}
+
+.redaktion__marke {
+  display: flex;
+  align-items: center;
+  gap: var(--abstand-xs);
+  color: var(--farbe-primaer);
+  font-weight: var(--gewicht-halbfett);
+  text-decoration: none;
+}
+
+.redaktion__marke img { width: 44px; height: 44px; }
+
+.redaktion__links {
+  display: flex;
+  gap: var(--abstand-s);
+  font-size: var(--text-s);
+}
+
+.redaktion__links a { color: var(--farbe-text); }
+
+.redaktion h1 { font-size: var(--text-xl); }
+
+.redaktion__einleitung {
+  max-width: none;
+  color: var(--farbe-text-gedeckt);
+}
+
+/* Übersicht */
+.bereiche {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--abstand-s);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.bereich {
+  display: flex;
+  gap: var(--abstand-s);
+  align-items: flex-start;
+  height: 100%;
+  padding: var(--abstand-s);
+  background: var(--farbe-flaeche);
+  border: 1px solid var(--farbe-linie);
+  border-radius: var(--radius-m);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--dauer-schnell) var(--verlauf);
+}
+
+.bereich:hover,
+.bereich:focus-visible { border-color: var(--farbe-primaer); }
+
+.bereich img { flex: none; width: 44px; height: 44px; }
+
+.bereich__titel { display: block; color: var(--farbe-primaer); font-weight: var(--gewicht-halbfett); }
+.bereich__text { font-size: var(--text-s); color: var(--farbe-text-gedeckt); }
+
+/* Formular */
+.formular {
+  padding: var(--abstand-m);
+  background: var(--farbe-flaeche);
+  border: 1px solid var(--farbe-linie);
+  border-radius: var(--radius-m);
+}
+
+.feld { margin-bottom: var(--abstand-m); }
+
+.feld__label {
+  display: block;
+  margin-bottom: var(--abstand-3xs);
+  font-weight: var(--gewicht-halbfett);
+  color: var(--farbe-dunkel);
+}
+
+.feld__hilfe {
+  margin: var(--abstand-3xs) 0 0;
+  max-width: none;
+  font-size: var(--text-xs);
+  color: var(--farbe-text-gedeckt);
+}
+
+.feld__eingabe,
+.feld__auswahl,
+.feld__mehrzeilig {
+  width: 100%;
+  padding: var(--abstand-2xs) var(--abstand-xs);
+  border: 1px solid var(--farbe-linie);
+  border-radius: var(--radius-s);
+  background: var(--farbe-flaeche);
+  font: inherit;
+  color: var(--farbe-dunkel);
+}
+
+.feld__eingabe:focus,
+.feld__auswahl:focus,
+.feld__mehrzeilig:focus,
+.richtext__inhalt:focus {
+  outline: 2px solid var(--farbe-primaer);
+  outline-offset: 0;
+  border-color: var(--farbe-primaer);
+}
+
+.feld__eingabe[readonly] { background: var(--farbe-flaeche-gedeckt); color: var(--farbe-text-gedeckt); }
+
+.feld__mehrzeilig { min-height: 5.5em; resize: vertical; }
+
+.feld--schalter { display: flex; align-items: center; gap: var(--abstand-2xs); }
+.feld--schalter .feld__label { margin: 0; }
+.feld--schalter input { width: 18px; height: 18px; accent-color: var(--farbe-primaer); }
+
+/* Richtext */
+.richtext { border: 1px solid var(--farbe-linie); border-radius: var(--radius-s); }
+
+.richtext__leiste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: var(--abstand-3xs);
+  border-bottom: 1px solid var(--farbe-linie);
+  background: var(--farbe-flaeche-gedeckt);
+}
+
+.richtext__leiste button {
+  padding: 2px var(--abstand-2xs);
+  border: 1px solid transparent;
+  border-radius: var(--radius-s);
+  background: none;
+  font: inherit;
+  font-size: var(--text-s);
+  color: var(--farbe-dunkel);
+  cursor: pointer;
+}
+
+.richtext__leiste button:hover { border-color: var(--farbe-linie); background: var(--farbe-flaeche); }
+
+.richtext__inhalt {
+  min-height: 10em;
+  padding: var(--abstand-xs);
+  line-height: 1.5;
+}
+
+.richtext__inhalt p { margin: 0 0 0.6em; max-width: none; }
+.richtext__inhalt ul, .richtext__inhalt ol { margin: 0 0 0.6em; padding-left: 1.4em; }
+.richtext__inhalt table { border-collapse: collapse; margin-bottom: 0.6em; }
+.richtext__inhalt th, .richtext__inhalt td { padding: 0.2em 0.5em; border: 1px solid var(--farbe-linie); }
+.richtext__inhalt h3 { font-size: var(--text-m); margin: 0.6em 0 0.3em; }
+
+/* Bild / PDF */
+.datei { display: flex; flex-wrap: wrap; gap: var(--abstand-2xs); align-items: center; }
+.datei .feld__eingabe { flex: 1 1 14rem; }
+.datei__vorschau { width: 64px; height: 64px; object-fit: cover; border-radius: var(--radius-s); background: var(--farbe-flaeche-gedeckt); }
+.datei__hochladen { position: relative; overflow: hidden; }
+.datei__hochladen input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+/* Gruppen und Einträge */
+.gruppe {
+  margin-bottom: var(--abstand-m);
+  padding: var(--abstand-s);
+  border: 1px solid var(--farbe-linie);
+  border-radius: var(--radius-m);
+}
+
+.gruppe > .feld__label { margin-bottom: var(--abstand-s); font-size: var(--text-l); color: var(--farbe-primaer); }
+
+.eintraege { margin-bottom: var(--abstand-m); }
+.eintraege > .feld__label { font-size: var(--text-l); color: var(--farbe-primaer); }
+
+.eintrag {
+  margin-bottom: var(--abstand-s);
+  border: 1px solid var(--farbe-linie);
+  border-radius: var(--radius-m);
+  background: var(--farbe-flaeche);
+}
+
+.eintrag[data-inaktiv] { opacity: 0.7; }
+
+.eintrag__kopf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--abstand-2xs);
+  align-items: center;
+  width: 100%;
+  padding: var(--abstand-xs) var(--abstand-s);
+  border: 0;
+  background: var(--farbe-flaeche-gedeckt);
+  border-radius: var(--radius-m) var(--radius-m) 0 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.eintrag__kopf[aria-expanded='false'] { border-radius: var(--radius-m); }
+
+.eintrag__titel { flex: 1; font-weight: var(--gewicht-halbfett); color: var(--farbe-primaer); }
+
+.eintrag__marke {
+  padding: 0 var(--abstand-2xs);
+  border-radius: var(--radius-rund);
+  background: var(--farbe-linie);
+  font-size: var(--text-xs);
+  color: var(--farbe-text);
+}
+
+.eintrag__inhalt { padding: var(--abstand-s); }
+.eintrag__inhalt[hidden] { display: none; }
+
+.eintrag__werkzeuge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--abstand-2xs);
+  padding-top: var(--abstand-2xs);
+  border-top: 1px solid var(--farbe-linie);
+}
+
+.knopf {
+  padding: var(--abstand-2xs) var(--abstand-s);
+  border: 1px solid var(--farbe-primaer);
+  border-radius: var(--radius-rund);
+  background: var(--farbe-flaeche);
+  font: inherit;
+  font-size: var(--text-s);
+  color: var(--farbe-primaer);
+  cursor: pointer;
+}
+
+.knopf:hover, .knopf:focus-visible { background: var(--farbe-flaeche-gedeckt); }
+
+.knopf--haupt { background: var(--farbe-primaer); color: var(--farbe-text-invers); font-weight: var(--gewicht-halbfett); }
+.knopf--haupt:hover, .knopf--haupt:focus-visible { background: var(--farbe-dunkel); border-color: var(--farbe-dunkel); }
+.knopf--leise { border-color: var(--farbe-linie); color: var(--farbe-text); }
+.knopf[disabled] { opacity: 0.5; cursor: wait; }
+
+/* Speichern-Leiste */
+.speichern {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--abstand-s);
+  align-items: center;
+  margin-top: var(--abstand-m);
+  padding: var(--abstand-s) var(--abstand-m);
+  background: var(--farbe-flaeche);
+  border: 1px solid var(--farbe-linie);
+  border-radius: var(--radius-m);
+  box-shadow: 0 -8px 30px -20px rgb(0 0 0 / 30%);
+}
+
+.meldung { flex: 1; margin: 0; max-width: none; font-size: var(--text-s); }
+.meldung[data-art='fehler'] { color: var(--farbe-fehler); }
+.meldung[data-art='erfolg'] { color: var(--farbe-erfolg); font-weight: var(--gewicht-halbfett); }
+.meldung ul { margin: var(--abstand-3xs) 0 0; padding-left: 1.2em; }
+
+.laden { color: var(--farbe-text-gedeckt); }

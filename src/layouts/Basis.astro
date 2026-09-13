@@ -6,6 +6,7 @@
 import { ClientRouter } from 'astro:transitions';
 import Einwilligung from '../components/Einwilligung.astro';
 import seite from '../content/seite.json';
+import { alleInhaltePruefen } from '../content/laden';
 import '../styles/schrift.css';
 import '../styles/tokens.css';
 import '../styles/global.css';
@@ -15,6 +16,9 @@ interface Props {
   titel?: string;
   beschreibung?: string;
 }
+
+/* Bricht den Build ab, wenn eine Inhaltsdatei nicht zum Schema passt */
+alleInhaltePruefen();
 
 const { titel = seite.titel, beschreibung = seite.beschreibung } = Astro.props;
 ---

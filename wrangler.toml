@@ -1,0 +1,26 @@
+# Einstellungen für Cloudflare Pages.
+#
+# Secrets (Schlüssel, Token) stehen NICHT hier, sondern im Cloudflare-
+# Projekt unter Settings → Variables and Secrets bzw. werden mit
+# `npx wrangler pages secret put NAME` gesetzt. Lokal: Datei `.dev.vars`
+# (siehe .dev.vars.example — git-ignoriert).
+#
+#   GITHUB_TOKEN        Fine-grained Token, nur dieses Repo, Contents: Read/Write
+#   RESEND_API_KEY      Schlüssel aus dem Resend-Konto
+#   ACCESS_AUD          Application Audience (AUD) Tag der Access-Anwendung
+#
+# Alles andere sind schlichte Einstellungen und dürfen hier stehen.
+
+name = "dres-nold"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-09-01"
+
+[vars]
+# Repo, in das die Redaktion schreibt, und der Zweig, der online geht
+GITHUB_REPO = "brownsugarwhite/dres-nold"
+GITHUB_BRANCH = "main"
+# Cloudflare-Access-Team (der Teil vor .cloudflareaccess.com)
+ACCESS_TEAM = "dres-nold"
+# Kontaktformular
+KONTAKT_EMPFAENGER = "info@dres-nold.de"
+KONTAKT_ABSENDER = "Website Dres. Nold <formular@dres-nold.de>"
