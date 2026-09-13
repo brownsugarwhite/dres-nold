@@ -17,7 +17,7 @@ Die Seite läuft dann unter `http://localhost:4321`.
 
 Die Praxis pflegt alle Inhalte über die Redaktionsoberfläche unter **dres-nold.de/login** — dafür sind keine technischen Kenntnisse nötig. Die dort gemachten Änderungen landen als Dateien unter `src/content/` und sind damit automatisch versioniert.
 
-Eine bebilderte Anleitung liegt unter `docs/anleitung/`.
+Die Anleitung liegt unter [docs/anleitung/redaktion.md](docs/anleitung/redaktion.md), alles zum Betrieb (Konten, Zugänge, Störungen) unter [docs/betrieb.md](docs/betrieb.md).
 
 ## Für Entwicklung und KI-Unterstützung
 
@@ -30,7 +30,8 @@ Eine bebilderte Anleitung liegt unter `docs/anleitung/`.
 | Seitengenerator | Astro (statisches HTML) |
 | Hosting | Cloudflare Pages |
 | Redaktions-Login | Cloudflare Access (E-Mail-Einmalcode) |
-| Analytics | Cloudflare Web Analytics (cookielos) |
+| Veröffentlichen | GitHub Actions, bei jeder Änderung und täglich um 03:00 UTC |
+| Kontaktformular | Resend (E-Mail-Versand) |
 | Laufende Kosten | Hosting 0 €, nur die Domain |
 
-Die Seite lädt **keinerlei externe Ressourcen** — das ist die Grundlage dafür, dass kein Cookie-Banner nötig ist. Bitte bei jeder Erweiterung beibehalten.
+Die Seite lädt **keine externen Ressourcen** — einzige Ausnahme ist die Google-Maps-Karte im Kontakt, die erst nach Einwilligung geladen wird. Bitte bei jeder Erweiterung beibehalten.

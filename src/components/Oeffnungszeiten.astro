@@ -330,9 +330,11 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 
       /* Der Knopf in der Symbolleiste. Nur seine x-Lage zählt — die
          Leiste fährt beim Scrollen weg, ihre Höhe ist aber fest. */
-      const knopf = document.querySelector<HTMLElement>('.fussknopf[data-punkt="zeiten"]');
-      const kr = knopf?.getBoundingClientRect();
-      spitzeX = kr && kr.width > 0 ? kr.left + kr.width / 2 : breite * 0.8667;
+      /* Es gibt zwei Leisten (Desktop und Handy); die sichtbare hat Breite. */
+      const kr = [...document.querySelectorAll<HTMLElement>('.fussknopf[data-punkt="zeiten"]')]
+        .map((k) => k.getBoundingClientRect())
+        .find((r) => r.width > 0);
+      spitzeX = kr ? kr.left + kr.width / 2 : breite * 0.8667;
 
       /* Die Linie darf rechts nicht über die Blasenkante steigen:
          Versatz so wählen, dass der höchste Punkt 2 px darunter liegt. */
