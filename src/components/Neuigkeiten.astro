@@ -17,16 +17,16 @@ const alsDatum = (iso: string) =>
 ---
 
 {beitraege.length > 0 && (
-  <section class="neuigkeiten" id="neuigkeiten">
+  <section class="neuigkeiten" id="neuigkeiten" data-verlauf>
     <h2 class="neuigkeiten__titel">{daten.titel}</h2>
     {daten.einleitung && <p class="neuigkeiten__einleitung">{daten.einleitung}</p>}
 
     <div class="neuigkeiten__liste inhalt">
       {beitraege.map((b) => (
-        <article class="beitrag" transition:name={`beitrag-${b.id}`}>
-          <a class="beitrag__link" href={`/neuigkeiten/${b.id}/`}>
+        <article class="beitrag">
+          <a class="beitrag__link" data-karte href={`/neuigkeiten/${b.id}/`} transition:name={`beitrag-${b.id}`}>
             {b.bild && (
-              <img class="beitrag__bild" src={b.bild} alt={b.bild_alt || ''} width="600" height="360" loading="lazy" />
+              <img class="beitrag__bild" src={b.bild} alt={b.bild_alt || ''} width="600" height="360" loading="lazy" transition:name={`beitrag-bild-${b.id}`} />
             )}
             <div class="beitrag__text">
               {b.datum && <time class="beitrag__datum" datetime={b.datum}>{alsDatum(b.datum)}</time>}
@@ -72,8 +72,23 @@ const alsDatum = (iso: string) =>
     display: flex;
     flex-direction: column;
     height: 100%;
+    padding: var(--abstand-xs);
+    margin: calc(-1 * var(--abstand-xs));
+    border-radius: var(--radius-m);
+    background: var(--farbe-flaeche);
     color: inherit;
     text-decoration: none;
+    transition:
+      box-shadow var(--dauer-schnell) var(--verlauf),
+      transform var(--dauer-schnell) var(--verlauf);
+  }
+
+  /* Angeklickt: hebt sich ab, bevor die Seite aus ihm herauswächst */
+  .beitrag__link[data-gehoben] {
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 18px 40px -12px rgb(0 0 0 / 30%);
+    transform: scale(1.03);
   }
 
   .beitrag__bild {
@@ -81,6 +96,7 @@ const alsDatum = (iso: string) =>
     height: 220px;
     object-fit: cover;
     margin-bottom: var(--abstand-s);
+    view-transition-class: bild;
   }
 
   .beitrag__text {

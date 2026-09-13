@@ -53,5 +53,8 @@ const { titel = seite.titel, beschreibung = seite.beschreibung } = Astro.props;
   <body>
     <a class="sprungmarke" href="#inhalt">Zum Inhalt springen</a>
     <slot />
+    <script>
+      import '../scripts/uebergaenge';
+    </script>
   </body>
 </html>

@@ -6,9 +6,13 @@
  * auffindbar, teilbar, druckbar und auch ohne JavaScript vollständig.
  *
  * Beim Aufruf von der Startseite morpht die zugehörige Kachel in diese
- * Seite hinein: möglich durch den gemeinsamen `transition:name`.
+ * Seite hinein: möglich durch die gemeinsamen `transition:name`
+ * (Hülle, Symbol, Titel). Der Text gleitet als `seiteninhalt` nach.
+ * Schließen-Kreuz, „Alle Leistungen" und Escape gehen im Verlauf
+ * zurück (scripts/uebergaenge.ts).
  */
 import Navigation from '../../components/Navigation.astro';
+import Fussbereich from '../../components/Fussbereich.astro';
 import Basis from '../../layouts/Basis.astro';
 import daten from '../../content/leistungen.json';
 import seite from '../../content/seite.json';
@@ -32,39 +36,54 @@ const naechste = alle[i + 1];
 >
   <Navigation />
 
-  <article class="leistung" transition:name={`leistung-${leistung.id}`}>
-    <header class="leistung__kopf">
-      <a class="leistung__zurueck" href="/#leistungen">
-        <span aria-hidden="true">←</span> Alle Leistungen
-      </a>
-      <img class="leistung__icon" src={leistung.icon} alt="" width="96" height="96" />
-      <h1 class="leistung__titel">{leistung.titel}</h1>
-    </header>
-
-    <div class="leistung__text" set:html={leistung.inhalt} />
-
-    <nav class="leistung__nachbarn" aria-label="Weitere Leistungen">
-      {vorherige && (
-        <a class="nachbar nachbar--zurueck" href={`/leistungen/${vorherige.id}/`}>
-          <span class="nachbar__label">Vorherige</span>
-          <span class="nachbar__titel">{vorherige.titel}</span>
+  <main id="inhalt" class="leistungsseite">
+    <article class="leistung" transition:name={`leistung-${leistung.id}`}>
+      <header class="leistung__kopf">
+        <a class="leistung__zurueck" href="/#leistungen" data-zurueck>
+          <span aria-hidden="true">←</span> Alle Leistungen
         </a>
-      )}
-      {naechste && (
-        <a class="nachbar nachbar--vor" href={`/leistungen/${naechste.id}/`}>
-          <span class="nachbar__label">Nächste</span>
-          <span class="nachbar__titel">{naechste.titel}</span>
-        </a>
-      )}
-    </nav>
-  </article>
+        <a class="schliessen" href="/#leistungen" data-zurueck aria-label="Leistung schließen"></a>
+        <img class="leistung__icon" src={leistung.icon} alt="" width="96" height="96" transition:name={`leistung-symbol-${leistung.id}`} />
+        <h1 class="leistung__titel" transition:name={`leistung-titel-${leistung.id}`}>{leistung.titel}</h1>
+      </header>
+
+      <div class="leistung__rest" transition:name="seiteninhalt">
+        <div class="leistung__text" set:html={leistung.inhalt} />
+
+        <nav class="leistung__nachbarn" aria-label="Weitere Leistungen">
+          {vorherige && (
+            <a class="nachbar nachbar--zurueck" href={`/leistungen/${vorherige.id}/`}>
+              <span class="nachbar__label">Vorherige</span>
+              <span class="nachbar__titel">{vorherige.titel}</span>
+            </a>
+          )}
+          {naechste && (
+            <a class="nachbar nachbar--vor" href={`/leistungen/${naechste.id}/`}>
+              <span class="nachbar__label">Nächste</span>
+              <span class="nachbar__titel">{naechste.titel}</span>
+            </a>
+          )}
+        </nav>
+      </div>
+    </article>
+  </main>
+
+  <Fussbereich />
 </Basis>
 
 <style>
+  /* Wie die Beitragsseite: Platz für die feste Leiste oben */
+  .leistungsseite {
+    position: relative;
+    z-index: 40;
+    padding-block: 140px 100px;
+    background: var(--farbe-flaeche);
+  }
+
   .leistung {
+    position: relative;
     width: min(100% - 2 * var(--abstand-m), 46rem);
     margin-inline: auto;
-    padding-block: var(--abstand-l) var(--abstand-2xl);
     background: var(--farbe-flaeche);
   }
 
@@ -81,15 +100,33 @@ const naechste = alle[i + 1];
     color: var(--farbe-primaer);
   }
 
+  /* Schließen-Kreuz oben rechts — dreht sich beim Zeigen wie das
+     Kreuz der Hinweis-Blase (Abläufe a-34 / a-35) */
+  .schliessen {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background: url('/icons/ui/schliessen.svg') center / contain no-repeat;
+    transition: transform 300ms var(--verlauf);
+  }
+
+  .schliessen:hover,
+  .schliessen:focus-visible { transform: rotate(90deg); }
+
   .leistung__icon {
     width: 5rem;
     height: 5rem;
     object-fit: contain;
     margin-bottom: var(--abstand-s);
+    /* Gruppe für den Übergang, siehe styles/uebergaenge.css */
+    view-transition-class: symbol;
   }
 
   .leistung__titel {
     margin-bottom: var(--abstand-l);
+    view-transition-class: titel;
   }
 
   /* Vom Redaktionssystem geliefertes HTML */
@@ -158,5 +195,10 @@ const naechste = alle[i + 1];
     .leistung__nachbarn { flex-direction: column; }
     .nachbar { max-width: 100%; }
     .nachbar--vor { margin-left: 0; text-align: left; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .schliessen { transition: none; }
+    .schliessen:hover { transform: none; }
   }
 </style>

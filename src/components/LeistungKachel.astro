@@ -15,9 +15,9 @@ interface Props {
 const { id, titel, kurz, icon } = Astro.props;
 ---
 
-<a class="kachel" data-kachel href={`/leistungen/${id}/`} transition:name={`leistung-${id}`}>
-  <img class="kachel__icon" src={icon} alt="" width="64" height="64" />
-  <h3 class="kachel__titel">{titel}</h3>
+<a class="kachel" data-kachel data-karte href={`/leistungen/${id}/`} transition:name={`leistung-${id}`}>
+  <img class="kachel__icon" src={icon} alt="" width="64" height="64" transition:name={`leistung-symbol-${id}`} />
+  <h3 class="kachel__titel" transition:name={`leistung-titel-${id}`}>{titel}</h3>
   <p class="kachel__kurz">{kurz}</p>
   <span class="kachel__mehr" aria-hidden="true">Mehr erfahren →</span>
 </a>
@@ -40,6 +40,7 @@ const { id, titel, kurz, icon } = Astro.props;
     background-color: var(--kachel-grund, #fff);
     transition:
       border-color var(--dauer-schnell) var(--verlauf),
+      box-shadow var(--dauer-schnell) var(--verlauf),
       transform var(--dauer-schnell) var(--verlauf);
   }
 
@@ -47,6 +48,17 @@ const { id, titel, kurz, icon } = Astro.props;
   .kachel:focus-visible {
     border-color: var(--farbe-primaer);
     transform: scale(var(--kachel-groesse, 1)) translateY(-2px);
+  }
+
+  /* Angeklickt: hebt sich ab, bevor die Seite aus ihr herauswächst
+     (gesetzt in scripts/uebergaenge.ts) */
+  .kachel[data-gehoben] {
+    position: relative;
+    z-index: 2;
+    border-color: transparent;
+    background-color: var(--farbe-flaeche);
+    box-shadow: 0 18px 40px -12px rgb(0 0 0 / 30%);
+    transform: scale(1.04);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -57,11 +69,14 @@ const { id, titel, kurz, icon } = Astro.props;
     width: 3.5rem;
     height: 3.5rem;
     object-fit: contain;
+    /* Gruppe für den Übergang, siehe styles/uebergaenge.css */
+    view-transition-class: symbol;
   }
 
   .kachel__titel {
     margin: 0;
     font-size: var(--text-l);
+    view-transition-class: titel;
   }
 
   .kachel__kurz {

@@ -1,125 +1,176 @@
 /*
   ÜBERGÄNGE ZWISCHEN DEN SEITEN
   ==================================================================
-  Beim Öffnen einer Leistung erzeugt der Browser drei Ebenen, die sich
-  wie jedes andere Element mit CSS animieren lassen:
+  Beim Öffnen einer Leistung oder eines Beitrags erzeugt der Browser
+  Ebenen, die sich wie jedes andere Element mit CSS animieren lassen:
 
     ::view-transition-group(name)   die Hülle — bewegt und skaliert sich
-    ::view-transition-old(name)     der alte Zustand (die Kachel)
-    ::view-transition-new(name)     der neue Zustand (die Seite)
+    ::view-transition-old(name)     der alte Zustand (z. B. die Karte)
+    ::view-transition-new(name)     der neue Zustand (z. B. die Seite)
 
-  Unterstützt von Chrome 111+, Safari 18+ und Firefox 144+.
+  `root` ist der Rest der Seite. Alles, was einen eigenen
+  `transition:name` trägt, wird aus `root` herausgelöst und bekommt
+  eine eigene Hülle.
 
-  Der Morph ist also nur die Voreinstellung, nicht die einzige Option.
-  Unten stehen vier Varianten. Genau EINE aktiv lassen, die anderen
-  auskommentiert stehen lassen — dann kann jederzeit umgeschaltet werden.
+  Unterstützt von Chrome 111+, Safari 18+ und Firefox 144+. Ältere
+  Browser wechseln die Seite schlicht ohne Übergang.
 
-  Zum Ausprobieren: die aktive Variante auskommentieren, eine andere
-  einkommentieren, Seite neu laden. Kein Neustart nötig.
+  Der Ablauf beim Öffnen einer Karte
+  ------------------------------------------------------------------
+    1. Die geklickte Karte hebt sich ab (Schatten, leicht größer) —
+       das passiert noch vor dem Wechsel, siehe scripts/uebergaenge.ts.
+    2. Der Rest der Seite (`root`) verschwimmt und blendet aus.
+    3. Die Hülle der Karte wandert und wächst zur Seite; Symbol und
+       Titel wandern dabei einzeln an ihren Platz.
+    4. Der Seitentext gleitet etwas später von unten herein.
+
+  Zurück (Schließen-Knopf, Escape, Browser-Zurück) läuft derselbe Ablauf
+  spiegelbildlich: alt und neu tauschen die Rollen, deshalb sind die
+  Regeln unten symmetrisch aufgebaut und brauchen keine Richtung.
+
+  Die Namen im Überblick (vergeben in den Komponenten):
+    leistung-<id>          Hülle der Leistungskarte / des Artikels
+    leistung-symbol-<id>   ihr Symbol
+    leistung-titel-<id>    ihr Titel
+    beitrag-<id>           Hülle des Neuigkeiten-Beitrags
+    beitrag-bild-<id>      sein Bild
+    seiteninhalt           Text und Anhang der Zielseite
+    nav-kopf / nav-fuss    die Leisten — bleiben unbewegt und scharf
 */
 
-/* --- Tempo: gilt für alle Varianten ---------------------------- */
+/* --- Tempo: gilt für alle Hüllen ------------------------------- */
 ::view-transition-group(*) {
-  animation-duration: var(--dauer-normal);
-  animation-timing-function: var(--verlauf);
+  animation-duration: var(--dauer-uebergang);
+  animation-timing-function: var(--verlauf-betont);
 }
-
-/* ==================================================================
-   VARIANTE 1 — Morph  ·  AKTIV
-   Die Kachel wandert an ihren Platz und wächst zur Seite.
-   Der Browser berechnet den Weg selbst.
-   ================================================================== */
 
 ::view-transition-old(*),
 ::view-transition-new(*) {
-  /* Beide Zustände überblenden, während die Hülle sich bewegt.
-     mix-blend-mode: normal verhindert Farbstiche beim Kreuzen. */
+  animation-duration: var(--dauer-uebergang);
+  animation-timing-function: var(--verlauf-betont);
+  /* Kein Aufhellen beim Kreuzen der beiden Zustände */
   mix-blend-mode: normal;
 }
 
-/* Der Inhalt der Zielseite blendet etwas später ein als die Hülle
-   wandert — das lässt die Bewegung ruhiger wirken. */
-::view-transition-new(*) {
-  animation-delay: 60ms;
+/* --- Der Rest der Seite verschwimmt ---------------------------- */
+@keyframes uebergang-rest-aus {
+  to {
+    opacity: 0;
+    filter: blur(var(--weichzeichner-uebergang));
+    transform: scale(0.98);
+  }
 }
 
-/* ==================================================================
-   VARIANTE 2 — Von unten hereinfahren
-   Wie ein Fenster, das sich über die Seite schiebt (iOS-Gefühl).
-   Zum Aktivieren: Block einkommentieren und Variante 1 auskommentieren.
-   ==================================================================
-
-@keyframes von-unten {
-  from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-@keyframes nach-unten {
-  from { transform: translateY(0);    opacity: 1; }
-  to   { transform: translateY(100%); opacity: 0; }
+@keyframes uebergang-rest-ein {
+  from {
+    opacity: 0;
+    filter: blur(var(--weichzeichner-uebergang));
+    transform: scale(0.98);
+  }
 }
 
-::view-transition-new(root) { animation: von-unten var(--dauer-normal) var(--verlauf); }
-::view-transition-old(root) { animation: nach-unten var(--dauer-normal) var(--verlauf); }
-
-*/
-
-/* ==================================================================
-   VARIANTE 3 — Ruhige Kreuzblende
-   Kein Wandern, nur weiches Überblenden. Zurückhaltend und schnell.
-   ==================================================================
-
-::view-transition-group(*) {
-  animation-duration: var(--dauer-schnell);
-}
-::view-transition-old(*) { animation: blende-aus var(--dauer-schnell) var(--verlauf); }
-::view-transition-new(*) { animation: blende-ein var(--dauer-schnell) var(--verlauf); }
-
-@keyframes blende-aus { to   { opacity: 0; } }
-@keyframes blende-ein { from { opacity: 0; } }
-
-*/
-
-/* ==================================================================
-   VARIANTE 4 — Aus der Kachel heraus zoomen
-   Die Zielseite wächst leicht auf, während die Kachel verblasst.
-   ==================================================================
-
-@keyframes zoom-auf {
-  from { transform: scale(0.94); opacity: 0; }
-  to   { transform: scale(1);    opacity: 1; }
+::view-transition-old(root) {
+  animation: uebergang-rest-aus var(--dauer-uebergang) var(--verlauf-betont) forwards;
 }
 
 ::view-transition-new(root) {
-  animation: zoom-auf var(--dauer-normal) var(--verlauf);
-  transform-origin: center;
+  animation: uebergang-rest-ein var(--dauer-uebergang) var(--verlauf-betont) both;
+  /* Erst erscheinen, wenn der alte Zustand schon zurücktritt */
+  animation-delay: 60ms;
 }
-::view-transition-old(root) {
-  animation: blende-aus var(--dauer-schnell) var(--verlauf);
-}
-@keyframes blende-aus { to { opacity: 0; } }
 
-*/
+/* --- Die Karte selbst: alt und neu weich ineinander -------------
+   Gilt für alles, was keinen eigenen Namen weiter unten hat — also
+   die Hüllen der Leistungskarten und Beiträge. */
+@keyframes uebergang-blende-aus { to { opacity: 0; } }
+@keyframes uebergang-blende-ein { from { opacity: 0; } }
+
+::view-transition-old(*) {
+  animation-name: uebergang-blende-aus;
+  animation-duration: calc(var(--dauer-uebergang) * 0.6);
+}
+
+::view-transition-new(*) {
+  animation-name: uebergang-blende-ein;
+  animation-duration: calc(var(--dauer-uebergang) * 0.7);
+  animation-delay: calc(var(--dauer-uebergang) * 0.2);
+  animation-fill-mode: both;
+}
+
+/* Symbol, Titel und Bild wandern für sich. Ihre Abbilder werden auf
+   die Hülle gepasst, statt oben abgeschnitten zu werden — so wächst
+   ein Titel mit, statt zu springen. Zugeordnet über
+   `view-transition-class` in den Komponenten. */
+::view-transition-old(.symbol),
+::view-transition-new(.symbol),
+::view-transition-old(.titel),
+::view-transition-new(.titel) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+::view-transition-old(.bild),
+::view-transition-new(.bild) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- Der Seitentext gleitet nach --------------------------------- */
+@keyframes uebergang-von-unten {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@keyframes uebergang-nach-unten {
+  to {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+::view-transition-new(seiteninhalt) {
+  animation: uebergang-von-unten calc(var(--dauer-uebergang) * 0.8) var(--verlauf-betont) both;
+  animation-delay: calc(var(--dauer-uebergang) * 0.25);
+}
+
+::view-transition-old(seiteninhalt) {
+  animation: uebergang-nach-unten calc(var(--dauer-uebergang) * 0.5) var(--verlauf-betont) forwards;
+}
+
+/* Die Hülle des Textes soll nicht „wandern" — sie hat kein Gegenstück */
+::view-transition-group(seiteninhalt) {
+  animation: none;
+}
+
+/* --- Die Leisten bleiben scharf --------------------------------- */
+::view-transition-group(nav-kopf),
+::view-transition-group(nav-fuss),
+::view-transition-group(nav-kontakt),
+::view-transition-old(nav-kopf),
+::view-transition-old(nav-fuss),
+::view-transition-old(nav-kontakt),
+::view-transition-new(nav-kopf),
+::view-transition-new(nav-fuss),
+::view-transition-new(nav-kontakt) {
+  animation: none;
+}
+
+/* Die Leisten liegen über allem — auch über der wachsenden Karte */
+::view-transition-group(nav-kopf),
+::view-transition-group(nav-fuss),
+::view-transition-group(nav-kontakt) {
+  z-index: 100;
+}
 
 /*
-  EINZELNE ELEMENTE ABWEICHEND BEHANDELN
-  ------------------------------------------------------------------
-  Jede Kachel hat einen eigenen Namen (leistung-prophylaxe usw.).
-  Damit lässt sich eine einzelne Leistung anders animieren als die
-  übrigen — etwa langsamer:
-
-    ::view-transition-group(leistung-implantate) {
-      animation-duration: var(--dauer-langsam);
-    }
-
   ÜBER CSS HINAUS
   ------------------------------------------------------------------
-  Reicht CSS nicht, greift JavaScript am Übergang an:
-
-    document.addEventListener('astro:before-swap', (e) => {
-      // e.viewTransition.ready  — Übergang steht bereit
-      // e.viewTransition.finished — Übergang ist fertig
-    });
-
-  Darauf ließe sich jede Animationsbibliothek aufsetzen. Bisher nicht
-  nötig — und solange es nicht nötig ist, bleibt es draußen.
+  Das Abheben der Karte vor dem Wechsel und das Schließen per Escape
+  bzw. Zurück-Knopf stehen in scripts/uebergaenge.ts. Astro meldet den
+  Wechsel über Ereignisse (`astro:before-preparation`, `astro:before-swap`,
+  `astro:page-load`); mehr ist nicht nötig.
 */

@@ -26,9 +26,10 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
 
   <main id="inhalt" class="beitragsseite">
     <article class="beitrag" transition:name={`beitrag-${beitrag.id}`}>
-      <a class="beitrag__zurueck" href="/#neuigkeiten">
+      <a class="beitrag__zurueck" href="/#neuigkeiten" data-zurueck>
         <span aria-hidden="true">←</span> Alle Neuigkeiten
       </a>
+      <a class="schliessen" href="/#neuigkeiten" data-zurueck aria-label="Beitrag schließen"></a>
 
       {beitrag.datum && (
         <time class="beitrag__datum" datetime={beitrag.datum}>{alsDatum(beitrag.datum)}</time>
@@ -36,9 +37,10 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
       <h1 class="beitrag__titel">{beitrag.titel}</h1>
 
       {beitrag.bild && (
-        <img class="beitrag__bild" src={beitrag.bild} alt={beitrag.bild_alt || ''} width="900" height="500" />
+        <img class="beitrag__bild" src={beitrag.bild} alt={beitrag.bild_alt || ''} width="900" height="500" transition:name={`beitrag-bild-${beitrag.id}`} />
       )}
 
+      <div class="beitrag__rest" transition:name="seiteninhalt">
       <div class="beitrag__inhalt" set:html={beitrag.inhalt} />
 
       {anhaenge.length > 0 && (
@@ -56,6 +58,7 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
           </ul>
         </section>
       )}
+      </div>
     </article>
   </main>
 
@@ -71,8 +74,29 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
   }
 
   .beitrag {
+    position: relative;
     width: min(100% - 2 * var(--abstand-m), 46rem);
     margin-inline: auto;
+  }
+
+  /* Schließen-Kreuz oben rechts — dreht sich beim Zeigen wie das
+     Kreuz der Hinweis-Blase (Abläufe a-34 / a-35) */
+  .schliessen {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background: url('/icons/ui/schliessen.svg') center / contain no-repeat;
+    transition: transform 300ms var(--verlauf);
+  }
+
+  .schliessen:hover,
+  .schliessen:focus-visible { transform: rotate(90deg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .schliessen { transition: none; }
+    .schliessen:hover { transform: none; }
   }
 
   .beitrag__zurueck {
@@ -98,6 +122,7 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
     width: 100%;
     height: auto;
     margin-bottom: var(--abstand-m);
+    view-transition-class: bild;
   }
 
   /* Vom Redaktionssystem geliefertes HTML */

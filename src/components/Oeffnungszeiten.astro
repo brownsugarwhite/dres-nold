@@ -7,18 +7,19 @@
  *   • Darin eine Bühne, die über die volle Strecke stehen bleibt und
  *     ihren Überlauf abschneidet — die Blase ist unsichtbar, solange
  *     sie noch unterhalb steht
- *   • Die Blase selbst ruht 110 px über dem unteren Rand, also genau
- *     über der Symbolleiste, und wird vom Scrollweg dorthin gefahren
- *   • Darunter die Lottie-Grafik mit dem Zipfel
+ *   • Die Blase selbst ruht knapp über der Symbolleiste und wird vom
+ *     Scrollweg dorthin gefahren
+ *   • Darunter die Abschlusslinie mit dem Zipfel — eine eigene
+ *     SVG-Zeichnung, die auf den Öffnungszeiten-Knopf zeigt
  *
- * Alle Werte stammen aus Ablauf `a-19` („oz test") der Vorlage:
+ * Alle Zeitwerte stammen aus Ablauf `a-19` („oz test") der Vorlage:
  *
  *   bei 15 %   Blase  y = 700 px      Kurve easeIn   ⟶ holt Schwung
- *   bei 50 %   Blase  y = 150 px      Kurve outCubic ⟶ bremst ab
- *              Zipfel Bild 0
+ *   bei 50 %   Blase  y = Zipfellänge Kurve outCubic ⟶ bremst ab
+ *              Zipfel eingezogen
  *   bei 71 %   Blase  y =   0 px      — steht
- *              Zipfel Bild 99         Kurve easeOut
- *   bei 80 %   Zipfel Bild 0
+ *              Zipfel voll ausgefahren  Kurve easeOut
+ *   bei 80 %   Zipfel eingezogen
  *
  * Die Kurve gehört jeweils zu dem Abschnitt, der an dieser Stelle
  * BEGINNT — so wertet Webflow scrollgebundene Abläufe aus. Daher das
@@ -30,6 +31,21 @@
  * den sichtbaren Bereich, sondern wie Webflows „while scrolling in
  * view" über einen 350vh hohen Streifen am Dokumentanfang. Beim Laden
  * sind dadurch schon ~22 % zurückgelegt (siehe scripts/scrollwege.ts).
+ *
+ * Der Zipfel
+ * ----------
+ * In der Vorlage war das eine Lottie-Datei (`oz_box_mobile.json`): ein
+ * weißes Polygon mit gestrichelter Kontur, bei dem drei Punkte wandern.
+ * Hier wird dieselbe Form direkt als SVG gezeichnet. Vorteile:
+ *   • die Grundlinie läuft von Fensterrand zu Fensterrand
+ *   • die Spitze zeigt exakt auf die Mitte des Öffnungszeiten-Knopfs
+ *     in der Symbolleiste — gemessen, nicht geschätzt
+ *   • die Länge ist je Bildschirmgröße einstellbar (`--zipfel-laenge`)
+ *   • keine 170 KB Lottie-Bibliothek für diesen Bereich
+ *
+ * Die Maße der Vorlage (Zipfel 155 px lang, Basis 117 → 33 px breit,
+ * Spitze lehnt 44 px nach rechts, Grundlinie fällt 18 px auf 600 px
+ * nach links ab) werden proportional zur eingestellten Länge skaliert.
  */
 import oz from '../content/oeffnungszeiten.json';
 
@@ -80,23 +96,36 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
         </div>
       </div>
 
-      {/* Untere Abschlusslinie mit Zipfel — die Lottie-Grafik */}
-      <div class="ozblase__linie" data-ozlinie aria-hidden="true"></div>
+      {/* Untere Abschlusslinie mit Zipfel — vom Skript gezeichnet */}
+      <svg class="ozzipfel" data-ozzipfel aria-hidden="true" focusable="false">
+        <path class="ozzipfel__flaeche" data-ozflaeche d="" />
+        <path class="ozzipfel__kontur" data-ozkontur d="" />
+      </svg>
     </div>
   </div>
 </section>
 
 <style>
+  /* Wie lang der Zipfel voll ausgefahren ist. Mobil das Maß der
+     Vorlage; auf dem Desktop kürzer, damit er nicht die halbe
+     Symbolleiste überragt (Wunsch von Florian). Das Skript liest den
+     Wert und richtet Ruhelage und Bewegung danach aus. */
+  .ozblase { --zipfel-laenge: 154px; }
+  @media (min-width: 60rem) {
+    .ozblase { --zipfel-laenge: 90px; }
+  }
+
   /* Nimmt den Platz im Seitenfluss ein und deckt den grauen Grund ab.
      Höhe von `.trigger-oz-scroll` / `.oz` in der mobilen Vorlage. */
   .ozraum {
     position: relative;
     z-index: 2;
-    /* 264 px kürzer als der Bereich darüber: so viel steht unter der
-       Blase für den ausgefahrenen Zipfel frei. Ist er wieder
-       eingezogen, wäre das nur leerer Raum vor der Begrüßung —
-       der folgende Inhalt rückt deshalb um diesen Betrag auf. */
-    height: calc(350vh - 264px);
+    /* Um die Ruhelage der Blase kürzer als der Bereich darüber: so viel
+       steht unter der Blase für den Zipfel frei. Ist er wieder
+       eingezogen, wäre das nur leerer Raum vor der Begrüßung — der
+       folgende Inhalt rückt deshalb um diesen Betrag auf. Der Wert wird
+       vom Skript gesetzt; die Vorgabe entspricht der mobilen Vorlage. */
+    height: calc(350vh - var(--oz-ruhe, 264px));
     background: var(--farbe-flaeche);
   }
 
@@ -126,20 +155,12 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     pointer-events: none;
   }
 
-  /* Maße der Lottie-Grafik `oz_box_mobile.json`, nachgemessen:
-       Artboard        600 × 400
-       Abschlusslinie  bei y = 246
-       Zipfelspitze    bei y = 400 (voll ausgefahren), x = 520
-     Die Spitze fährt also 154 px aus. Genau so weit steigt die Blase
-     zwischen 50 % und 71 % (150 px) — deshalb steht die Spitze
-     während dieser Phase still. Das funktioniert nur, wenn die Grafik
-     in ihrer ursprünglichen HÖHE steht; in der Breite darf sie
-     gestreckt werden. */
   .ozblase {
     position: absolute;
-    /* 110 px Leistenhöhe + 154 px Zipfellänge: so trifft die voll
-       ausgefahrene Spitze genau die Oberkante der Symbolleiste. */
-    bottom: 264px;
+    /* Ruhelage: Leistenhöhe + Zipfellänge + Höhe der Grundlinie unter
+       der Blase. So trifft die voll ausgefahrene Spitze genau die
+       Oberkante der Symbolleiste. Vom Skript gesetzt. */
+    bottom: var(--oz-ruhe, 264px);
     left: 50%;
     width: min(calc(100vw - 2 * var(--abstand-m)), 62rem);
     /* Vom Skript gesetzt */
@@ -156,31 +177,33 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     overflow-y: auto;
   }
 
-  /* Die Grafik hängt an der Unterkante der Fläche, ohne Platz zu
-     brauchen: die Abschlusslinie (y = 246) liegt genau auf der Kante,
-     der Zipfelbereich ragt 154 px darunter hinaus. */
-  .ozblase__linie {
+  /* Die Zeichnung hängt an der Unterkante der Fläche und ist so breit
+     wie das Fenster; Breite und Höhe setzt das Skript in Bildpunkten,
+     damit die Maße 1:1 stimmen. */
+  .ozzipfel {
     position: absolute;
     top: 100%;
-    left: 0;
-    margin-top: -246px;
-    width: 100%;
-    height: 400px;
-    line-height: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: block;
+    overflow: visible;
     pointer-events: none;
-    /* Die Grafik enthält oberhalb der Linie eine große weiße Fläche —
-       in der Vorlage IST das der Kasten. Bei uns zeichnet ihn die
-       Fläche darüber selbst, deshalb wird alles oberhalb der Linie
-       weggeschnitten. 238 px statt 246, weil die Linie leicht schräg
-       verläuft (rechts 241, links 259) und nicht angeschnitten werden
-       darf. */
-    clip-path: inset(238px 0 0 0);
   }
 
-  .ozblase__linie :global(svg) {
-    display: block;
-    width: 100%;
-    height: 100%;
+  /* Weiße Fläche zwischen Blasenunterkante und schräger Grundlinie
+     samt Zipfel — in der Vorlage ist das der Kasten selbst. */
+  .ozzipfel__flaeche {
+    fill: var(--farbe-flaeche);
+    stroke: none;
+  }
+
+  /* Gestrichelte Kontur wie in der Lottie: 1 px, Muster 1/2 */
+  .ozzipfel__kontur {
+    fill: none;
+    stroke: var(--farbe-primaer);
+    stroke-width: 1;
+    stroke-dasharray: 1 2;
+    stroke-linejoin: round;
   }
 
   /* Überschrift über allen drei Listen */
@@ -253,57 +276,131 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     .ozbereich { position: static; height: auto; padding-block: var(--abstand-2xl); }
     .ozbereich__buehne { position: static; height: auto; }
     .ozblase { position: static; transform: none; margin-inline: auto; }
-    .ozblase__linie { display: none; }
+    .ozzipfel { display: none; }
   }
 </style>
 
 <script>
-  import { ladeAnimation } from '../scripts/lottie';
   import { ausStuetzstellen, type Stuetzstelle } from '../scripts/easing';
   import { OZ_WEG, beimScrollenSichtbar, nachziehen } from '../scripts/scrollwege';
 
+  /** Höhe der Symbolleiste unten — `.fussleiste__inhalt` */
+  const LEISTE = 110;
+
+  /* Maße des Zipfels aus der Lottie der Vorlage, bezogen auf die
+     Spitze T bei voller Länge 155 px. Links/rechts der Basis als
+     Abstand zu T: eingezogen (Bild 0) und ausgefahren (Bild 100). */
+  const VORLAGE = {
+    laenge: 155,
+    basisLinks: { zu: -112, auf: -60 },
+    spitze: { zu: -31, auf: 0 },
+    basisRechts: { zu: 5, auf: -27 },
+    /* Die Grundlinie fällt nach links ab: 18 px auf 600 px Breite */
+    neigung: 18 / 600,
+  };
+
   /**
-   * Fährt die Öffnungszeiten am Scrollweg entlang herein — Ablauf a-19.
+   * Fährt die Öffnungszeiten am Scrollweg entlang herein — Ablauf a-19 —
+   * und zeichnet Grundlinie und Zipfel.
    */
   function ozAufbauen() {
     const bereich = document.querySelector<HTMLElement>('.ozbereich');
     const blase = document.querySelector<HTMLElement>('[data-ozblase]');
-    const linie = document.querySelector<HTMLElement>('[data-ozlinie]');
-    if (!bereich || !blase || blase.dataset.bereit) return;
+    const svg = document.querySelector<SVGSVGElement>('[data-ozzipfel]');
+    const flaeche = document.querySelector<SVGPathElement>('[data-ozflaeche]');
+    const kontur = document.querySelector<SVGPathElement>('[data-ozkontur]');
+    if (!bereich || !blase || !svg || !flaeche || !kontur || blase.dataset.bereit) return;
     blase.dataset.bereit = 'ja';
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+    /* ---- Geometrie: wird bei Größenänderung neu vermessen ---- */
+    let breite = 0;        // Fensterbreite
+    let laenge = 154;      // Zipfellänge (--zipfel-laenge)
+    let spitzeX = 0;       // x der Spitze = Mitte des Öffnungszeiten-Knopfs
+    let versatzOben = 0;   // Grundlinie in der Mitte, unter der Blasenkante
+    let ruhelage = 264;    // bottom-Wert der Blase in Ruhe
+
+    /** y der Grundlinie an Stelle x (SVG-Koordinaten, 0 = Blasenkante) */
+    const grundlinie = (x: number) => versatzOben + (breite / 2 - x) * VORLAGE.neigung;
+
+    const vermessen = () => {
+      breite = document.documentElement.clientWidth;
+      laenge = parseFloat(getComputedStyle(blase).getPropertyValue('--zipfel-laenge')) || 154;
+
+      /* Der Knopf in der Symbolleiste. Nur seine x-Lage zählt — die
+         Leiste fährt beim Scrollen weg, ihre Höhe ist aber fest. */
+      const knopf = document.querySelector<HTMLElement>('.fussknopf[data-punkt="zeiten"]');
+      const kr = knopf?.getBoundingClientRect();
+      spitzeX = kr && kr.width > 0 ? kr.left + kr.width / 2 : breite * 0.8667;
+
+      /* Die Linie darf rechts nicht über die Blasenkante steigen:
+         Versatz so wählen, dass der höchste Punkt 2 px darunter liegt. */
+      versatzOben = Math.max(4, (breite / 2) * VORLAGE.neigung + 2);
+
+      /* Blase so hoch, dass die ausgefahrene Spitze die Leiste berührt */
+      ruhelage = LEISTE + laenge + grundlinie(spitzeX);
+      document.documentElement.style.setProperty('--oz-ruhe', `${ruhelage}px`);
+
+      const hoehe = versatzOben * 2 + laenge + 4;
+      svg.setAttribute('width', String(breite));
+      svg.setAttribute('height', String(hoehe));
+      svg.setAttribute('viewBox', `0 0 ${breite} ${hoehe}`);
+
+      /* Der Hub zwischen 50 % und 71 % entspricht der Zipfellänge —
+         so steht die Spitze still, während die Blase einrastet. */
+      BLASE[2].wert = laenge;
+    };
+
+    /** Zeichnet Fläche und Kontur für einen Ausfahrgrad 0 … 1 */
+    const zipfelZeichnen = (anteil: number) => {
+      const f = laenge / VORLAGE.laenge;
+      const zw = (m: { zu: number; auf: number }) => (m.zu + (m.auf - m.zu) * anteil) * f;
+      const xL = spitzeX + zw(VORLAGE.basisLinks);
+      const xS = spitzeX + zw(VORLAGE.spitze);
+      const xR = spitzeX + zw(VORLAGE.basisRechts);
+      const yL = grundlinie(xL);
+      const yR = grundlinie(xR);
+      const yS = grundlinie(xS) + anteil * laenge;
+
+      const linie =
+        `M0 ${grundlinie(0).toFixed(2)} L${xL.toFixed(2)} ${yL.toFixed(2)} ` +
+        `L${xS.toFixed(2)} ${yS.toFixed(2)} L${xR.toFixed(2)} ${yR.toFixed(2)} ` +
+        `L${breite} ${grundlinie(breite).toFixed(2)}`;
+
+      kontur.setAttribute('d', linie);
+      /* Fläche: dieselbe Linie, oben bis knapp über die Blasenkante
+         geschlossen — deckt die Lücke zwischen Kante und Schräge. */
+      flaeche.setAttribute('d', `${linie} L${breite} -2 L0 -2 Z`);
+    };
+
+    /* ---- Bewegung ---- */
+
     /* Schlüsselstellen aus a-19. Die Kurve gehört zum Abschnitt, der an
        dieser Stelle beginnt. Vor der ersten Stelle hält Webflow den
        ersten Wert — daher die Stütze bei 0 %. */
+    const BLASE: Stuetzstelle[] = [
+      { bei: 0.00, wert: 700, kurve: 'linear' },
+      { bei: 0.15, wert: 700, kurve: 'easeIn' },
+      { bei: 0.50, wert: 154, kurve: 'outCubic' },
+      { bei: 0.71, wert: 0, kurve: 'linear' },
+      { bei: 1.00, wert: 0 },
+    ];
+
     /* Der Startwert der Vorlage ist 700 px. Er reicht dort, weil die
        Blase nur rund 400 px hoch ist. Unsere Listen stehen auf schmalen
        Schirmen untereinander, die Blase wird dadurch höher — dann muss
        der Startwert mitwachsen, sonst schaut sie beim Laden schon
-       herein. Die Strecke ab 50 % (150 → 0) bleibt unangetastet: an ihr
-       hängt, dass die Zipfelspitze stillsteht. */
-    const RUHELAGE = 264; // bottom-Wert der Blase
-    let start = 700;
-
+       herein. */
     const startBestimmen = () => {
       const hoch = blase.getBoundingClientRect().height;
-      start = Math.max(700, RUHELAGE + hoch + 40);
+      const start = Math.max(700, ruhelage + hoch + 40);
       BLASE[0].wert = start;
       BLASE[1].wert = start;
     };
 
-    const BLASE: Stuetzstelle[] = [
-      { bei: 0.00, wert: 700, kurve: 'linear' },
-      { bei: 0.15, wert: 700, kurve: 'easeIn' },
-      { bei: 0.50, wert: 150, kurve: 'outCubic' },
-      { bei: 0.71, wert: 0, kurve: 'linear' },
-      { bei: 1.00, wert: 0 },
-    ];
-    startBestimmen();
-
     /* Der Zipfel fährt aus, während die Blase einrastet, und zieht sich
-       danach wieder ein. Werte als Anteil der Bildfolge (99 % = 0.99). */
+       danach wieder ein (99 % wie in der Vorlage). */
     const ZIPFEL: Stuetzstelle[] = [
       { bei: 0.00, wert: 0, kurve: 'linear' },
       { bei: 0.50, wert: 0, kurve: 'outCubic' },
@@ -312,7 +409,8 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
       { bei: 1.00, wert: 0 },
     ];
 
-    let spieler: { goToAndStop: (w: number, b?: boolean) => void; totalFrames: number } | null = null;
+    vermessen();
+    startBestimmen();
 
     /** Der Wert, der gezeichnet wird — läuft dem Scrollwert nach. */
     let p = ziel();
@@ -326,10 +424,7 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 
     const zeichnen = () => {
       blase.style.setProperty('--oz-versatz', `${ausStuetzstellen(p, BLASE)}px`);
-      if (spieler) {
-        const anteil = ausStuetzstellen(p, ZIPFEL);
-        spieler.goToAndStop(anteil * (spieler.totalFrames - 1), true);
-      }
+      zipfelZeichnen(ausStuetzstellen(p, ZIPFEL));
     };
 
     /* Eigene Schleife statt reinem Scroll-Ereignis: Der Nachlauf muss
@@ -357,18 +452,17 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     };
 
     window.addEventListener('scroll', anstossen, { passive: true });
-    window.addEventListener('resize', () => { startBestimmen(); anstossen(); }, { passive: true });
-    zeichnen();
+    window.addEventListener('resize', () => {
+      vermessen();
+      startBestimmen();
+      zeichnen();
+      anstossen();
+    }, { passive: true });
 
-    if (linie) {
-      /* 'none': in der Breite auf die Blase gestreckt, in der Höhe
-         unverändert. Nur so bleibt der Zipfel 154 px lang. */
-      ladeAnimation(linie, '/lottie/oeffnungszeiten-mobil.json', { verhaeltnis: 'none' }).then((s) => {
-        if (!s) return;
-        spieler = s;
-        zeichnen();
-      });
-    }
+    /* Die Symbolleiste könnte ihre Schrift erst nach dem ersten Bild
+       gesetzt haben — einmal kurz danach nachmessen. */
+    requestAnimationFrame(() => { vermessen(); zeichnen(); });
+    zeichnen();
   }
 
   ozAufbauen();

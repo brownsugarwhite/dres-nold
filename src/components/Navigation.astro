@@ -58,9 +58,16 @@ const kategorien = (leistungen.kategorien ?? [])
   .filter((k) => k.eintraege.length > 0);
 ---
 
-<div class="navigation">
+{/*
+  `transition:persist`: Beim Seitenwechsel bleibt die Navigation samt
+  Zustand (offenes Menü, Leistenwechsel) stehen und wird nicht neu
+  aufgebaut. Die Leisten tragen eigene Übergangsnamen und bewegen
+  sich nicht — so bleiben sie scharf, während der Rest verschwimmt
+  (styles/uebergaenge.css).
+*/}
+<div class="navigation" transition:persist="navigation">
 {/* Kontaktzeile — oben auf der Seite sichtbar */}
-<div class="kontaktzeile" data-leiste="kontakt">
+<div class="kontaktzeile" data-leiste="kontakt" transition:name="nav-kontakt" transition:animate="none">
   <div class="kontaktzeile__inhalt">
     <span class="kontaktzeile__text">{praxis.strasse}</span>
     <span class="punkt" aria-hidden="true"></span>
@@ -77,7 +84,7 @@ const kategorien = (leistungen.kategorien ?? [])
 </div>
 
 {/* Kopfleiste — fährt beim Scrollen ein */}
-<header class="kopfleiste" data-leiste="kopf">
+<header class="kopfleiste" data-leiste="kopf" transition:name="nav-kopf" transition:animate="none">
   <nav class="kopfleiste__inhalt" aria-label="Hauptnavigation">
     {/* Auf Handys: Logo und Menü-Knopf statt der Menüpunkte */}
     <div class="kopfleiste__mobil">
@@ -187,7 +194,7 @@ const kategorien = (leistungen.kategorien ?? [])
 </div>
 
 {/* Symbolleiste am unteren Rand — oben auf der Seite sichtbar */}
-<nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff">
+<nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff" transition:name="nav-fuss" transition:animate="none">
   <div class="fussleiste__inhalt fussleiste__inhalt--gross">
     {fussGross.map((e, i) => (
       <>
@@ -522,7 +529,14 @@ const kategorien = (leistungen.kategorien ?? [])
 
   /* ---------- Menüpunkte mit Text-Roll ----------
      Zwei identische Texte übereinander; beim Zeigen rollt der Block
-     um genau eine Höhe hoch. Aus Ablauf a-18 (300 ms, easeInOut). */
+     um genau eine Höhe hoch. Aus Ablauf a-18 (300 ms, easeInOut).
+
+     Wichtig: Die Vorlage kennt KEIN Hover-Out. Der Ablauf rollt hoch und
+     springt danach in 0 ms auf den Anfang zurück — unsichtbar, weil beide
+     Texte gleich sind. Beim Verlassen läuft also nichts zurück. Deshalb
+     eine Animation ohne Nachzustand statt einer Transition: Fällt der
+     Zeiger weg, endet die Animation, der Block steht wieder auf 0, und
+     der nächste Hover startet sie erneut. */
   .menuepunkt {
     display: block;
     height: 80px;
@@ -539,8 +553,10 @@ const kategorien = (leistungen.kategorien ?? [])
   .menuepunkt__rolle {
     display: flex;
     flex-direction: column;
-    /* Ablauf a-18: 300 ms, easeInOut */
-    transition: transform 300ms cubic-bezier(0.42, 0, 0.58, 1);
+  }
+
+  @keyframes menue-rolle {
+    to { transform: translateY(-80px); }
   }
 
   .menuepunkt__text {
@@ -551,10 +567,25 @@ const kategorien = (leistungen.kategorien ?? [])
     flex: none;
   }
 
-  .menuepunkt:hover .menuepunkt__rolle,
-  .menuepunkt:focus-visible .menuepunkt__rolle,
+  /* Ablauf a-18: 300 ms, easeInOut — einmal hoch, kein Zurückrollen */
+  .menuepunkt:hover .menuepunkt__rolle {
+    animation: menue-rolle 300ms cubic-bezier(0.42, 0, 0.58, 1);
+  }
+
+  /* Solange das Aufklappmenü offen ist, steht der Text still oben */
   .aufklapp[data-offen] .menuepunkt__rolle {
     transform: translateY(-80px);
+    animation: none;
+  }
+
+  /* Tastatur: kein Rollen, dafür eine sichtbare Fokuslinie */
+  .menuepunkt:focus-visible {
+    outline: 2px solid var(--farbe-primaer);
+    outline-offset: -2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menuepunkt:hover .menuepunkt__rolle { animation: none; }
   }
 
   /* ---------- Aufklappmenü ---------- */
@@ -684,7 +715,7 @@ const kategorien = (leistungen.kategorien ?? [])
     justify-content: center;
     align-items: center;
     width: 100%;
-    background: rgb(255 255 255 / 70%) url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
+    background: rgb(255 255 255 / 80%) url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     transition: transform 300ms cubic-bezier(0, 0, 0.58, 1);
@@ -745,9 +776,12 @@ const kategorien = (leistungen.kategorien ?? [])
     object-fit: contain;
   }
 
-  .fussknopf:hover .fussknopf__text,
-  .fussknopf:focus-visible .fussknopf__text {
-    text-decoration: underline;
+  /* Die Vorlage kennt keinen Hover-Zustand für die Symbolknöpfe;
+     nur die Tastatur bekommt eine sichtbare Fokuslinie. */
+  .fussknopf:focus-visible {
+    outline: 2px solid var(--farbe-primaer);
+    outline-offset: 2px;
+    border-radius: var(--radius-s);
   }
 
   /* ---------- Zustand „gescrollt" ----------
@@ -849,8 +883,10 @@ const kategorien = (leistungen.kategorien ?? [])
 
       const sollGescrollt = bereich
         ? window.scrollY > SCHNALZ_WEG * window.innerHeight
-        // Auf Seiten ohne Öffnungszeiten-Bereich: schlichte Schwelle
-        : window.scrollY > 120;
+        // Unterseiten (Leistung, Beitrag, Rechtliches) haben keinen
+        // Logobereich: dort steht von Anfang an die Kopfleiste mit dem
+        // Menü, die Symbolleiste bleibt eingefahren.
+        : true;
 
       if (sollGescrollt !== gescrollt) {
         gescrollt = sollGescrollt;

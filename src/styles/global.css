@@ -98,7 +98,9 @@ img {
   Wie in der Vorlage: Ein bewegtes Verlaufsbild wird durch die Buchstaben
   hindurch sichtbar (`background-clip: text`).
 
-  Gilt für Überschriften im Inhaltsbereich. Ausgenommen sind Überschriften
+  Gilt für Überschriften im Inhaltsbereich (`main`) und in Abschnitten,
+  die `data-verlauf` tragen (Neuigkeiten, Team, Kontakt liegen wegen der
+  Stapelreihenfolge außerhalb von `main`). Ausgenommen sind Überschriften
   in Bedienelementen — dort würde der Verlauf die Lesbarkeit stören;
   sie tragen die Klasse `.ohne-verlauf`.
 
@@ -106,14 +108,14 @@ img {
   nicht oder erzwingt das Betriebssystem eigene Farben, ist der Text
   weiterhin lesbar — er verliert nur den Verlauf.
 */
-main h1,
-main h2 {
+:is(main, [data-verlauf]) h1,
+:is(main, [data-verlauf]) h2 {
   color: var(--farbe-primaer);
 }
 
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
-  main h1:not(.ohne-verlauf),
-  main h2:not(.ohne-verlauf) {
+  :is(main, [data-verlauf]) h1:not(.ohne-verlauf),
+  :is(main, [data-verlauf]) h2:not(.ohne-verlauf) {
     background: url('/bilder/deko/verlauf.gif') center / cover no-repeat;
     -webkit-background-clip: text;
     background-clip: text;
@@ -124,8 +126,8 @@ main h2 {
 /* Erzwingt das Betriebssystem eigene Farben (Kontrastmodus),
    tritt der Verlauf zurück. */
 @media (forced-colors: active) {
-  main h1,
-  main h2 {
+  :is(main, [data-verlauf]) h1,
+  :is(main, [data-verlauf]) h2 {
     background: none;
     -webkit-text-fill-color: currentColor;
     color: CanvasText;
