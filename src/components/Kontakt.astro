@@ -1,23 +1,32 @@
 ---
 /**
- * Kontakt — Adresse zweispaltig, darunter der Kartenausschnitt.
+ * Kontakt — „So erreichen Sie uns".
  *
- * Maße aus dem Stylesheet der Vorlage:
- *   .contact       60 px oben, 200 px unten Innenabstand
- *   .div-block-27  30 px Abstand über der Adresse
- *   .text-block-4  rechtsbündig, 20 px, Gewicht 300, Zeilenhöhe 26 px
- *   .text-block-5  linksbündig, gleiche Schrift
+ * Aufbau nach der Vorlage, um das dort nur ausgeblendete Formular
+ * ergänzt (Entscheidung von Florian, September 2026):
+ *   .contact          60 px oben, 200 px unten Innenabstand
+ *   .div-block-27     Adresse zweispaltig, 30 px darüber
+ *   .text-block-4/-5  20 px, Gewicht 300, Zeilenhöhe 26 px
+ *   .contact-content  46 px darunter: links die Karte (60 %),
+ *                     rechts das Formular (40 %); mobil untereinander
+ *   .div-block-22     Karte mit weichem Schatten 1px 1px 17px -12px
  *
- * Kein Briefumschlag — der gehörte zu einem früheren Provisorium
- * und wird durch den Neuigkeiten-Bereich ersetzt.
+ * Die Karte kommt von Google Maps und lädt erst nach Einwilligung
+ * (Einwilligung.astro, scripts/einwilligung.ts). Vorher steht ein
+ * selbst gehostetes Vorschaubild mit dem Knopf „Karte laden".
+ *
+ * Kein Briefumschlag — der gehörte zu einem früheren Provisorium.
  */
+import Kontaktformular from './Kontaktformular.astro';
 import seite from '../content/seite.json';
+
 const { praxis } = seite;
-const kartenZiel = 'https://www.google.com/maps/search/?api=1&query=' +
-  encodeURIComponent(`${praxis.strasse}, ${praxis.plz} ${praxis.ort}`);
+const adresse = `${praxis.strasse}, ${praxis.plz} ${praxis.ort}`;
+const kartenZiel = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(adresse);
+const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(adresse) + '&z=16&hl=de&output=embed';
 ---
 
-<section class="kontakt" id="contact">
+<section class="kontakt" id="contact" data-verlauf>
   <h2 class="kontakt__titel">So erreichen Sie uns</h2>
 
   <div class="kontakt__adresse">
@@ -34,14 +43,32 @@ const kartenZiel = 'https://www.google.com/maps/search/?api=1&query=' +
     </address>
   </div>
 
-  <a class="kontakt__karte" href={kartenZiel} target="_blank" rel="noopener">
-    <span class="kontakt__kartentext">Zu Google Maps</span>
-    <img src="/bilder/deko/karte.png" alt="Lageplan der Praxis in Bietigheim" width="875" height="325" loading="lazy" />
-  </a>
+  <div class="kontakt__inhalt">
+    <div class="landkarte" data-landkarte data-einbettung={karteEinbettung}>
+      <div class="landkarte__vorschau" data-landkarte-vorschau>
+        <img src="/bilder/deko/karte-vorschau.jpg" alt={`Kartenausschnitt: ${adresse}`} width="1600" height="969" loading="lazy" />
+        <div class="landkarte__hinweis">
+          <p class="landkarte__text">
+            Die Karte wird von Google Maps geladen. Dabei erhält Google Ihre IP-Adresse.
+          </p>
+          <div class="landkarte__knoepfe">
+            <button class="landkarte__knopf" type="button" data-landkarte-laden>Karte laden</button>
+            <a class="landkarte__verweis" href={kartenZiel} target="_blank" rel="noopener">In Google Maps öffnen</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kontakt__formular">
+      <h3 class="kontakt__formulartitel ohne-verlauf">Schreiben Sie uns</h3>
+      <Kontaktformular />
+    </div>
+  </div>
 </section>
 
 <style>
-  /* .contact: 60 px oben, 200 px unten */
+  /* .contact: 60 px oben, 200 px unten — der graue Symbolgrund scheint
+     wie in der Vorlage hinter dem Bereich durch */
   .kontakt {
     position: relative;
     z-index: 40;
@@ -97,34 +124,110 @@ const kartenZiel = 'https://www.google.com/maps/search/?api=1&query=' +
     color: var(--farbe-primaer);
   }
 
-  /* Kartenausschnitt, 46 px unter der Adresse */
-  .kontakt__karte {
-    position: relative;
-    display: block;
-    width: min(100% - 2 * var(--abstand-m), 875px);
+  /* .contact-content: Karte und Formular nebeneinander, 46 px darunter */
+  .kontakt__inhalt {
+    display: flex;
+    gap: 40px;
+    align-items: stretch;
+    width: min(100% - 2 * var(--abstand-m), var(--breite-inhalt));
     margin-top: 46px;
   }
 
-  .kontakt__karte img {
-    width: 100%;
-    height: auto;
+  /* .div-block-22: 60 % breit, mindestens 40 vh hoch, weicher Schatten */
+  .landkarte {
+    position: relative;
+    flex: 3 1 0;
+    min-height: max(40vh, 420px);
+    overflow: hidden;
+    border-radius: var(--radius-m);
+    background: var(--farbe-flaeche-gedeckt);
+    box-shadow: 1px 1px 17px -12px rgb(0 0 0 / 50%);
   }
 
-  /* .text-block-13: 18 px, Gewicht 600 */
-  .kontakt__kartentext {
+  .landkarte__vorschau {
     position: absolute;
-    top: 0;
-    left: 0;
-    padding: 1em;
-    color: #505050;
-    font-size: 18px;
-    font-weight: 600;
-    transition: font-size var(--dauer-schnell) var(--verlauf);
+    inset: 0;
   }
 
-  .kontakt__karte:hover .kontakt__kartentext,
-  .kontakt__karte:focus-visible .kontakt__kartentext {
-    font-size: 20px;
+  .landkarte__vorschau img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Zurückhaltend, damit der Hinweis darüber lesbar bleibt */
+    filter: saturate(0.6);
+  }
+
+  .landkarte__hinweis {
+    position: absolute;
+    inset: auto var(--abstand-m) var(--abstand-m);
+    padding: var(--abstand-s) var(--abstand-m);
+    background: rgb(255 255 255 / 92%);
+    border-radius: var(--radius-m);
+    box-shadow: 0 12px 30px -12px rgb(0 0 0 / 30%);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .landkarte__text {
+    margin: 0 0 var(--abstand-2xs);
+    max-width: none;
+    font-size: var(--text-s);
+    color: var(--farbe-text);
+  }
+
+  .landkarte__knoepfe {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--abstand-2xs) var(--abstand-s);
+    align-items: center;
+  }
+
+  .landkarte__knopf {
+    padding: var(--abstand-2xs) var(--abstand-s);
+    border: 0;
+    border-radius: var(--radius-rund);
+    background: var(--farbe-primaer);
+    color: var(--farbe-text-invers);
+    font: inherit;
+    font-size: var(--text-s);
+    font-weight: var(--gewicht-halbfett);
+    cursor: pointer;
+    transition: background-color var(--dauer-schnell) var(--verlauf);
+  }
+
+  .landkarte__knopf:hover,
+  .landkarte__knopf:focus-visible { background: var(--farbe-dunkel); }
+
+  .landkarte__verweis {
+    font-size: var(--text-s);
+    color: var(--farbe-primaer);
+  }
+
+  /* Die geladene Karte füllt den Kasten */
+  .landkarte :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* .div-block-23: 40 % breit */
+  .kontakt__formular {
+    flex: 2 1 0;
+    min-width: 0;
+  }
+
+  .kontakt__formulartitel {
+    margin-bottom: var(--abstand-s);
+    color: var(--farbe-primaer);
+    font-size: var(--text-l);
+    font-weight: var(--gewicht-normal);
+  }
+
+  @media (max-width: 991px) {
+    .kontakt__inhalt { flex-direction: column; }
+    .landkarte { min-height: 320px; }
   }
 
   @media (max-width: 767px) {
@@ -132,5 +235,50 @@ const kartenZiel = 'https://www.google.com/maps/search/?api=1&query=' +
     .kontakt__adresse { flex-direction: column; align-items: center; gap: var(--abstand-s); }
     .kontakt__spalte--rechts,
     .kontakt__spalte--links { text-align: center; margin: 0; }
+    .landkarte { min-height: 260px; }
+    .landkarte__hinweis { inset: auto var(--abstand-s) var(--abstand-s); padding: var(--abstand-xs) var(--abstand-s); }
   }
 </style>
+
+<script>
+  import { lesen, setzen, EREIGNIS } from '../scripts/einwilligung';
+
+  /**
+   * Lädt die Google-Karte, sobald die Einwilligung vorliegt — und nimmt
+   * sie wieder heraus, wenn sie widerrufen wird.
+   */
+  function landkarteAufbauen() {
+    const kasten = document.querySelector<HTMLElement>('[data-landkarte]');
+    if (!kasten || kasten.dataset.bereit) return;
+    kasten.dataset.bereit = 'ja';
+
+    const vorschau = kasten.querySelector<HTMLElement>('[data-landkarte-vorschau]');
+    const einbettung = kasten.dataset.einbettung || '';
+    let rahmen: HTMLIFrameElement | null = null;
+
+    const anwenden = () => {
+      const erlaubt = lesen()?.karte === true;
+      if (erlaubt && !rahmen) {
+        rahmen = document.createElement('iframe');
+        rahmen.src = einbettung;
+        rahmen.title = 'Google-Maps-Karte: Lage der Praxis';
+        rahmen.loading = 'lazy';
+        rahmen.referrerPolicy = 'no-referrer-when-downgrade';
+        rahmen.setAttribute('allowfullscreen', '');
+        kasten.appendChild(rahmen);
+        if (vorschau) vorschau.hidden = true;
+      } else if (!erlaubt && rahmen) {
+        rahmen.remove();
+        rahmen = null;
+        if (vorschau) vorschau.hidden = false;
+      }
+    };
+
+    kasten.querySelector('[data-landkarte-laden]')?.addEventListener('click', () => setzen(true));
+    document.addEventListener(EREIGNIS, anwenden);
+    anwenden();
+  }
+
+  landkarteAufbauen();
+  document.addEventListener('astro:page-load', landkarteAufbauen);
+</script>

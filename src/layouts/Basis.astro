@@ -4,6 +4,7 @@
  * Enthält die Metadaten, die Schrifteinbindung und die globalen Stile.
  */
 import { ClientRouter } from 'astro:transitions';
+import Einwilligung from '../components/Einwilligung.astro';
 import seite from '../content/seite.json';
 import '../styles/schrift.css';
 import '../styles/tokens.css';
@@ -53,6 +54,7 @@ const { titel = seite.titel, beschreibung = seite.beschreibung } = Astro.props;
   <body>
     <a class="sprungmarke" href="#inhalt">Zum Inhalt springen</a>
     <slot />
+    <Einwilligung />
     <script>
       import '../scripts/uebergaenge';
     </script>

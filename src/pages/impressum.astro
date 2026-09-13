@@ -1,0 +1,133 @@
+---
+/**
+ * Impressum — Inhalt aus der bisherigen Webflow-Seite übernommen
+ * (dort standen Impressum und Datenschutz auf einer Seite).
+ */
+import Textseite from '../layouts/Textseite.astro';
+import seite from '../content/seite.json';
+const { praxis } = seite;
+---
+
+<Textseite titel="Impressum" beschreibung="Impressum der Praxis Dres. Nold, Bietigheim">
+  <h2>Angaben gemäß § 5 DDG</h2>
+  <address>
+    <strong>Praxis Dres. Nold</strong><br />
+    {praxis.strasse}<br />
+    {praxis.plz} {praxis.ort}<br />
+    Telefon: <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a><br />
+    Fax: {praxis.fax}<br />
+    E-Mail: <a href={`mailto:${praxis.email}`}>{praxis.email}</a><br />
+    www.dres-nold.de
+  </address>
+
+  <h2>Inhaltlich verantwortlich</h2>
+  <p>Dr. Paul Nold<br />Dr. Inge Wilhelm-Nold<br />Dr. Sarah Buchgeister-Nold</p>
+
+  <h2>Berufsbezeichnung</h2>
+  <ul>
+    <li>Dr. Paul Nold – Zahnarzt</li>
+    <li>Dr. Sarah Buchgeister-Nold – Zahnärztin</li>
+    <li>Dr. Inge Wilhelm-Nold – Fachzahnärztin für Kieferorthopädie</li>
+  </ul>
+  <p>Die Berufsbezeichnungen wurden in der Bundesrepublik Deutschland verliehen.</p>
+
+  <h2>Berufsrechtliche Regelungen</h2>
+  <ul>
+    <li>Zahnheilkundegesetz</li>
+    <li>Heilberufe-Kammergesetz</li>
+    <li>Gebührenordnung für Zahnärzte</li>
+    <li>Berufsordnung für Zahnärzte</li>
+  </ul>
+  <p>
+    Die relevanten berufsrechtlichen Regelungen der Landeszahnärztekammer
+    Baden-Württemberg finden Sie unter
+    <a href="https://www.lzk-bw.de/patienten/gesetzliche-regelungen-zur-zahnaerztlichen-berufsausuebung" rel="noopener">www.lzk-bw.de</a>.
+  </p>
+
+  <h2>Zuständige Kassenzahnärztliche Vereinigung</h2>
+  <p>
+    Kassenzahnärztliche Vereinigung Baden-Württemberg<br />
+    Bezirksdirektion Karlsruhe (Sitz Mannheim), Telefon 0621 380000<br />
+    Hauptverwaltung Stuttgart, Telefon 0711 78770<br />
+    <a href="https://www.kzvbw.de" rel="noopener">www.kzvbw.de</a>
+  </p>
+
+  <h2>Zuständige Aufsichtsbehörde</h2>
+  <p>
+    Landeszahnärztekammer Baden-Württemberg<br />
+    Albstadtweg 9<br />
+    70567 Stuttgart<br />
+    <a href="https://www.lzk-bw.de" rel="noopener">www.lzk-bw.de</a>
+  </p>
+
+  <h2>Verbraucherstreitbeilegung</h2>
+  <p>
+    Im Hinblick auf eine Verpflichtung aus §§ 36, 37 VSBG informieren wir
+    unsere Patienten darüber, dass unsere Praxis nicht zur Teilnahme an
+    einem außergerichtlichen Streitbeilegungsverfahren vor einer
+    Verbraucherschlichtungsstelle verpflichtet ist und auch an keinem
+    außergerichtlichen Streitbeilegungsverfahren vor einer
+    Verbraucherschlichtungsstelle teilnimmt. Bei Streitigkeiten aus dem
+    Behandlungsverhältnis besteht die Möglichkeit, eine außergerichtliche
+    Klärung vor der Gutachterkommission für Fragen zahnärztlicher Haftung
+    durchzuführen. Die Gutachterkommission ist bei der für uns zuständigen
+    Bezirkszahnärztekammer eingerichtet. Nähere Informationen finden Sie
+    unter
+    <a href="https://www.lzk-bw.de/patienten/gutachten/gutachterkommission-fuer-fragen-zahnaerztlicher-haftung/" rel="noopener">www.lzk-bw.de</a>.
+  </p>
+
+  <h2>Haftungsausschluss</h2>
+  <h3>Haftung für Inhalte</h3>
+  <p>
+    Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für
+    die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir
+    jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß
+    § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den
+    allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir als
+    Diensteanbieter jedoch nicht verpflichtet, übermittelte oder
+    gespeicherte fremde Informationen zu überwachen oder nach Umständen zu
+    forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
+    Verpflichtungen zur Entfernung oder Sperrung der Nutzung von
+    Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt.
+    Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der
+    Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden
+    von entsprechenden Rechtsverletzungen werden wir diese Inhalte
+    umgehend entfernen.
+  </p>
+  <h3>Haftung für Links</h3>
+  <p>
+    Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren
+    Inhalte wir keinen Einfluss haben. Deshalb können wir für diese
+    fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der
+    verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der
+    Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der
+    Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige
+    Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine
+    permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch
+    ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar.
+    Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links
+    umgehend entfernen.
+  </p>
+  <h3>Urheberrecht</h3>
+  <p>
+    Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen
+    Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung,
+    Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der
+    Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des
+    jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite
+    sind nur für den privaten, nicht kommerziellen Gebrauch gestattet.
+    Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt
+    wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden
+    Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf
+    eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen
+    entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen
+    werden wir derartige Inhalte umgehend entfernen.
+  </p>
+
+  <p class="pruefen">
+    Hinweis für die Praxis: Die Angaben wurden von der bisherigen Seite
+    übernommen; die Gesetzesverweise wurden vom TMG auf das seit Mai 2024
+    geltende Digitale-Dienste-Gesetz (DDG) aktualisiert. Bitte einmal
+    prüfen, ob Kammer- und KZV-Angaben noch aktuell sind.
+  </p>
+</Textseite>

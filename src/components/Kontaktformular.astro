@@ -1,0 +1,260 @@
+---
+/**
+ * Kontaktformular — bewusst schlicht: Name, E-Mail, Telefon (optional),
+ * Nachricht, Einverständnis. Es fragt KEINE Gesundheitsdaten ab und
+ * darf das auch künftig nicht (CLAUDE.md, Abschnitt Rechtliches).
+ *
+ * Ohne JavaScript schickt der Browser das Formular normal an
+ * /api/kontakt und landet danach wieder hier (?gesendet=1). Mit
+ * JavaScript bleibt die Seite stehen und die Antwort erscheint direkt
+ * unter dem Formular.
+ *
+ * Gegen Spam: ein verstecktes Feld, das Menschen nicht ausfüllen
+ * (Honigtopf), und eine Mindestdauer zwischen Aufruf und Absenden.
+ * Beides prüft functions/api/kontakt.ts.
+ *
+ * Gestaltung nach dem Webflow-Entwurf: randlose Felder mit weichem
+ * Schatten, runder Sendeknopf in der Hausfarbe.
+ */
+---
+
+<form class="formular" method="post" action="/api/kontakt" data-kontaktformular novalidate>
+  <div class="feld">
+    <input class="feld__eingabe" id="kontakt-name" name="name" type="text" autocomplete="name" placeholder=" " required maxlength="100" />
+    <label class="feld__label" for="kontakt-name">Name</label>
+  </div>
+
+  <div class="feld">
+    <input class="feld__eingabe" id="kontakt-email" name="email" type="email" autocomplete="email" placeholder=" " required maxlength="200" />
+    <label class="feld__label" for="kontakt-email">E-Mail</label>
+  </div>
+
+  <div class="feld">
+    <input class="feld__eingabe" id="kontakt-telefon" name="telefon" type="tel" autocomplete="tel" placeholder=" " maxlength="40" />
+    <label class="feld__label" for="kontakt-telefon">Telefonnummer (optional)</label>
+  </div>
+
+  <div class="feld">
+    <textarea class="feld__eingabe feld__eingabe--mehrzeilig" id="kontakt-nachricht" name="nachricht" placeholder=" " required maxlength="5000" rows="7"></textarea>
+    <label class="feld__label" for="kontakt-nachricht">Nachricht</label>
+  </div>
+
+  {/* Honigtopf: für Menschen unsichtbar, Roboter füllen es aus */}
+  <div class="feld--versteckt" aria-hidden="true">
+    <label for="kontakt-website">Website</label>
+    <input id="kontakt-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+  <input type="hidden" name="zeit" value="" data-zeit />
+
+  <label class="einverstaendnis">
+    <input class="einverstaendnis__kasten" name="datenschutz" type="checkbox" value="ja" required />
+    <span>
+      Sie erklären sich damit einverstanden, dass Ihre Daten zur Bearbeitung
+      Ihres Anliegens verwendet werden. Weitere Informationen und
+      Widerrufshinweise finden Sie in der
+      <a href="/datenschutz/">Datenschutzerklärung</a>.
+    </span>
+  </label>
+
+  <p class="formular__meldung" data-meldung role="status" aria-live="polite"></p>
+
+  <div class="formular__senden">
+    <button class="senden" type="submit">Senden</button>
+  </div>
+</form>
+
+<style>
+  .formular {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    font-size: 18px;
+  }
+
+  .feld {
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  /* .text-field-2: randlos, weicher Schatten, 18 px, dunkle Schrift */
+  .feld__eingabe {
+    display: block;
+    width: 100%;
+    padding: 20px 12px 8px;
+    border: 0;
+    border-radius: var(--radius-s);
+    background: var(--farbe-flaeche);
+    box-shadow: 1px 1px 17px -12px rgb(0 0 0 / 50%), 0 0 0 1px var(--farbe-linie);
+    color: var(--farbe-dunkel);
+    font: inherit;
+    line-height: 1.3;
+    transition: box-shadow var(--dauer-schnell) var(--verlauf);
+  }
+
+  .feld__eingabe:focus {
+    outline: none;
+    box-shadow: 1px 1px 17px -12px rgb(0 0 0 / 50%), 0 0 0 2px var(--farbe-primaer);
+  }
+
+  .feld__eingabe--mehrzeilig {
+    min-height: 200px;
+    resize: vertical;
+  }
+
+  /* Beschriftung liegt im Feld und rückt beim Schreiben nach oben —
+     so bleibt sie immer sichtbar (anders als ein Platzhalter). */
+  .feld__label {
+    position: absolute;
+    top: 14px;
+    left: 12px;
+    color: var(--farbe-text-gedeckt);
+    pointer-events: none;
+    transform-origin: left top;
+    transition: transform var(--dauer-schnell) var(--verlauf), color var(--dauer-schnell) var(--verlauf);
+  }
+
+  .feld__eingabe:focus + .feld__label,
+  .feld__eingabe:not(:placeholder-shown) + .feld__label {
+    transform: translateY(-10px) scale(0.72);
+    color: var(--farbe-primaer);
+  }
+
+  .feld--versteckt {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* .checkbox-label: 15 px, Zeilenhöhe 20 px */
+  .einverstaendnis {
+    display: flex;
+    gap: var(--abstand-2xs);
+    align-items: flex-start;
+    margin: 6px 0 10px;
+    color: var(--farbe-text);
+    font-size: 15px;
+    line-height: 20px;
+    cursor: pointer;
+  }
+
+  .einverstaendnis__kasten {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+    accent-color: var(--farbe-primaer);
+  }
+
+  .formular__meldung {
+    min-height: 1.4em;
+    margin: 0 0 var(--abstand-2xs);
+    max-width: none;
+    font-size: var(--text-s);
+  }
+
+  .formular__meldung[data-art='fehler'] { color: var(--farbe-fehler); }
+  .formular__meldung[data-art='erfolg'] { color: var(--farbe-erfolg); font-weight: var(--gewicht-halbfett); }
+
+  .formular__senden {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  /* .submit-button: runder Knopf, 100 px, Hausfarbe, 22 px, Gewicht 500 */
+  .senden {
+    width: 100px;
+    height: 100px;
+    border: 0;
+    border-radius: var(--radius-rund);
+    background: var(--farbe-primaer);
+    color: var(--farbe-text-invers);
+    font: inherit;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background-color 300ms var(--verlauf), transform var(--dauer-schnell) var(--verlauf);
+  }
+
+  .senden:hover,
+  .senden:focus-visible { background: var(--farbe-dunkel); transform: scale(1.04); }
+
+  .senden[disabled] { opacity: 0.6; cursor: wait; transform: none; }
+
+  /* Ungültige Felder erst nach dem ersten Sendeversuch markieren */
+  .formular[data-geprueft] .feld__eingabe:invalid {
+    box-shadow: 1px 1px 17px -12px rgb(0 0 0 / 50%), 0 0 0 2px var(--farbe-fehler);
+  }
+</style>
+
+<script>
+  /**
+   * Absenden ohne Seitenwechsel. Schlägt etwas fehl, sagt die Meldung
+   * in Worten, was zu tun ist — nie nur ein rotes Feld.
+   */
+  function formularAufbauen() {
+    const formular = document.querySelector<HTMLFormElement>('[data-kontaktformular]');
+    if (!formular || formular.dataset.bereit) return;
+    formular.dataset.bereit = 'ja';
+
+    const meldung = formular.querySelector<HTMLElement>('[data-meldung]')!;
+    const zeit = formular.querySelector<HTMLInputElement>('[data-zeit]');
+    const knopf = formular.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    if (zeit) zeit.value = String(Date.now());
+
+    const sagen = (art: 'fehler' | 'erfolg' | '', text: string) => {
+      meldung.dataset.art = art;
+      meldung.textContent = text;
+    };
+
+    /* Rückkehr ohne JavaScript: /?gesendet=1 bzw. /?fehler=1 */
+    const params = new URLSearchParams(location.search);
+    if (params.get('gesendet')) sagen('erfolg', 'Danke! Ihre Nachricht ist bei uns angekommen. Wir melden uns schnellstmöglich.');
+    if (params.get('fehler')) sagen('fehler', 'Die Nachricht konnte nicht gesendet werden. Bitte rufen Sie uns an oder schreiben Sie eine E-Mail.');
+
+    formular.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      formular.dataset.geprueft = 'ja';
+
+      if (!formular.checkValidity()) {
+        const erstes = formular.querySelector<HTMLInputElement>(':invalid');
+        if (erstes?.name === 'datenschutz') sagen('fehler', 'Bitte bestätigen Sie den Hinweis zum Datenschutz.');
+        else if (erstes?.type === 'email') sagen('fehler', 'Bitte prüfen Sie Ihre E-Mail-Adresse.');
+        else sagen('fehler', 'Bitte füllen Sie Name, E-Mail und Nachricht aus.');
+        erstes?.focus();
+        return;
+      }
+
+      knopf.disabled = true;
+      sagen('', 'Wird gesendet …');
+
+      try {
+        const daten = Object.fromEntries(new FormData(formular).entries());
+        const antwort = await fetch(formular.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(daten),
+        });
+        const ergebnis = (await antwort.json().catch(() => ({}))) as { ok?: boolean; fehler?: string };
+
+        if (antwort.ok && ergebnis.ok) {
+          formular.reset();
+          delete formular.dataset.geprueft;
+          if (zeit) zeit.value = String(Date.now());
+          sagen('erfolg', 'Danke! Ihre Nachricht ist bei uns angekommen. Wir melden uns schnellstmöglich.');
+        } else {
+          sagen('fehler', ergebnis.fehler || 'Die Nachricht konnte nicht gesendet werden. Bitte rufen Sie uns an oder schreiben Sie eine E-Mail.');
+        }
+      } catch {
+        sagen('fehler', 'Keine Verbindung. Bitte versuchen Sie es später noch einmal oder rufen Sie uns an.');
+      } finally {
+        knopf.disabled = false;
+      }
+    });
+  }
+
+  formularAufbauen();
+  document.addEventListener('astro:page-load', formularAufbauen);
+</script>

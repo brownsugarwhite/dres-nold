@@ -1,0 +1,156 @@
+---
+/**
+ * Datenschutzerklärung — Grundlage ist der Text der bisherigen Seite,
+ * angepasst an den neuen Aufbau: Hosting bei Cloudflare, Kontaktformular
+ * mit Versand über Resend, Google Maps nur nach Einwilligung, kein
+ * Google Analytics, keine Cookies. Als Entwurf gekennzeichnet — die
+ * Praxis (bzw. ihr Datenschutzbeauftragter) prüft ihn vor Freigabe.
+ */
+import Textseite from '../layouts/Textseite.astro';
+import seite from '../content/seite.json';
+const { praxis } = seite;
+---
+
+<Textseite titel="Datenschutzerklärung" beschreibung="Datenschutzerklärung der Praxis Dres. Nold, Bietigheim">
+  <p class="pruefen">
+    Entwurf, Stand September 2026: an den Neuaufbau der Seite angepasst.
+    Bitte von der Praxis bzw. dem Datenschutzbeauftragten prüfen und
+    freigeben.
+  </p>
+
+  <h2>1. Verantwortliche Stelle</h2>
+  <p>
+    Verantwortlich für die Erhebung und Verarbeitung personenbezogener
+    Daten auf dieser Webseite sind die Praxisinhaber Dr. Paul Nold und
+    Dr. Inge Wilhelm-Nold, erreichbar unter der Praxisanschrift
+    {praxis.strasse}, {praxis.plz} {praxis.ort}, E-Mail
+    <a href={`mailto:${praxis.email}`}>{praxis.email}</a>, Telefon {praxis.telefon}.
+  </p>
+  <p>
+    Unseren Datenschutzbeauftragten Dr. Bernhard Greiner erreichen Sie
+    unter der Anschrift Bahnhofstraße 33, 76476 Bischweier.
+  </p>
+
+  <h2>2. Welche Daten beim Besuch der Webseite anfallen</h2>
+  <p>
+    Unsere Webseite dient ausschließlich der Information über unsere
+    Praxis, unser Behandlungsspektrum und unsere Sprechzeiten. Beim Aufruf
+    werden nur die Daten verarbeitet, die Ihr Browser technisch an den
+    Server übermittelt, damit die Seite angezeigt werden kann:
+  </p>
+  <ul>
+    <li>IP-Adresse</li>
+    <li>Art, Sprache und Version des Browsers</li>
+    <li>Betriebssystem</li>
+    <li>Datum, Uhrzeit und Zeitzone der Anfrage</li>
+    <li>aufgerufene Seite und die Seite, von der Sie kommen (Referrer)</li>
+    <li>Zugriffsstatus und übertragene Datenmenge</li>
+  </ul>
+  <p>
+    Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse
+    an einer sicheren und funktionierenden Webseite). Diese Daten werden
+    nicht mit anderen Daten zusammengeführt und gelöscht, sobald sie für
+    den Betrieb nicht mehr erforderlich sind.
+  </p>
+
+  <h2>3. Hosting</h2>
+  <p>
+    Die Webseite wird bei Cloudflare betrieben (Cloudflare Germany GmbH,
+    Rosental 7, 80331 München, bzw. Cloudflare, Inc., 101 Townsend St.,
+    San Francisco, CA 94107, USA). Cloudflare stellt die Seite aus und
+    schützt sie vor Angriffen; dabei verarbeitet Cloudflare die unter
+    Ziffer 2 genannten Verbindungsdaten in unserem Auftrag. Mit Cloudflare
+    besteht ein Vertrag zur Auftragsverarbeitung; für Übermittlungen in
+    die USA ist Cloudflare nach dem EU-US Data Privacy Framework
+    zertifiziert, ergänzend gelten die EU-Standardvertragsklauseln.
+    Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
+  </p>
+
+  <h2>4. Cookies und lokale Speicherung</h2>
+  <p>
+    Diese Webseite setzt keine Cookies und verwendet keine Werkzeuge zur
+    Reichweitenmessung oder zum Tracking. Ihr Browser speichert lediglich
+    zwei Einstellungen lokal auf Ihrem Gerät (sogenannter Local Storage),
+    die nicht an uns übertragen werden:
+  </p>
+  <ul>
+    <li>ob Sie einen aktuellen Hinweis (z. B. zu Urlaubszeiten) bereits weggeklickt haben,</li>
+    <li>ob Sie der Anzeige der Google-Maps-Karte zugestimmt haben (siehe Ziffer 6).</li>
+  </ul>
+  <p>
+    Beides ist für die Darstellung der Seite erforderlich bzw. dient dazu,
+    Ihre Entscheidung zu merken (§ 25 Abs. 2 Nr. 2 TDDDG). Sie können
+    diese Einträge jederzeit über die Einstellungen Ihres Browsers löschen.
+  </p>
+
+  <h2>5. Kontaktformular</h2>
+  <p>
+    Wenn Sie uns über das Kontaktformular schreiben, übermitteln Sie uns
+    Ihren Namen, Ihre E-Mail-Adresse, optional Ihre Telefonnummer und
+    Ihre Nachricht. Wir verwenden diese Angaben ausschließlich, um Ihr
+    Anliegen zu beantworten. Bitte geben Sie im Formular keine
+    Gesundheitsdaten an — für medizinische Fragen rufen Sie uns bitte an
+    oder vereinbaren einen Termin.
+  </p>
+  <p>
+    Die Nachricht wird nicht auf dem Webserver gespeichert, sondern
+    unmittelbar als E-Mail an unser Praxispostfach zugestellt. Für den
+    Versand nutzen wir den Dienst Resend (Resend, Inc., 2261 Market
+    Street #5039, San Francisco, CA 94114, USA) als Auftragsverarbeiter;
+    die Verarbeitung erfolgt auf Servern in der Europäischen Union, für
+    einen etwaigen Zugriff aus den USA gelten die
+    EU-Standardvertragsklauseln. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b
+    DSGVO (Anbahnung bzw. Durchführung eines Behandlungsverhältnisses)
+    sowie Art. 6 Abs. 1 lit. f DSGVO. Ihre Daten werden gelöscht, sobald
+    Ihr Anliegen erledigt ist und keine gesetzlichen Aufbewahrungsfristen
+    entgegenstehen.
+  </p>
+
+  <h2>6. Google Maps</h2>
+  <p>
+    Im Kontaktbereich können Sie sich eine Karte von Google Maps anzeigen
+    lassen (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4,
+    Irland). Die Karte wird <strong>erst geladen, wenn Sie dem zustimmen</strong>
+    — über die Leiste am unteren Rand oder den Knopf „Karte laden". Bis
+    dahin sehen Sie nur ein von uns gespeichertes Vorschaubild.
+  </p>
+  <p>
+    Mit dem Laden erhält Google Ihre IP-Adresse und Informationen über
+    den Aufruf unserer Seite und kann Cookies auf Ihrem Gerät setzen —
+    auch dann, wenn Sie kein Google-Konto haben. Sind Sie bei Google
+    angemeldet, kann Google die Daten Ihrem Konto zuordnen. Dabei können
+    Daten in die USA übermittelt werden; Google LLC ist nach dem EU-US
+    Data Privacy Framework zertifiziert.
+  </p>
+  <p>
+    Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO,
+    § 25 Abs. 1 TDDDG). Sie können sie jederzeit mit Wirkung für die
+    Zukunft widerrufen: über „Datenschutz-Einstellungen" am Seitenende.
+    Weitere Informationen finden Sie in der
+    <a href="https://policies.google.com/privacy?hl=de" rel="noopener">Datenschutzerklärung von Google</a>.
+  </p>
+
+  <h2>7. Ihre Rechte</h2>
+  <p>Sie haben uns gegenüber hinsichtlich der Sie betreffenden Daten folgende Rechte:</p>
+  <ul>
+    <li>Recht auf Auskunft (Art. 15 DSGVO)</li>
+    <li>Recht auf Berichtigung (Art. 16 DSGVO) und Löschung (Art. 17 DSGVO)</li>
+    <li>Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO)</li>
+    <li>Recht auf Datenübertragbarkeit (Art. 20 DSGVO)</li>
+    <li>Recht auf Widerspruch gegen die Verarbeitung (Art. 21 DSGVO)</li>
+    <li>Recht, eine erteilte Einwilligung jederzeit zu widerrufen (Art. 7 Abs. 3 DSGVO)</li>
+  </ul>
+  <p>
+    Ihnen steht außerdem ein Beschwerderecht bei einer
+    Datenschutz-Aufsichtsbehörde zu, etwa beim Landesbeauftragten für den
+    Datenschutz und die Informationsfreiheit Baden-Württemberg,
+    Lautenschlagerstraße 20, 70173 Stuttgart.
+  </p>
+
+  <h2>8. Sicherheit</h2>
+  <p>
+    Die Übertragung zwischen Ihrem Browser und unserer Webseite ist
+    durchgehend verschlüsselt (HTTPS). Wir passen diese Erklärung an,
+    wenn sich die Technik oder die Rechtslage ändert.
+  </p>
+</Textseite>

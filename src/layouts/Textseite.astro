@@ -1,0 +1,81 @@
+---
+/**
+ * Seitenrahmen für Textseiten (Impressum, Datenschutz).
+ * Navigation, ein schmaler Textbereich, Fußbereich.
+ */
+import Basis from './Basis.astro';
+import Navigation from '../components/Navigation.astro';
+import Fussbereich from '../components/Fussbereich.astro';
+import seite from '../content/seite.json';
+
+interface Props {
+  titel: string;
+  beschreibung?: string;
+}
+const { titel, beschreibung } = Astro.props;
+---
+
+<Basis titel={`${titel} – ${seite.praxis.name}`} beschreibung={beschreibung}>
+  <Navigation />
+
+  <main id="inhalt" class="textseite">
+    <article class="textseite__inhalt">
+      <h1>{titel}</h1>
+      <slot />
+    </article>
+  </main>
+
+  <Fussbereich />
+</Basis>
+
+<style>
+  .textseite {
+    position: relative;
+    z-index: 40;
+    padding-block: 140px 100px;
+    background: var(--farbe-flaeche);
+  }
+
+  .textseite__inhalt {
+    width: min(100% - 2 * var(--abstand-m), 46rem);
+    margin-inline: auto;
+  }
+
+  .textseite__inhalt :global(h2) {
+    margin-top: var(--abstand-l);
+    font-size: var(--text-l);
+  }
+
+  .textseite__inhalt :global(h3) {
+    margin-top: var(--abstand-m);
+    font-size: var(--text-m);
+  }
+
+  .textseite__inhalt :global(p),
+  .textseite__inhalt :global(li) {
+    max-width: none;
+  }
+
+  .textseite__inhalt :global(ul) {
+    padding-left: var(--abstand-m);
+    margin: 0 0 var(--abstand-s);
+  }
+
+  .textseite__inhalt :global(address) {
+    font-style: normal;
+    margin-bottom: var(--abstand-s);
+  }
+
+  .textseite__inhalt :global(a) {
+    overflow-wrap: anywhere;
+  }
+
+  /* Hinweis für die Praxis: markiert, was noch geprüft werden muss */
+  .textseite__inhalt :global(.pruefen) {
+    padding: var(--abstand-xs) var(--abstand-s);
+    border-left: 4px solid var(--farbe-primaer-hell);
+    background: var(--farbe-flaeche-gedeckt);
+    color: var(--farbe-text-gedeckt);
+    font-size: var(--text-s);
+  }
+</style>

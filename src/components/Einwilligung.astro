@@ -1,0 +1,132 @@
+---
+/**
+ * Einwilligungs-Leiste für die Google-Maps-Karte.
+ *
+ * Erscheint beim ersten Besuch unten im Fenster, nicht-modal: Die Seite
+ * bleibt vollständig bedienbar. Erst nach „Karte erlauben" lädt der
+ * Kontaktbereich die Karte von Google (siehe Kontakt.astro und
+ * scripts/einwilligung.ts). „Ohne Karte" zeigt dort ein Vorschaubild.
+ *
+ * Kein Fremdskript, kein Tracking — nur diese eine Frage.
+ */
+---
+
+<div class="einwilligung" data-einwilligung hidden role="region" aria-label="Datenschutz-Einstellungen">
+  <div class="einwilligung__inhalt">
+    <p class="einwilligung__text">
+      Im Kontaktbereich zeigen wir eine <strong>Google-Maps-Karte</strong>.
+      Wird sie geladen, erhält Google Ihre IP-Adresse und kann Cookies setzen.
+      Darüber hinaus speichern wir nichts über Ihren Besuch.
+      <a href="/datenschutz/">Datenschutzerklärung</a>
+    </p>
+    <div class="einwilligung__knoepfe">
+      <button class="einwilligung__knopf einwilligung__knopf--nein" type="button" data-einwilligung-nein>
+        Ohne Karte
+      </button>
+      <button class="einwilligung__knopf einwilligung__knopf--ja" type="button" data-einwilligung-ja>
+        Karte erlauben
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .einwilligung {
+    position: fixed;
+    left: 50%;
+    /* Über der Symbolleiste (110 px); fährt sie weg, rückt die Leiste nach */
+    bottom: calc(110px + var(--abstand-s));
+    z-index: var(--ebene-hinweis);
+    width: min(100% - 2 * var(--abstand-s), 46rem);
+    transform: translateX(-50%);
+    transition: bottom 300ms cubic-bezier(0, 0, 0.58, 1);
+  }
+
+  :global(body[data-gescrollt]) .einwilligung { bottom: var(--abstand-s); }
+
+  .einwilligung__inhalt {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--abstand-s) var(--abstand-m);
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--abstand-s) var(--abstand-m);
+    background: var(--farbe-flaeche);
+    border: 1px solid var(--farbe-linie);
+    border-radius: var(--radius-m);
+    box-shadow: 0 18px 40px -12px rgb(0 0 0 / 30%);
+  }
+
+  .einwilligung__text {
+    flex: 1 1 22rem;
+    margin: 0;
+    max-width: none;
+    font-size: var(--text-s);
+    color: var(--farbe-text);
+  }
+
+  .einwilligung__knoepfe {
+    display: flex;
+    gap: var(--abstand-2xs);
+    margin-left: auto;
+  }
+
+  .einwilligung__knopf {
+    padding: var(--abstand-2xs) var(--abstand-s);
+    border: 1px solid var(--farbe-primaer);
+    border-radius: var(--radius-rund);
+    font: inherit;
+    font-size: var(--text-s);
+    font-weight: var(--gewicht-halbfett);
+    cursor: pointer;
+    transition: background-color var(--dauer-schnell) var(--verlauf), color var(--dauer-schnell) var(--verlauf);
+  }
+
+  .einwilligung__knopf--ja {
+    background: var(--farbe-primaer);
+    color: var(--farbe-text-invers);
+  }
+
+  .einwilligung__knopf--ja:hover { background: var(--farbe-dunkel); border-color: var(--farbe-dunkel); }
+
+  .einwilligung__knopf--nein {
+    background: var(--farbe-flaeche);
+    color: var(--farbe-primaer);
+  }
+
+  .einwilligung__knopf--nein:hover { background: var(--farbe-flaeche-gedeckt); }
+
+  @media (max-width: 767px) {
+    .einwilligung__knoepfe { width: 100%; justify-content: flex-end; }
+  }
+</style>
+
+<script>
+  import { lesen, setzen, EREIGNIS } from '../scripts/einwilligung';
+
+  function einwilligungAufbauen() {
+    const leiste = document.querySelector<HTMLElement>('[data-einwilligung]');
+    if (!leiste || leiste.dataset.bereit) return;
+    leiste.dataset.bereit = 'ja';
+
+    const zeigen = () => { leiste.hidden = lesen() !== null; };
+
+    leiste.querySelector('[data-einwilligung-ja]')?.addEventListener('click', () => setzen(true));
+    leiste.querySelector('[data-einwilligung-nein]')?.addEventListener('click', () => setzen(false));
+    document.addEventListener(EREIGNIS, zeigen);
+
+    /* „Datenschutz-Einstellungen" im Fußbereich öffnet die Leiste erneut */
+    document.addEventListener('click', (e) => {
+      const ziel = (e.target as Element | null)?.closest?.('[data-einwilligung-oeffnen]');
+      if (!ziel) return;
+      e.preventDefault();
+      leiste.hidden = false;
+      leiste.querySelector<HTMLButtonElement>('[data-einwilligung-ja]')?.focus();
+    });
+
+    zeigen();
+  }
+
+  einwilligungAufbauen();
+  document.addEventListener('astro:page-load', einwilligungAufbauen);
+</script>

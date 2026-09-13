@@ -4,9 +4,24 @@
     {
       "name": "dres-nold",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 4321,
       "autoPort": true
+    },
+    {
+      "name": "dres-nold-vorschau",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "preview",
+        "--",
+        "--port",
+        "4330"
+      ],
+      "port": 4330
     }
   ]
 }
