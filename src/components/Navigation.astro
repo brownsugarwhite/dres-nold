@@ -196,6 +196,13 @@ const kategorien = (leistungen.kategorien ?? [])
 </div>
 
 {/* Symbolleiste am unteren Rand — oben auf der Seite sichtbar */}
+{/*
+  Der Umschlag trägt Grund (Weichzeichner) und Punktlinie, die Leiste
+  darin den Übergangsnamen. Beides auf einem Element geht nicht: Ein
+  Element mit Übergangsnamen bildet eine eigene Zeichenwurzel, und ein
+  Weichzeichner darin sieht die Seite dahinter nicht mehr.
+*/}
+<div class="fussleiste-huelle" data-fusshuelle>
 <nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff" transition:name="nav-fuss" transition:animate="none">
   <div class="fussleiste__inhalt fussleiste__inhalt--gross">
     {fussGross.map((e, i) => (
@@ -246,6 +253,7 @@ const kategorien = (leistungen.kategorien ?? [])
     ))}
   </div>
 </nav>
+</div>
 
 <style>
   /* ---------- Umschlag beider Leisten ----------
@@ -268,7 +276,7 @@ const kategorien = (leistungen.kategorien ?? [])
      einziges Element, also keine Kante zwischen beiden. Werte setzt das
      Skript (`--blase-hoehe`, `--blase-form`). */
   .navigation::before,
-  .fussleiste::before {
+  .fussleiste-huelle::before {
     content: '';
     position: absolute;
     left: 0;
@@ -286,7 +294,7 @@ const kategorien = (leistungen.kategorien ?? [])
     clip-path: var(--blase-form, inset(0 0 var(--blase-hoehe, 0px) 0));
   }
 
-  .fussleiste::before {
+  .fussleiste-huelle::before {
     top: calc(-1 * var(--blase-hoehe, 0px));
     bottom: 0;
     clip-path: var(--blase-form, inset(var(--blase-hoehe, 0px) 0 0 0));
@@ -295,7 +303,7 @@ const kategorien = (leistungen.kategorien ?? [])
   /* Die Punktlinie liegt ÜBER dem Grund (sonst dämpft ihn das Weiß):
      unten am Rand der Kopfleiste, oben am Rand der Symbolleiste. */
   .navigation::after,
-  .fussleiste::after {
+  .fussleiste-huelle::after {
     content: '';
     position: absolute;
     left: 0;
@@ -307,15 +315,15 @@ const kategorien = (leistungen.kategorien ?? [])
   }
 
   .navigation::after { bottom: 0; }
-  .fussleiste::after { top: 0; }
+  .fussleiste-huelle::after { top: 0; }
 
   /* Solange die Blase gezeichnet wird, übernimmt sie die Punktlinie */
   .navigation[data-ohne-linie]::after,
-  .fussleiste[data-ohne-linie]::after { display: none; }
+  .fussleiste-huelle[data-ohne-linie]::after { display: none; }
 
   /* Alles in den Leisten liegt über dem Grund */
   .navigation > :not(.blase),
-  .fussleiste > :not(.blase) {
+  .fussleiste-huelle > .fussleiste {
     position: relative;
     z-index: 1;
   }
@@ -376,6 +384,7 @@ const kategorien = (leistungen.kategorien ?? [])
   .navigation:has(.aufklapp[data-aktiv]) .kopfleiste,
   .navigation:has(.aufklapp[data-aktiv]) { overflow: visible; }
 
+  .fussleiste-huelle:has(.aufklapp[data-aktiv]),
   .fussleiste:has(.aufklapp[data-aktiv]) { overflow: visible; }
 
 
@@ -782,16 +791,20 @@ const kategorien = (leistungen.kategorien ?? [])
 
   /* ---------- Symbolleiste unten ---------- */
   /* .nav-bottom: fest am unteren Rand, Punktlinie oben */
-  .fussleiste {
+  .fussleiste-huelle {
     position: fixed;
     inset: auto 0 0;
     z-index: 100;
+    width: 100%;
+    transition: transform 300ms cubic-bezier(0, 0, 0.58, 1);
+  }
+
+  .fussleiste {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
-    transition: transform 300ms cubic-bezier(0, 0, 0.58, 1);
   }
 
   /* .nav-bottom-wrapper: feste Breite 700px, Höhe 110px */
@@ -861,7 +874,7 @@ const kategorien = (leistungen.kategorien ?? [])
      Gesetzt vom Skript, sobald der Startbereich verlassen wird. */
   :global(body[data-gescrollt]) .kontaktzeile { height: 0; }
   :global(body[data-gescrollt]) .kopfleiste { height: 80px; }
-  :global(body[data-gescrollt]) .fussleiste { transform: translateY(110px); }
+  :global(body[data-gescrollt]) .fussleiste-huelle { transform: translateY(110px); }
 
   /* ---------- Punkte als Trenner ---------- */
   .punkt--fuss {
@@ -1004,7 +1017,7 @@ const kategorien = (leistungen.kategorien ?? [])
          im selben Stapelkontext wie der Inhalt liegen — die Kopfleiste
          trägt einen Übergangsnamen und bildet damit einen eigenen. */
       const leiste = hoch ? huelle.closest<HTMLElement>('.fussleiste') : huelle.closest<HTMLElement>('.kopfleiste');
-      const linienTraeger = hoch ? leiste : huelle.closest<HTMLElement>('.navigation');
+      const linienTraeger = hoch ? huelle.closest<HTMLElement>('.fussleiste-huelle') : huelle.closest<HTMLElement>('.navigation');
       if (!knopf || !inhalt || !leiste || !linienTraeger) return;
 
       const wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
