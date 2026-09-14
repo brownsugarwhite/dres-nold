@@ -256,13 +256,30 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
 
   .portraet:not(.portraet--gross) .portraet__bild { height: 260px; }
 
-  /* .team-shadow: 14 px hoher Schattensaum, über die volle Breite */
+  /* .team-shadow: 14 px hoher Schattensaum, über die volle Breite.
+     Er sitzt je Porträt; nebeneinander ergeben sie eine durchgehende
+     Linie. An den beiden Enden einer Reihe brach sie bisher hart ab —
+     dort läuft sie jetzt aus. Welche Karte am Anfang bzw. Ende einer
+     Reihe steht, kann CSS bei umbrechendem Flex nicht wissen; das
+     setzt das Skript unten als `data-reihe`. */
   .portraet__schatten {
     position: absolute;
     inset: auto 0 0;
     z-index: 1;
     height: 14px;
     background: url('/icons/ui/linie-schatten.svg') 50% 100% / cover no-repeat;
+  }
+
+  [data-reihe='anfang'] .portraet__schatten {
+    mask-image: linear-gradient(to right, transparent, #000 60%);
+  }
+
+  [data-reihe='ende'] .portraet__schatten {
+    mask-image: linear-gradient(to left, transparent, #000 60%);
+  }
+
+  [data-reihe='allein'] .portraet__schatten {
+    mask-image: linear-gradient(to right, transparent, #000 35%, #000 65%, transparent);
   }
 
   /* .team-arrow: weißer Pfeil, 16 px hoch, unten mittig */
@@ -522,6 +539,68 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     });
   }
 
+  /**
+   * Reihenenden bestimmen.
+   *
+   * Die Karten stehen in einem umbrechenden Flex-Layout — es gibt kein
+   * Element „Reihe", an dem CSS ansetzen könnte. Also werden die Karten
+   * nach ihrem Abstand zum Seitenanfang gruppiert: Was auf derselben
+   * Höhe beginnt, steht in derselben Reihe. Die erste und die letzte
+   * Karte einer Reihe bekommen `data-reihe`; das CSS lässt ihren
+   * Schattensaum dort auslaufen.
+   *
+   * Ohne JavaScript bleibt alles wie bisher — die Linie endet dann
+   * eben hart, aber nichts fehlt.
+   */
+  function reihenendenMarkieren() {
+    const listen = [...document.querySelectorAll<HTMLElement>('.aerzte, .mitarbeitende')]
+      .filter((l) => !l.dataset.reihenbereit);
+    if (!listen.length) return;
+    for (const liste of listen) liste.dataset.reihenbereit = 'ja';
+
+    const markieren = () => {
+      for (const liste of listen) {
+        const karten = [...liste.children] as HTMLElement[];
+        let reihe: HTMLElement[] = [];
+        let hoehe: number | null = null;
+
+        const abschliessen = () => {
+          if (!reihe.length) return;
+          for (const karte of reihe) delete karte.dataset.reihe;
+          if (reihe.length === 1) reihe[0].dataset.reihe = 'allein';
+          else {
+            reihe[0].dataset.reihe = 'anfang';
+            reihe[reihe.length - 1].dataset.reihe = 'ende';
+          }
+          reihe = [];
+        };
+
+        for (const karte of karten) {
+          /* Auf ganze Pixel gerundet: Unterpixel-Unterschiede sollen
+             keine neue Reihe auslösen. */
+          const oben = Math.round(karte.offsetTop);
+          if (hoehe === null || Math.abs(oben - hoehe) > 2) {
+            abschliessen();
+            hoehe = oben;
+          }
+          reihe.push(karte);
+        }
+        abschliessen();
+      }
+    };
+
+    markieren();
+
+    /* Beim Aufklappen der Tätigkeiten und beim Größerziehen des
+       Fensters können sich die Reihen ändern. */
+    const beobachter = new ResizeObserver(() => markieren());
+    for (const liste of listen) beobachter.observe(liste);
+  }
+
   teamAufbauen();
-  document.addEventListener('astro:page-load', teamAufbauen);
+  reihenendenMarkieren();
+  document.addEventListener('astro:page-load', () => {
+    teamAufbauen();
+    reihenendenMarkieren();
+  });
 </script>

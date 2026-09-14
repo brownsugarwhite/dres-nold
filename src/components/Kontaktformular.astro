@@ -1,8 +1,8 @@
 ---
 /**
- * Kontaktformular — bewusst schlicht: Name, E-Mail, Telefon (optional),
- * Nachricht, Einverständnis. Es fragt KEINE Gesundheitsdaten ab und
- * darf das auch künftig nicht (CLAUDE.md, Abschnitt Rechtliches).
+ * Kontaktformular — bewusst schlicht im Inhalt: Name, E-Mail, Telefon
+ * (optional), Nachricht, Einverständnis. Es fragt KEINE Gesundheitsdaten
+ * ab und darf das auch künftig nicht (CLAUDE.md, Abschnitt Rechtliches).
  *
  * Ohne JavaScript schickt der Browser das Formular normal an
  * /api/kontakt und landet danach wieder hier (?gesendet=1). Mit
@@ -13,8 +13,17 @@
  * (Honigtopf), und eine Mindestdauer zwischen Aufruf und Absenden.
  * Beides prüft functions/api/kontakt.ts.
  *
- * Gestaltung nach dem Webflow-Entwurf: randlose Felder mit weichem
- * Schatten, runder Sendeknopf in der Hausfarbe.
+ * Gestaltung
+ * ----------
+ * Keine Kästen: Jedes Feld steht auf einer feinen Grundlinie. Beim
+ * Hineinklicken zeichnet sich darunter eine zweite Linie in der
+ * Hausfarbe von links nach rechts — dieselbe Handschrift wie der Kreis,
+ * der sich um das Schließen-Kreuz der Leistungsseiten zieht. Die
+ * Beschriftung rückt dabei nach oben und wechselt die Farbe.
+ *
+ * Der Sendeknopf ist eine Pille mit einem Pfeil, der beim Zeigen nach
+ * rechts gleitet. Nach erfolgreichem Versand zeichnet sich ein Kreis
+ * mit Haken — auch das die gleiche Handschrift.
  */
 ---
 
@@ -22,21 +31,27 @@
   <div class="feld">
     <input class="feld__eingabe" id="kontakt-name" name="name" type="text" autocomplete="name" placeholder=" " required maxlength="100" />
     <label class="feld__label" for="kontakt-name">Name</label>
+    <span class="feld__linie" aria-hidden="true"></span>
+  </div>
+
+  <div class="feldpaar">
+    <div class="feld">
+      <input class="feld__eingabe" id="kontakt-email" name="email" type="email" autocomplete="email" placeholder=" " required maxlength="200" />
+      <label class="feld__label" for="kontakt-email">E-Mail</label>
+      <span class="feld__linie" aria-hidden="true"></span>
+    </div>
+
+    <div class="feld">
+      <input class="feld__eingabe" id="kontakt-telefon" name="telefon" type="tel" autocomplete="tel" placeholder=" " maxlength="40" />
+      <label class="feld__label" for="kontakt-telefon">Telefon <span class="feld__zusatz">(optional)</span></label>
+      <span class="feld__linie" aria-hidden="true"></span>
+    </div>
   </div>
 
   <div class="feld">
-    <input class="feld__eingabe" id="kontakt-email" name="email" type="email" autocomplete="email" placeholder=" " required maxlength="200" />
-    <label class="feld__label" for="kontakt-email">E-Mail</label>
-  </div>
-
-  <div class="feld">
-    <input class="feld__eingabe" id="kontakt-telefon" name="telefon" type="tel" autocomplete="tel" placeholder=" " maxlength="40" />
-    <label class="feld__label" for="kontakt-telefon">Telefonnummer (optional)</label>
-  </div>
-
-  <div class="feld">
-    <textarea class="feld__eingabe feld__eingabe--mehrzeilig" id="kontakt-nachricht" name="nachricht" placeholder=" " required maxlength="5000" rows="7"></textarea>
-    <label class="feld__label" for="kontakt-nachricht">Nachricht</label>
+    <textarea class="feld__eingabe feld__eingabe--mehrzeilig" id="kontakt-nachricht" name="nachricht" placeholder=" " required maxlength="5000" rows="5"></textarea>
+    <label class="feld__label" for="kontakt-nachricht">Ihre Nachricht</label>
+    <span class="feld__linie" aria-hidden="true"></span>
   </div>
 
   {/* Honigtopf: für Menschen unsichtbar, Roboter füllen es aus */}
@@ -48,7 +63,7 @@
 
   <label class="einverstaendnis">
     <input class="einverstaendnis__kasten" name="datenschutz" type="checkbox" value="ja" required />
-    <span>
+    <span class="einverstaendnis__text">
       Sie erklären sich damit einverstanden, dass Ihre Daten zur Bearbeitung
       Ihres Anliegens verwendet werden. Weitere Informationen und
       Widerrufshinweise finden Sie in der
@@ -56,10 +71,25 @@
     </span>
   </label>
 
-  <p class="formular__meldung" data-meldung role="status" aria-live="polite"></p>
+  <div class="formular__fuss">
+    <p class="formular__meldung" data-meldung role="status" aria-live="polite"></p>
 
-  <div class="formular__senden">
-    <button class="senden" type="submit">Senden</button>
+    <button class="senden" type="submit">
+      <span class="senden__text">Senden</span>
+      <svg class="senden__pfeil" viewBox="0 0 24 12" aria-hidden="true" focusable="false">
+        <path d="M0 6h21M16 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+  </div>
+
+  {/* Erscheint nach erfolgreichem Versand — der Kreis zeichnet sich,
+      dann der Haken darin. */}
+  <div class="gelungen" data-gelungen hidden>
+    <svg class="gelungen__zeichen" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+      <circle class="gelungen__kreis" cx="24" cy="24" r="22" />
+      <path class="gelungen__haken" d="M15 24.5l6 6 12-13" />
+    </svg>
+    <p class="gelungen__text" data-gelungen-text></p>
   </div>
 </form>
 
@@ -68,54 +98,87 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    font-size: 18px;
   }
 
   .feld {
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: var(--abstand-m);
   }
 
-  /* .text-field-2: randlos, weicher Schatten, 18 px, dunkle Schrift */
+  /* E-Mail und Telefon teilen sich eine Zeile, solange Platz ist */
+  .feldpaar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--abstand-m);
+  }
+
+  /* Kein Kasten, keine Rundung, kein Schatten: nur eine Grundlinie. */
   .feld__eingabe {
     display: block;
     width: 100%;
-    padding: 20px 12px 8px;
+    padding: var(--abstand-m) 0 var(--abstand-2xs);
     border: 0;
-    border-radius: var(--radius-s);
-    background: var(--farbe-flaeche);
-    box-shadow: 1px 1px 17px -12px rgb(0 0 0 / 50%), 0 0 0 1px var(--farbe-linie);
+    border-bottom: 1px solid var(--farbe-linie);
+    border-radius: 0;
+    background: none;
     color: var(--farbe-dunkel);
-    font: inherit;
-    line-height: 1.3;
-    transition: box-shadow var(--dauer-schnell) var(--verlauf);
+    font-family: var(--schrift);
+    font-size: var(--text-m);
+    line-height: 1.4;
   }
 
   .feld__eingabe:focus {
     outline: none;
-    box-shadow: 1px 1px 17px -12px rgb(0 0 0 / 50%), 0 0 0 2px var(--farbe-primaer);
   }
 
   .feld__eingabe--mehrzeilig {
-    min-height: 200px;
+    min-height: 8em;
     resize: vertical;
   }
 
-  /* Beschriftung liegt im Feld und rückt beim Schreiben nach oben —
+  /* Die zweite Linie zeichnet sich beim Hineinklicken von links nach
+     rechts — wie der Kreis um das Schließen-Kreuz. */
+  .feld__linie {
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: var(--farbe-primaer);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 320ms var(--verlauf-betont), background-color var(--dauer-schnell) var(--verlauf);
+  }
+
+  .feld__eingabe:focus ~ .feld__linie {
+    transform: scaleX(1);
+  }
+
+  /* Ausgefülltes Feld behält eine ruhige, dünnere Linie */
+  .feld__eingabe:not(:placeholder-shown) ~ .feld__linie {
+    transform: scaleX(1);
+    opacity: 0.35;
+  }
+
+  .feld__eingabe:focus ~ .feld__linie { opacity: 1; }
+
+  /* Beschriftung steht im Feld und rückt beim Schreiben nach oben —
      so bleibt sie immer sichtbar (anders als ein Platzhalter). */
   .feld__label {
     position: absolute;
-    top: 14px;
-    left: 12px;
+    top: var(--abstand-m);
+    left: 0;
     color: var(--farbe-text-gedeckt);
+    font-family: var(--schrift-titel);
+    font-size: var(--text-m);
     pointer-events: none;
     transform-origin: left top;
-    transition: transform var(--dauer-schnell) var(--verlauf), color var(--dauer-schnell) var(--verlauf);
+    transition: transform 260ms var(--verlauf-betont), color 260ms var(--verlauf);
   }
+
+  .feld__zusatz { color: var(--farbe-text-gedeckt); }
 
   .feld__eingabe:focus + .feld__label,
   .feld__eingabe:not(:placeholder-shown) + .feld__label {
-    transform: translateY(-10px) scale(0.72);
+    transform: translateY(-1.55em) scale(0.75);
     color: var(--farbe-primaer);
   }
 
@@ -127,15 +190,17 @@
     overflow: hidden;
   }
 
-  /* .checkbox-label: 15 px, Zeilenhöhe 20 px */
+  /* ---------- Einverständnis ---------- */
+
   .einverstaendnis {
     display: flex;
-    gap: var(--abstand-2xs);
+    gap: var(--abstand-xs);
     align-items: flex-start;
-    margin: 6px 0 10px;
+    margin: var(--abstand-2xs) 0 var(--abstand-m);
     color: var(--farbe-text);
-    font-size: 15px;
-    line-height: 20px;
+    font-family: var(--schrift);
+    font-size: var(--text-s);
+    line-height: 1.45;
     cursor: pointer;
   }
 
@@ -143,49 +208,144 @@
     flex: none;
     width: 18px;
     height: 18px;
-    margin: 1px 0 0;
+    margin: 2px 0 0;
     accent-color: var(--farbe-primaer);
   }
 
+  /* ---------- Fuß: Meldung und Knopf ---------- */
+
+  .formular__fuss {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--abstand-s);
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .formular__meldung {
-    min-height: 1.4em;
-    margin: 0 0 var(--abstand-2xs);
+    flex: 1 1 14rem;
+    margin: 0;
     max-width: none;
     font-size: var(--text-s);
   }
 
+  .formular__meldung:empty { display: none; }
   .formular__meldung[data-art='fehler'] { color: var(--farbe-fehler); }
-  .formular__meldung[data-art='erfolg'] { color: var(--farbe-erfolg); font-weight: var(--gewicht-halbfett); }
+  .formular__meldung[data-art='erfolg'] { color: var(--farbe-erfolg); }
 
-  .formular__senden {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  /* .submit-button: runder Knopf, 100 px, Hausfarbe, 22 px, Gewicht 500 */
+  /* Pille in der Hausfarbe; der Pfeil gleitet beim Zeigen nach rechts */
   .senden {
-    width: 100px;
-    height: 100px;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--abstand-xs);
+    margin-left: auto;
+    padding: var(--abstand-xs) var(--abstand-l);
     border: 0;
     border-radius: var(--radius-rund);
     background: var(--farbe-primaer);
     color: var(--farbe-text-invers);
-    font: inherit;
-    font-size: 22px;
-    font-weight: 500;
-    letter-spacing: 1px;
+    font-family: var(--schrift-titel);
+    font-size: var(--text-m);
+    font-weight: var(--gewicht-halbfett);
     cursor: pointer;
-    transition: background-color 300ms var(--verlauf), transform var(--dauer-schnell) var(--verlauf);
+    transition: background-color 300ms var(--verlauf);
+  }
+
+  .senden__pfeil {
+    width: 24px;
+    height: 12px;
+    transition: transform 300ms var(--verlauf-betont);
   }
 
   .senden:hover,
-  .senden:focus-visible { background: var(--farbe-dunkel); transform: scale(1.04); }
+  .senden:focus-visible { background: var(--farbe-dunkel); }
 
-  .senden[disabled] { opacity: 0.6; cursor: wait; transform: none; }
+  .senden:hover .senden__pfeil,
+  .senden:focus-visible .senden__pfeil { transform: translateX(4px); }
+
+  .senden[disabled] {
+    opacity: 0.65;
+    cursor: wait;
+  }
+
+  /* Im Sendezustand wandert der Pfeil ruhig hin und her */
+  .senden[disabled] .senden__pfeil { animation: senden-warten 1.1s ease-in-out infinite; }
+
+  @keyframes senden-warten {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+  }
+
+  /* ---------- Bestätigung ---------- */
+
+  .gelungen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--abstand-s);
+    padding-block: var(--abstand-m);
+    text-align: center;
+  }
+
+  .gelungen[hidden] { display: none; }
+
+  .gelungen__zeichen {
+    width: 64px;
+    height: 64px;
+    fill: none;
+    stroke: var(--farbe-primaer);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .gelungen__kreis {
+    stroke-dasharray: 139;
+    stroke-dashoffset: 139;
+    transform: rotate(-90deg);
+    transform-origin: center;
+    transition: stroke-dashoffset 600ms var(--verlauf-betont);
+  }
+
+  .gelungen__haken {
+    stroke-dasharray: 30;
+    stroke-dashoffset: 30;
+    transition: stroke-dashoffset 300ms var(--verlauf-betont) 400ms;
+  }
+
+  .gelungen[data-gezeichnet] .gelungen__kreis,
+  .gelungen[data-gezeichnet] .gelungen__haken { stroke-dashoffset: 0; }
+
+  .gelungen__text {
+    max-width: 28rem;
+    margin: 0;
+    color: var(--farbe-text);
+  }
 
   /* Ungültige Felder erst nach dem ersten Sendeversuch markieren */
   .formular[data-geprueft] .feld__eingabe:invalid {
-    box-shadow: 1px 1px 17px -12px rgb(0 0 0 / 50%), 0 0 0 2px var(--farbe-fehler);
+    border-bottom-color: var(--farbe-fehler);
+  }
+
+  .formular[data-geprueft] .feld__eingabe:invalid ~ .feld__linie {
+    background: var(--farbe-fehler);
+    transform: scaleX(1);
+    opacity: 1;
+  }
+
+  @media (max-width: 560px) {
+    .feldpaar { grid-template-columns: 1fr; gap: 0; }
+    .senden { width: 100%; justify-content: center; margin-left: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .feld__linie,
+    .feld__label,
+    .senden,
+    .senden__pfeil,
+    .gelungen__kreis,
+    .gelungen__haken { transition: none; }
+    .senden[disabled] .senden__pfeil { animation: none; }
   }
 </style>
 
@@ -202,6 +362,9 @@
     const meldung = formular.querySelector<HTMLElement>('[data-meldung]')!;
     const zeit = formular.querySelector<HTMLInputElement>('[data-zeit]');
     const knopf = formular.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const gelungen = formular.querySelector<HTMLElement>('[data-gelungen]')!;
+    const gelungenText = formular.querySelector<HTMLElement>('[data-gelungen-text]')!;
+    const felder = [...formular.querySelectorAll<HTMLElement>('.feld, .feldpaar, .einverstaendnis, .formular__fuss')];
     if (zeit) zeit.value = String(Date.now());
 
     const sagen = (art: 'fehler' | 'erfolg' | '', text: string) => {
@@ -209,9 +372,24 @@
       meldung.textContent = text;
     };
 
+    /**
+     * Nach erfolgreichem Versand treten die Felder zurück und der
+     * gezeichnete Haken erscheint. Die Meldung bleibt für Vorlese-
+     * programme im `role="status"`-Absatz stehen.
+     */
+    const bestaetigen = (text: string) => {
+      gelungenText.textContent = text;
+      gelungen.hidden = false;
+      for (const feld of felder) feld.style.display = 'none';
+      requestAnimationFrame(() => { gelungen.dataset.gezeichnet = 'ja'; });
+    };
+
     /* Rückkehr ohne JavaScript: /?gesendet=1 bzw. /?fehler=1 */
     const params = new URLSearchParams(location.search);
-    if (params.get('gesendet')) sagen('erfolg', 'Danke! Ihre Nachricht ist bei uns angekommen. Wir melden uns schnellstmöglich.');
+    if (params.get('gesendet')) {
+      sagen('erfolg', 'Danke! Ihre Nachricht ist bei uns angekommen.');
+      bestaetigen('Danke! Ihre Nachricht ist bei uns angekommen. Wir melden uns schnellstmöglich.');
+    }
     if (params.get('fehler')) sagen('fehler', 'Die Nachricht konnte nicht gesendet werden. Bitte rufen Sie uns an oder schreiben Sie eine E-Mail.');
 
     formular.addEventListener('submit', async (e) => {
@@ -243,7 +421,8 @@
           formular.reset();
           delete formular.dataset.geprueft;
           if (zeit) zeit.value = String(Date.now());
-          sagen('erfolg', 'Danke! Ihre Nachricht ist bei uns angekommen. Wir melden uns schnellstmöglich.');
+          sagen('erfolg', 'Danke! Ihre Nachricht ist bei uns angekommen.');
+          bestaetigen('Danke! Ihre Nachricht ist bei uns angekommen. Wir melden uns schnellstmöglich.');
         } else {
           sagen('fehler', ergebnis.fehler || 'Die Nachricht konnte nicht gesendet werden. Bitte rufen Sie uns an oder schreiben Sie eine E-Mail.');
         }

@@ -61,6 +61,39 @@ const { id, titel, kurz, icon } = Astro.props;
     box-shadow: 0 18px 40px -12px rgb(0 0 0 / 30%);
   }
 
+  /* Handys: kompakter. Symbol links neben dem Titel statt darüber,
+     weniger Innenabstand, Anriss auf zwei Zeilen — sonst stehen zwölf
+     Kacheln à 200 px untereinander. */
+  @media (max-width: 600px) {
+    .kachel {
+      display: grid;
+      grid-template-columns: 2.5rem 1fr;
+      gap: var(--abstand-2xs) var(--abstand-s);
+      align-items: center;
+      padding: var(--abstand-s);
+    }
+
+    .kachel__icon {
+      grid-row: 1;
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+
+    .kachel__titel {
+      grid-row: 1;
+      font-size: var(--text-m);
+    }
+
+    .kachel__kurz {
+      grid-column: 1 / -1;
+      -webkit-line-clamp: 2;
+    }
+
+    /* „Mehr erfahren →" ist auf dem Handy überflüssig — die ganze
+       Kachel ist ohnehin anklickbar. */
+    .kachel__mehr { display: none; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .kachel { transform: none; background-color: #fff; }
   }
