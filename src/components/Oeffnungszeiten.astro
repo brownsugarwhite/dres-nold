@@ -97,7 +97,8 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
   }
 
   /* Der Scrollweg, über den die Blase hereinfährt — muss zu `ozWeg()`
-     in scripts/scrollwege.ts passen. */
+     in scripts/scrollwege.ts passen. Gezählt wird er wie Webflows
+     „while scrolling in view": über Scrollweg PLUS eine Fensterhöhe. */
   .ozraum,
   .ozbereich { --oz-weg: 350vh; }
   @media (max-width: 991px) {
@@ -105,17 +106,24 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
     .ozbereich { --oz-weg: 450vh; }
   }
 
+  /* Bei 71 % des Ablaufs steht die Blase mit ausgefahrenem Zipfel, die
+     Leisten tauschen (OZ_RAST in scripts/scrollwege.ts). Genau dort
+     endet der Bereich: Die Bühne löst sich vom Fenster, und die Blase
+     scrollt von da an mit dem Inhalt weiter (Florian, 14. September
+     2026), statt bis zum Ende des Scrollwegs stehen zu bleiben. */
+  .ozraum,
+  .ozbereich { --oz-ende: calc(0.71 * (var(--oz-weg) + 100vh)); }
+
   /* Nimmt den Platz im Seitenfluss ein und deckt den grauen Grund ab.
      Höhe von `.trigger-oz-scroll` / `.oz` in der mobilen Vorlage. */
   .ozraum {
     position: relative;
     z-index: 2;
-    /* Um die Ruhelage der Blase kürzer als der Bereich darüber: so viel
-       steht unter der Blase für den Zipfel frei. Ist er wieder
-       eingezogen, wäre das nur leerer Raum vor der Begrüßung — der
-       folgende Inhalt rückt deshalb um diesen Betrag auf. Der Wert wird
-       vom Skript gesetzt; die Vorgabe entspricht der mobilen Vorlage. */
-    height: calc(var(--oz-weg) - var(--oz-ruhe, 264px));
+    /* Der Inhalt beginnt dort, wo im Moment des Freigebens die Spitze
+       des Zipfels steht: an der Oberkante der Symbolleiste (110 px).
+       Fährt die Leiste weg, kommt darunter schon die Begrüßung hervor;
+       zieht sich der Zipfel ein, schließt der Inhalt an die Blase an. */
+    height: calc(var(--oz-ende) - 110px);
     background: var(--farbe-flaeche);
   }
 
@@ -128,7 +136,7 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
     left: 0;
     z-index: 30;
     width: 100%;
-    height: var(--oz-weg);
+    height: var(--oz-ende);
   }
 
   /* Bleibt stehen, während der Bereich durchläuft.
@@ -162,9 +170,6 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
     position: relative;
     padding: var(--abstand-m) var(--abstand-l);
     background: var(--farbe-flaeche);
-    /* Nie höher als das Fenster — abzüglich Leiste und Zipfel */
-    max-height: calc(100vh - 190px);
-    overflow-y: auto;
   }
 
   /* Die Zeichnung hängt an der Unterkante der Fläche und ist so breit
@@ -216,20 +221,13 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
     align-items: start;
   }
 
-  /* Handys: Listen untereinander, und zwar so kompakt, dass die ganze
-     Blase samt Zipfel über der Symbolleiste ins Fenster passt — nichts
-     wird abgeschnitten, nichts rollt in der Blase (Vorlage: Überschrift
-     16 px, enge Zeilen). Notfalls, auf sehr kleinen Fenstern, rollt sie
-     doch — besser als unerreichbare Zeiten. */
+  /* Handys: Listen untereinander. Die Blase darf höher sein als der
+     Platz über der Leiste — sie ist kein Rollkasten; was oben hinaus-
+     steht, kommt beim Weiterscrollen zum Vorschein. */
   @media (max-width: 60rem) {
     .ozblase { width: calc(100vw - 2 * var(--abstand-s)); }
-    .ozblase__flaeche {
-      padding: var(--abstand-s) var(--abstand-m);
-      max-height: calc(100vh - var(--oz-ruhe, 264px) - 48px);
-      max-height: calc(100dvh - var(--oz-ruhe, 264px) - 48px);
-    }
-    .ozblase__titel { margin-bottom: var(--abstand-xs); font-size: 20px; }
-    .ozblase__spalten { grid-template-columns: 1fr; gap: var(--abstand-xs); }
+    .ozblase__flaeche { padding: var(--abstand-m); }
+    .ozblase__spalten { grid-template-columns: 1fr; gap: var(--abstand-m); }
   }
 
   /* Ohne Bewegung: steht ruhig im Seitenfluss */
