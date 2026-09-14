@@ -1076,9 +1076,13 @@ const kategorien = (leistungen.kategorien ?? [])
            nur der Scheitel weitet sich mit der Höhe, die Bögen werden
            dadurch von breit-flach zu 40-px-Kreisen und die Seiten steiler. */
         const aussen = boxBreite / 2 + ECKE;                   // halbe Fußbreite, fest
-        const w = boxBreite * (0.45 + 0.55 * weich(p));         // Breite des Scheitels
+        /* Scheitelbreite: beginnt bei der halben Fußbreite — dann sind die
+           Bögen genau so breit wie der halbe Scheitel und stoßen in der
+           Mitte aneinander (reiner Hügel ohne Plateau). Breiter dürfen
+           die Bögen nie sein, sonst liefe die Linie über sich zurück. */
+        const w = aussen + (boxBreite - aussen) * weich(p);
         const fa = Math.min(ECKE, h / 2);                       // Höhe der Bögen
-        const aB = Math.max(fa, aussen - w / 2);                // Breite der Bögen
+        const aB = Math.min(w / 2, Math.max(fa, aussen - w / 2)); // Breite der Bögen
         const k = 0.5523;
         const xL = mitte - w / 2;
         const xR = mitte + w / 2;
