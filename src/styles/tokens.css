@@ -46,6 +46,8 @@
   --text-l: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
   --text-xl: clamp(1.5rem, 1.3rem + 1vw, 2.25rem);
   --text-xxl: clamp(2rem, 1.6rem + 2vw, 3.5rem);
+  /* Abschnittsüberschriften der Startseite — 60 px wie `.heading` der Vorlage */
+  --text-titel: clamp(2.25rem, 1.5rem + 2.6vw, 3.75rem);
 
   --gewicht-normal: 400;
   --gewicht-halbfett: 600;

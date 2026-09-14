@@ -113,6 +113,18 @@ img {
   color: var(--farbe-primaer);
 }
 
+/* Abschnittsüberschriften der Startseite: groß und mittig wie `.heading`
+   der Vorlage (60 px). Der Inhalt darunter bleibt linksbündig. */
+main.seiteninhalt h2:not(.ohne-verlauf),
+[data-verlauf] > h2,
+[data-verlauf] > .inhalt > h2 {
+  margin-inline: auto;
+  font-size: var(--text-titel);
+  line-height: 1;
+  text-align: center;
+  text-wrap: balance;
+}
+
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   :is(main, [data-verlauf]) h1:not(.ohne-verlauf),
   :is(main, [data-verlauf]) h2:not(.ohne-verlauf) {

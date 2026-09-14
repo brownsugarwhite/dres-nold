@@ -125,9 +125,11 @@ const kategorien = (leistungen.kategorien ?? [])
               <div class="aufklapp__spalten">
                 {kategorien.map((k, i) => (
                   <a class="oberpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}`}>
-                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="60" height="60" />}
-                    <span class="oberpunkt__titel">{k.titel}</span>
-                    {k.kurz && <span class="oberpunkt__kurz">{k.kurz}</span>}
+                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="72" height="72" />}
+                    <span class="oberpunkt__text">
+                      <span class="oberpunkt__titel">{k.titel}</span>
+                      {k.kurz && <span class="oberpunkt__kurz">{k.kurz}</span>}
+                    </span>
                   </a>
                 ))}
               </div>
@@ -211,9 +213,11 @@ const kategorien = (leistungen.kategorien ?? [])
               <div class="aufklapp__spalten">
                 {kategorien.map((k, i) => (
                   <a class="oberpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}`}>
-                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="60" height="60" />}
-                    <span class="oberpunkt__titel">{k.titel}</span>
-                    {k.kurz && <span class="oberpunkt__kurz">{k.kurz}</span>}
+                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="72" height="72" />}
+                    <span class="oberpunkt__text">
+                      <span class="oberpunkt__titel">{k.titel}</span>
+                      {k.kurz && <span class="oberpunkt__kurz">{k.kurz}</span>}
+                    </span>
                   </a>
                 ))}
               </div>
@@ -313,10 +317,14 @@ const kategorien = (leistungen.kategorien ?? [])
 
   /* Das Aufklappmenü ragt aus der Leiste heraus — solange es offen ist,
      darf sie den Überlauf nicht beschneiden. */
-  .navigation:has(.aufklapp[data-offen]) .kopfleiste,
-  .navigation:has(.aufklapp[data-offen]) { overflow: visible; }
+  .navigation:has(.aufklapp[data-aktiv]) .kopfleiste,
+  .navigation:has(.aufklapp[data-aktiv]) { overflow: visible; }
 
-  .fussleiste:has(.aufklapp[data-offen]) { overflow: visible; }
+  .fussleiste:has(.aufklapp[data-aktiv]) { overflow: visible; }
+
+  /* Solange die Blase gezeichnet wird, übernimmt sie die Punktlinie */
+  .navigation[data-ohne-linie],
+  .fussleiste[data-ohne-linie] { background-image: none; }
 
   .kopfleiste__inhalt {
     display: flex;
@@ -588,98 +596,93 @@ const kategorien = (leistungen.kategorien ?? [])
     .menuepunkt:hover .menuepunkt__rolle { animation: none; }
   }
 
-  /* ---------- Aufklappmenü ---------- */
+  /* ---------- Aufklappmenü („Blase") ----------
+     Die Punktlinie der Leiste wölbt sich zu einem abgerundeten Feld
+     auf — nach oben aus der Symbolleiste, nach unten aus der Kopfleiste.
+     Gezeichnet wird das als SVG (Skript unten: `blaseZeichnen`), das
+     Feld selbst ist nur der Inhalt darüber. */
   .aufklapp {
     position: relative;
   }
 
-  /* Klappt unter dem Menüpunkt auf. Solange die Leiste unten steht
-     (Seite ganz oben), öffnet es nach oben; sobald sie oben klebt,
-     nach unten. */
   .aufklapp__inhalt {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%);
     z-index: var(--ebene-menue);
-    min-width: 34rem;
-    padding: var(--abstand-m);
-    background: var(--farbe-flaeche);
+    width: min(760px, 100vw - 2rem);
+    padding: var(--abstand-l) var(--abstand-xl);
+    transform: translateX(-50%);
   }
 
-  /* Untere Leiste: das Feld steht über der Leiste */
-  .aufklapp[data-richtung='hoch'] .aufklapp__inhalt {
-    bottom: 100%;
-    box-shadow: 0 -12px 32px rgb(19 0 13 / 12%);
-  }
-
-  /* Obere Leiste: darunter */
-  .aufklapp[data-richtung='runter'] .aufklapp__inhalt {
-    top: 100%;
-    box-shadow: 0 12px 32px rgb(19 0 13 / 12%);
-  }
+  /* Untere Leiste: das Feld steht über der Leiste; obere: darunter */
+  .aufklapp[data-richtung='hoch'] .aufklapp__inhalt { bottom: 100%; padding-bottom: calc(var(--abstand-l) + 24px); }
+  .aufklapp[data-richtung='runter'] .aufklapp__inhalt { top: 100%; padding-top: calc(var(--abstand-l) + 24px); }
 
   .aufklapp__inhalt[hidden] { display: none; }
 
-  /* Die gestrichelte Linie fährt aus dem Menüpunkt heraus —
-     nach oben, wenn das Menü unten steht, sonst nach unten. */
-  .aufklapp__linie {
+  /* Die Zeichnung der Wölbung: liegt über die volle Breite auf der
+     Punktlinie der Leiste. Größe setzt das Skript. */
+  :global(.blase) {
     position: absolute;
     left: 0;
-    right: 0;
-    height: 1px;
-    background: url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
-    background-size: auto 1px;
-    transition:
-      top 300ms cubic-bezier(0, 0, 0.58, 1),
-      bottom 300ms cubic-bezier(0, 0, 0.58, 1);
+    /* Knapp unter dem Inhalt des Feldes — die weiße Fläche darf ihn nicht verdecken */
+    z-index: calc(var(--ebene-menue) - 1);
+    display: block;
+    overflow: visible;
+    pointer-events: none;
   }
 
-  /* Sie startet an der Leiste und fährt an die andere Kante des Feldes —
-     nach oben, wenn die Leiste unten steht, sonst nach unten. */
-  .aufklapp[data-richtung='hoch'] .aufklapp__linie { bottom: 0; }
-  .aufklapp[data-richtung='hoch'][data-offen] .aufklapp__linie { bottom: calc(100% - 1px); }
+  :global(.blase__flaeche) { fill: var(--farbe-flaeche); }
 
-  .aufklapp[data-richtung='runter'] .aufklapp__linie { top: 0; }
-  .aufklapp[data-richtung='runter'][data-offen] .aufklapp__linie { top: calc(100% - 1px); }
+  :global(.blase__linie) {
+    fill: none;
+    stroke: var(--farbe-primaer);
+    stroke-width: 1;
+    stroke-dasharray: 1 3;
+  }
 
-  /* Die Oberpunkte erscheinen nacheinander von links nach rechts */
+  :global(.blase__pfeil) {
+    fill: none;
+    stroke: var(--farbe-primaer);
+    stroke-width: 1;
+    stroke-linecap: round;
+  }
+
+  /* Die Oberpunkte erscheinen nacheinander, leicht von unten */
   .oberpunkt {
     opacity: 0;
-    transform: translateX(-16px);
+    transform: translateY(10px);
     transition:
-      opacity 300ms cubic-bezier(0, 0, 0.58, 1),
-      transform 300ms cubic-bezier(0, 0, 0.58, 1),
+      opacity 360ms cubic-bezier(0.2, 0, 0, 1),
+      transform 360ms cubic-bezier(0.2, 0, 0, 1),
       background-color var(--dauer-schnell) var(--verlauf);
-    transition-delay: calc(120ms + var(--stufe, 0) * 90ms), calc(120ms + var(--stufe, 0) * 90ms), 0ms;
+    transition-delay: calc(200ms + var(--stufe, 0) * 70ms), calc(200ms + var(--stufe, 0) * 70ms), 0ms;
   }
 
   .aufklapp[data-offen] .oberpunkt {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .aufklapp__linie,
-    .oberpunkt { transition: none; }
-    .oberpunkt { opacity: 1; transform: none; }
+    .oberpunkt { transition: none; opacity: 1; transform: none; }
   }
 
   .aufklapp__spalten {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: var(--abstand-m);
   }
 
-  /* Ein Oberpunkt je Kategorie — Symbol, Titel, Kurztext */
+  /* Ein Oberpunkt je Kategorie — Symbol links, Titel und Kurztext rechts */
   .oberpunkt {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: var(--abstand-3xs);
-    padding: var(--abstand-s);
+    gap: var(--abstand-m);
+    padding: var(--abstand-2xs) var(--abstand-s);
+    margin: 0 calc(-1 * var(--abstand-s));
     border-radius: var(--radius-m);
     color: var(--farbe-primaer);
-    text-align: center;
     text-decoration: none;
   }
 
@@ -687,21 +690,28 @@ const kategorien = (leistungen.kategorien ?? [])
   .oberpunkt:focus-visible { background: var(--farbe-flaeche-gedeckt); }
 
   .oberpunkt__symbol {
-    width: 60px;
-    height: 60px;
-    margin-bottom: 5px;
+    flex: none;
+    width: 72px;
+    height: 72px;
     object-fit: contain;
   }
 
+  .oberpunkt__text {
+    display: flex;
+    flex-direction: column;
+  }
+
   .oberpunkt__titel {
-    font-size: 16px;
+    font-size: 28px;
     font-weight: var(--gewicht-halbfett);
+    line-height: 1.2;
   }
 
   .oberpunkt__kurz {
     color: var(--farbe-text);
-    font-size: 14px;
+    font-size: 20px;
     font-weight: 300;
+    line-height: 1.3;
   }
 
   /* ---------- Symbolleiste unten ---------- */
@@ -905,28 +915,136 @@ const kategorien = (leistungen.kategorien ?? [])
     window.addEventListener('resize', beiScroll, { passive: true });
     pruefen();
 
-    // ---- Aufklappmenü ----
+    // Beim Seitenwechsel tauscht Astro den <body> samt Attributen aus —
+    // die Markierung wäre weg und die Kopfleiste würde kurz aufblitzen.
+    // Deshalb sofort nach dem Tausch (noch vor dem ersten Bild) neu setzen.
+    document.addEventListener('astro:after-swap', () => {
+      // Als Microtask: erst nachdem andere Zuhörer die Scrollposition
+      // gesetzt haben (scripts/uebergaenge.ts), aber noch vor dem Bild.
+      queueMicrotask(() => { gescrollt = false; pruefen(); });
+    });
+
+    // ---- Aufklappmenü („Blase") ----
+    // Die Punktlinie der Leiste wölbt sich zu einem abgerundeten Feld.
+    // Gezeichnet als SVG über die volle Breite: links und rechts die
+    // Linie, in der Mitte die Wölbung, deren Höhe von 0 auf die Höhe
+    // des Inhalts wächst — mit leichtem Überschwingen, damit es
+    // organisch wirkt. Ein kleiner Pfeil zeigt auf den Menüpunkt.
     document.querySelectorAll<HTMLElement>('[data-aufklapp]').forEach((huelle) => {
       if (huelle.dataset.bereit) return;
       huelle.dataset.bereit = 'ja';
 
       const knopf = huelle.querySelector<HTMLButtonElement>('button[aria-expanded]');
       const inhalt = huelle.querySelector<HTMLElement>('.aufklapp__inhalt');
-      if (!knopf || !inhalt) return;
+      const hoch = huelle.dataset.richtung === 'hoch';
+      const leiste = hoch ? huelle.closest<HTMLElement>('.fussleiste') : huelle.closest<HTMLElement>('.navigation');
+      if (!knopf || !inhalt || !leiste) return;
+
+      const wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Die Zeichnung
+      const NS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('class', 'blase');
+      svg.setAttribute('aria-hidden', 'true');
+      const flaeche = document.createElementNS(NS, 'path'); flaeche.setAttribute('class', 'blase__flaeche');
+      const linie = document.createElementNS(NS, 'path'); linie.setAttribute('class', 'blase__linie');
+      const pfeil = document.createElementNS(NS, 'path'); pfeil.setAttribute('class', 'blase__pfeil');
+      svg.append(flaeche, linie, pfeil);
+      svg.style.display = 'none';
+      leiste.append(svg);
+
+      let anteil = 0;        // 0 = Linie, 1 = voll aufgewölbt
+      let ziel = 0;
+      let laeuft = false;
+      let hoehe = 0;         // Höhe der Wölbung in px
+      let start = 0, von = 0, dauer = 520;
+      const s = hoch ? -1 : 1;   // Richtung: nach oben oder unten
+
+      /* Weich mit leichtem Überschwingen (nur beim Öffnen) */
+      const kurveAuf = (t: number) => { const c = 1.25; const u = t - 1; return 1 + (c + 1) * u * u * u + c * u * u; };
+      const kurveZu = (t: number) => 1 - Math.pow(1 - t, 3);
+
+      const zeichnen = () => {
+        const breite = document.documentElement.clientWidth;
+        const boxBreite = Math.min(760, breite - 32);
+        const xL = (breite - boxBreite) / 2;
+        const xR = xL + boxBreite;
+        const h = hoehe * anteil;
+        const r = Math.min(90, Math.abs(h) / 2);
+        const k = 0.5523 * r;
+        const rand = 4;
+        const y0 = hoch ? hoehe + rand : rand;   // Grundlinie im SVG
+
+        svg.setAttribute('width', String(breite));
+        svg.setAttribute('height', String(hoehe + 2 * rand));
+        svg.setAttribute('viewBox', `0 0 ${breite} ${hoehe + 2 * rand}`);
+        /* Die Grundlinie der Zeichnung liegt genau auf der Punktlinie der
+           Leiste: oben an der Symbolleiste bzw. unten an der Kopfleiste. */
+        svg.style[hoch ? 'bottom' : 'top'] = `calc(100% - ${rand}px)`;
+
+        const f = (n: number) => n.toFixed(2);
+        const woelbung =
+          `L${f(xL - r)} ${f(y0)} C${f(xL - r + k)} ${f(y0)} ${f(xL)} ${f(y0 + s * (r - k))} ${f(xL)} ${f(y0 + s * r)} ` +
+          `L${f(xL)} ${f(y0 + s * (h - r))} C${f(xL)} ${f(y0 + s * (h - r + k))} ${f(xL + r - k)} ${f(y0 + s * h)} ${f(xL + r)} ${f(y0 + s * h)} ` +
+          `L${f(xR - r)} ${f(y0 + s * h)} C${f(xR - r + k)} ${f(y0 + s * h)} ${f(xR)} ${f(y0 + s * (h - r + k))} ${f(xR)} ${f(y0 + s * (h - r))} ` +
+          `L${f(xR)} ${f(y0 + s * r)} C${f(xR)} ${f(y0 + s * (r - k))} ${f(xR + r - k)} ${f(y0)} ${f(xR + r)} ${f(y0)} `;
+        linie.setAttribute('d', `M0 ${f(y0)} ${woelbung}L${breite} ${f(y0)}`);
+        flaeche.setAttribute('d', `M${f(xL - r)} ${f(y0)} ${woelbung}Z`);
+
+        /* Kleiner Pfeil an der Grundlinie, auf den Menüpunkt zeigend */
+        const kr = knopf.getBoundingClientRect();
+        const px = kr.left + kr.width / 2;
+        const py = y0 + s * 14;
+        const sicht = Math.max(0, (anteil - 0.6) / 0.4);
+        pfeil.setAttribute('d', `M${f(px - 10)} ${f(py + s * -8)} L${f(px)} ${f(py)} L${f(px + 10)} ${f(py + s * -8)}`);
+        pfeil.setAttribute('opacity', f(sicht));
+
+        /* Der Inhalt sitzt mittig im Fenster, nicht unter dem Menüpunkt */
+        const hr = huelle.getBoundingClientRect();
+        inhalt.style.left = `${breite / 2 - hr.left}px`;
+      };
+
+      const schritt = (jetzt: number) => {
+        const t = Math.min(1, (jetzt - start) / dauer);
+        const kurve = ziel === 1 ? kurveAuf : kurveZu;
+        anteil = von + (ziel - von) * kurve(t);
+        zeichnen();
+        if (t < 1) { requestAnimationFrame(schritt); return; }
+        laeuft = false;
+        anteil = ziel;
+        if (ziel === 0) {
+          svg.style.display = 'none';
+          delete leiste.dataset.ohneLinie;
+          delete huelle.dataset.aktiv;
+          if (knopf.getAttribute('aria-expanded') !== 'true') inhalt.hidden = true;
+        }
+      };
+
+      const animieren = (nachZiel: number) => {
+        ziel = nachZiel;
+        von = anteil;
+        start = performance.now();
+        dauer = nachZiel === 1 ? 560 : 380;
+        if (wenigerBewegung) { anteil = ziel; zeichnen(); dauer = 0; start = -1e9; }
+        if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
+      };
 
       const setzen = (offen: boolean) => {
+        if ((knopf.getAttribute('aria-expanded') === 'true') === offen) return;
         knopf.setAttribute('aria-expanded', String(offen));
         if (offen) {
           inhalt.hidden = false;
-          // Zwei Bilder abwarten, sonst springt das Feld ohne Übergang auf
-          requestAnimationFrame(() => requestAnimationFrame(() => {
-            if (knopf.getAttribute('aria-expanded') === 'true') huelle.dataset.offen = 'ja';
-          }));
+          hoehe = inhalt.getBoundingClientRect().height;
+          huelle.dataset.aktiv = 'ja';
+          leiste.dataset.ohneLinie = 'ja';
+          svg.style.display = 'block';
+          zeichnen();
+          requestAnimationFrame(() => { huelle.dataset.offen = 'ja'; });
+          animieren(1);
         } else {
           delete huelle.dataset.offen;
-          window.setTimeout(() => {
-            if (knopf.getAttribute('aria-expanded') !== 'true') inhalt.hidden = true;
-          }, 300);
+          animieren(0);
         }
       };
 
@@ -934,12 +1052,16 @@ const kategorien = (leistungen.kategorien ?? [])
         setzen(knopf.getAttribute('aria-expanded') !== 'true');
       });
 
-      // Auf Zeigegeräten öffnet auch das Überfahren
+      // Auf Zeigegeräten öffnet auch das Überfahren — die Blase gehört dazu
+      let schliessTimer = 0;
       huelle.addEventListener('pointerenter', (e) => {
-        if ((e as PointerEvent).pointerType === 'mouse') setzen(true);
+        if ((e as PointerEvent).pointerType !== 'mouse') return;
+        window.clearTimeout(schliessTimer);
+        setzen(true);
       });
       huelle.addEventListener('pointerleave', (e) => {
-        if ((e as PointerEvent).pointerType === 'mouse') setzen(false);
+        if ((e as PointerEvent).pointerType !== 'mouse') return;
+        schliessTimer = window.setTimeout(() => setzen(false), 120);
       });
 
       // Schließen, wenn der Fokus den Bereich verlässt
@@ -960,6 +1082,10 @@ const kategorien = (leistungen.kategorien ?? [])
           knopf.focus();
         }
       });
+
+      window.addEventListener('resize', () => { if (huelle.dataset.aktiv) { hoehe = inhalt.getBoundingClientRect().height; zeichnen(); } }, { passive: true });
+      // Beim Seitenwechsel schließen
+      document.addEventListener('astro:before-preparation', () => setzen(false));
     });
 
     // ---- Mobiles Ausklappmenü ----

@@ -166,6 +166,66 @@
   z-index: 100;
 }
 
+/* --- Blättern zwischen zwei Leistungen / Beiträgen ---------------
+   Ausgelöst über „Vorherige / Nächste" (scripts/uebergaenge.ts setzt
+   `data-uebergang` auf <html>). Die alte Seite schiebt sich zur Seite
+   hinaus, die neue kommt von der anderen Seite herein. Der Rest bleibt
+   stehen — nichts verschwimmt. */
+@keyframes uebergang-raus-links { to { opacity: 0; transform: translateX(-12%); } }
+@keyframes uebergang-raus-rechts { to { opacity: 0; transform: translateX(12%); } }
+@keyframes uebergang-rein-links { from { opacity: 0; transform: translateX(-12%); } }
+@keyframes uebergang-rein-rechts { from { opacity: 0; transform: translateX(12%); } }
+
+html[data-uebergang] ::view-transition-old(root),
+html[data-uebergang] ::view-transition-new(root) {
+  animation: none;
+}
+
+/* Die Hüllen der Artikel wandern nicht — ihre Bilder gleiten */
+html[data-uebergang] ::view-transition-group(.karte),
+html[data-uebergang] ::view-transition-group(seiteninhalt) {
+  animation: none;
+}
+
+html[data-uebergang] ::view-transition-old(.karte),
+html[data-uebergang] ::view-transition-old(seiteninhalt) {
+  animation-duration: var(--dauer-uebergang);
+  animation-timing-function: var(--verlauf-betont);
+  animation-delay: 0ms;
+  animation-fill-mode: forwards;
+}
+
+html[data-uebergang] ::view-transition-new(.karte),
+html[data-uebergang] ::view-transition-new(seiteninhalt) {
+  animation-duration: var(--dauer-uebergang);
+  animation-timing-function: var(--verlauf-betont);
+  animation-delay: 0ms;
+  animation-fill-mode: both;
+}
+
+html[data-uebergang='vor'] ::view-transition-old(.karte),
+html[data-uebergang='vor'] ::view-transition-old(seiteninhalt) { animation-name: uebergang-raus-links; }
+html[data-uebergang='vor'] ::view-transition-new(.karte),
+html[data-uebergang='vor'] ::view-transition-new(seiteninhalt) { animation-name: uebergang-rein-rechts; }
+
+html[data-uebergang='zurueck'] ::view-transition-old(.karte),
+html[data-uebergang='zurueck'] ::view-transition-old(seiteninhalt) { animation-name: uebergang-raus-rechts; }
+html[data-uebergang='zurueck'] ::view-transition-new(.karte),
+html[data-uebergang='zurueck'] ::view-transition-new(seiteninhalt) { animation-name: uebergang-rein-links; }
+
+/* Symbol und Titel gleiten mit dem Artikel, statt zu wandern */
+html[data-uebergang] ::view-transition-group(.symbol),
+html[data-uebergang] ::view-transition-group(.titel),
+html[data-uebergang] ::view-transition-group(.bild) {
+  animation: none;
+}
+html[data-uebergang] ::view-transition-old(.symbol),
+html[data-uebergang] ::view-transition-old(.titel),
+html[data-uebergang] ::view-transition-old(.bild) { animation: uebergang-blende-aus calc(var(--dauer-uebergang) * 0.4) both; }
+html[data-uebergang] ::view-transition-new(.symbol),
+html[data-uebergang] ::view-transition-new(.titel),
+html[data-uebergang] ::view-transition-new(.bild) { animation: uebergang-blende-ein calc(var(--dauer-uebergang) * 0.5) both; animation-delay: calc(var(--dauer-uebergang) * 0.4); }
+
 /*
   ÜBER CSS HINAUS
   ------------------------------------------------------------------

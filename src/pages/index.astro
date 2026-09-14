@@ -125,23 +125,35 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
   }
 
   .abschnitt__einleitung {
+    max-width: none;
+    margin-bottom: var(--abstand-l);
     color: var(--farbe-text-gedeckt);
-    margin-bottom: var(--abstand-m);
+    text-align: center;
   }
 
   .gruppe {
-    margin-top: var(--abstand-m);
+    margin-top: var(--abstand-l);
     font-size: var(--text-m);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--farbe-text-gedeckt);
+    text-align: center;
   }
 
+  /* Kacheln: mittig gesetzt. Bleiben in der letzten Reihe weniger übrig,
+     werden sie etwas breiter und stehen zentriert — bis zu einer
+     Höchstbreite, damit eine einzelne Kachel nicht die Zeile füllt. */
   .kacheln {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: var(--abstand-s);
     margin-bottom: var(--abstand-m);
+  }
+
+  .kacheln > :global(.kachel) {
+    flex: 1 1 15rem;
+    max-width: 24rem;
   }
 
   .aerzte {

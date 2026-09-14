@@ -229,6 +229,11 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
           { name: 'text', label: 'Text', typ: 'richtext' },
           { name: 'bild', label: 'Bild (optional)', typ: 'bild', ordner: 'abschnitte' },
           { name: 'bild_alt', label: 'Bildbeschreibung', typ: 'text' },
+          { name: 'bild_anzeige', label: 'Bild anzeigen', typ: 'auswahl', optionen: [
+            { wert: 'links', label: 'Links, halbe Breite — Text umfließt es' },
+            { wert: 'rechts', label: 'Rechts, halbe Breite — Text umfließt es' },
+            { wert: 'voll', label: 'Volle Breite über dem Text' },
+          ] },
           { name: 'link_text', label: 'Verweis: Beschriftung', typ: 'text' },
           { name: 'link_ziel', label: 'Verweis: Adresse', typ: 'text' },
           { name: 'pdf_text', label: 'PDF-Knopf: Beschriftung', typ: 'text' },

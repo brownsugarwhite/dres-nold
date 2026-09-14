@@ -6,32 +6,46 @@
  *    aus der heraus die Seite wächst. Damit das auch bei blitzschnellem
  *    Laden sichtbar ist, wartet der Wechsel kurz auf die Bewegung.
  *
- * 2. Zurück: Der Schließen-Knopf, der Verweis „Alle Leistungen" und die
- *    Escape-Taste gehen im Verlauf zurück, wenn der vorige Eintrag von
- *    dieser Seite stammt — dann läuft der Übergang rückwärts und die
- *    alte Scrollposition steht wieder. Kam der Besucher von außen
- *    (Google, geteilter Link), führt der Verweis normal zur Übersicht.
+ * 2. Schließen: Schließen-Kreuz, „Alle Leistungen" und Escape führen zur
+ *    Übersicht — so, dass die gerade offene Leistung dort mittig im
+ *    Fenster steht. Das gilt auch, wenn man in der offenen Ansicht mit
+ *    „Vorherige / Nächste" weitergeblättert hat: Die Seite morpht dann
+ *    in die Karte der zuletzt gesehenen Leistung zurück.
  *
- * Astro merkt sich in `history.state.index`, der wievielte Eintrag
- * innerhalb dieser Seite gerade offen ist; 0 heißt „von außen gekommen".
+ * 3. Blättern: „Vorherige / Nächste" schiebt die Seiten seitlich
+ *    durch (styles/uebergaenge.css, `html[data-uebergang]`).
+ *
+ * 4. Das Schließen-Kreuz bleibt beim Scrollen oben stehen; sobald es
+ *    „klebt", zeichnet sich ein Kreis darum.
  */
 import { navigate } from 'astro:transitions/client';
 
 const ABHEBE_DAUER = 220; // ms — siehe `[data-gehoben]` in LeistungKachel/Neuigkeiten
+const MERKER = 'uebergang-ziel';
 
 const pause = (ms: number) => new Promise<void>((f) => setTimeout(f, ms));
 
+type Vorbereitung = Event & {
+  sourceElement?: Element | null;
+  loader: () => Promise<void>;
+  direction: string;
+  to: URL;
+};
+
 document.addEventListener('astro:before-preparation', (ereignis) => {
-  const e = ereignis as Event & {
-    sourceElement?: Element | null;
-    loader: () => Promise<void>;
-    direction: string;
-  };
-  const karte = e.sourceElement?.closest?.('[data-karte]');
+  const e = ereignis as Vorbereitung;
+  const quelle = e.sourceElement ?? null;
+
+  /* Blättern: Richtung merken, bis der Wechsel vorbei ist */
+  const blaettern = quelle?.closest?.('[data-blaettern]');
+  if (blaettern) {
+    document.documentElement.dataset.uebergang = blaettern.getAttribute('data-blaettern') || 'vor';
+  }
+
+  /* Abheben */
+  const karte = quelle?.closest?.('[data-karte]');
   if (!karte) return;
-
   karte.setAttribute('data-gehoben', '');
-
   const laden = e.loader;
   const start = performance.now();
   e.loader = async () => {
@@ -41,23 +55,45 @@ document.addEventListener('astro:before-preparation', (ereignis) => {
   };
 });
 
-/** Zurück im Verlauf — oder zur angegebenen Adresse, wenn es keinen gibt. */
-function zurueck(ersatz: string) {
-  const zustand = history.state as { index?: number } | null;
-  if (zustand && typeof zustand.index === 'number' && zustand.index > 0) {
-    history.back();
-  } else {
-    navigate(ersatz);
-  }
+/* Nach dem Tausch: die Karte der zuletzt offenen Leistung mittig
+   stellen — noch bevor der Browser das neue Bild aufnimmt, damit der
+   Morph dort endet, wo die Karte dann steht. */
+document.addEventListener('astro:after-swap', () => {
+  let ziel = '';
+  try { ziel = sessionStorage.getItem(MERKER) || ''; sessionStorage.removeItem(MERKER); } catch { /* egal */ }
+  if (!ziel) return;
+  const karte = document.querySelector<HTMLElement>(`[data-karte][href="${ziel}"]`);
+  if (!karte) return;
+  const r = karte.getBoundingClientRect();
+  const oben = window.scrollY + r.top - (window.innerHeight - r.height) / 2;
+  window.scrollTo({ top: Math.max(0, oben), behavior: 'instant' as ScrollBehavior });
+});
+
+document.addEventListener('astro:page-load', () => {
+  delete document.documentElement.dataset.uebergang;
+  schliessenKlebenLassen();
+});
+
+/** Zur Übersicht — die aktuelle Seite soll dort als Karte mittig stehen. */
+function schliessen(verweis: HTMLAnchorElement) {
+  try { sessionStorage.setItem(MERKER, location.pathname); } catch { /* egal */ }
+  /* Ohne Anker: die Position setzt after-swap, ein Anker würde dazwischenfunken */
+  const ziel = new URL(verweis.href);
+  ziel.hash = '';
+  navigate(ziel.pathname + ziel.search);
 }
 
+/* In der Capture-Phase, damit dieser Zuhörer VOR Astros eigenem
+   Klick-Zuhörer dran ist — sonst navigiert Astro schon selbst und die
+   Karte wird nicht mittig gestellt. */
 document.addEventListener('click', (e) => {
   const ziel = e.target as Element | null;
   const verweis = ziel?.closest?.<HTMLAnchorElement>('a[data-zurueck]');
-  if (!verweis || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+  if (!verweis || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
   e.preventDefault();
-  zurueck(verweis.href);
-});
+  e.stopPropagation();
+  schliessen(verweis);
+}, true);
 
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape' || e.defaultPrevented) return;
@@ -65,5 +101,21 @@ document.addEventListener('keydown', (e) => {
   if (!verweis) return;
   /* Offene Menüs oder Dialoge haben Vorrang */
   if (document.querySelector('[aria-expanded="true"]')) return;
-  zurueck(verweis.href);
+  schliessen(verweis);
 });
+
+/** Kreis um das Schließen-Kreuz, sobald es beim Scrollen oben klebt. */
+function schliessenKlebenLassen() {
+  const halter = document.querySelector<HTMLElement>('[data-schliessen-halter]');
+  const wache = document.querySelector<HTMLElement>('[data-schliessen-wache]');
+  if (!halter || !wache || halter.dataset.bereit) return;
+  halter.dataset.bereit = 'ja';
+  const oben = parseFloat(getComputedStyle(halter).top) || 0;
+  const beobachter = new IntersectionObserver(([eintrag]) => {
+    if (eintrag.isIntersecting) delete halter.dataset.klebt;
+    else halter.dataset.klebt = 'ja';
+  }, { rootMargin: `-${Math.round(oben) + 1}px 0px 0px 0px`, threshold: 0 });
+  beobachter.observe(wache);
+}
+
+schliessenKlebenLassen();

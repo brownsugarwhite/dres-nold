@@ -7,7 +7,7 @@
       "position": 1,
       "aktiv": true,
       "kurz": "Vorsorge, Zahnerhalt und Zahnersatz",
-      "icon": "/icons/prophylaxe.svg"
+      "icon": "/icons/kategorien/zahnaerztlich.svg"
     },
     {
       "id": "kieferorthopaedie",
@@ -15,7 +15,7 @@
       "position": 2,
       "aktiv": true,
       "kurz": "Zahnspangen für Kinder und Erwachsene",
-      "icon": "/icons/kieferorthopaedie-kinder.svg"
+      "icon": "/icons/kategorien/kieferorthopaedie.svg"
     },
     {
       "id": "sonstige",
@@ -23,7 +23,7 @@
       "position": 3,
       "aktiv": true,
       "kurz": "Digitale Diagnostik und Ästhetik",
-      "icon": "/icons/3d-roentgen.svg"
+      "icon": "/icons/kategorien/sonstige.svg"
     }
   ],
   "eintraege": [

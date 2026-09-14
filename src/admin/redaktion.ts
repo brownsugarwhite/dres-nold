@@ -240,10 +240,13 @@ function richtextFeld(feld: Feld, wert: Wert): Baustein {
       const ziel = window.prompt('Adresse des Verweises (z. B. https://… oder /leistungen/prophylaxe/):');
       if (ziel) befehl('createLink', ziel)();
     }),
-    knopf('Tabelle', 'Tabelle mit 2 Spalten einfügen', () => {
-      const zeilen = Number(window.prompt('Wie viele Zeilen?', '3')) || 3;
-      let html = '<table><thead><tr><th>Spalte 1</th><th>Spalte 2</th></tr></thead><tbody>';
-      for (let i = 0; i < zeilen; i++) html += '<tr><td>…</td><td>…</td></tr>';
+    knopf('Tabelle', 'Tabelle einfügen', () => {
+      const spalten = Math.min(8, Math.max(1, Number(window.prompt('Wie viele Spalten?', '2')) || 2));
+      const zeilen = Math.min(50, Math.max(1, Number(window.prompt('Wie viele Zeilen (ohne Überschrift)?', '3')) || 3));
+      let html = '<table><thead><tr>';
+      for (let c = 1; c <= spalten; c++) html += `<th>Spalte ${c}</th>`;
+      html += '</tr></thead><tbody>';
+      for (let i = 0; i < zeilen; i++) html += '<tr>' + '<td>…</td>'.repeat(spalten) + '</tr>';
       html += '</tbody></table><p></p>';
       befehl('insertHTML', html)();
     }),
