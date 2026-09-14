@@ -1,0 +1,69 @@
+---
+/**
+ * Die drei Sprechstunden-Listen — gemeinsamer Inhalt der scrollgesteuerten
+ * Blase (Desktop) und der festen Ansicht (Handy) in Oeffnungszeiten.astro.
+ */
+import oz from '../content/oeffnungszeiten.json';
+
+const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
+---
+
+{listen.map((liste) => (
+  <section class="ozliste">
+    <h3 class="ozliste__titel ohne-verlauf">{liste.titel}</h3>
+    <table class="ozzeiten">
+      <tbody>
+        {liste.zeilen
+          .filter((z) => z.vormittag || z.nachmittag)
+          .map((z) => (
+            <tr>
+              <th scope="row">{z.tag}</th>
+              <td>{z.vormittag}</td>
+              <td>{z.nachmittag}</td>
+            </tr>
+          ))}
+      </tbody>
+    </table>
+    {liste.zusatz && <p class="ozliste__zusatz">{liste.zusatz}</p>}
+  </section>
+))}
+
+<style>
+  .ozliste__titel {
+    margin-bottom: var(--abstand-2xs);
+    color: var(--farbe-primaer);
+    font-size: var(--text-m);
+    font-weight: var(--gewicht-normal);
+  }
+
+  /* Wochentag, Vormittag, Nachmittag — drei Spalten, damit die
+     Zeitangaben nicht umbrechen. In der Vorlage stehen sie ebenso
+     nebeneinander. */
+  .ozzeiten {
+    border-collapse: collapse;
+    font-size: var(--text-s);
+    color: var(--farbe-primaer);
+  }
+
+  .ozzeiten th,
+  .ozzeiten td {
+    padding: 0.1rem 0;
+    font-weight: var(--gewicht-normal);
+    white-space: nowrap;
+    vertical-align: baseline;
+  }
+
+  .ozzeiten th {
+    text-align: right;
+    padding-right: var(--abstand-s);
+  }
+
+  .ozzeiten td + td { padding-left: var(--abstand-xs); }
+
+  .ozliste__zusatz {
+    margin: var(--abstand-2xs) 0 0;
+    color: var(--farbe-primaer);
+    font-size: var(--text-s);
+    text-align: right;
+  }
+</style>

@@ -46,7 +46,7 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
       )}
 
       <div class="beitrag__rest" transition:name="seiteninhalt">
-      <div class="beitrag__inhalt" set:html={beitrag.inhalt} />
+      <div class="beitrag__inhalt redaktionstext" set:html={beitrag.inhalt} />
 
       {anhaenge.length > 0 && (
         <section class="anhaenge">

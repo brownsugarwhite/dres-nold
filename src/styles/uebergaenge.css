@@ -35,7 +35,8 @@
     beitrag-<id>           Hülle des Neuigkeiten-Beitrags
     beitrag-bild-<id>      sein Bild
     seiteninhalt           Text und Anhang der Zielseite
-    nav-kopf / nav-fuss    die Leisten — bleiben unbewegt und scharf
+    nav-oben / nav-unten   die Leisten — bleiben unbewegt und scharf
+                           (gesetzt per CSS in Navigation.astro)
 */
 
 /* --- Tempo: gilt für alle Hüllen ------------------------------- */
@@ -146,24 +147,34 @@
   animation: none;
 }
 
-/* --- Die Leisten bleiben scharf --------------------------------- */
-::view-transition-group(nav-kopf),
-::view-transition-group(nav-fuss),
-::view-transition-group(nav-kontakt),
-::view-transition-old(nav-kopf),
-::view-transition-old(nav-fuss),
-::view-transition-old(nav-kontakt),
-::view-transition-new(nav-kopf),
-::view-transition-new(nav-fuss),
-::view-transition-new(nav-kontakt) {
+/* --- Die Leisten bleiben scharf und still ------------------------
+   Während des Übergangs zeigt der Browser Abbilder statt der Elemente;
+   ihr Weichzeichner wirkt dann nicht mehr auf die Seite dahinter. Die
+   Hülle bekommt ihn deshalb selbst — so bleibt der milchige Grund auch
+   im Übergang milchig. */
+::view-transition-group(nav-oben),
+::view-transition-group(nav-unten),
+::view-transition-old(nav-oben),
+::view-transition-old(nav-unten),
+::view-transition-new(nav-oben),
+::view-transition-new(nav-unten) {
   animation: none;
 }
 
 /* Die Leisten liegen über allem — auch über der wachsenden Karte */
-::view-transition-group(nav-kopf),
-::view-transition-group(nav-fuss),
-::view-transition-group(nav-kontakt) {
+::view-transition-group(nav-oben),
+::view-transition-group(nav-unten) {
   z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Ohne Gegenstück (etwa die weggefahrene Symbolleiste) würde das alte
+   Abbild sonst noch bis zum Ende stehen — es soll einfach da sein oder
+   nicht, ohne Bewegung. */
+::view-transition-old(nav-oben):only-child,
+::view-transition-old(nav-unten):only-child {
+  animation: none;
 }
 
 /* --- Blättern zwischen zwei Leistungen / Beiträgen ---------------

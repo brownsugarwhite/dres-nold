@@ -21,12 +21,10 @@ import Basis from '../layouts/Basis.astro';
 import Hinweis from '../components/Hinweis.astro';
 import LeistungKachel from '../components/LeistungKachel.astro';
 import seite from '../content/seite.json';
-import oz from '../content/oeffnungszeiten.json';
 import leistungen from '../content/leistungen.json';
 import team from '../content/team.json';
 
 const { praxis } = seite;
-const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 
 const aktiv = leistungen.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
 
@@ -61,6 +59,9 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
   <Navigation />
 
   <main id="inhalt" class="seiteninhalt">
+    {/* Auf Handys stehen die Sprechstunden fest am Anfang des Inhalts;
+        die Blase oben ist dort ausgeblendet (Oeffnungszeiten.astro) */}
+    <Oeffnungszeiten statisch />
     <Willkommen />
     <Galerie />
     <Abschnitte />
@@ -84,23 +85,6 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 
 
 
-    <section class="inhalt abschnitt" hidden>
-      <h2>Öffnungszeiten</h2>
-      {listen.map((liste) => (
-        <div class="zeiten-block">
-          <h3 class="gruppe">{liste.titel}</h3>
-          <dl class="zeiten">
-            {liste.zeilen.map((z) => (
-              <>
-                <dt>{z.tag}</dt>
-                <dd>{z.zeiten}</dd>
-              </>
-            ))}
-          </dl>
-        </div>
-      ))}
-    </section>
-
   </main>
 
   <Neuigkeiten />
@@ -111,10 +95,13 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 </Basis>
 
 <style>
-  /* Der Inhalt schiebt sich über den fixierten Startbereich */
+  /* Der Inhalt schiebt sich über den fixierten Startbereich — auch
+     über das Logo (Ebene 10): Auf Handys ist der Startraum nur eine
+     Fensterhöhe lang, das Logo noch da, wenn der Inhalt hereinkommt.
+     Er deckt es dann wie ein Blatt ab. */
   .seiteninhalt {
     position: relative;
-    z-index: 5;
+    z-index: 15;
     background: var(--farbe-flaeche);
   }
 
@@ -183,25 +170,6 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 
   .arzt figcaption span {
     color: var(--farbe-text-gedeckt);
-  }
-
-  .zeiten-block {
-    margin-bottom: var(--abstand-m);
-  }
-
-  .zeiten {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: var(--abstand-3xs) var(--abstand-m);
-    margin: var(--abstand-2xs) 0 0;
-  }
-
-  .zeiten dt {
-    font-weight: var(--gewicht-halbfett);
-  }
-
-  .zeiten dd {
-    margin: 0;
   }
 
   .notiz {

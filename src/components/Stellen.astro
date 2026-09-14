@@ -21,7 +21,7 @@ const stellen = daten.eintraege
           <li class="stelle">
             <h3 class="stelle__titel">{s.titel}</h3>
             {s.umfang && <p class="stelle__umfang">{s.umfang}</p>}
-            <div class="stelle__text" set:html={s.beschreibung} />
+            <div class="stelle__text redaktionstext" set:html={s.beschreibung} />
             <p class="stelle__fuss">
               {s.ansprechpartner && <span>Ansprechperson: {s.ansprechpartner}</span>}
               {s.pdf_datei && (
@@ -56,7 +56,7 @@ const stellen = daten.eintraege
 
   .stellen__liste {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
     gap: var(--abstand-l);
     list-style: none;
     margin: 0;

@@ -27,6 +27,12 @@ mit Lottie-Zipfel, nicht die beiden versetzten Kästen der Desktop-Vorlage.
   (Vorlage), auf dem Desktop 90 px
 - Der Bereich sitzt direkt nach dem Logobereich
 - Der graue Symbolgrund erst unterhalb der Öffnungszeiten
+- **Handys (14. September 2026):** Auf Bildschirmen bis 991 px fahren die
+  Öffnungszeiten nicht herein, sondern stehen **vollständig als erster
+  Abschnitt** im Inhalt (`#sprechstunden`). Der Startraum unter dem Logo
+  ist dort nur eine Fensterhöhe lang; der Inhalt schiebt sich darüber.
+  Der Öffnungszeiten-Knopf (Symbolleiste und Menü) scrollt sanft dorthin;
+  auf dem Desktop zum Punkt, an dem die Blase mit Zipfel steht.
 
 ## Leistungen
 
@@ -112,6 +118,13 @@ Die geklickte Karte hebt sich ab, der Rest der Seite verschwimmt, die
 Karte wächst zur Seite; Symbol und Titel wandern einzeln, der Text
 gleitet nach. Schließen-Kreuz, „Alle Leistungen" und Escape gehen im
 Verlauf zurück — derselbe Ablauf rückwärts, alte Scrollposition.
+
+## Handy-Menü (14. September 2026)
+
+„Leistungen" klappt im Handy-Menü **an Ort und Stelle als Akkordeon**
+auf und zeigt die Kategorien (wie die Blase auf dem Desktop) — keine
+zweite Ebene, kein Schließen des Menüs. Sprungmarken auf der Seite
+werden **sanft angescrollt**, mit Platz für die Kopfleiste.
 
 ## Menü-Rollover (13. September 2026)
 

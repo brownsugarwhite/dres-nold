@@ -30,6 +30,10 @@ const punkte = navi.eintraege
   .filter((e) => e.aktiv && (e.id !== 'neuigkeiten' || hatNeuigkeiten))
   .sort((a, b) => a.position - b.position);
 
+/* Sprungmarken (`#team`) zeigen immer auf die Startseite — sonst
+   liefen sie auf einer Unterseite ins Leere. */
+const ziel = (e: { ziel: string }) => (e.ziel.startsWith('#') ? `/${e.ziel}` : e.ziel);
+
 const kopf = punkte.filter((e) => e.in_kopfleiste);
 /* Die Symbolleiste unten hat in der Vorlage eine eigene Reihenfolge —
    und auf Handys eine andere als auf dem Desktop. Statt die Reihenfolge
@@ -61,13 +65,19 @@ const kategorien = (leistungen.kategorien ?? [])
 {/*
   `transition:persist`: Beim Seitenwechsel bleibt die Navigation samt
   Zustand (offenes Menü, Leistenwechsel) stehen und wird nicht neu
-  aufgebaut. Die Leisten tragen eigene Übergangsnamen und bewegen
-  sich nicht — so bleiben sie scharf, während der Rest verschwimmt
-  (styles/uebergaenge.css).
+  aufgebaut.
+
+  Die Übergangsnamen (`nav-oben`, `nav-unten`) stehen im CSS unten,
+  nicht als `transition:name`: Astro bindet `transition:name` an eine
+  Kennung, die je Seite anders ausfällt — das mitgenommene Element
+  trüge nach dem Wechsel die alte Kennung und verlöre seinen Namen.
+  Dann verschwämme die Leiste mit dem Rest der Seite und blitzte
+  doppelt auf. Über die Klasse bleibt der Name auf jeder Seite gleich
+  (styles/uebergaenge.css hält die Leisten still).
 */}
 <div class="navigation" transition:persist="navigation">
 {/* Kontaktzeile — oben auf der Seite sichtbar */}
-<div class="kontaktzeile" data-leiste="kontakt" transition:name="nav-kontakt" transition:animate="none">
+<div class="kontaktzeile" data-leiste="kontakt">
   <div class="kontaktzeile__inhalt">
     <span class="kontaktzeile__text">{praxis.strasse}</span>
     <span class="punkt" aria-hidden="true"></span>
@@ -84,7 +94,7 @@ const kategorien = (leistungen.kategorien ?? [])
 </div>
 
 {/* Kopfleiste — fährt beim Scrollen ein */}
-<header class="kopfleiste" data-leiste="kopf" transition:name="nav-kopf" transition:animate="none">
+<header class="kopfleiste" data-leiste="kopf">
   <nav class="kopfleiste__inhalt" aria-label="Hauptnavigation">
     {/* Auf Handys: Logo und Menü-Knopf statt der Menüpunkte */}
     <div class="kopfleiste__mobil">
@@ -136,7 +146,7 @@ const kategorien = (leistungen.kategorien ?? [])
             </div>
           </div>
         ) : (
-          <a class="menuepunkt" href={e.ziel}>
+          <a class="menuepunkt" href={ziel(e)}>
             <span class="menuepunkt__rolle">
               <span class="menuepunkt__text">{e.titel}</span>
               <span class="menuepunkt__text" aria-hidden="true">{e.titel}</span>
@@ -148,42 +158,46 @@ const kategorien = (leistungen.kategorien ?? [])
     ))}
   </nav>
 </header>
-  {/* Ausklappmenü für Handys — Höhe 0 → 338 px (Ablauf a-25) */}
+  {/* Ausklappmenü für Handys — fährt unter der Kopfleiste auf (Ablauf a-25) */}
   <div class="mobilmenue" id="mobilmenue" data-mobilmenue>
     <div class="mobilmenue__inhalt">
       {punkte.map((e) => (
         e.id === 'leistungen' ? (
-          <button class="mobilmenue__punkt mobilmenue__punkt--knopf" type="button" data-mobilleistungen>
-            <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
-            <span class="mobilmenue__text">{e.titel}</span>
-            <span class="mobilmenue__pfeil" aria-hidden="true">›</span>
-          </button>
+          <div class="mobilmenue__gruppe">
+            {/* „Leistungen" klappt an Ort und Stelle auf — ein Akkordeon
+                mit den Kategorien, wie die Blase auf dem Desktop */}
+            <button
+              class="mobilmenue__punkt mobilmenue__punkt--knopf"
+              type="button"
+              data-mobilleistungen
+              aria-expanded="false"
+              aria-controls="mobil-leistungen"
+            >
+              <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
+              <span class="mobilmenue__text">{e.titel}</span>
+              <span class="mobilmenue__pfeil" aria-hidden="true"></span>
+            </button>
+            <div class="mobilmenue__unter" id="mobil-leistungen" data-mobilunter>
+              <div class="mobilmenue__unterliste">
+                {kategorien.map((k, i) => (
+                  <a class="mobilmenue__punkt mobilmenue__unterpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}`}>
+                    {k.icon && <img class="mobilmenue__symbol mobilmenue__symbol--klein" src={k.icon} alt="" width="40" height="40" />}
+                    <span class="mobilmenue__untertext">
+                      <span class="mobilmenue__text">{k.titel}</span>
+                      {k.kurz && <span class="mobilmenue__kurz">{k.kurz}</span>}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
         ) : (
-          <a class="mobilmenue__punkt" href={e.ziel}>
+          <a class="mobilmenue__punkt" href={ziel(e)}>
             <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
             <span class="mobilmenue__text">{e.titel}</span>
           </a>
         )
       ))}
-    </div>
-
-    {/* Unterebene: erscheint beim Tippen auf „Leistungen“ */}
-    <div class="unterebene" data-unterebene hidden>
-      <button class="unterebene__zurueck" type="button" data-unterebeneZurueck>
-        <span aria-hidden="true">‹</span> Zurück
-      </button>
-      <h2 class="unterebene__titel">Leistungen</h2>
-      <div class="unterebene__liste">
-        {kategorien.map((k, i) => (
-          <a class="unterebene__punkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}`}>
-            {k.icon && <img class="mobilmenue__symbol" src={k.icon} alt="" width="60" height="60" />}
-            <span class="unterebene__text">
-              <span class="unterebene__name">{k.titel}</span>
-              {k.kurz && <span class="unterebene__kurz">{k.kurz}</span>}
-            </span>
-          </a>
-        ))}
-      </div>
     </div>
 
     {/* .div-block-30: Punktlinie oben, 40 px hoch */}
@@ -197,13 +211,11 @@ const kategorien = (leistungen.kategorien ?? [])
 
 {/* Symbolleiste am unteren Rand — oben auf der Seite sichtbar */}
 {/*
-  Der Umschlag trägt Grund (Weichzeichner) und Punktlinie, die Leiste
-  darin den Übergangsnamen. Beides auf einem Element geht nicht: Ein
-  Element mit Übergangsnamen bildet eine eigene Zeichenwurzel, und ein
-  Weichzeichner darin sieht die Seite dahinter nicht mehr.
+  Der Umschlag trägt Grund, Weichzeichner, Punktlinie und den
+  Übergangsnamen (siehe CSS); die Leiste darin nur den Inhalt.
 */}
 <div class="fussleiste-huelle" data-fusshuelle>
-<nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff" transition:name="nav-fuss" transition:animate="none">
+<nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff">
   <div class="fussleiste__inhalt fussleiste__inhalt--gross">
     {fussGross.map((e, i) => (
       <>
@@ -231,7 +243,7 @@ const kategorien = (leistungen.kategorien ?? [])
             </div>
           </div>
         ) : (
-          <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
+          <a class="fussknopf" href={ziel(e)} data-punkt={e.id}>
             <img class="fussknopf__symbol" src={e.icon} alt="" width="60" height="60" />
             <span class="fussknopf__text">{e.titel}</span>
           </a>
@@ -244,7 +256,7 @@ const kategorien = (leistungen.kategorien ?? [])
   <div class="fussleiste__inhalt fussleiste__inhalt--klein">
     {fussKlein.map((e, i) => (
       <>
-        <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
+        <a class="fussknopf" href={ziel(e)} data-punkt={e.id}>
           <img class="fussknopf__symbol" src={e.icon} alt="" width="60" height="60" />
           <span class="fussknopf__text">{e.titel}</span>
         </a>
@@ -270,38 +282,37 @@ const kategorien = (leistungen.kategorien ?? [])
     width: 100%;
   }
 
-  /* Der milchige Grund der Leiste liegt auf einem ::before, das über die
-     Leiste hinausreicht und per Maske (clip-path) zugeschnitten wird:
-     geschlossen genau auf die Leiste, offen auf Leiste PLUS Blase — ein
-     einziges Element, also keine Kante zwischen beiden. Werte setzt das
-     Skript (`--blase-hoehe`, `--blase-form`). */
-  .navigation::before,
-  .fussleiste-huelle::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    z-index: 0;
+  /* Grund (milchiges Weiß mit Weichzeichner), Punktlinie und Übergangs-
+     name liegen auf den beiden Umschlägen SELBST, nicht auf einem Kind:
+     Ein Element mit Übergangsnamen bildet eine eigene Zeichenwurzel —
+     ein Weichzeichner in einem Kind sähe die Seite dahinter nicht mehr,
+     der eigene sieht sie.
+
+     Offenes Aufklappmenü: Der Umschlag wächst per Innenabstand um die
+     Höhe der Blase und wird per Maske (clip-path) auf „Leiste plus
+     Blase" zugeschnitten. Ein Element, also keine Kante zwischen Leiste
+     und Blase. Werte setzt das Skript (`--blase-hoehe`, `--blase-form`). */
+  .navigation,
+  .fussleiste-huelle {
     background: rgb(255 255 255 / 80%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    pointer-events: none;
   }
 
-  .navigation::before {
-    top: 0;
-    bottom: calc(-1 * var(--blase-hoehe, 0px));
+  .navigation {
+    padding-bottom: var(--blase-hoehe, 0px);
     clip-path: var(--blase-form, inset(0 0 var(--blase-hoehe, 0px) 0));
+    view-transition-name: nav-oben;
   }
 
-  .fussleiste-huelle::before {
-    top: calc(-1 * var(--blase-hoehe, 0px));
-    bottom: 0;
+  .fussleiste-huelle {
+    padding-top: var(--blase-hoehe, 0px);
     clip-path: var(--blase-form, inset(var(--blase-hoehe, 0px) 0 0 0));
+    view-transition-name: nav-unten;
   }
 
-  /* Die Punktlinie liegt ÜBER dem Grund (sonst dämpft ihn das Weiß):
-     unten am Rand der Kopfleiste, oben am Rand der Symbolleiste. */
+  /* Die Punktlinie: unten am Rand der Kopfleiste, oben am Rand der
+     Symbolleiste — jeweils am Rand des Inhalts, nicht des Innenabstands. */
   .navigation::after,
   .fussleiste-huelle::after {
     content: '';
@@ -314,14 +325,13 @@ const kategorien = (leistungen.kategorien ?? [])
     pointer-events: none;
   }
 
-  .navigation::after { bottom: 0; }
-  .fussleiste-huelle::after { top: 0; }
+  .navigation::after { bottom: var(--blase-hoehe, 0px); }
+  .fussleiste-huelle::after { top: var(--blase-hoehe, 0px); }
 
   /* Solange die Blase gezeichnet wird, übernimmt sie die Punktlinie */
   .navigation[data-ohne-linie]::after,
   .fussleiste-huelle[data-ohne-linie]::after { display: none; }
 
-  /* Alles in den Leisten liegt über dem Grund */
   .navigation > :not(.blase),
   .fussleiste-huelle > .fussleiste {
     position: relative;
@@ -431,7 +441,9 @@ const kategorien = (leistungen.kategorien ?? [])
 
   .menueknopf__lottie[data-lottie-bereit] { background: none; }
 
-  /* .mobile-expend: Höhe 0 → 338 px, 700 ms easeInOut */
+  /* .mobile-expend: fährt in 700 ms (easeInOut) auf — bis zum unteren
+     Fensterrand; die Kopfleiste darüber ist 80 px hoch. Wird der Inhalt
+     höher als das Fenster, lässt er sich darin rollen. */
   .mobilmenue {
     position: relative;
     width: 100%;
@@ -440,16 +452,18 @@ const kategorien = (leistungen.kategorien ?? [])
     transition: height 700ms cubic-bezier(0.42, 0, 0.58, 1);
   }
 
-  .navigation[data-menue-offen] .mobilmenue { height: 100vh; }
+  .navigation[data-menue-offen] .mobilmenue {
+    height: calc(100vh - 80px);
+    height: calc(100dvh - 80px);
+    overflow-y: auto;
+  }
 
-  /* .menu-button-container: 90 % Breite, 20 px Abstand oben.
-     Als Liste untereinander statt zweizeilig — die Leistungen
-     bekommen später Unterpunkte. */
+  /* .menu-button-container: 90 % Breite, 20 px Abstand oben */
   .mobilmenue__inhalt {
     display: flex;
     flex-direction: column;
     width: 90%;
-    margin: 20px auto 0;
+    margin: 12px auto 0;
   }
 
   .mobilmenue__punkt {
@@ -472,18 +486,7 @@ const kategorien = (leistungen.kategorien ?? [])
   .mobilmenue__text {
     font-size: 18px;
     font-weight: 400;
-  }
-
-  /* Beim Tippen auf „Leistungen“ faden die übrigen Punkte aus … */
-  .mobilmenue[data-unterebene-offen] .mobilmenue__inhalt {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 250ms cubic-bezier(0, 0, 0.58, 1);
-  }
-
-  .mobilmenue__inhalt {
-    opacity: 1;
-    transition: opacity 250ms cubic-bezier(0, 0, 0.58, 1);
+    line-height: 1.2;
   }
 
   .mobilmenue__punkt--knopf {
@@ -495,79 +498,64 @@ const kategorien = (leistungen.kategorien ?? [])
     cursor: pointer;
   }
 
+  /* Pfeil rechts: dreht sich, wenn die Kategorien aufgeklappt sind */
   .mobilmenue__pfeil {
+    flex: none;
+    width: 14px;
+    height: 8px;
     margin-left: auto;
-    font-size: 24px;
-    color: var(--farbe-text-gedeckt);
+    margin-right: var(--abstand-2xs);
+    background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
+    transition: transform 350ms var(--verlauf-betont);
   }
 
-  /* … und die Unterebene schiebt sich von oben herein */
-  .unterebene {
-    position: absolute;
-    inset: 0 auto auto 0;
-    width: 100%;
-    padding: 20px 5% 0;
+  .mobilmenue__punkt--knopf[aria-expanded='true'] .mobilmenue__pfeil { transform: rotate(180deg); }
+
+  /* Das Akkordeon: klappt über die Rasterhöhe auf (0fr → 1fr) —
+     so braucht es keine feste Höhe und passt sich dem Inhalt an. */
+  .mobilmenue__unter {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 350ms var(--verlauf-betont);
   }
 
-  .unterebene[hidden] { display: none; }
+  .mobilmenue__unter[data-offen] { grid-template-rows: 1fr; }
 
-  .unterebene__zurueck {
-    padding: 0;
-    border: 0;
-    background: none;
-    color: var(--farbe-text-gedeckt);
-    font: inherit;
-    font-size: 14px;
-    cursor: pointer;
-  }
-
-  /* Überschrift gleitet von oben herein */
-  .unterebene__titel {
-    margin: var(--abstand-2xs) 0 var(--abstand-m);
-    color: var(--farbe-primaer);
-    font-size: 24px;
-    transform: translateY(-16px);
-    opacity: 0;
-    transition:
-      transform 350ms cubic-bezier(0, 0, 0.58, 1),
-      opacity 350ms cubic-bezier(0, 0, 0.58, 1);
-  }
-
-  .unterebene__liste { display: flex; flex-direction: column; }
-
-  /* Die Kategorien erscheinen nacheinander */
-  .unterebene__punkt {
+  .mobilmenue__unterliste {
     display: flex;
-    align-items: center;
-    gap: var(--abstand-s);
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    padding-left: calc(60px + var(--abstand-s));
+  }
+
+  .mobilmenue__unterpunkt {
+    gap: var(--abstand-xs);
     padding: var(--abstand-2xs) 0;
-    color: var(--farbe-primaer);
-    text-decoration: none;
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(-6px);
     transition:
-      opacity 300ms cubic-bezier(0, 0, 0.58, 1),
-      transform 300ms cubic-bezier(0, 0, 0.58, 1);
-    transition-delay: calc(200ms + var(--stufe, 0) * 90ms);
+      opacity 280ms var(--verlauf-betont),
+      transform 280ms var(--verlauf-betont);
   }
 
-  .mobilmenue[data-unterebene-offen] .unterebene__titel {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
-  .mobilmenue[data-unterebene-offen] .unterebene__punkt {
+  /* Die Kategorien erscheinen nacheinander, sobald Platz da ist */
+  .mobilmenue__unter[data-offen] .mobilmenue__unterpunkt {
     opacity: 1;
     transform: translateY(0);
+    transition-delay: calc(120ms + var(--stufe, 0) * 70ms);
   }
 
-  .unterebene__text { display: flex; flex-direction: column; }
-  .unterebene__name { font-size: 18px; }
-  .unterebene__kurz { color: var(--farbe-text); font-size: 14px; font-weight: 300; }
+  .mobilmenue__symbol--klein { width: 40px; height: 40px; }
+
+  .mobilmenue__untertext { display: flex; flex-direction: column; }
+  .mobilmenue__kurz { color: var(--farbe-text); font-size: 14px; font-weight: 300; line-height: 1.3; }
 
   @media (prefers-reduced-motion: reduce) {
-    .unterebene__titel,
-    .unterebene__punkt { transition: none; }
+    .mobilmenue,
+    .mobilmenue__unter,
+    .mobilmenue__unterpunkt,
+    .mobilmenue__pfeil { transition: none; }
   }
 
   /* .div-block-30: Punktlinie oben, 40 px hoch */
@@ -933,6 +921,13 @@ const kategorien = (leistungen.kategorien ?? [])
     .punkt--fuss[data-nach='zeiten'] { display: none; }
   }
 
+  /* Schmale Handys: die Kontaktzeile muss in eine Zeile passen */
+  @media (max-width: 479px) {
+    .kontaktzeile__inhalt { width: 94%; gap: var(--abstand-2xs); }
+    .kontaktzeile__text { font-size: 13px; }
+    .fussleiste__inhalt { width: 94%; }
+  }
+
   /* ---------- Ab Tablet ---------- */
   @media (min-width: 992px) {
   }
@@ -951,7 +946,21 @@ const kategorien = (leistungen.kategorien ?? [])
    * 2. Aufklappmenü unter „Leistungen": öffnet per Klick, schließt per
    *    Escape, Klick nach außen oder wenn der Fokus den Bereich verlässt.
    */
+  /* Der Leistenwechsel hängt sich an Fenster und Dokument — das darf
+     nur einmal geschehen, auch wenn Astro nach jedem Seitenwechsel
+     `astro:page-load` auslöst (die Navigation selbst bleibt erhalten). */
+  let leistenwechselBereit = false;
+
   function navigationAufbauen() {
+    if (!leistenwechselBereit) {
+      leistenwechselBereit = true;
+      leistenwechselAufbauen();
+    }
+    aufklappmenuesAufbauen();
+    mobilmenueAufbauen();
+  }
+
+  function leistenwechselAufbauen() {
     // ---- Leistenwechsel ----
     // In der Vorlage hängt der Wechsel an einem eigenen unsichtbaren
     // Streifen (`.trigger-schnalz`, 250vh ab Dokumentanfang): sobald er
@@ -960,19 +969,25 @@ const kategorien = (leistungen.kategorien ?? [])
     // Einrasten der Öffnungszeiten — die Blase steht also schon eine
     // Weile, bevor die Leisten tauschen.
 
-    let gescrollt = false;
+    let gescrollt = document.body.hasAttribute('data-gescrollt');
     let geplant = false;
+
+    /* Ab welcher Scrolltiefe die Leisten tauschen. Auf Handys stehen die
+       Öffnungszeiten fest im Seitenfluss, der Startbereich ist dort nur
+       eine Fensterhöhe lang — getauscht wird nach der halben. */
+    const schwelle = () =>
+      (window.matchMedia('(max-width: 991px)').matches ? 0.5 : SCHNALZ_WEG) * window.innerHeight;
+
+    /** Gehört zu dieser Scrolltiefe der gescrollte Zustand? */
+    const gescrolltBei = (y: number, startseite: boolean) =>
+      // Unterseiten (Leistung, Beitrag, Rechtliches) haben keinen
+      // Logobereich: dort steht von Anfang an die Kopfleiste mit dem
+      // Menü, die Symbolleiste bleibt eingefahren.
+      startseite ? y > schwelle() : true;
 
     const pruefen = () => {
       geplant = false;
-      const bereich = document.querySelector<HTMLElement>('.ozbereich');
-
-      const sollGescrollt = bereich
-        ? window.scrollY > SCHNALZ_WEG * window.innerHeight
-        // Unterseiten (Leistung, Beitrag, Rechtliches) haben keinen
-        // Logobereich: dort steht von Anfang an die Kopfleiste mit dem
-        // Menü, die Symbolleiste bleibt eingefahren.
-        : true;
+      const sollGescrollt = gescrolltBei(window.scrollY, !!document.querySelector('.ozbereich'));
 
       if (sollGescrollt !== gescrollt) {
         gescrollt = sollGescrollt;
@@ -992,14 +1007,44 @@ const kategorien = (leistungen.kategorien ?? [])
     pruefen();
 
     // Beim Seitenwechsel tauscht Astro den <body> samt Attributen aus —
-    // die Markierung wäre weg und die Kopfleiste würde kurz aufblitzen.
-    // Deshalb sofort nach dem Tausch (noch vor dem ersten Bild) neu setzen.
-    document.addEventListener('astro:after-swap', () => {
-      // Als Microtask: erst nachdem andere Zuhörer die Scrollposition
-      // gesetzt haben (scripts/uebergaenge.ts), aber noch vor dem Bild.
-      queueMicrotask(() => { gescrollt = false; pruefen(); });
+    // die Markierung wäre weg, die Kopfleiste würde in ihrer 300-ms-
+    // Bewegung kurz auf Höhe 0 fallen und während des Übergangs
+    // aufblitzen. Deshalb bekommt schon das NEUE Dokument die
+    // Markierung, bevor es eingetauscht wird: Der Zustand steht dann
+    // vom ersten Bild an fest, nichts bewegt sich.
+    document.addEventListener('astro:before-swap', (ereignis) => {
+      const e = ereignis as Event & { newDocument: Document; to: URL; navigationType: string };
+      const startseite = !!e.newDocument.querySelector('.ozbereich');
+      let merker = '';
+      try { merker = sessionStorage.getItem('uebergang-ziel') || ''; } catch { /* egal */ }
+
+      let soll: boolean;
+      if (e.navigationType === 'traverse') {
+        // Vor/Zurück im Verlauf: Astro stellt die gemerkte Scrolltiefe wieder her
+        const y = (history.state && typeof history.state.scrollY === 'number') ? history.state.scrollY : 0;
+        soll = gescrolltBei(y, startseite);
+      } else if (!startseite || merker) {
+        // Unterseite — oder zurück zur Übersicht, wo die Karte mittig gestellt wird
+        soll = true;
+      } else {
+        // Sprungmarke tiefer auf der Seite? Der Anfang und die
+        // Öffnungszeiten liegen oben, alles andere ist gescrollt.
+        soll = !!e.to.hash && !['#start', '#oz_anchor', '#inhalt'].includes(e.to.hash);
+      }
+      if (soll) e.newDocument.body.dataset.gescrollt = 'ja';
+      else delete e.newDocument.body.dataset.gescrollt;
+      gescrollt = soll;
     });
 
+    // Nach dem Tausch (noch vor dem ersten Bild) gegenprüfen — die
+    // Scrollposition steht dann fest.
+    document.addEventListener('astro:after-swap', () => {
+      queueMicrotask(pruefen);
+    });
+
+  }
+
+  function aufklappmenuesAufbauen() {
     // ---- Aufklappmenü („Blase") ----
     // Die Punktlinie der Leiste wölbt sich zu einem abgerundeten Feld.
     // Gezeichnet als SVG über die volle Breite: links und rechts die
@@ -1084,12 +1129,13 @@ const kategorien = (leistungen.kategorien ?? [])
         const fa = Math.min(ECKE, h / 2);                       // Höhe der Bögen
         const aB = Math.min(w / 2, Math.max(fa, aussen - w / 2)); // Breite der Bögen
         const k = 0.5523;
-        const xL = mitte - w / 2;
-        const xR = mitte + w / 2;
         const rand = 4;
         /* Grundlinie im SVG — auf halbe Pixel gelegt, damit der 1-px-Strich
            genau auf der Punktreihe der Leiste liegt und nicht verschmiert */
-        const y0 = hoch ? hoehe + rand + 0.5 : rand - 0.5;
+        const yBasis = hoch ? hoehe + rand + 0.5 : rand - 0.5;
+        const y0 = yBasis;
+        const xL = mitte - w / 2;
+        const xR = mitte + w / 2;
         const gesamt = hoehe + 2 * rand;
 
         svg.style.width = `${breite}px`;
@@ -1099,9 +1145,15 @@ const kategorien = (leistungen.kategorien ?? [])
 
         const f = (n: number) => n.toFixed(2);
         /* Die Wölbung als Pfadstück, um `dy` verschoben (die Maske des
-           Leistengrunds hat einen anderen Nullpunkt als die Zeichnung) */
-        const woelbungMit = (dy: number) => {
+           Leistengrunds hat einen anderen Nullpunkt als die Zeichnung).
+           `auf` weitet die Form um so viele Bildpunkte nach außen — die
+           Maske greift damit über den Strich hinaus, statt ihn zur
+           Hälfte abzuschneiden. */
+        const woelbungMit = (dy: number, auf = 0) => {
           const g = (n: number) => f(n + dy);
+          const xL = mitte - w / 2 - auf;
+          const xR = mitte + w / 2 + auf;
+          const y0 = yBasis + s * auf;
           return (
             /* Fuß links: flacher Bogen von der Linie in die Wand */
             `L${f(xL - aB)} ${g(y0)} C${f(xL - aB + k * aB)} ${g(y0)} ${f(xL)} ${g(y0 + s * (fa - k * fa))} ${f(xL)} ${g(y0 + s * fa)} ` +
@@ -1127,9 +1179,13 @@ const kategorien = (leistungen.kategorien ?? [])
 
         /* Dieselbe Wölbung von rechts nach links, um `dy` verschoben —
            für die Maske der oberen Leiste */
-        const woelbungRueckwaerts = (dy: number) => {
+        const woelbungRueckwaerts = (dy: number, auf = 0) => {
           const g = (n: number) => f(n + dy);
+          const xL = mitte - w / 2 - auf;
+          const xR = mitte + w / 2 + auf;
+          const y0 = yBasis + s * auf;
           return (
+            `L${f(xR + aB)} ${g(y0)} ` +
             `C${f(xR + aB - k * aB)} ${g(y0)} ${f(xR)} ${g(y0 + s * (fa - k * fa))} ${f(xR)} ${g(y0 + s * fa)} ` +
             `L${f(xR)} ${g(y0 + s * (h - fa))} ` +
             `C${f(xR)} ${g(y0 + s * (h - fa + k * fa))} ${f(xR - aB + k * aB)} ${g(y0 + s * h)} ${f(xR - aB)} ${g(y0 + s * h)} ` +
@@ -1140,19 +1196,25 @@ const kategorien = (leistungen.kategorien ?? [])
           );
         };
 
-        /* Die Maske des Leistengrunds: Leiste plus Blase als eine Form.
-           Koordinaten des ::before — es reicht um `hoehe + rand` über
-           (bzw. unter) die Leiste hinaus. */
+        /* Die Maske des Leistengrunds: Leiste plus Blase als eine Form,
+           in den Koordinaten des Umschlags. Der reicht per Innenabstand
+           (`--blase-hoehe`) über die Leiste hinaus — gemessen wird die
+           Leiste selbst, also ohne diesen Abstand. */
         const lr = linienTraeger.getBoundingClientRect();
-        const leisteH = lr.height;
+        const cs = getComputedStyle(linienTraeger);
+        const leisteH = lr.height - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
         linienTraeger.style.setProperty('--blase-hoehe', `${gesamt}px`);
         /* Nullpunkt-Versatz zwischen Zeichnung und Maske:
-           unten liegt die Zeichnung `rand` unter dem oberen Maskenrand,
+           unten liegt die Zeichnung `rand` unter dem oberen Umschlagrand,
            oben liegt die Grundlinie erst unter der Leiste */
         const dy = hoch ? rand : leisteH - rand;
+        /* Der Strich liegt in der Zeichnung, die mit maskiert wird — die
+           Maske greift deshalb 1 px über ihn hinaus */
+        const auf = 1;
+        const yM = y0 + dy + s * auf;
         const form = hoch
-          ? `M0 ${f(gesamt + leisteH)} L0 ${f(y0 + dy)} ${woelbungMit(dy)}L${breite} ${f(y0 + dy)} L${breite} ${f(gesamt + leisteH)} Z`
-          : `M0 0 L${breite} 0 L${breite} ${f(y0 + dy)} L${f(xR + aB)} ${f(y0 + dy)} ${woelbungRueckwaerts(dy)}L0 ${f(y0 + dy)} Z`;
+          ? `M0 ${f(gesamt + leisteH)} L0 ${f(yM)} ${woelbungMit(dy, auf)}L${breite} ${f(yM)} L${breite} ${f(gesamt + leisteH)} Z`
+          : `M0 0 L${breite} 0 L${breite} ${f(yM)} ${woelbungRueckwaerts(dy, auf)}L0 ${f(yM)} Z`;
         linienTraeger.style.setProperty('--blase-form', `path("${form}")`);
 
         /* Kleiner Pfeil an der Grundlinie, auf den Menüpunkt zeigend */
@@ -1251,6 +1313,9 @@ const kategorien = (leistungen.kategorien ?? [])
       document.addEventListener('astro:before-preparation', () => setzen(false));
     });
 
+  }
+
+  function mobilmenueAufbauen() {
     // ---- Mobiles Ausklappmenü ----
     // Ablauf a-25 / a-27: Höhe 0 ↔ 338 px in 700 ms, der Lottie-Knopf
     // läuft dabei in 600 ms von Bild 0 auf 99 und zurück.
@@ -1283,33 +1348,30 @@ const kategorien = (leistungen.kategorien ?? [])
         }
       });
 
-      // Unterebene „Leistungen“ öffnen und schließen
-      const menue = document.querySelector<HTMLElement>('[data-mobilmenue]');
-      const unter = document.querySelector<HTMLElement>('[data-unterebene]');
+      // „Leistungen" klappt die Kategorien an Ort und Stelle auf
+      const unter = document.querySelector<HTMLElement>('[data-mobilunter]');
       const knopfLeistungen = document.querySelector<HTMLButtonElement>('[data-mobilleistungen]');
-      const zurueck = document.querySelector<HTMLButtonElement>('[data-unterebeneZurueck]');
+
+      const leistungenAufklappen = (offen: boolean) => {
+        if (!unter || !knopfLeistungen) return;
+        knopfLeistungen.setAttribute('aria-expanded', String(offen));
+        if (offen) unter.dataset.offen = 'ja';
+        else delete unter.dataset.offen;
+      };
 
       knopfLeistungen?.addEventListener('click', () => {
-        if (!menue || !unter) return;
-        unter.hidden = false;
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          menue.setAttribute('data-unterebene-offen', 'ja');
-        }));
+        leistungenAufklappen(knopfLeistungen.getAttribute('aria-expanded') !== 'true');
       });
 
-      zurueck?.addEventListener('click', () => {
-        if (!menue || !unter) return;
-        menue.removeAttribute('data-unterebene-offen');
-        window.setTimeout(() => { unter.hidden = true; }, 300);
-        knopfLeistungen?.focus();
-      });
-
-      // Ein Klick auf einen Menüpunkt schließt wieder (wie in a-27)
-      document.querySelectorAll('.mobilmenue__punkt').forEach((a) => {
+      // Ein Klick auf ein Ziel schließt das Menü wieder (wie in a-27);
+      // das Akkordeon klappt dabei zu, sobald das Menü eingefahren ist.
+      document.querySelectorAll('a.mobilmenue__punkt').forEach((a) => {
         a.addEventListener('click', () => {
           navigation.removeAttribute('data-menue-offen');
           menueknopf.setAttribute('aria-expanded', 'false');
+          menueknopf.setAttribute('aria-label', 'Menü öffnen');
           knopfSpieler?.playSegments([knopfSpieler.totalFrames - 1, 0], true);
+          window.setTimeout(() => leistungenAufklappen(false), 700);
         });
       });
     }

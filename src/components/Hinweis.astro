@@ -41,7 +41,7 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
       <div class="hinweis__blase">
         <button class="hinweis__schliessen" type="button" aria-label="Hinweis schließen"></button>
         <h2 class="hinweis__titel" id="hinweis-titel">{daten.titel}</h2>
-        <div class="hinweis__text" set:html={daten.text} />
+        <div class="hinweis__text redaktionstext" set:html={daten.text} />
 
         {daten.mehr_erfahren_ziel && (
           <div class="hinweis__mehr">

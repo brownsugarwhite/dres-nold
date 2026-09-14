@@ -47,9 +47,19 @@
  * Spitze lehnt 44 px nach rechts, Grundlinie fällt 18 px auf 600 px
  * nach links ab) werden proportional zur eingestellten Länge skaliert.
  */
-import oz from '../content/oeffnungszeiten.json';
+import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
 
-const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
+interface Props {
+  /**
+   * Feste Ansicht für Handys: die Sprechstunden stehen als normaler
+   * Abschnitt vollständig im Seitenfluss, statt scrollgesteuert
+   * hereinzufahren. Wird auf der Startseite zusätzlich am Anfang des
+   * Inhalts eingesetzt; sichtbar ist je Bildschirmgröße nur eine der
+   * beiden Fassungen (Umbruch bei 991 px wie die Navigation).
+   */
+  statisch?: boolean;
+}
+const { statisch = false } = Astro.props;
 ---
 
 {/*
@@ -65,6 +75,17 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
   (docs/entscheidungen.md), das Logo bleibt aber sichtbar, während
   die Blase darüber hereinfährt.
 */}
+{statisch ? (
+  <section class="ozstatisch" id="sprechstunden" aria-labelledby="sprechstunden-titel">
+    <div class="ozstatisch__inhalt">
+      <h2 class="ozstatisch__titel" id="sprechstunden-titel">Sprechstunden</h2>
+      <div class="ozblase__spalten">
+        <OeffnungszeitenListen />
+      </div>
+    </div>
+  </section>
+) : (
+<>
 <div class="ozraum" aria-hidden="true"></div>
 
 <section class="ozbereich" id="oz_anchor" aria-labelledby="oz-titel">
@@ -74,25 +95,7 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
         <h2 class="ozblase__titel" id="oz-titel">Sprechstunden</h2>
 
         <div class="ozblase__spalten">
-          {listen.map((liste) => (
-            <section class="ozliste">
-              <h3 class="ozliste__titel ohne-verlauf">{liste.titel}</h3>
-              <table class="ozzeiten">
-                <tbody>
-                  {liste.zeilen
-                    .filter((z) => z.vormittag || z.nachmittag)
-                    .map((z) => (
-                      <tr>
-                        <th scope="row">{z.tag}</th>
-                        <td>{z.vormittag}</td>
-                        <td>{z.nachmittag}</td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-              {liste.zusatz && <p class="ozliste__zusatz">{liste.zusatz}</p>}
-            </section>
-          ))}
+          <OeffnungszeitenListen />
         </div>
       </div>
 
@@ -104,6 +107,8 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     </div>
   </div>
 </section>
+</>
+)}
 
 <style>
   /* Wie lang der Zipfel voll ausgefahren ist. Mobil das Maß der
@@ -226,48 +231,51 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     align-items: start;
   }
 
-  .ozliste__titel {
-    margin-bottom: var(--abstand-2xs);
-    color: var(--farbe-primaer);
-    font-size: var(--text-m);
-    font-weight: var(--gewicht-normal);
-  }
-
-  /* Wochentag, Vormittag, Nachmittag — drei Spalten, damit die
-     Zeitangaben nicht umbrechen. In der Vorlage stehen sie ebenso
-     nebeneinander. */
-  .ozzeiten {
-    border-collapse: collapse;
-    font-size: var(--text-s);
-    color: var(--farbe-primaer);
-  }
-
-  .ozzeiten th,
-  .ozzeiten td {
-    padding: 0.1rem 0;
-    font-weight: var(--gewicht-normal);
-    white-space: nowrap;
-    vertical-align: baseline;
-  }
-
-  .ozzeiten th {
-    text-align: right;
-    padding-right: var(--abstand-s);
-  }
-
-  .ozzeiten td + td { padding-left: var(--abstand-xs); }
-
-  .ozliste__zusatz {
-    margin: var(--abstand-2xs) 0 0;
-    color: var(--farbe-primaer);
-    font-size: var(--text-s);
-    text-align: right;
-  }
-
   @media (max-width: 60rem) {
     .ozblase { width: calc(100vw - 2 * var(--abstand-s)); }
     .ozblase__flaeche { padding: var(--abstand-m); }
     .ozblase__spalten { grid-template-columns: 1fr; gap: var(--abstand-m); }
+  }
+
+  /* ---------- Feste Ansicht für Handys ----------
+     Auf dem Desktop unsichtbar; auf Handys ersetzt sie die Blase:
+     Die scrollgesteuerte Fassung verschwindet, der weiße Startraum
+     schrumpft auf eine Fensterhöhe (das Logo davor bleibt), und die
+     Sprechstunden stehen vollständig als erster Abschnitt im Inhalt. */
+  .ozstatisch {
+    display: none;
+    background: var(--farbe-flaeche) url('/bilder/deko/punktlinie.png') 50% 100% repeat-x;
+    background-size: auto 1px;
+  }
+
+  .ozstatisch__inhalt {
+    width: min(100% - 2 * var(--abstand-m), 62rem);
+    margin-inline: auto;
+    padding-block: var(--abstand-xl) var(--abstand-l);
+  }
+
+  /* Überschrift wie die übrigen Abschnitte (Verlauf, groß, mittig —
+     styles/global.css); die Listen stehen als Block mittig darunter */
+  .ozstatisch__titel { margin-bottom: var(--abstand-l); }
+
+  .ozstatisch .ozblase__spalten {
+    grid-template-columns: minmax(0, max-content);
+    justify-content: center;
+    gap: var(--abstand-m);
+  }
+
+  @media (max-width: 991px) {
+    .ozstatisch { display: block; }
+    .ozraum { height: 100vh; height: 100dvh; }
+    .ozbereich { display: none; }
+  }
+
+  /* Auf Tablets nebeneinander, wenn Platz ist */
+  @media (min-width: 48rem) and (max-width: 991px) {
+    .ozstatisch .ozblase__spalten {
+      grid-template-columns: repeat(3, max-content);
+      gap: var(--abstand-l);
+    }
   }
 
   /* Ohne Bewegung: steht ruhig im Seitenfluss */
@@ -313,6 +321,9 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     blase.dataset.bereit = 'ja';
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    /* Auf Handys steht die feste Ansicht im Seitenfluss; die Blase ist
+       ausgeblendet und braucht keine Bewegung. */
+    const ausgeblendet = () => bereich.getClientRects().length === 0;
 
     /* ---- Geometrie: wird bei Größenänderung neu vermessen ---- */
     let breite = 0;        // Fensterbreite
@@ -325,6 +336,7 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     const grundlinie = (x: number) => versatzOben + (breite / 2 - x) * VORLAGE.neigung;
 
     const vermessen = () => {
+      if (ausgeblendet()) return;
       breite = document.documentElement.clientWidth;
       laenge = parseFloat(getComputedStyle(blase).getPropertyValue('--zipfel-laenge')) || 154;
 
@@ -425,6 +437,7 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     }
 
     const zeichnen = () => {
+      if (ausgeblendet()) return;
       blase.style.setProperty('--oz-versatz', `${ausStuetzstellen(p, BLASE)}px`);
       zipfelZeichnen(ausStuetzstellen(p, ZIPFEL));
     };

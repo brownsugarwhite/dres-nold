@@ -28,7 +28,7 @@ const abschnitte = daten.eintraege
           {a.bild && (
             <img class="abschnitt__bild" src={a.bild} alt={a.bild_alt || ''} width="900" height="600" loading="lazy" />
           )}
-          <div class="abschnitt__inhalt" set:html={a.text} />
+          <div class="abschnitt__inhalt redaktionstext" set:html={a.text} />
           {(a.link_ziel || a.pdf_datei) && (
             <p class="abschnitt__knoepfe">
               {a.link_ziel && (

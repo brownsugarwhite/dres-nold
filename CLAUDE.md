@@ -150,7 +150,7 @@ src/
   admin/        Feldbeschreibungen und Skript der Redaktion
   server/       Gemeinsamer Code der Functions (GitHub-API, Access-Prüfung)
   styles/       tokens.css (Gestaltungswerte) + globale Stile + Übergänge
-  scripts/      Animationen, Übergänge, Einwilligung — ohne Bibliotheken
+  scripts/      Animationen, Übergänge, sanftes Scrollen, Einwilligung — ohne Bibliotheken
 public/
   bilder/       Fotos (werden beim Build automatisch optimiert)
   dokumente/    PDFs zum Download
@@ -177,7 +177,7 @@ docs/
 
 **Startseite** (`/`) ist und bleibt ein One-Pager mit Ankern:
 
-`#start` · `#oz_anchor` (Öffnungszeiten) · `#galerie` · `#information` (Hinweis) · `#praxis` · `#leistungen` (Kachelübersicht) · `#team` · `#neuigkeiten` · `#contact`
+`#start` · `#oz_anchor` (Öffnungszeiten; auf Handys steht die feste Fassung unter `#sprechstunden`, `scripts/anker.ts` leitet um) · `#galerie` · `#information` (Hinweis) · `#praxis` · `#leistungen` (Kachelübersicht) · `#team` · `#neuigkeiten` · `#contact`
 
 **Unterseiten** — von der Startseite aus als Vollbild geöffnet, aber mit eigener Adresse:
 

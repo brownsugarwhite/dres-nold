@@ -10,6 +10,14 @@
   box-sizing: border-box;
 }
 
+/* Nichts darf die Seite seitlich scrollen lassen — auch nicht ein
+   überlanges Wort aus der Redaktion auf einem schmalen Handy. `clip`
+   statt `hidden`, damit klebende Elemente (position: sticky) weiter
+   funktionieren. */
+html {
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
   font-family: var(--schrift);
@@ -35,6 +43,20 @@ h3 { font-size: var(--text-l); }
 p {
   margin: 0 0 var(--abstand-s);
   max-width: var(--breite-text);
+}
+
+/* Text aus der Redaktion: überlange Wörter (Adressen, Fachbegriffe)
+   brechen um, statt die Seite zu verbreitern; breite Tabellen rollen
+   in ihrem Kasten. */
+.redaktionstext {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.redaktionstext table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 a {

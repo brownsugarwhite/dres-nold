@@ -55,7 +55,7 @@ const naechste = alle[i + 1];
       </header>
 
       <div class="leistung__rest" transition:name="seiteninhalt">
-        <div class="leistung__text" set:html={leistung.inhalt} />
+        <div class="leistung__text redaktionstext" set:html={leistung.inhalt} />
 
         <nav class="leistung__nachbarn" aria-label="Weitere Leistungen">
           {vorherige && (

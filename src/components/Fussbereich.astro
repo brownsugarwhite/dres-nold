@@ -24,7 +24,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100px;
+    min-height: 100px;
+    padding: var(--abstand-m) var(--abstand-s);
     background: var(--farbe-flaeche) url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
     background-size: auto 1px;
   }
@@ -55,8 +56,9 @@
     text-decoration: underline;
   }
 
+  /* Schmale Handys: die drei Verweise brechen mittig um */
   @media (max-width: 479px) {
-    .fuss__links { flex-wrap: wrap; justify-content: center; }
+    .fuss__links { flex-wrap: wrap; justify-content: center; row-gap: var(--abstand-2xs); text-align: center; }
   }
 
   .punkt {
