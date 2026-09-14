@@ -2,7 +2,7 @@
 /**
  * Datenschutzerklärung — Grundlage ist der Text der bisherigen Seite,
  * angepasst an den neuen Aufbau: Hosting bei Cloudflare, Kontaktformular
- * mit Versand über Resend, Google Maps nur nach Einwilligung, kein
+ * mit Versand über Resend, Google Maps erst auf Klick, kein
  * Google Analytics, keine Cookies. Als Entwurf gekennzeichnet — die
  * Praxis (bzw. ihr Datenschutzbeauftragter) prüft ihn vor Freigabe.
  */
@@ -110,9 +110,9 @@ const { praxis } = seite;
   <p>
     Im Kontaktbereich können Sie sich eine Karte von Google Maps anzeigen
     lassen (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4,
-    Irland). Die Karte wird <strong>erst geladen, wenn Sie dem zustimmen</strong>
-    — über die Leiste am unteren Rand oder den Knopf „Karte laden". Bis
-    dahin sehen Sie nur ein von uns gespeichertes Vorschaubild.
+    Irland). Die Karte wird <strong>erst geladen, wenn Sie den Knopf
+    „Karte laden" anklicken</strong>. Bis dahin sehen Sie nur ein von uns
+    gespeichertes Vorschaubild, und es wird nichts an Google übermittelt.
   </p>
   <p>
     Mit dem Laden erhält Google Ihre IP-Adresse und Informationen über
@@ -125,7 +125,8 @@ const { praxis } = seite;
   <p>
     Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO,
     § 25 Abs. 1 TDDDG). Sie können sie jederzeit mit Wirkung für die
-    Zukunft widerrufen: über „Datenschutz-Einstellungen" am Seitenende.
+    Zukunft widerrufen: über „Zustimmung zur Karte zurücknehmen" am
+    Seitenende.
     Weitere Informationen finden Sie in der
     <a href="https://policies.google.com/privacy?hl=de" rel="noopener">Datenschutzerklärung von Google</a>.
   </p>

@@ -17,8 +17,8 @@ Website der Zahnarzt- und Kieferorthopädie-Praxis **Dres. Nold**, Rosenstraße 
 > - **Öffnungszeiten** verwenden auf allen Größen die mobile Lösung
 >   (Blase mit Zipfel). **Nicht** die zwei Kästen der Desktop-Vorlage.
 > - **Kein Briefumschlag** im Kontakt.
-> - **Google-Karte nur nach Einwilligung** — eigenes Banner, kein Fremdskript
->   (Entscheidung vom 13. September 2026, siehe dort).
+> - **Google-Karte erst auf Klick** — Vorschaubild statt Banner, kein
+>   Fremdskript (geändert am 14. September 2026, siehe dort).
 >
 > `docs/referenz/` beschreibt, was die alte Seite tut — als Nachschlage-
 > werk, nicht als Vorgabe. Bei Widerspruch gilt `entscheidungen.md`.
@@ -77,7 +77,7 @@ Redaktion ──► dres-nold.de/login
 
 - **jQuery, Swiper, Font Awesome, Adobe Typekit** — die vier Fremd-Abhängigkeiten der Webflow-Seite. Alles wird selbst gehostet bzw. neu gebaut.
 - **Google Analytics** — erfordert bei einer Arztpraxis ein Einwilligungs-Banner (§ 25 TDDDG) und ist datenschutzrechtlich heikel, weil Seitenaufrufe Rückschlüsse auf Gesundheitsthemen zulassen. Nachrüstbar, aber nur auf ausdrücklichen Wunsch der Praxis.
-- **Externe Ressourcen jeder Art.** Die Seite darf nichts von fremden Servern nachladen. `scripts/pruefe-externe-ressourcen.mjs` prüft das nach jedem Build (auch im Workflow). **Einzige Ausnahme:** die Google-Maps-Karte im Kontakt — sie lädt erst nach Einwilligung per Skript und steht nicht im HTML.
+- **Externe Ressourcen jeder Art.** Die Seite darf nichts von fremden Servern nachladen. `scripts/pruefe-externe-ressourcen.mjs` prüft das nach jedem Build (auch im Workflow). **Einzige Ausnahme:** die Google-Maps-Karte im Kontakt — sie lädt erst, wenn der Besucher das Vorschaubild anklickt, und steht nicht im HTML.
 - **Eine Datenbank.** Inhalte liegen als Dateien im Repo.
 
 ---
@@ -99,11 +99,18 @@ Redaktion ──► dres-nold.de/login
 
 ### Schrift
 
-Die Vorlage nutzt **Myriad Pro** über Adobe Typekit. Typekit entfällt beim Umzug.
+Die Vorlage nutzt **Myriad Pro** über Adobe Typekit. Typekit entfällt beim Umzug. Zwei Schriften treten an seine Stelle:
 
-**Ersatz: Source Sans 3** — vom selben Schriftgestalter (Robert Slimbach), praktisch deckungsgleiche Proportionen, frei lizenziert (SIL OFL), selbst hostbar. Falls eine Myriad-Pro-Lizenz vorliegt, kann diese stattdessen als WOFF2 eingebunden werden.
+| | Schrift | Token | Wofür |
+|---|---|---|---|
+| Fließtext | **Source Sans 3** | `--schrift` | Alles, was man liest: Absätze, Listen, Tabellen |
+| Überschriften | **Poppins** | `--schrift-titel` | Alles, was man überfliegt oder anklickt: Überschriften, Menü- und Knopfbeschriftungen, Namen, Formularbeschriftungen |
 
-Einbindung: selbst gehostet unter `public/fonts/`, `font-display: swap`, nur die tatsächlich benötigten Schnitte.
+Source Sans 3 stammt vom selben Schriftgestalter wie Myriad Pro (Robert Slimbach) und ist in den Proportionen praktisch deckungsgleich. Poppins ist Florians Wahl für die Überschriften (14. September 2026); es ist geometrisch und ruhig und setzt sich klar vom Fließtext ab.
+
+Beide sind frei lizenziert (SIL OFL) und selbst gehostet unter `public/fonts/`, `font-display: swap`, nur die tatsächlich benötigten Schnitte: Source Sans 3 als variable Schrift (aufrecht und kursiv), Poppins in 400, 600 und 700.
+
+*Vorsicht:* Poppins hat tiefere Unterlängen als Source Sans 3. Überschriften brauchen deshalb etwas mehr Zeilenhöhe — bei `line-height: 1` schneidet der bewegte Verlauf (`background-clip: text`) das „g" unten ab.
 
 ### Design-Tokens
 
@@ -119,13 +126,14 @@ Alle Inhalte liegen als JSON unter `src/content/`. Jede Datei entspricht einem B
 |---|---|---|
 | `hinweis.json` | Hinweis-Sprechblase (Urlaub, Vertretung, Notfall) | Zeitgesteuert über `von`/`bis` — erscheint und verschwindet automatisch |
 | `oeffnungszeiten.json` | 3 Listen: zahnärztlich, kieferorthopädisch, telefonisch | |
-| `leistungen.json` | 11 Leistungen mit Icon, Titel, Kurztext, Rich-Text | Kategorie `zahnmedizin` oder `kieferorthopaedie`; `id` = Adresse, **unveränderlich** |
+| `leistungen.json` | Die Leistungen mit Icon, Titel, Kurztext, Rich-Text — dazu die Kategorien mit Titel, Symbol und Erklärtext | Kategorien: `zahnaerztlich`, `kieferorthopaedie`, `sonstige`; `id` = Adresse, **unveränderlich** |
 | `neuigkeiten.json` | Beiträge mit Datum, Bild, Text, PDF-Anhängen | `id` = Adresse; Text erlaubt Absätze, Aufzählungen, Tabellen |
 | `navigation.json` | Menüpunkte und Reihenfolge | Leistungen klappen automatisch auf |
 | `team.json` | Personen mit Foto, Name, Funktion, Tätigkeiten | `gruppe`: `aerzte` oder `team`; `taetigkeiten` ist eine Liste und klappt auf der Seite auf |
 | `galerie.json` | Praxisbilder | Alternativtexte sind **Pflicht** (Barrierefreiheit) |
-| `abschnitte.json` | Frei anlegbare Abschnitte im Praxis-Bereich | Ohne eigenen Menüeintrag; Bild, Link *oder* PDF-Download |
+| `abschnitte.json` | Frei anlegbare Abschnitte im Praxis-Bereich | Ohne eigenen Menüeintrag; `breite`: `schmal` (46 rem) oder `breit` (volle Inhaltsbreite); Bilder auch direkt im Fließtext |
 | `stellen.json` | Stellenanzeigen | Bereich blendet sich aus, wenn leer |
+| `startseite.json` | Überschriften und Einleitungstexte der Startseiten-Abschnitte | Ein Abschnitt je Bereich: `willkommen`, `sprechstunden`, `galerie`, `leistungen`, `team`, `kontakt`, `formular` |
 | `seite.json` | Seitentitel, Beschreibung, Vorschaubild, Praxisadresse | |
 
 PDF-Downloads hängen an Beiträgen (`neuigkeiten.json` → `dateien`), Abschnitten und Stellen; eine eigene `dokumente.json` gibt es nicht.
@@ -299,7 +307,7 @@ Wenn Sie diese Seite mit einem KI-Assistenten erweitern wollen, geben Sie ihm di
 
 ## Rechtliches
 
-- **Einwilligung nur für die Google-Karte.** Sie lädt erst nach Zustimmung über das eigene Banner (`src/components/Einwilligung.astro`); alles andere kommt vom eigenen Server. Jede weitere Fremdressource müsste ebenso hinter die Einwilligung — oder besser: weglassen.
+- **Einwilligung nur für die Google-Karte — und ohne Banner.** Im Kontaktbereich steht ein selbst gehostetes Vorschaubild; erst ein Klick darauf holt die Karte von Google (`src/components/Kontakt.astro`, `src/scripts/einwilligung.ts`). Bis dahin lädt die Seite nichts von fremden Servern, deshalb ist beim Seitenaufruf kein Einwilligungs-Banner nötig. Im Fußbereich lässt sich eine erteilte Zustimmung zurücknehmen. Jede weitere Fremdressource müsste denselben Weg gehen — oder besser: weggelassen werden.
 - **Impressum und Datenschutzerklärung sind getrennte Seiten** (in der Webflow-Version zeigten beide Footer-Links auf `/datenschutz`).
 - **Das Kontaktformular fragt bewusst keine Gesundheitsdaten ab.** Das darf sich nicht ändern — für Gesundheitsangaben wäre eine erheblich aufwendigere Absicherung nötig.
 - Cloudflare-AV-Vertrag ist im Konto der Praxis abzuschließen; Resend-Konto mit EU-Region anlegen.

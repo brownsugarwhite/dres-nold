@@ -72,12 +72,14 @@ Google-Maps-Karte, rechts ein Kontaktformular** (Name, E-Mail, Telefon,
 Nachricht, Datenschutz-Häkchen — keine Gesundheitsdaten). Versand über
 Resend an info@dres-nold.de.
 
-**Einwilligung:** Die Google-Karte lädt erst nach Zustimmung. Florian
-hat sich bewusst für Google Maps samt eigenem, schlichtem
-Einwilligungs-Banner (ohne Fremdskript) entschieden — gegen die
-ursprüngliche Festlegung „kein Cookie-Banner". Vor der Zustimmung steht
-ein selbst gehostetes Vorschaubild; Widerruf über
-„Datenschutz-Einstellungen" im Fußbereich.
+**Einwilligung (geändert am 14. September 2026):** Das
+Einwilligungs-Banner beim Seitenaufruf ist wieder entfallen. Es bleibt
+allein bei der Klick-Vorschau: Vor der Zustimmung steht ein selbst
+gehostetes Vorschaubild mit dem Knopf „Karte laden"; erst ein Klick
+darauf holt die Karte von Google. Bis dahin lädt die Seite nichts von
+fremden Servern — deshalb braucht sie kein Banner. Eine einmal erteilte
+Zustimmung merkt der Browser und lässt sich im Fußbereich
+zurücknehmen.
 
 **Der Briefumschlag entfällt** — er gehörte zu einem provisorischen
 Neuigkeiten-Bereich, den der neue Bereich ersetzt.
@@ -96,7 +98,9 @@ Eigener Bereich, von der Praxis pflegbar, blendet sich aus wenn leer.
 
 - Analytics **cookielos** (Cloudflare Web Analytics), kein Google Analytics
 - Barrierefrei nach WCAG 2.1 AA
-- Schrift: Source Sans 3 selbst gehostet
+- Schrift: **Poppins** für Überschriften und Bedienelemente,
+  **Source Sans 3** für den Fließtext — beide selbst gehostet
+  (14. September 2026; vorher Source Sans 3 allein)
 - Sauberer Neubau, kein Webflow-Export als Codebasis
 - Keine externen Ressourcen — Voraussetzung dafür, dass kein Cookie-Banner nötig ist
 
@@ -135,3 +139,39 @@ werden **sanft angescrollt**, mit Platz für die Kopfleiste.
 
 Wie Webflow a-18: rollt beim Zeigen einmal hoch und läuft beim
 Verlassen **nicht** zurück.
+
+## Feinschliff (14. September 2026)
+
+Aus Florians Durchsicht der fertigen Seite:
+
+- **Schrift:** Überschriften, Menü- und Knopfbeschriftungen stehen in
+  Poppins; der Fließtext bleibt Source Sans 3. Faustregel: Was man
+  liest, ist Source Sans 3; was man überfliegt oder anklickt, Poppins.
+- **Sprechstunden:** längerer Zipfel auf dem Desktop, mehr Luft
+  zwischen den drei Spalten, kräftigere Spaltenüberschriften, graue
+  Wochentage, vollwertige Überschrift mit Beschreibungstext und ein
+  Schließen-Kreuz wie in der mobilen Vorlage. Es „schließt" die Blase,
+  indem es an den Praxis-Bereich darunter scrollt.
+- **Praxisbilder:** Format wie die alte Seite (feste Höhe statt
+  quadratischem Zuschnitt). Das Band läuft weiter endlos durch; die
+  Punkte darunter zeigen nur an, wo es steht, und springen auf Klick
+  dorthin. Kein schrittweiser Slider.
+- **Freie Abschnitte:** Breite in der Redaktion wählbar — schmal
+  (46 rem, wie eine aufgeklappte Leistung) oder breit (volle
+  Inhaltsbreite). Bilder stehen über die volle Breite, ohne Rundung,
+  und lassen sich direkt in den Fließtext setzen.
+- **Startseitentexte:** Überschriften und Einleitungen aller Abschnitte
+  liegen in `src/content/startseite.json` und sind über die Redaktion
+  pflegbar. Kategorien der Leistungen haben zusätzlich einen Erklärtext.
+- **Trennlinien:** ausprobiert und wieder verworfen — die Seite bleibt
+  ohne graue Linien zwischen den Abschnitten.
+- **Übergänge:** eine durchgehende Bewegung statt Hüpfer und Sprung.
+  Der Fließtext der Zielseite trägt keinen eigenen Übergangsnamen mehr
+  und wächst mit der Karte. Beim Blättern schieben sich die Karten
+  vollständig seitlich durch. Bei den Neuigkeiten wandert das Bild
+  wirklich (kein Überblenden), und der Text der Vorschaukarte blendet
+  unten aus, während der Seitenkopf oben einblendet.
+- **Kontaktformular:** keine Kästen mehr, sondern feine Grundlinien,
+  unter denen sich beim Hineinklicken eine Linie in der Hausfarbe
+  zeichnet. Sendeknopf als Pille mit gleitendem Pfeil, Bestätigung als
+  gezeichneter Kreis mit Haken.
