@@ -22,5 +22,10 @@ GITHUB_BRANCH = "main"
 # Cloudflare-Access-Team (der Teil vor .cloudflareaccess.com)
 ACCESS_TEAM = "dres-nold"
 # Kontaktformular
-KONTAKT_EMPFAENGER = "info@dres-nold.de"
-KONTAKT_ABSENDER = "Website Dres. Nold <formular@dres-nold.de>"
+# TESTPHASE: Solange die Domain nicht bei Resend bestätigt ist, geht der
+# Versand über Resends Testabsender — der darf nur an die Adresse des
+# Resend-Kontos zustellen. Für den echten Betrieb umstellen auf:
+#   KONTAKT_EMPFAENGER = "info@dres-nold.de"
+#   KONTAKT_ABSENDER = "Website Dres. Nold <formular@dres-nold.de>"
+KONTAKT_EMPFAENGER = "website@dres-nold.de"
+KONTAKT_ABSENDER = "Website Dres. Nold <onboarding@resend.dev>"

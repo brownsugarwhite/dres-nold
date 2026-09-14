@@ -1,0 +1,20 @@
+DNS-Sicherung dres-nold.de — 2026-09-14 10:08 — vor dem Umzug zu Cloudflare (Nameserver bei united-domains)
+
+dres-nold.de  A  198.202.211.1 
+dres-nold.de  MX  20 mx01.udag.de. 10 mx00.udag.de. 
+dres-nold.de  NS  ns.udag.de. ns.udag.net. ns.udag.org. 
+www.dres-nold.de  A  cdn.webflow.com. 
+www.dres-nold.de  AAAA  cdn.webflow.com. 
+www.dres-nold.de  CNAME  cdn.webflow.com. 
+www.dres-nold.de  MX  cdn.webflow.com. 
+www.dres-nold.de  TXT  cdn.webflow.com. 
+www.dres-nold.de  SRV  cdn.webflow.com. 
+www.dres-nold.de  NS  cdn.webflow.com. 
+autoconfig.dres-nold.de  A  89.31.143.90 
+autodiscover.dres-nold.de  A  89.31.143.90 
+
+SOA:
+ns.udag.de. hostmaster.united-domains.de. 2023120517 10800 3600 604800 3600
+
+AXFR-Versuch:
+; Transfer failed.
