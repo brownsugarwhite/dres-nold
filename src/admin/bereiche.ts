@@ -72,6 +72,17 @@ const zeitenListe = (name: string, label: string): Feld => ({
   ],
 });
 
+const abschnittstext = (name: string, label: string, hilfe?: string): Feld => ({
+  name,
+  label,
+  typ: 'gruppe',
+  hilfe,
+  felder: [
+    { name: 'titel', label: 'Überschrift', typ: 'text' },
+    { name: 'text', label: 'Beschreibungstext', typ: 'mehrzeilig', hilfe: 'Darf leer bleiben — dann steht nur die Überschrift da.' },
+  ],
+});
+
 export const bereiche: Record<Bereich, BereichDefinition> = {
   hinweis: {
     titel: 'Hinweis (Urlaub, Vertretung, Notfall)',
@@ -128,7 +139,8 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         hilfe: 'Leere Bereiche erscheinen nicht.',
         felder: [
           { name: 'titel', label: 'Titel', typ: 'text' },
-          { name: 'kurz', label: 'Untertitel', typ: 'text' },
+          { name: 'kurz', label: 'Untertitel', typ: 'text', hilfe: 'Eine Zeile — erscheint im Aufklappmenü.' },
+          { name: 'beschreibung', label: 'Erklärtext über den Kacheln', typ: 'richtext', hilfe: 'Steht auf der Startseite zwischen der Überschrift des Bereichs und den Kacheln.' },
           { name: 'icon', label: 'Symbol', typ: 'bild', ordner: 'allgemein' },
         ],
       },
@@ -226,8 +238,12 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         titelfeld: 'titel',
         felder: [
           { name: 'titel', label: 'Überschrift', typ: 'text' },
-          { name: 'text', label: 'Text', typ: 'richtext' },
-          { name: 'bild', label: 'Bild (optional)', typ: 'bild', ordner: 'abschnitte' },
+          { name: 'breite', label: 'Breite des Abschnitts', typ: 'auswahl', hilfe: 'Schmal liest sich angenehmer, breit wirkt großzügiger.', optionen: [
+            { wert: 'schmal', label: 'Schmal — wie eine aufgeklappte Leistung' },
+            { wert: 'breit', label: 'Breit — volle Inhaltsbreite' },
+          ] },
+          { name: 'text', label: 'Text', typ: 'richtext', hilfe: 'Bilder lassen sich mit dem Knopf „Bild" direkt in den Text setzen — sie stehen dann über die volle Breite.' },
+          { name: 'bild', label: 'Bild oben (optional)', typ: 'bild', ordner: 'abschnitte' },
           { name: 'bild_alt', label: 'Bildbeschreibung', typ: 'text' },
           { name: 'bild_anzeige', label: 'Bild anzeigen', typ: 'auswahl', optionen: [
             { wert: 'links', label: 'Links, halbe Breite — Text umfließt es' },
@@ -291,6 +307,21 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
     ],
   },
 
+  startseite: {
+    titel: 'Texte der Startseite',
+    beschreibung: 'Die Überschriften und Einleitungstexte der Abschnitte auf der Startseite. Die Inhalte selbst — Leistungen, Team, Sprechstunden — pflegen Sie in den jeweils eigenen Bereichen.',
+    symbol: '/icons/navigation/praxis.svg',
+    felder: [
+      abschnittstext('willkommen', 'Begrüßung ganz oben'),
+      abschnittstext('sprechstunden', 'Sprechstunden-Blase'),
+      abschnittstext('galerie', 'Praxisbilder', 'Bleibt beides leer, steht über den Bildern nichts.'),
+      abschnittstext('leistungen', 'Leistungen'),
+      abschnittstext('team', 'Team'),
+      abschnittstext('kontakt', 'Kontakt'),
+      abschnittstext('formular', 'Kontaktformular'),
+    ],
+  },
+
   seite: {
     titel: 'Angaben für Google und Kontakt',
     beschreibung: 'Titel und Beschreibung, die Suchmaschinen zeigen, sowie Adresse und Telefonnummer der Praxis.',
@@ -320,5 +351,5 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
 /** Reihenfolge auf der Übersichtsseite */
 export const reihenfolge: Bereich[] = [
   'hinweis', 'oeffnungszeiten', 'neuigkeiten', 'leistungen', 'team',
-  'galerie', 'abschnitte', 'stellen', 'seite', 'navigation',
+  'galerie', 'abschnitte', 'stellen', 'startseite', 'seite', 'navigation',
 ];

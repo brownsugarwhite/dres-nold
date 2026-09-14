@@ -49,6 +49,9 @@
  * nach links ab) werden proportional zur eingestellten Länge skaliert.
  */
 import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
+import startseite from '../content/startseite.json';
+
+const texte = startseite.sprechstunden;
 ---
 
 {/*
@@ -70,7 +73,13 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
   <div class="ozbereich__buehne">
     <div class="ozblase" data-ozblase>
       <div class="ozblase__flaeche">
-        <h2 class="ozblase__titel" id="oz-titel">Sprechstunden</h2>
+        {/* Wie in der mobilen Vorlage ein Kreuz oben rechts. Weil die
+            Blase scrollgesteuert ist, „schließt" es sie, indem es sanft
+            an den Praxis-Bereich darunter scrollt. */}
+        <button class="ozschliessen" type="button" data-ozschliessen aria-label="Sprechstunden schließen"></button>
+
+        <h2 class="ozblase__titel ohne-verlauf" id="oz-titel">{texte.titel}</h2>
+        {texte.text && <p class="ozblase__einleitung">{texte.text}</p>}
 
         <div class="ozblase__spalten">
           <OeffnungszeitenListen />
@@ -93,7 +102,7 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
      Wert und richtet Ruhelage und Bewegung danach aus. */
   .ozblase { --zipfel-laenge: 154px; }
   @media (min-width: 60rem) {
-    .ozblase { --zipfel-laenge: 90px; }
+    .ozblase { --zipfel-laenge: 130px; }
   }
 
   /* Der Scrollweg, über den die Blase hereinfährt — muss zu `ozWeg()`
@@ -201,12 +210,45 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
     stroke-linejoin: round;
   }
 
-  /* Überschrift über allen drei Listen */
+  /* Überschrift über allen drei Listen — eine vollwertige Abschnitts-
+     überschrift wie „Unsere Leistungen" oder „Wir freuen uns auf Sie",
+     nur eine Spur kleiner, weil sie in der Blase steht. */
   .ozblase__titel {
-    margin: 0 0 var(--abstand-m);
+    margin: 0;
+    padding-right: 48px;
     color: var(--farbe-primaer);
-    font-size: var(--text-l);
+    font-size: clamp(1.75rem, 1.2rem + 1.8vw, 2.75rem);
     font-weight: var(--gewicht-halbfett);
+    line-height: 1.1;
+  }
+
+  /* Schließen-Kreuz wie auf den Leistungsseiten: dreht sich beim
+     Zeigen um 90° (Abläufe a-34 / a-35 der Vorlage). */
+  .ozschliessen {
+    position: absolute;
+    top: var(--abstand-xs);
+    right: var(--abstand-xs);
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-rund);
+    background: url('/icons/ui/schliessen.svg') center / 20px no-repeat;
+    cursor: pointer;
+    transition: transform 300ms var(--verlauf), background-color 300ms var(--verlauf);
+  }
+
+  .ozschliessen:hover,
+  .ozschliessen:focus-visible {
+    transform: rotate(90deg);
+    background-color: var(--farbe-flaeche-gedeckt);
+  }
+
+  .ozblase__einleitung {
+    max-width: 46rem;
+    margin: var(--abstand-2xs) 0 var(--abstand-l);
+    color: var(--farbe-text);
+    font-size: var(--text-m);
   }
 
   /* Drei Listen nebeneinander — auf kleinen Bildschirmen untereinander */
@@ -217,7 +259,7 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
        die breiteste Spalte abgeschnitten. */
     grid-template-columns: repeat(3, auto);
     justify-content: space-between;
-    gap: var(--abstand-l);
+    gap: clamp(var(--abstand-l), 6vw, var(--abstand-2xl));
     align-items: start;
   }
 
@@ -232,6 +274,8 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
 
   /* Ohne Bewegung: steht ruhig im Seitenfluss */
   @media (prefers-reduced-motion: reduce) {
+    .ozschliessen { transition: none; }
+    .ozschliessen:hover { transform: none; }
     .ozraum { display: none; }
     .ozbereich { position: static; height: auto; padding-block: var(--abstand-2xl); }
     .ozbereich__buehne { position: static; height: auto; }
@@ -243,6 +287,21 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
 <script>
   import { ausStuetzstellen, type Stuetzstelle } from '../scripts/easing';
   import { ozWeg, beimScrollenSichtbar, nachziehen } from '../scripts/scrollwege';
+  import { zuSprungmarke } from '../scripts/anker';
+
+  /**
+   * Das Kreuz in der Blase: Die Blase hängt am Scrollweg, lässt sich
+   * also nicht „wegklicken". Stattdessen gleitet die Seite an den
+   * Praxis-Bereich darunter — dort ist die Blase vorbei.
+   */
+  function ozSchliessenAufbauen() {
+    const knopf = document.querySelector<HTMLElement>('[data-ozschliessen]');
+    if (!knopf || knopf.dataset.bereit) return;
+    knopf.dataset.bereit = 'ja';
+    knopf.addEventListener('click', () => {
+      if (!zuSprungmarke('#praxis')) window.scrollTo({ top: window.innerHeight * 4, behavior: 'smooth' });
+    });
+  }
 
   /** Höhe der Symbolleiste unten — `.fussleiste__inhalt` */
   const LEISTE = 110;
@@ -428,5 +487,9 @@ import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
   }
 
   ozAufbauen();
-  document.addEventListener('astro:page-load', ozAufbauen);
+  ozSchliessenAufbauen();
+  document.addEventListener('astro:page-load', () => {
+    ozAufbauen();
+    ozSchliessenAufbauen();
+  });
 </script>

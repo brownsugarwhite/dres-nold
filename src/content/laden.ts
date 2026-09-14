@@ -17,6 +17,7 @@ import team from './team.json';
 import galerie from './galerie.json';
 import abschnitte from './abschnitte.json';
 import stellen from './stellen.json';
+import startseite from './startseite.json';
 import seite from './seite.json';
 
 const dateien = {
@@ -29,6 +30,7 @@ const dateien = {
   galerie,
   abschnitte,
   stellen,
+  startseite,
   seite,
 };
 

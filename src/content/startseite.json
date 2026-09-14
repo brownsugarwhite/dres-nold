@@ -1,0 +1,31 @@
+{
+  "_hinweis_fuer_die_redaktion": "Die Überschriften und Einleitungstexte der Abschnitte auf der Startseite. Ein leerer Einleitungstext lässt den Absatz einfach weg; eine leere Überschrift blendet sie aus.",
+  "willkommen": {
+    "titel": "Willkommen in unserer Praxis Dres. Nold",
+    "text": "Zahnmedizin und Kieferorthopädie unter einem Dach — in Bietigheim. Wir nehmen uns Zeit für Sie, erklären jeden Schritt und behandeln so schonend wie möglich."
+  },
+  "sprechstunden": {
+    "titel": "Sprechstunden",
+    "text": "Wann Sie uns antreffen und wann Sie uns telefonisch erreichen. Termine vereinbaren wir gerne auch außerhalb dieser Zeiten."
+  },
+  "galerie": {
+    "titel": "",
+    "text": ""
+  },
+  "leistungen": {
+    "titel": "Unsere Leistungen",
+    "text": "Klicken Sie auf eine Leistung, um mehr zu erfahren."
+  },
+  "team": {
+    "titel": "Wir freuen uns auf Sie",
+    "text": ""
+  },
+  "kontakt": {
+    "titel": "So erreichen Sie uns",
+    "text": ""
+  },
+  "formular": {
+    "titel": "Schreiben Sie uns",
+    "text": "Wir melden uns zurück, sobald wir Ihre Nachricht gelesen haben. Bitte schicken Sie uns keine Angaben zu Ihrer Gesundheit — dafür rufen Sie uns bitte an."
+  }
+}

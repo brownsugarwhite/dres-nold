@@ -33,7 +33,7 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     margin-bottom: var(--abstand-2xs);
     color: var(--farbe-primaer);
     font-size: var(--text-m);
-    font-weight: var(--gewicht-normal);
+    font-weight: var(--gewicht-halbfett);
   }
 
   /* Wochentag, Vormittag, Nachmittag — drei Spalten, damit die
@@ -53,7 +53,11 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
     vertical-align: baseline;
   }
 
+  /* Der Wochentag tritt zurück — er ist Beschriftung, nicht Angabe.
+     Gleiche Farbe wie der Fließtext, die Zeiten bleiben in der
+     Hausfarbe. */
   .ozzeiten th {
+    color: var(--farbe-text);
     text-align: right;
     padding-right: var(--abstand-s);
   }

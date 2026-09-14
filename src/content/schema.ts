@@ -86,6 +86,8 @@ export const leistungenSchema = z.object({
       position: z.number(),
       aktiv: z.boolean(),
       kurz: text,
+      /** Erklärtext zwischen Kategorieüberschrift und den Kacheln */
+      beschreibung: richtext.optional(),
       icon: pfad,
     }),
   ),
@@ -186,6 +188,8 @@ export const abschnitteSchema = z.object({
       bild_alt: text,
       /** links / rechts: halbe Breite, der Text umfließt das Bild; voll: volle Breite über dem Text */
       bild_anzeige: z.enum(['links', 'rechts', 'voll']).default('links'),
+      /** schmal: gute Lesebreite wie die aufgeklappten Leistungen; breit: volle Inhaltsbreite */
+      breite: z.enum(['schmal', 'breit']).default('schmal'),
       link_text: text,
       link_ziel: text,
       pdf_text: text,
@@ -209,6 +213,26 @@ export const stellenSchema = z.object({
       pdf_datei: pfad,
     }),
   ),
+});
+
+/**
+ * Überschrift und Einleitungstext eines Startseiten-Abschnitts.
+ * Beides darf leer bleiben — dann entfällt der jeweilige Teil.
+ */
+const abschnittstext = z.object({
+  titel: text,
+  text: text,
+});
+
+export const startseiteSchema = z.object({
+  _hinweis_fuer_die_redaktion: text.optional(),
+  willkommen: abschnittstext,
+  sprechstunden: abschnittstext,
+  galerie: abschnittstext,
+  leistungen: abschnittstext,
+  team: abschnittstext,
+  kontakt: abschnittstext,
+  formular: abschnittstext,
 });
 
 export const seiteSchema = z.object({
@@ -241,6 +265,7 @@ export const schemata = {
   galerie: galerieSchema,
   abschnitte: abschnitteSchema,
   stellen: stellenSchema,
+  startseite: startseiteSchema,
   seite: seiteSchema,
 } as const;
 

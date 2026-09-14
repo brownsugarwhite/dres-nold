@@ -31,9 +31,32 @@ body {
 h1, h2, h3, h4 {
   margin: 0 0 var(--abstand-s);
   color: var(--farbe-primaer);
+  font-family: var(--schrift-titel);
   line-height: var(--zeilenhoehe-eng);
   font-weight: var(--gewicht-halbfett);
   text-wrap: balance;
+}
+
+/*
+  Überschriftenschrift auch für alles, was man nicht liest, sondern
+  überfliegt oder anklickt: Menü- und Knopfbeschriftungen, Namen,
+  Formularbeschriftungen. Der Fließtext bleibt Source Sans 3.
+  Komponenten, die das brauchen, setzen diese Klasse oder greifen auf
+  `var(--schrift-titel)` zurück.
+*/
+.schrift-titel,
+button,
+input,
+select,
+textarea,
+label,
+legend {
+  font-family: var(--schrift-titel);
+}
+
+/* Mehrzeilige Eingaben sind Fließtext — dort bleibt es bei Source Sans 3. */
+textarea {
+  font-family: var(--schrift);
 }
 
 h1 { font-size: var(--text-xxl); }

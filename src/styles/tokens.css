@@ -42,6 +42,12 @@
      lizenziert und selbst gehostet unter public/fonts/. */
   --schrift: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
+  /* Überschriften und Bedienelemente stehen in Poppins — geometrisch,
+     ruhig, mit klar gezeichneten Rundungen. Fließtext bleibt Source
+     Sans 3. Regel: Alles, was man liest, ist Source Sans 3; alles, was
+     man überfliegt oder anklickt, ist Poppins. */
+  --schrift-titel: 'Poppins', 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
   /* Fließende Größen: passen sich stufenlos der Fensterbreite an */
   --text-xs: clamp(0.78rem, 0.76rem + 0.1vw, 0.84rem);
   --text-s: clamp(0.9rem, 0.87rem + 0.15vw, 1rem);

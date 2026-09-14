@@ -88,7 +88,7 @@ const kategorien = (leistungen.kategorien ?? [])
     </span>
     <span class="punkt" aria-hidden="true"></span>
     <span class="kontaktzeile__text">
-      <a href={`mailto:${praxis.email}`}>{praxis.email}</a>
+      <a href={`mailto:${praxis.email}`}><span class="kontaktzeile__mail">{praxis.email}</span></a>
     </span>
   </div>
 </div>
@@ -338,6 +338,17 @@ const kategorien = (leistungen.kategorien ?? [])
     z-index: 1;
   }
 
+  /* Alle Beschriftungen der Navigation stehen in der Überschriftenschrift
+     (Poppins) — sie werden überflogen und angeklickt, nicht gelesen. */
+  .menuepunkt__text,
+  .mobilmenue__text,
+  .mobilmenue__kurz,
+  .oberpunkt__titel,
+  .oberpunkt__kurz,
+  .fussknopf__text {
+    font-family: var(--schrift-titel);
+  }
+
   /* ---------- Kontaktzeile ---------- */
   .kontaktzeile {
     display: flex;
@@ -362,8 +373,9 @@ const kategorien = (leistungen.kategorien ?? [])
     display: flex;
     align-items: center;
     color: var(--farbe-primaer);
-    font-size: var(--text-xs);
-    font-weight: 300;
+    font-family: var(--schrift-titel);
+    font-size: var(--text-s);
+    font-weight: var(--gewicht-normal);
     white-space: nowrap;
   }
 
@@ -372,9 +384,25 @@ const kategorien = (leistungen.kategorien ?? [])
     text-decoration: none;
   }
 
-  .kontaktzeile__text a:hover,
-  .kontaktzeile__text a:focus-visible {
-    text-decoration: underline;
+  /* Keine Unterstreichung beim Zeigen — die Zeile soll ruhig bleiben.
+     Nur die E-Mail-Adresse reagiert, und zwar mit einem kleinen
+     Aufziehen statt mit einem Strich. */
+  .kontaktzeile__mail {
+    display: inline-block;
+    font-weight: var(--gewicht-halbfett);
+    transform-origin: center;
+    transition: transform var(--dauer-schnell) var(--verlauf);
+  }
+
+  .kontaktzeile__text a:hover .kontaktzeile__mail,
+  .kontaktzeile__text a:focus-visible .kontaktzeile__mail {
+    transform: scale(1.08);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kontaktzeile__mail { transition: none; }
+    .kontaktzeile__text a:hover .kontaktzeile__mail,
+    .kontaktzeile__text a:focus-visible .kontaktzeile__mail { transform: none; }
   }
 
   /* ---------- Kopfleiste ---------- */
@@ -796,12 +824,16 @@ const kategorien = (leistungen.kategorien ?? [])
   }
 
   /* .nav-bottom-wrapper: feste Breite 700px, Höhe 110px */
+  /* Die Leiste war mit festen 700 px eng getaktet. Jetzt darf sie bis
+     980 px atmen und staucht sich auf schmalen Fenstern von selbst.
+     Zipfel und Aufklappmenue richten sich nach der gemessenen Knopfmitte
+     (Oeffnungszeiten.astro `vermessen()`, Navigation `zeichnen()`) und
+     wandern deshalb automatisch mit. */
   .fussleiste__inhalt {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 700px;
-    max-width: 700px;
+    width: min(100% - 2 * var(--abstand-m), 980px);
     height: 110px;
   }
 
@@ -912,7 +944,7 @@ const kategorien = (leistungen.kategorien ?? [])
      zwischen den Symbolen */
   @media (max-width: 479px) {
     .kontaktzeile__inhalt { width: 94%; gap: var(--abstand-2xs); }
-    .kontaktzeile__text { font-size: 13px; }
+    .kontaktzeile__text { font-size: var(--text-xs); }
     .fussleiste__inhalt { width: 94%; }
     .fussleiste__inhalt--klein .fussknopf { flex: 1; }
   }

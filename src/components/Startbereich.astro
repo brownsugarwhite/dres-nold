@@ -235,17 +235,25 @@ const { praxis } = seite;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: var(--abstand-m);
+    /* In der Vorlage folgt `.scroll2action` ohne Abstand direkt auf das
+       Logo (live-webflow.css `.logo` / `.scroll2action`). Der Abstand
+       entsteht dort allein aus der Logohöhe. */
+    margin-top: 0;
     opacity: var(--hinweis-deckkraft, 1);
     transform: scale(var(--hinweis-groesse, 1)) translateY(var(--hinweis-versatz, 0px));
   }
 
+  /* `.text-block` der Vorlage: 250 px breit, 16 px, 10 px über dem Pfeil.
+     Etwas kräftiger als die Vorlage (400 statt 300) und mit engerem
+     Zeilenabstand, damit die zwei Zeilen zusammengehören. */
   .scrollhinweis__text {
     max-width: 250px;
-    margin: 0 0 var(--abstand-2xs);
+    margin: 0 0 10px;
     color: var(--farbe-primaer);
+    font-family: var(--schrift-titel);
     font-size: 1rem;
-    font-weight: 300;
+    font-weight: var(--gewicht-normal);
+    line-height: 1.25;
     text-align: center;
   }
 
