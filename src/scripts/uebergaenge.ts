@@ -35,9 +35,40 @@ type Vorbereitung = Event & {
   to: URL;
 };
 
+type VorTausch = Event & { newDocument: Document; viewTransition?: ViewTransition };
+
+/**
+ * Die Kennzeichen wieder abräumen.
+ *
+ * WICHTIG ist der Zeitpunkt. Ein Seitenwechsel läuft so ab:
+ *
+ *   1. altes Bild aufnehmen
+ *   2. Seite austauschen  → hier meldet Astro `astro:after-swap`,
+ *                           gleich darauf `astro:page-load`
+ *   3. neues Bild aufnehmen
+ *   4. bewegen
+ *
+ * `astro:page-load` kommt also noch VOR Schritt 3. Wer dort aufräumt,
+ * nimmt der Zielkachel ihren Übergangsnamen, bevor das neue Bild
+ * aufgenommen ist — dann gibt es kein Gegenstück mehr und der Rückweg
+ * bricht mitten in der Bewegung ab. Deshalb wird erst aufgeräumt, wenn
+ * der Wechsel fertig ist (`finished`).
+ */
+function kennzeichenAbraeumen() {
+  delete document.documentElement.dataset.uebergang;
+  for (const k of document.querySelectorAll('[data-morph]')) k.removeAttribute('data-morph');
+}
+
+/** Läuft gerade ein echter Übergang? Dann räumt dessen `finished` auf. */
+let uebergangLaeuft = false;
+
 document.addEventListener('astro:before-preparation', (ereignis) => {
   const e = ereignis as Vorbereitung;
   const quelle = e.sourceElement ?? null;
+
+  /* Reste eines früheren Wechsels — sonst trüge eine zweite Kachel noch
+     ihren Namen und bekäme eine überflüssige Ebene. */
+  kennzeichenAbraeumen();
 
   /* Blättern: Richtung merken, bis der Wechsel vorbei ist */
   const blaettern = quelle?.closest?.('[data-blaettern]');
@@ -73,16 +104,26 @@ document.addEventListener('astro:after-swap', () => {
    Blätterns muss deshalb auch am NEUEN <html> stehen, sonst verlöre die
    hereinfahrende Seite mitten in der Bewegung ihre Regeln. */
 document.addEventListener('astro:before-swap', (ereignis) => {
+  const e = ereignis as VorTausch;
+
   const richtung = document.documentElement.dataset.uebergang;
-  if (!richtung) return;
-  const neu = (ereignis as Event & { newDocument: Document }).newDocument;
-  neu.documentElement.dataset.uebergang = richtung;
+  if (richtung) e.newDocument.documentElement.dataset.uebergang = richtung;
+
+  /* Aufräumen erst, wenn die Bewegung vorbei ist — siehe
+     `kennzeichenAbraeumen()`. */
+  const wechsel = e.viewTransition;
+  if (!wechsel) return;
+  uebergangLaeuft = true;
+  wechsel.finished.catch(() => { /* abgebrochen: trotzdem aufräumen */ }).finally(() => {
+    uebergangLaeuft = false;
+    kennzeichenAbraeumen();
+  });
 });
 
 document.addEventListener('astro:page-load', () => {
-  delete document.documentElement.dataset.uebergang;
-  /* Aufräumen: Die Kennzeichen gelten nur für den einen Übergang. */
-  for (const k of document.querySelectorAll('[data-morph]')) k.removeAttribute('data-morph');
+  /* Ohne echten Übergang (ältere Browser, reduzierte Bewegung) gibt es
+     kein `finished` — dann hier aufräumen. */
+  if (!uebergangLaeuft) kennzeichenAbraeumen();
   schliessenKlebenLassen();
 });
 
