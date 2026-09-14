@@ -217,6 +217,19 @@
       ],
       "foto": "",
       "foto_alt": "Porträtfoto von Sarah"
+    },
+    {
+      "id": "heidi",
+      "aktiv": true,
+      "position": 17,
+      "gruppe": "team",
+      "name": "Heidi",
+      "funktion": "Helferin",
+      "taetigkeiten": [
+        "dfsfsdfsfdfsdd"
+      ],
+      "foto": "/bilder/team/heidi.png",
+      "foto_alt": ""
     }
   ]
 }
