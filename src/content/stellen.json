@@ -12,6 +12,16 @@
       "beschreibung": "Beschreibung der Stelle, der Aufgaben und dessen, was die Praxis bietet.",
       "ansprechpartner": "Dr. Paul Nold",
       "pdf_datei": ""
+    },
+    {
+      "id": "arzt",
+      "aktiv": true,
+      "position": 2,
+      "titel": "Arzt",
+      "umfang": "Voll",
+      "beschreibung": "beajfbdivjnsdvvmxdfbndfihbghdifhsvfsvdnfvdns",
+      "ansprechpartner": "",
+      "pdf_datei": ""
     }
   ]
 }
