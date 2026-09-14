@@ -1028,10 +1028,12 @@ const kategorien = (leistungen.kategorien ?? [])
       const s = hoch ? -1 : 1;   // Richtung: nach oben oder unten
       const ECKE = 40;             // Rundung, voll aufgewölbt (Entwurf)
       const ECKE_UNTERWEGS = 140;  // Rundung während der Bewegung
+      let kappe = ECKE_UNTERWEGS;  // aktuelle Obergrenze der Rundung
 
       /* Weich mit leichtem Überschwingen (nur beim Öffnen) */
       const kurveAuf = (t: number) => { const c = 1.15; const u = t - 1; return 1 + (c + 1) * u * u * u + c * u * u; };
-      const kurveZu = (t: number) => 1 - Math.pow(1 - t, 3);
+      const kurveZu = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+      const weich = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
       const zeichnen = () => {
         const breite = document.documentElement.clientWidth;
@@ -1049,10 +1051,11 @@ const kategorien = (leistungen.kategorien ?? [])
         const p = Math.min(1, anteil);
         const w = boxBreite * (0.45 + 0.55 * p);
         /* Rundung: unterwegs so groß wie möglich (halbe Höhe, bis 140 px),
-           erst gegen Ende auf die 40 px des Entwurfs — so bleibt die Form
-           während der ganzen Bewegung eine Blase, nie ein Kasten. */
-        const eckeMax = ECKE_UNTERWEGS + (ECKE - ECKE_UNTERWEGS) * p * p * p;
-        const r = Math.min(eckeMax, h / 2, w / 2 - 1);
+           die Obergrenze `kappe` wandert zeitgesteuert und weich zu den
+           40 px des Entwurfs (siehe `schritt`) — so bleibt die Form
+           während der ganzen Bewegung eine Blase, nie ein Kasten, und
+           nichts zieht am Ende hastig nach. */
+        const r = Math.min(kappe, h / 2, w / 2 - 1);
         const k = 0.5523 * r;
         const xL = mitte - w / 2;
         const xR = mitte + w / 2;
@@ -1122,6 +1125,11 @@ const kategorien = (leistungen.kategorien ?? [])
         const t = Math.min(1, (jetzt - start) / dauer);
         const kurve = ziel === 1 ? kurveAuf : kurveZu;
         anteil = von + (ziel - von) * kurve(t);
+        /* Rundung: beim Öffnen über die ganze Dauer weich von 140 auf 40,
+           beim Schließen in der ersten Hälfte weich zurück auf 140 */
+        kappe = ziel === 1
+          ? ECKE_UNTERWEGS + (ECKE - ECKE_UNTERWEGS) * weich(t)
+          : ECKE + (ECKE_UNTERWEGS - ECKE) * weich(Math.min(1, t / 0.5));
         zeichnen();
         if (t < 1) { requestAnimationFrame(schritt); return; }
         laeuft = false;
@@ -1140,8 +1148,8 @@ const kategorien = (leistungen.kategorien ?? [])
         ziel = nachZiel;
         von = anteil;
         start = performance.now();
-        dauer = nachZiel === 1 ? 620 : 360;
-        if (wenigerBewegung) { anteil = ziel; zeichnen(); dauer = 0; start = -1e9; }
+        dauer = nachZiel === 1 ? 680 : 460;
+        if (wenigerBewegung) { anteil = ziel; kappe = ECKE; zeichnen(); dauer = 0; start = -1e9; }
         if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
       };
 
