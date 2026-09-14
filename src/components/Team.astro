@@ -270,16 +270,33 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     background: url('/icons/ui/linie-schatten.svg') 50% 100% / cover no-repeat;
   }
 
+  /* Der Verlauf zieht sich über die ganze Karte und bleibt außen lange
+     sichtbar — er soll auslaufen, nicht abreißen. Die Zwischenstufen
+     halten ihn im äußeren Drittel noch gut erkennbar. */
   [data-reihe='anfang'] .portraet__schatten {
-    mask-image: linear-gradient(to right, transparent, #000 60%);
+    mask-image: linear-gradient(to right,
+      rgb(0 0 0 / 0) 0%,
+      rgb(0 0 0 / 0.35) 25%,
+      rgb(0 0 0 / 0.7) 55%,
+      rgb(0 0 0 / 1) 95%);
   }
 
   [data-reihe='ende'] .portraet__schatten {
-    mask-image: linear-gradient(to left, transparent, #000 60%);
+    mask-image: linear-gradient(to left,
+      rgb(0 0 0 / 0) 0%,
+      rgb(0 0 0 / 0.35) 25%,
+      rgb(0 0 0 / 0.7) 55%,
+      rgb(0 0 0 / 1) 95%);
   }
 
   [data-reihe='allein'] .portraet__schatten {
-    mask-image: linear-gradient(to right, transparent, #000 35%, #000 65%, transparent);
+    mask-image: linear-gradient(to right,
+      rgb(0 0 0 / 0) 0%,
+      rgb(0 0 0 / 0.5) 20%,
+      rgb(0 0 0 / 1) 45%,
+      rgb(0 0 0 / 1) 55%,
+      rgb(0 0 0 / 0.5) 80%,
+      rgb(0 0 0 / 0) 100%);
   }
 
   /* .team-arrow: weißer Pfeil, 16 px hoch, unten mittig */

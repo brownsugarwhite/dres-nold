@@ -229,7 +229,10 @@ const bilder = galerie.eintraege
     };
 
     let zuletzt = -1;
+    let laeuft = false;
+
     const zeichnen = () => {
+      if (!laeuft) return;
       const jetzt = aktuell();
       if (jetzt !== zuletzt) {
         zuletzt = jetzt;
@@ -257,8 +260,19 @@ const bilder = galerie.eintraege
       zuletzt = -1;
     });
 
+    /* Die Schleife läuft nur, solange das Band im Fenster steht. Sonst
+       rechnete sie in jedem Bild der ganzen Seite mit — und stahl
+       anderen Bewegungen (etwa dem Seitenwechsel) Rechenzeit. */
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      requestAnimationFrame(zeichnen);
+      const beobachter = new IntersectionObserver(([eintrag]) => {
+        if (eintrag.isIntersecting && !laeuft) {
+          laeuft = true;
+          requestAnimationFrame(zeichnen);
+        } else if (!eintrag.isIntersecting) {
+          laeuft = false;
+        }
+      }, { threshold: 0 });
+      beobachter.observe(bereich);
     }
   }
 

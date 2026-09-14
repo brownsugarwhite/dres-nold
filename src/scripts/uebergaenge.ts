@@ -1,10 +1,11 @@
 /**
  * Seitenwechsel — die Teile, die CSS allein nicht kann.
  *
- * 1. Abheben: Die geklickte Karte hebt sich ab, BEVOR die Zielseite
- *    eingetauscht wird. Das alte Abbild zeigt dann die abgehobene Karte,
- *    aus der heraus die Seite wächst. Damit das auch bei blitzschnellem
- *    Laden sichtbar ist, wartet der Wechsel kurz auf die Bewegung.
+ * 1. Die Karte setzt sich sofort in Bewegung. Früher hob sie sich erst
+ *    220 ms lang ab (Schatten und leichte Vergrößerung), bevor der
+ *    Wechsel begann — das wirkte wie ein Hüpfer mit anschließendem
+ *    Sprung. Jetzt gibt es keinen Vorlauf und keinen Schatten: Es bleibt
+ *    bei einer einzigen, sauberen Bewegung (styles/uebergaenge.css).
  *
  * 2. Schließen: Schließen-Kreuz, „Alle Leistungen" und Escape führen zur
  *    Übersicht — so, dass die gerade offene Leistung dort mittig im
@@ -25,14 +26,7 @@
  */
 import { navigate } from 'astro:transitions/client';
 
-/* Nur so lang, dass der Schatten unter der Karte sichtbar wird. Früher
-   waren es 220 ms mit einem Sprung auf scale(1.04) — das wirkte wie ein
-   Hüpfer, dem dann die eigentliche Bewegung folgte. Jetzt ist das
-   Abheben der Anfang derselben Bewegung. */
-const ABHEBE_DAUER = 90; // ms — siehe `[data-gehoben]` in LeistungKachel/Neuigkeiten
 const MERKER = 'uebergang-ziel';
-
-const pause = (ms: number) => new Promise<void>((f) => setTimeout(f, ms));
 
 type Vorbereitung = Event & {
   sourceElement?: Element | null;
@@ -51,20 +45,10 @@ document.addEventListener('astro:before-preparation', (ereignis) => {
     document.documentElement.dataset.uebergang = blaettern.getAttribute('data-blaettern') || 'vor';
   }
 
-  /* Abheben */
-  const karte = quelle?.closest?.('[data-karte]');
-  if (!karte) return;
-  karte.setAttribute('data-gehoben', '');
-  /* Damit sie im Übergang über allen anderen Karten liegt — sonst
-     stünde sie zwischen ihren Nachbarn (styles/uebergaenge.css) */
-  karte.setAttribute('data-morph', '');
-  const laden = e.loader;
-  const start = performance.now();
-  e.loader = async () => {
-    await laden();
-    const rest = ABHEBE_DAUER - (performance.now() - start);
-    if (rest > 0) await pause(rest);
-  };
+  /* Die angeklickte Karte kennzeichnen: Nur sie gehört zur
+     Übergangsgruppe „karte" und liegt damit über ihren Nachbarn
+     (styles/uebergaenge.css). */
+  quelle?.closest?.('[data-karte]')?.setAttribute('data-morph', '');
 });
 
 /* Nach dem Tausch: die Karte der zuletzt offenen Leistung mittig
@@ -98,10 +82,7 @@ document.addEventListener('astro:before-swap', (ereignis) => {
 document.addEventListener('astro:page-load', () => {
   delete document.documentElement.dataset.uebergang;
   /* Aufräumen: Die Kennzeichen gelten nur für den einen Übergang. */
-  for (const k of document.querySelectorAll('[data-morph], [data-gehoben]')) {
-    k.removeAttribute('data-morph');
-    k.removeAttribute('data-gehoben');
-  }
+  for (const k of document.querySelectorAll('[data-morph]')) k.removeAttribute('data-morph');
   schliessenKlebenLassen();
 });
 

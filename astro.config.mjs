@@ -17,6 +17,15 @@ export default defineConfig({
     // Saubere URLs ohne .html — passt zum bisherigen Webflow-Verhalten
     format: 'directory',
   },
+  prefetch: {
+    // Jede Zielseite wird schon geholt, sobald ihr Verweis im Fenster
+    // erscheint. Beim Klick liegt sie dann bereits da — der Morph muss
+    // nicht auf das Netz warten und läuft von der ersten Bildhälfte an
+    // flüssig. Alles kommt vom eigenen Server, es wird nichts Fremdes
+    // nachgeladen.
+    prefetchAll: true,
+    defaultStrategy: 'viewport',
+  },
   image: {
     // Bilder werden beim Build in moderne Formate umgewandelt
     formats: ['avif', 'webp'],

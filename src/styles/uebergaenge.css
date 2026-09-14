@@ -17,10 +17,11 @@
 
   Der Ablauf beim Öffnen einer Karte
   ------------------------------------------------------------------
-  EINE Bewegung, kein Hüpfer mit anschließendem Sprung: Die Karte hebt
-  sich ab und wächst im selben Zug zur Seite, während der Rest dahinter
-  verschwimmt und ausblendet. Die Karte liegt dabei über allem außer
-  der Kopfleiste.
+  EINE Bewegung ohne Vorlauf: Die Karte setzt sich sofort in Bewegung
+  und wächst zur Seite, während der Rest dahinter verschwimmt und
+  ausblendet. Kein Abheben vorweg, kein Schatten — die Karte ist eine
+  saubere weiße Fläche, die sich verschiebt und wächst. Sie liegt dabei
+  über allem außer der Kopfleiste.
 
   Wichtig für die Ruhe der Bewegung: Der Fließtext der Zielseite trägt
   KEINEN eigenen Übergangsnamen. Er steckt damit in der Momentaufnahme
@@ -38,12 +39,15 @@
     leistung-titel-<id>      ihr Titel
     beitrag-<id>             Hülle des Neuigkeiten-Beitrags
     beitrag-bild-<id>        sein Bild — wandert, ohne zu kreuzblenden
-    beitrag-vorschautext-<id>  Text der Vorschaukarte (ohne Gegenstück:
-                             blendet unten an seiner Stelle aus)
-    beitrag-kopf-<id>        Datum und Titel der Beitragsseite (ohne
-                             Gegenstück: blendet oben an seiner Stelle ein)
     nav-oben / nav-unten     die Leisten — bleiben unbewegt und scharf
                              (gesetzt per CSS in Navigation.astro)
+
+  Datum, Überschrift und Text der Neuigkeiten tragen bewusst KEINEN
+  eigenen Namen: Sie gehören zur Karte, machen deren Bewegung und
+  Skalierung mit und kreuzblenden dabei. Weil die Vorschaukarte den Text
+  unter dem Bild hat und die Beitragsseite über dem Bild, blendet der
+  eine unten aus, während der andere oben einblendet — ohne dass etwas
+  durch das Bild wandert.
 */
 
 /* --- Tempo: gilt für alle Hüllen ------------------------------- */
@@ -117,6 +121,29 @@
   z-index: 90;
 }
 
+/* Die Karte ist eine deckende weiße Fläche.
+   Ohne sie sähe man während des Kreuzens der beiden Abbilder — beide
+   sind dann halb durchsichtig — die Kacheln dahinter durchscheinen; es
+   wirkte, als läge die Karte unter ihren Nachbarn. */
+::view-transition-image-pair(.karte) {
+  background: var(--farbe-flaeche);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+
+/* Beide Abbilder füllen die Hülle immer ganz aus.
+   Standardmäßig behalten sie ihr Seitenverhältnis und hängen oben —
+   sobald die Hülle breiter wird als hoch, ragt das Abbild unten hinaus
+   und wird abgeschnitten (bei den Neuigkeiten verschwand so das
+   „Weiterlesen"). So bleibt alles in der Karte und macht ihre Bewegung
+   und Skalierung mit. */
+::view-transition-old(.karte),
+::view-transition-new(.karte) {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
 /* Symbol, Titel und Bild wandern für sich. Ihre Abbilder werden auf
    die Hülle gepasst, statt oben abgeschnitten zu werden — so wächst
    ein Titel mit, statt zu springen. Zugeordnet über
@@ -155,25 +182,6 @@
   object-fit: cover;
 }
 
-/* --- Text der Neuigkeiten kreuzt das Bild nicht -----------------
-   In der Vorschaukarte steht der Text unter dem Bild, auf der Seite
-   darüber. Wandern beide, liefe der Text mitten durchs Bild. Beide
-   tragen deshalb Namen OHNE Gegenstück: Ihre Hüllen stehen still, der
-   Vorschautext blendet unten aus, der Seitenkopf oben ein. */
-::view-transition-group(.beitragtext) {
-  animation: none;
-  z-index: 92;
-}
-
-::view-transition-old(.beitragtext) {
-  animation: uebergang-blende-aus calc(var(--dauer-uebergang) * 0.35) var(--verlauf-betont) forwards;
-}
-
-::view-transition-new(.beitragtext) {
-  animation: uebergang-blende-ein calc(var(--dauer-uebergang) * 0.45) var(--verlauf-betont) both;
-  animation-delay: calc(var(--dauer-uebergang) * 0.45);
-}
-
 /* --- Die Leisten bleiben scharf und still ------------------------
    Während des Übergangs zeigt der Browser Abbilder statt der Elemente;
    ihr Weichzeichner wirkt dann nicht mehr auf die Seite dahinter. Die
@@ -190,7 +198,11 @@
 
 /* Die Kopfleiste liegt über allem, auch über der wachsenden Karte.
    Die Symbolleiste unten liegt darunter — die Karte soll sich davor
-   bewegen (Wunsch von Florian, September 2026). */
+   bewegen (Wunsch von Florian, September 2026).
+
+   Der milchige Grund wird hier mit einem festen Radius nachgebildet.
+   Fest heißt: Der Browser kann das Ergebnis über den ganzen Wechsel
+   wiederverwenden, statt es in jedem Bild neu zu rechnen. */
 ::view-transition-group(nav-oben) {
   z-index: 100;
   backdrop-filter: blur(20px);
@@ -264,8 +276,7 @@ html[data-uebergang='zurueck'] ::view-transition-new(.karte) { animation-name: u
 */
 html[data-uebergang] .leistung__icon,
 html[data-uebergang] .leistung__titel,
-html[data-uebergang] .beitrag__bild,
-html[data-uebergang] .beitrag__kopf {
+html[data-uebergang] .beitrag__bild {
   view-transition-name: none;
 }
 

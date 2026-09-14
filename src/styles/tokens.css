@@ -98,8 +98,13 @@
      ein Aufreißen wirkte. */
   --dauer-uebergang: 640ms;
   --verlauf-betont: cubic-bezier(0.22, 0.61, 0.24, 1);
-  /* Wie stark der Rest der Seite dabei verschwimmt */
-  --weichzeichner-uebergang: 12px;
+  /* Wie stark der Rest der Seite dabei verschwimmt.
+     Zurückhaltend halten: Ein `filter: blur()`, dessen Radius sich in
+     jedem Bild ändert, muss der Browser jedes Mal neu über die ganze
+     Fensterfläche rechnen — das ist der teuerste Posten im
+     Seitenwechsel. 12 px ließen den Morph auf schwächeren Geräten
+     ruckeln. */
+  --weichzeichner-uebergang: 6px;
 
   /* --- Ebenen ---------------------------------------------------- */
   --ebene-inhalt: 1;

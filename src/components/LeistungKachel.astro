@@ -40,7 +40,6 @@ const { id, titel, kurz, icon } = Astro.props;
     background-color: var(--kachel-grund, #fff);
     transition:
       border-color var(--dauer-schnell) var(--verlauf),
-      box-shadow var(--dauer-schnell) var(--verlauf),
       transform var(--dauer-schnell) var(--verlauf);
   }
 
@@ -50,25 +49,31 @@ const { id, titel, kurz, icon } = Astro.props;
     transform: scale(var(--kachel-groesse, 1)) translateY(-2px);
   }
 
-  /* Nur die Karte, die gerade morpht, gehört zur Gruppe „karte" und
-     liegt dadurch über allen anderen Kacheln (styles/uebergaenge.css).
-     Das Kennzeichen setzt scripts/uebergaenge.ts — beim Öffnen auf der
-     angeklickten Kachel, beim Schließen auf der Kachel, in die
-     zurückgemorpht wird. Bekämen alle Kacheln die Gruppe, stünde die
-     richtige beim Zurückmorphen wieder hinter ihren Nachbarn. */
+  /*
+    ÜBERGANG: nur die eine Karte, die wirklich morpht
+    ----------------------------------------------------------------
+    `data-morph` setzt scripts/uebergaenge.ts — beim Öffnen auf die
+    angeklickte Kachel, beim Schließen auf die, in die zurückgemorpht
+    wird.
+
+    Alle anderen Kacheln geben ihre Übergangsnamen ab. Das ist der
+    entscheidende Punkt fürs Tempo: Jeder Name erzeugt eine eigene
+    Ebene, die der Browser während des Wechsels einzeln zeichnen und
+    zusammensetzen muss. Mit zwölf Kacheln à Hülle, Symbol und Titel
+    waren das 36 Ebenen statt drei — daher das Ruckeln. Ohne Namen
+    stecken sie einfach im Abbild der Seite.
+
+    Nebenbei löst das auch die Stapelfrage: Es gibt gar keine
+    Nachbarebenen mehr, hinter denen die Karte liegen könnte.
+  */
   .kachel[data-morph] {
     view-transition-class: karte;
   }
 
-  /* Angeklickt: legt nur den Schatten darunter — das Größerwerden
-     übernimmt der Übergang selbst, damit es EINE Bewegung bleibt
-     (styles/uebergaenge.css). */
-  .kachel[data-gehoben] {
-    position: relative;
-    z-index: 2;
-    border-color: transparent;
-    background-color: var(--farbe-flaeche);
-    box-shadow: 0 18px 40px -12px rgb(0 0 0 / 30%);
+  .kachel:not([data-morph]),
+  .kachel:not([data-morph]) .kachel__icon,
+  .kachel:not([data-morph]) .kachel__titel {
+    view-transition-name: none;
   }
 
   /* Handys: kompakter. Symbol links neben dem Titel statt darüber,
