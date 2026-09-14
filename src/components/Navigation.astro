@@ -1083,7 +1083,9 @@ const kategorien = (leistungen.kategorien ?? [])
         const xL = mitte - w / 2;
         const xR = mitte + w / 2;
         const rand = 4;
-        const y0 = hoch ? hoehe + rand : rand;   // Grundlinie im SVG
+        /* Grundlinie im SVG — auf halbe Pixel gelegt, damit der 1-px-Strich
+           genau auf der Punktreihe der Leiste liegt und nicht verschmiert */
+        const y0 = hoch ? hoehe + rand + 0.5 : rand - 0.5;
         const gesamt = hoehe + 2 * rand;
 
         svg.style.width = `${breite}px`;
@@ -1114,7 +1116,10 @@ const kategorien = (leistungen.kategorien ?? [])
           );
         };
         const woelbung = woelbungMit(0);
-        linie.setAttribute('d', `M0 ${f(y0)} ${woelbung}L${breite} ${f(y0)}`);
+        /* Bei (fast) null Höhe eine reine Linie: Die Bögen hätten sonst
+           Punkte, die um Bruchteile eines Pixels wackeln, und aus den
+           Strichen würde in der Mitte ein durchgezogener Strich */
+        linie.setAttribute('d', h < 1.5 ? `M0 ${f(y0)} L${breite} ${f(y0)}` : `M0 ${f(y0)} ${woelbung}L${breite} ${f(y0)}`);
 
         /* Dieselbe Wölbung von rechts nach links, um `dy` verschoben —
            für die Maske der oberen Leiste */
