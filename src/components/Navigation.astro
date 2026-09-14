@@ -1039,10 +1039,17 @@ const kategorien = (leistungen.kategorien ?? [])
       let hoehe = 0;         // Höhe der Wölbung in px
       let start = 0, von = 0, dauer = 520;
       const s = hoch ? -1 : 1;   // Richtung: nach oben oder unten
-      const ECKE = 40;             // Rundung — wie im Entwurf, nie größer
+      const ECKE = 40;             // Rundung am Ende — wie im Entwurf
+      const SPREIZ_START = 170;    // Breite der Bögen am Anfang (flacher Hügel)
 
       /* Weich mit leichtem Überschwingen (nur beim Öffnen) */
-      const kurveAuf = (t: number) => { const c = 1.15; const u = t - 1; return 1 + (c + 1) * u * u * u + c * u * u; };
+      /* Wie eine Blase, die von unten drückt: langsam anschwellend, dann
+         zügig steigend, mit einem Hauch Überschwingen zum Schluss */
+      const kurveAuf = (t: number) => {
+        const basis = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const u = Math.max(0, (t - 0.5) / 0.5);
+        return basis + 0.035 * Math.sin(Math.PI * u);
+      };
       const kurveZu = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
       const weich = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
@@ -1060,14 +1067,17 @@ const kategorien = (leistungen.kategorien ?? [])
            als die halbe Höhe: so bleibt jede Zwischenform weich. */
         const h = Math.max(0, hoehe * anteil);
         const p = Math.min(1, anteil);
-        /* Die Rundung ist nie größer als im Endzustand (40 px) und nie
-           größer als die halbe Höhe. Damit die Blase klein trotzdem rund
-           bleibt, wächst sie auch in der Breite: Bei kleiner Höhe ist sie
-           nur doppelt so breit wie hoch — eine Kuppel aus zwei Vierteln —
-           und weitet sich dann weich auf die volle Breite. */
-        const w = Math.min(boxBreite, 2 * h + (boxBreite - 2 * h) * weich(p));
-        const r = Math.min(ECKE, h / 2, w / 2 - 1);
-        const k = 0.5523 * r;
+        /* Die Form wie eine Blase, die von unten gegen die Linie drückt:
+           Anfangs ein breiter, flacher Hügel — die Ausrundungen an Fuß
+           und Schulter sind weit gestreckte Ellipsenbögen (breit `a`,
+           hoch `fa`). Mit der Höhe ziehen sie sich auf die 40-px-Kreise
+           des Entwurfs zusammen, dazwischen wächst die senkrechte Wand.
+           So gibt es in keiner Phase eine Ecke. */
+        const w = boxBreite * (0.5 + 0.5 * weich(p));          // Breite des Scheitels
+        const spreiz = ECKE + (SPREIZ_START - ECKE) * (1 - p) * (1 - p); // Breite der Bögen
+        const fa = Math.min(ECKE, h / 2);                       // Höhe der Bögen
+        const aB = Math.max(fa, Math.min(spreiz, w / 2 - 1));   // Breite der Bögen
+        const k = 0.5523;
         const xL = mitte - w / 2;
         const xR = mitte + w / 2;
         const rand = 4;
@@ -1085,10 +1095,20 @@ const kategorien = (leistungen.kategorien ?? [])
         const woelbungMit = (dy: number) => {
           const g = (n: number) => f(n + dy);
           return (
-            `L${f(xL - r)} ${g(y0)} C${f(xL - r + k)} ${g(y0)} ${f(xL)} ${g(y0 + s * (r - k))} ${f(xL)} ${g(y0 + s * r)} ` +
-            `L${f(xL)} ${g(y0 + s * (h - r))} C${f(xL)} ${g(y0 + s * (h - r + k))} ${f(xL + r - k)} ${g(y0 + s * h)} ${f(xL + r)} ${g(y0 + s * h)} ` +
-            `L${f(xR - r)} ${g(y0 + s * h)} C${f(xR - r + k)} ${g(y0 + s * h)} ${f(xR)} ${g(y0 + s * (h - r + k))} ${f(xR)} ${g(y0 + s * (h - r))} ` +
-            `L${f(xR)} ${g(y0 + s * r)} C${f(xR)} ${g(y0 + s * (r - k))} ${f(xR + r - k)} ${g(y0)} ${f(xR + r)} ${g(y0)} `
+            /* Fuß links: flacher Bogen von der Linie in die Wand */
+            `L${f(xL - aB)} ${g(y0)} C${f(xL - aB + k * aB)} ${g(y0)} ${f(xL)} ${g(y0 + s * (fa - k * fa))} ${f(xL)} ${g(y0 + s * fa)} ` +
+            /* Wand */
+            `L${f(xL)} ${g(y0 + s * (h - fa))} ` +
+            /* Schulter links */
+            `C${f(xL)} ${g(y0 + s * (h - fa + k * fa))} ${f(xL + aB - k * aB)} ${g(y0 + s * h)} ${f(xL + aB)} ${g(y0 + s * h)} ` +
+            /* Scheitel */
+            `L${f(xR - aB)} ${g(y0 + s * h)} ` +
+            /* Schulter rechts */
+            `C${f(xR - aB + k * aB)} ${g(y0 + s * h)} ${f(xR)} ${g(y0 + s * (h - fa + k * fa))} ${f(xR)} ${g(y0 + s * (h - fa))} ` +
+            /* Wand */
+            `L${f(xR)} ${g(y0 + s * fa)} ` +
+            /* Fuß rechts */
+            `C${f(xR)} ${g(y0 + s * (fa - k * fa))} ${f(xR + aB - k * aB)} ${g(y0)} ${f(xR + aB)} ${g(y0)} `
           );
         };
         const woelbung = woelbungMit(0);
@@ -1099,10 +1119,13 @@ const kategorien = (leistungen.kategorien ?? [])
         const woelbungRueckwaerts = (dy: number) => {
           const g = (n: number) => f(n + dy);
           return (
-            `C${f(xR + r - k)} ${g(y0)} ${f(xR)} ${g(y0 + s * (r - k))} ${f(xR)} ${g(y0 + s * r)} ` +
-            `L${f(xR)} ${g(y0 + s * (h - r))} C${f(xR)} ${g(y0 + s * (h - r + k))} ${f(xR - r + k)} ${g(y0 + s * h)} ${f(xR - r)} ${g(y0 + s * h)} ` +
-            `L${f(xL + r)} ${g(y0 + s * h)} C${f(xL + r - k)} ${g(y0 + s * h)} ${f(xL)} ${g(y0 + s * (h - r + k))} ${f(xL)} ${g(y0 + s * (h - r))} ` +
-            `L${f(xL)} ${g(y0 + s * r)} C${f(xL)} ${g(y0 + s * (r - k))} ${f(xL - r + k)} ${g(y0)} ${f(xL - r)} ${g(y0)} `
+            `C${f(xR + aB - k * aB)} ${g(y0)} ${f(xR)} ${g(y0 + s * (fa - k * fa))} ${f(xR)} ${g(y0 + s * fa)} ` +
+            `L${f(xR)} ${g(y0 + s * (h - fa))} ` +
+            `C${f(xR)} ${g(y0 + s * (h - fa + k * fa))} ${f(xR - aB + k * aB)} ${g(y0 + s * h)} ${f(xR - aB)} ${g(y0 + s * h)} ` +
+            `L${f(xL + aB)} ${g(y0 + s * h)} ` +
+            `C${f(xL + aB - k * aB)} ${g(y0 + s * h)} ${f(xL)} ${g(y0 + s * (h - fa + k * fa))} ${f(xL)} ${g(y0 + s * (h - fa))} ` +
+            `L${f(xL)} ${g(y0 + s * fa)} ` +
+            `C${f(xL)} ${g(y0 + s * (fa - k * fa))} ${f(xL - aB + k * aB)} ${g(y0)} ${f(xL - aB)} ${g(y0)} `
           );
         };
 
@@ -1118,7 +1141,7 @@ const kategorien = (leistungen.kategorien ?? [])
         const dy = hoch ? rand : leisteH - rand;
         const form = hoch
           ? `M0 ${f(gesamt + leisteH)} L0 ${f(y0 + dy)} ${woelbungMit(dy)}L${breite} ${f(y0 + dy)} L${breite} ${f(gesamt + leisteH)} Z`
-          : `M0 0 L${breite} 0 L${breite} ${f(y0 + dy)} L${f(xR + r)} ${f(y0 + dy)} ${woelbungRueckwaerts(dy)}L0 ${f(y0 + dy)} Z`;
+          : `M0 0 L${breite} 0 L${breite} ${f(y0 + dy)} L${f(xR + aB)} ${f(y0 + dy)} ${woelbungRueckwaerts(dy)}L0 ${f(y0 + dy)} Z`;
         linienTraeger.style.setProperty('--blase-form', `path("${form}")`);
 
         /* Kleiner Pfeil an der Grundlinie, auf den Menüpunkt zeigend */
@@ -1154,7 +1177,7 @@ const kategorien = (leistungen.kategorien ?? [])
         ziel = nachZiel;
         von = anteil;
         start = performance.now();
-        dauer = nachZiel === 1 ? 680 : 460;
+        dauer = nachZiel === 1 ? 820 : 520;
         if (wenigerBewegung) { anteil = ziel; zeichnen(); dauer = 0; start = -1e9; }
         if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
       };
