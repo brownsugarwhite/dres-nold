@@ -26,6 +26,9 @@
   --farbe-flaeche: #ffffff;
   --farbe-flaeche-gedeckt: #f4f2f3;
   --farbe-linie: #dddddd;
+  /* Farbe der Punktlinie in den Leisten — aus punktlinie.png übernommen,
+     damit die gezeichnete Blase nahtlos daran anschließt */
+  --farbe-punktlinie: #742d5d;
 
   /* Zustandsfarben für Hinweise und Formulare */
   --farbe-hinweis: var(--farbe-primaer);

@@ -260,7 +260,6 @@ const kategorien = (leistungen.kategorien ?? [])
     flex-direction: column;
     align-items: center;
     width: 100%;
-    background: url('/bilder/deko/punktlinie.png') 0 100% repeat-x;
   }
 
   /* Der milchige Grund der Leiste liegt auf einem ::before, das über die
@@ -274,7 +273,7 @@ const kategorien = (leistungen.kategorien ?? [])
     position: absolute;
     left: 0;
     right: 0;
-    z-index: -1;
+    z-index: 0;
     background: rgb(255 255 255 / 80%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -291,6 +290,34 @@ const kategorien = (leistungen.kategorien ?? [])
     top: calc(-1 * var(--blase-hoehe, 0px));
     bottom: 0;
     clip-path: var(--blase-form, inset(var(--blase-hoehe, 0px) 0 0 0));
+  }
+
+  /* Die Punktlinie liegt ÜBER dem Grund (sonst dämpft ihn das Weiß):
+     unten am Rand der Kopfleiste, oben am Rand der Symbolleiste. */
+  .navigation::after,
+  .fussleiste::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    height: 1px;
+    background: url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
+    pointer-events: none;
+  }
+
+  .navigation::after { bottom: 0; }
+  .fussleiste::after { top: 0; }
+
+  /* Solange die Blase gezeichnet wird, übernimmt sie die Punktlinie */
+  .navigation[data-ohne-linie]::after,
+  .fussleiste[data-ohne-linie]::after { display: none; }
+
+  /* Alles in den Leisten liegt über dem Grund */
+  .navigation > :not(.blase),
+  .fussleiste > :not(.blase) {
+    position: relative;
+    z-index: 1;
   }
 
   /* ---------- Kontaktzeile ---------- */
@@ -351,9 +378,7 @@ const kategorien = (leistungen.kategorien ?? [])
 
   .fussleiste:has(.aufklapp[data-aktiv]) { overflow: visible; }
 
-  /* Solange die Blase gezeichnet wird, übernimmt sie die Punktlinie */
-  .navigation[data-ohne-linie],
-  .fussleiste[data-ohne-linie] { background-image: none; }
+
 
   .kopfleiste__inhalt {
     display: flex;
@@ -665,16 +690,17 @@ const kategorien = (leistungen.kategorien ?? [])
     overflow: visible;
   }
 
+  /* Wie punktlinie.png: 1 px Punkt, 2 px Lücke, gleiche Farbe */
   :global(.blase__linie) {
     fill: none;
-    stroke: var(--farbe-primaer);
+    stroke: var(--farbe-punktlinie);
     stroke-width: 1;
-    stroke-dasharray: 1 3;
+    stroke-dasharray: 1 2;
   }
 
   :global(.blase__pfeil) {
     fill: none;
-    stroke: var(--farbe-primaer);
+    stroke: var(--farbe-punktlinie);
     stroke-width: 1;
     stroke-linecap: round;
   }
@@ -765,7 +791,6 @@ const kategorien = (leistungen.kategorien ?? [])
     justify-content: center;
     align-items: center;
     width: 100%;
-    background: url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
     transition: transform 300ms cubic-bezier(0, 0, 0.58, 1);
   }
 
@@ -1001,7 +1026,8 @@ const kategorien = (leistungen.kategorien ?? [])
       let hoehe = 0;         // Höhe der Wölbung in px
       let start = 0, von = 0, dauer = 520;
       const s = hoch ? -1 : 1;   // Richtung: nach oben oder unten
-      const ECKE = 40;           // Rundung, voll aufgewölbt
+      const ECKE = 40;             // Rundung, voll aufgewölbt (Entwurf)
+      const ECKE_UNTERWEGS = 140;  // Rundung während der Bewegung
 
       /* Weich mit leichtem Überschwingen (nur beim Öffnen) */
       const kurveAuf = (t: number) => { const c = 1.15; const u = t - 1; return 1 + (c + 1) * u * u * u + c * u * u; };
@@ -1020,8 +1046,13 @@ const kategorien = (leistungen.kategorien ?? [])
            eine fertige Form hochzuschieben. Die Rundung ist nie größer
            als die halbe Höhe: so bleibt jede Zwischenform weich. */
         const h = Math.max(0, hoehe * anteil);
-        const w = boxBreite * (0.55 + 0.45 * Math.min(1, anteil));
-        const r = Math.min(ECKE, h / 2);
+        const p = Math.min(1, anteil);
+        const w = boxBreite * (0.45 + 0.55 * p);
+        /* Rundung: unterwegs so groß wie möglich (halbe Höhe, bis 140 px),
+           erst gegen Ende auf die 40 px des Entwurfs — so bleibt die Form
+           während der ganzen Bewegung eine Blase, nie ein Kasten. */
+        const eckeMax = ECKE_UNTERWEGS + (ECKE - ECKE_UNTERWEGS) * p * p * p;
+        const r = Math.min(eckeMax, h / 2, w / 2 - 1);
         const k = 0.5523 * r;
         const xL = mitte - w / 2;
         const xR = mitte + w / 2;
