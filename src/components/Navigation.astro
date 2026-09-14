@@ -260,9 +260,37 @@ const kategorien = (leistungen.kategorien ?? [])
     flex-direction: column;
     align-items: center;
     width: 100%;
-    background: rgb(255 255 255 / 80%) url('/bilder/deko/punktlinie.png') 0 100% repeat-x;
+    background: url('/bilder/deko/punktlinie.png') 0 100% repeat-x;
+  }
+
+  /* Der milchige Grund der Leiste liegt auf einem ::before, das über die
+     Leiste hinausreicht und per Maske (clip-path) zugeschnitten wird:
+     geschlossen genau auf die Leiste, offen auf Leiste PLUS Blase — ein
+     einziges Element, also keine Kante zwischen beiden. Werte setzt das
+     Skript (`--blase-hoehe`, `--blase-form`). */
+  .navigation::before,
+  .fussleiste::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    background: rgb(255 255 255 / 80%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    pointer-events: none;
+  }
+
+  .navigation::before {
+    top: 0;
+    bottom: calc(-1 * var(--blase-hoehe, 0px));
+    clip-path: var(--blase-form, inset(0 0 var(--blase-hoehe, 0px) 0));
+  }
+
+  .fussleiste::before {
+    top: calc(-1 * var(--blase-hoehe, 0px));
+    bottom: 0;
+    clip-path: var(--blase-form, inset(var(--blase-hoehe, 0px) 0 0 0));
   }
 
   /* ---------- Kontaktzeile ---------- */
@@ -632,26 +660,6 @@ const kategorien = (leistungen.kategorien ?? [])
     pointer-events: none;
   }
 
-  /* Der Grund ist ein abgerundetes Rechteck mit Weichzeichner. Er liegt
-     NICHT in der Leiste, sondern direkt im <body> fest im Fenster: Ein
-     Weichzeichner innerhalb eines Elements, das selbst einen hat (die
-     Leiste), setzt in Chrome unzuverlässig aus. Ebene knapp unter den
-     Leisten — der Inhalt der Blase liegt in der Leiste und damit darüber. */
-  :global(.blase__grund) {
-    position: fixed;
-    z-index: calc(var(--ebene-navigation) - 1);
-    display: block;
-    pointer-events: none;
-    background: rgb(255 255 255 / 80%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-  }
-
-  :global(.blase__fuesse) {
-    fill: rgb(255 255 255 / 80%);
-    stroke: none;
-  }
-
   :global(.blase) {
     z-index: calc(var(--ebene-menue) - 1);
     overflow: visible;
@@ -757,9 +765,7 @@ const kategorien = (leistungen.kategorien ?? [])
     justify-content: center;
     align-items: center;
     width: 100%;
-    background: rgb(255 255 255 / 80%) url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
     transition: transform 300ms cubic-bezier(0, 0, 0.58, 1);
   }
 
@@ -980,18 +986,12 @@ const kategorien = (leistungen.kategorien ?? [])
 
       // Die Zeichnung: milchiger Grund (zugeschnitten) + gestrichelte Linie
       const NS = 'http://www.w3.org/2000/svg';
-      const grund = document.createElement('div');
-      grund.className = 'blase__grund';
-      grund.setAttribute('aria-hidden', 'true');
-      grund.style.display = 'none';
-      document.body.append(grund);
       const svg = document.createElementNS(NS, 'svg');
       svg.setAttribute('class', 'blase');
       svg.setAttribute('aria-hidden', 'true');
-      const fuesse = document.createElementNS(NS, 'path'); fuesse.setAttribute('class', 'blase__fuesse');
       const linie = document.createElementNS(NS, 'path'); linie.setAttribute('class', 'blase__linie');
       const pfeil = document.createElementNS(NS, 'path'); pfeil.setAttribute('class', 'blase__pfeil');
-      svg.append(fuesse, linie, pfeil);
+      svg.append(linie, pfeil);
       svg.style.display = 'none';
       leiste.append(svg);
 
@@ -1034,28 +1034,47 @@ const kategorien = (leistungen.kategorien ?? [])
         svg.style[hoch ? 'bottom' : 'top'] = `calc(100% - ${rand}px)`;
         svg.setAttribute('viewBox', `0 0 ${breite} ${gesamt}`);
 
-        /* Der Grund: abgerundetes Rechteck, fest im Fenster an der
-           Grundlinie der Leiste ausgerichtet */
-        const lr = leiste.getBoundingClientRect();
-        grund.style.left = `${xL}px`;
-        grund.style.width = `${w}px`;
-        grund.style.height = `${Math.max(0, h)}px`;
-        if (hoch) { grund.style.bottom = `${window.innerHeight - lr.top}px`; grund.style.top = 'auto'; }
-        else { grund.style.top = `${lr.bottom}px`; grund.style.bottom = 'auto'; }
-        grund.style.borderRadius = hoch ? `${r}px ${r}px 0 0` : `0 0 ${r}px ${r}px`;
-
         const f = (n: number) => n.toFixed(2);
-        const woelbung =
-          `L${f(xL - r)} ${f(y0)} C${f(xL - r + k)} ${f(y0)} ${f(xL)} ${f(y0 + s * (r - k))} ${f(xL)} ${f(y0 + s * r)} ` +
-          `L${f(xL)} ${f(y0 + s * (h - r))} C${f(xL)} ${f(y0 + s * (h - r + k))} ${f(xL + r - k)} ${f(y0 + s * h)} ${f(xL + r)} ${f(y0 + s * h)} ` +
-          `L${f(xR - r)} ${f(y0 + s * h)} C${f(xR - r + k)} ${f(y0 + s * h)} ${f(xR)} ${f(y0 + s * (h - r + k))} ${f(xR)} ${f(y0 + s * (h - r))} ` +
-          `L${f(xR)} ${f(y0 + s * r)} C${f(xR)} ${f(y0 + s * (r - k))} ${f(xR + r - k)} ${f(y0)} ${f(xR + r)} ${f(y0)} `;
+        /* Die Wölbung als Pfadstück, um `dy` verschoben (die Maske des
+           Leistengrunds hat einen anderen Nullpunkt als die Zeichnung) */
+        const woelbungMit = (dy: number) => {
+          const g = (n: number) => f(n + dy);
+          return (
+            `L${f(xL - r)} ${g(y0)} C${f(xL - r + k)} ${g(y0)} ${f(xL)} ${g(y0 + s * (r - k))} ${f(xL)} ${g(y0 + s * r)} ` +
+            `L${f(xL)} ${g(y0 + s * (h - r))} C${f(xL)} ${g(y0 + s * (h - r + k))} ${f(xL + r - k)} ${g(y0 + s * h)} ${f(xL + r)} ${g(y0 + s * h)} ` +
+            `L${f(xR - r)} ${g(y0 + s * h)} C${f(xR - r + k)} ${g(y0 + s * h)} ${f(xR)} ${g(y0 + s * (h - r + k))} ${f(xR)} ${g(y0 + s * (h - r))} ` +
+            `L${f(xR)} ${g(y0 + s * r)} C${f(xR)} ${g(y0 + s * (r - k))} ${f(xR + r - k)} ${g(y0)} ${f(xR + r)} ${g(y0)} `
+          );
+        };
+        const woelbung = woelbungMit(0);
         linie.setAttribute('d', `M0 ${f(y0)} ${woelbung}L${breite} ${f(y0)}`);
 
-        /* Die Füße: die kleinen Flächen zwischen Rechteck und Ausrundung */
-        fuesse.setAttribute('d',
-          `M${f(xL - r)} ${f(y0)} C${f(xL - r + k)} ${f(y0)} ${f(xL)} ${f(y0 + s * (r - k))} ${f(xL)} ${f(y0 + s * r)} L${f(xL)} ${f(y0)} Z ` +
-          `M${f(xR + r)} ${f(y0)} C${f(xR + r - k)} ${f(y0)} ${f(xR)} ${f(y0 + s * (r - k))} ${f(xR)} ${f(y0 + s * r)} L${f(xR)} ${f(y0)} Z`);
+        /* Dieselbe Wölbung von rechts nach links, um `dy` verschoben —
+           für die Maske der oberen Leiste */
+        const woelbungRueckwaerts = (dy: number) => {
+          const g = (n: number) => f(n + dy);
+          return (
+            `C${f(xR + r - k)} ${g(y0)} ${f(xR)} ${g(y0 + s * (r - k))} ${f(xR)} ${g(y0 + s * r)} ` +
+            `L${f(xR)} ${g(y0 + s * (h - r))} C${f(xR)} ${g(y0 + s * (h - r + k))} ${f(xR - r + k)} ${g(y0 + s * h)} ${f(xR - r)} ${g(y0 + s * h)} ` +
+            `L${f(xL + r)} ${g(y0 + s * h)} C${f(xL + r - k)} ${g(y0 + s * h)} ${f(xL)} ${g(y0 + s * (h - r + k))} ${f(xL)} ${g(y0 + s * (h - r))} ` +
+            `L${f(xL)} ${g(y0 + s * r)} C${f(xL)} ${g(y0 + s * (r - k))} ${f(xL - r + k)} ${g(y0)} ${f(xL - r)} ${g(y0)} `
+          );
+        };
+
+        /* Die Maske des Leistengrunds: Leiste plus Blase als eine Form.
+           Koordinaten des ::before — es reicht um `hoehe + rand` über
+           (bzw. unter) die Leiste hinaus. */
+        const lr = linienTraeger.getBoundingClientRect();
+        const leisteH = lr.height;
+        linienTraeger.style.setProperty('--blase-hoehe', `${gesamt}px`);
+        /* Nullpunkt-Versatz zwischen Zeichnung und Maske:
+           unten liegt die Zeichnung `rand` unter dem oberen Maskenrand,
+           oben liegt die Grundlinie erst unter der Leiste */
+        const dy = hoch ? rand : leisteH - rand;
+        const form = hoch
+          ? `M0 ${f(gesamt + leisteH)} L0 ${f(y0 + dy)} ${woelbungMit(dy)}L${breite} ${f(y0 + dy)} L${breite} ${f(gesamt + leisteH)} Z`
+          : `M0 0 L${breite} 0 L${breite} ${f(y0 + dy)} L${f(xR + r)} ${f(y0 + dy)} ${woelbungRueckwaerts(dy)}L0 ${f(y0 + dy)} Z`;
+        linienTraeger.style.setProperty('--blase-form', `path("${form}")`);
 
         /* Kleiner Pfeil an der Grundlinie, auf den Menüpunkt zeigend */
         const py = y0 + s * 22;
@@ -1078,7 +1097,8 @@ const kategorien = (leistungen.kategorien ?? [])
         anteil = ziel;
         if (ziel === 0) {
           svg.style.display = 'none';
-          grund.style.display = 'none';
+          linienTraeger.style.removeProperty('--blase-form');
+          linienTraeger.style.removeProperty('--blase-hoehe');
           delete linienTraeger.dataset.ohneLinie;
           delete huelle.dataset.aktiv;
           if (knopf.getAttribute('aria-expanded') !== 'true') inhalt.hidden = true;
@@ -1103,7 +1123,6 @@ const kategorien = (leistungen.kategorien ?? [])
           huelle.dataset.aktiv = 'ja';
           linienTraeger.dataset.ohneLinie = 'ja';
           svg.style.display = 'block';
-          grund.style.display = 'block';
           zeichnen();
           requestAnimationFrame(() => { huelle.dataset.offen = 'ja'; });
           animieren(1);
@@ -1151,7 +1170,6 @@ const kategorien = (leistungen.kategorien ?? [])
       window.addEventListener('resize', () => { if (huelle.dataset.aktiv) { hoehe = inhalt.getBoundingClientRect().height; zeichnen(); } }, { passive: true });
       // Beim Seitenwechsel schließen
       document.addEventListener('astro:before-preparation', () => setzen(false));
-      document.addEventListener('astro:after-swap', () => { if (!grund.isConnected) document.body.append(grund); });
     });
 
     // ---- Mobiles Ausklappmenü ----
