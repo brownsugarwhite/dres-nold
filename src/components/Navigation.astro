@@ -124,8 +124,8 @@ const kategorien = (leistungen.kategorien ?? [])
 
               <div class="aufklapp__spalten">
                 {kategorien.map((k, i) => (
-                  <a class="oberpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}`}>
-                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="72" height="72" />}
+                  <a class="oberpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}; --stufe-hoch: ${kategorien.length - 1 - i}`}>
+                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="36" height="36" />}
                     <span class="oberpunkt__text">
                       <span class="oberpunkt__titel">{k.titel}</span>
                       {k.kurz && <span class="oberpunkt__kurz">{k.kurz}</span>}
@@ -212,8 +212,8 @@ const kategorien = (leistungen.kategorien ?? [])
 
               <div class="aufklapp__spalten">
                 {kategorien.map((k, i) => (
-                  <a class="oberpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}`}>
-                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="72" height="72" />}
+                  <a class="oberpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}; --stufe-hoch: ${kategorien.length - 1 - i}`}>
+                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="36" height="36" />}
                     <span class="oberpunkt__text">
                       <span class="oberpunkt__titel">{k.titel}</span>
                       {k.kurz && <span class="oberpunkt__kurz">{k.kurz}</span>}
@@ -306,6 +306,7 @@ const kategorien = (leistungen.kategorien ?? [])
 
   /* ---------- Kopfleiste ---------- */
   .kopfleiste {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -607,32 +608,54 @@ const kategorien = (leistungen.kategorien ?? [])
 
   .aufklapp__inhalt {
     position: absolute;
-    left: 50%;
+    left: 0;
     z-index: var(--ebene-menue);
-    width: min(760px, 100vw - 2rem);
-    padding: var(--abstand-l) var(--abstand-xl);
-    transform: translateX(-50%);
+    width: min(400px, 100vw - 2rem);
+    padding: 26px 36px;
   }
 
-  /* Untere Leiste: das Feld steht über der Leiste; obere: darunter */
-  .aufklapp[data-richtung='hoch'] .aufklapp__inhalt { bottom: 100%; padding-bottom: calc(var(--abstand-l) + 24px); }
-  .aufklapp[data-richtung='runter'] .aufklapp__inhalt { top: 100%; padding-top: calc(var(--abstand-l) + 24px); }
+  /* Untere Leiste: das Feld steht über der Leiste; obere: darunter.
+     Jeweils Platz für den kleinen Pfeil an der Grundlinie. */
+  .aufklapp[data-richtung='hoch'] .aufklapp__inhalt { bottom: 100%; padding-bottom: 40px; }
+  .aufklapp[data-richtung='runter'] .aufklapp__inhalt { top: 100%; padding-top: 40px; }
 
   .aufklapp__inhalt[hidden] { display: none; }
 
-  /* Die Zeichnung der Wölbung: liegt über die volle Breite auf der
-     Punktlinie der Leiste. Größe setzt das Skript. */
+  /* Die Wölbung: ein milchiger Grund wie die Leisten selbst (weiß mit
+     Weichzeichner dahinter), auf die Form der Blase zugeschnitten —
+     darüber die gestrichelte Linie als SVG. Beides liegt über die volle
+     Breite auf der Punktlinie der Leiste; Maße setzt das Skript. */
   :global(.blase) {
     position: absolute;
     left: 0;
-    /* Knapp unter dem Inhalt des Feldes — die weiße Fläche darf ihn nicht verdecken */
-    z-index: calc(var(--ebene-menue) - 1);
     display: block;
-    overflow: visible;
     pointer-events: none;
   }
 
-  :global(.blase__flaeche) { fill: var(--farbe-flaeche); }
+  /* Der Grund ist ein abgerundetes Rechteck mit Weichzeichner. Er liegt
+     NICHT in der Leiste, sondern direkt im <body> fest im Fenster: Ein
+     Weichzeichner innerhalb eines Elements, das selbst einen hat (die
+     Leiste), setzt in Chrome unzuverlässig aus. Ebene knapp unter den
+     Leisten — der Inhalt der Blase liegt in der Leiste und damit darüber. */
+  :global(.blase__grund) {
+    position: fixed;
+    z-index: calc(var(--ebene-navigation) - 1);
+    display: block;
+    pointer-events: none;
+    background: rgb(255 255 255 / 80%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  :global(.blase__fuesse) {
+    fill: rgb(255 255 255 / 80%);
+    stroke: none;
+  }
+
+  :global(.blase) {
+    z-index: calc(var(--ebene-menue) - 1);
+    overflow: visible;
+  }
 
   :global(.blase__linie) {
     fill: none;
@@ -648,21 +671,30 @@ const kategorien = (leistungen.kategorien ?? [])
     stroke-linecap: round;
   }
 
-  /* Die Oberpunkte erscheinen nacheinander, leicht von unten */
+  /* Die Oberpunkte blenden nacheinander ein, während die Blase wächst:
+     von der Leiste her — unten also der letzte zuerst, oben der erste. */
   .oberpunkt {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(6px);
     transition:
-      opacity 360ms cubic-bezier(0.2, 0, 0, 1),
-      transform 360ms cubic-bezier(0.2, 0, 0, 1),
+      opacity 320ms cubic-bezier(0.2, 0, 0, 1),
+      transform 320ms cubic-bezier(0.2, 0, 0, 1),
       background-color var(--dauer-schnell) var(--verlauf);
-    transition-delay: calc(200ms + var(--stufe, 0) * 70ms), calc(200ms + var(--stufe, 0) * 70ms), 0ms;
+    transition-delay: calc(140ms + var(--stufe, 0) * 110ms), calc(140ms + var(--stufe, 0) * 110ms), 0ms;
+  }
+
+  .aufklapp[data-richtung='hoch'] .oberpunkt {
+    transform: translateY(-6px);
+    transition-delay: calc(140ms + var(--stufe-hoch, 0) * 110ms), calc(140ms + var(--stufe-hoch, 0) * 110ms), 0ms;
   }
 
   .aufklapp[data-offen] .oberpunkt {
     opacity: 1;
     transform: translateY(0);
   }
+
+  /* Beim Schließen sofort weg, ohne Staffelung */
+  .aufklapp:not([data-offen]) .oberpunkt { transition-delay: 0ms; transition-duration: 120ms; }
 
   @media (prefers-reduced-motion: reduce) {
     .oberpunkt { transition: none; opacity: 1; transform: none; }
@@ -671,28 +703,28 @@ const kategorien = (leistungen.kategorien ?? [])
   .aufklapp__spalten {
     display: flex;
     flex-direction: column;
-    gap: var(--abstand-m);
+    gap: 14px;
   }
 
   /* Ein Oberpunkt je Kategorie — Symbol links, Titel und Kurztext rechts */
   .oberpunkt {
     display: flex;
     align-items: center;
-    gap: var(--abstand-m);
-    padding: var(--abstand-2xs) var(--abstand-s);
-    margin: 0 calc(-1 * var(--abstand-s));
+    gap: 14px;
+    padding: 4px 10px;
+    margin: 0 -10px;
     border-radius: var(--radius-m);
     color: var(--farbe-primaer);
     text-decoration: none;
   }
 
   .oberpunkt:hover,
-  .oberpunkt:focus-visible { background: var(--farbe-flaeche-gedeckt); }
+  .oberpunkt:focus-visible { background: rgb(255 255 255 / 60%); }
 
   .oberpunkt__symbol {
     flex: none;
-    width: 72px;
-    height: 72px;
+    width: 36px;
+    height: 36px;
     object-fit: contain;
   }
 
@@ -702,14 +734,14 @@ const kategorien = (leistungen.kategorien ?? [])
   }
 
   .oberpunkt__titel {
-    font-size: 28px;
+    font-size: 20px;
     font-weight: var(--gewicht-halbfett);
     line-height: 1.2;
   }
 
   .oberpunkt__kurz {
     color: var(--farbe-text);
-    font-size: 20px;
+    font-size: 14px;
     font-weight: 300;
     line-height: 1.3;
   }
@@ -937,20 +969,29 @@ const kategorien = (leistungen.kategorien ?? [])
       const knopf = huelle.querySelector<HTMLButtonElement>('button[aria-expanded]');
       const inhalt = huelle.querySelector<HTMLElement>('.aufklapp__inhalt');
       const hoch = huelle.dataset.richtung === 'hoch';
-      const leiste = hoch ? huelle.closest<HTMLElement>('.fussleiste') : huelle.closest<HTMLElement>('.navigation');
-      if (!knopf || !inhalt || !leiste) return;
+      /* Wo die Zeichnung hängt und wer die Punktlinie trägt. Beides muss
+         im selben Stapelkontext wie der Inhalt liegen — die Kopfleiste
+         trägt einen Übergangsnamen und bildet damit einen eigenen. */
+      const leiste = hoch ? huelle.closest<HTMLElement>('.fussleiste') : huelle.closest<HTMLElement>('.kopfleiste');
+      const linienTraeger = hoch ? leiste : huelle.closest<HTMLElement>('.navigation');
+      if (!knopf || !inhalt || !leiste || !linienTraeger) return;
 
       const wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // Die Zeichnung
+      // Die Zeichnung: milchiger Grund (zugeschnitten) + gestrichelte Linie
       const NS = 'http://www.w3.org/2000/svg';
+      const grund = document.createElement('div');
+      grund.className = 'blase__grund';
+      grund.setAttribute('aria-hidden', 'true');
+      grund.style.display = 'none';
+      document.body.append(grund);
       const svg = document.createElementNS(NS, 'svg');
       svg.setAttribute('class', 'blase');
       svg.setAttribute('aria-hidden', 'true');
-      const flaeche = document.createElementNS(NS, 'path'); flaeche.setAttribute('class', 'blase__flaeche');
+      const fuesse = document.createElementNS(NS, 'path'); fuesse.setAttribute('class', 'blase__fuesse');
       const linie = document.createElementNS(NS, 'path'); linie.setAttribute('class', 'blase__linie');
       const pfeil = document.createElementNS(NS, 'path'); pfeil.setAttribute('class', 'blase__pfeil');
-      svg.append(flaeche, linie, pfeil);
+      svg.append(fuesse, linie, pfeil);
       svg.style.display = 'none';
       leiste.append(svg);
 
@@ -960,28 +1001,48 @@ const kategorien = (leistungen.kategorien ?? [])
       let hoehe = 0;         // Höhe der Wölbung in px
       let start = 0, von = 0, dauer = 520;
       const s = hoch ? -1 : 1;   // Richtung: nach oben oder unten
+      const ECKE = 40;           // Rundung, voll aufgewölbt
 
       /* Weich mit leichtem Überschwingen (nur beim Öffnen) */
-      const kurveAuf = (t: number) => { const c = 1.25; const u = t - 1; return 1 + (c + 1) * u * u * u + c * u * u; };
+      const kurveAuf = (t: number) => { const c = 1.15; const u = t - 1; return 1 + (c + 1) * u * u * u + c * u * u; };
       const kurveZu = (t: number) => 1 - Math.pow(1 - t, 3);
 
       const zeichnen = () => {
         const breite = document.documentElement.clientWidth;
-        const boxBreite = Math.min(760, breite - 32);
-        const xL = (breite - boxBreite) / 2;
-        const xR = xL + boxBreite;
-        const h = hoehe * anteil;
-        const r = Math.min(90, Math.abs(h) / 2);
+        const boxBreite = Math.min(400, breite - 32);
+        const kr = knopf.getBoundingClientRect();
+        const knopfX = kr.left + kr.width / 2;
+        /* Die Blase sitzt so, dass der Menüpunkt im linken Drittel liegt */
+        const links = Math.max(16, Math.min(breite - boxBreite - 16, knopfX - boxBreite * 0.15));
+        const mitte = links + boxBreite / 2;
+
+        /* Sie wächst in Höhe UND Breite — die Linie fließt auf, statt
+           eine fertige Form hochzuschieben. Die Rundung ist nie größer
+           als die halbe Höhe: so bleibt jede Zwischenform weich. */
+        const h = Math.max(0, hoehe * anteil);
+        const w = boxBreite * (0.55 + 0.45 * Math.min(1, anteil));
+        const r = Math.min(ECKE, h / 2);
         const k = 0.5523 * r;
+        const xL = mitte - w / 2;
+        const xR = mitte + w / 2;
         const rand = 4;
         const y0 = hoch ? hoehe + rand : rand;   // Grundlinie im SVG
+        const gesamt = hoehe + 2 * rand;
 
-        svg.setAttribute('width', String(breite));
-        svg.setAttribute('height', String(hoehe + 2 * rand));
-        svg.setAttribute('viewBox', `0 0 ${breite} ${hoehe + 2 * rand}`);
-        /* Die Grundlinie der Zeichnung liegt genau auf der Punktlinie der
-           Leiste: oben an der Symbolleiste bzw. unten an der Kopfleiste. */
+        svg.style.width = `${breite}px`;
+        svg.style.height = `${gesamt}px`;
         svg.style[hoch ? 'bottom' : 'top'] = `calc(100% - ${rand}px)`;
+        svg.setAttribute('viewBox', `0 0 ${breite} ${gesamt}`);
+
+        /* Der Grund: abgerundetes Rechteck, fest im Fenster an der
+           Grundlinie der Leiste ausgerichtet */
+        const lr = leiste.getBoundingClientRect();
+        grund.style.left = `${xL}px`;
+        grund.style.width = `${w}px`;
+        grund.style.height = `${Math.max(0, h)}px`;
+        if (hoch) { grund.style.bottom = `${window.innerHeight - lr.top}px`; grund.style.top = 'auto'; }
+        else { grund.style.top = `${lr.bottom}px`; grund.style.bottom = 'auto'; }
+        grund.style.borderRadius = hoch ? `${r}px ${r}px 0 0` : `0 0 ${r}px ${r}px`;
 
         const f = (n: number) => n.toFixed(2);
         const woelbung =
@@ -990,19 +1051,21 @@ const kategorien = (leistungen.kategorien ?? [])
           `L${f(xR - r)} ${f(y0 + s * h)} C${f(xR - r + k)} ${f(y0 + s * h)} ${f(xR)} ${f(y0 + s * (h - r + k))} ${f(xR)} ${f(y0 + s * (h - r))} ` +
           `L${f(xR)} ${f(y0 + s * r)} C${f(xR)} ${f(y0 + s * (r - k))} ${f(xR + r - k)} ${f(y0)} ${f(xR + r)} ${f(y0)} `;
         linie.setAttribute('d', `M0 ${f(y0)} ${woelbung}L${breite} ${f(y0)}`);
-        flaeche.setAttribute('d', `M${f(xL - r)} ${f(y0)} ${woelbung}Z`);
+
+        /* Die Füße: die kleinen Flächen zwischen Rechteck und Ausrundung */
+        fuesse.setAttribute('d',
+          `M${f(xL - r)} ${f(y0)} C${f(xL - r + k)} ${f(y0)} ${f(xL)} ${f(y0 + s * (r - k))} ${f(xL)} ${f(y0 + s * r)} L${f(xL)} ${f(y0)} Z ` +
+          `M${f(xR + r)} ${f(y0)} C${f(xR + r - k)} ${f(y0)} ${f(xR)} ${f(y0 + s * (r - k))} ${f(xR)} ${f(y0 + s * r)} L${f(xR)} ${f(y0)} Z`);
 
         /* Kleiner Pfeil an der Grundlinie, auf den Menüpunkt zeigend */
-        const kr = knopf.getBoundingClientRect();
-        const px = kr.left + kr.width / 2;
-        const py = y0 + s * 14;
+        const py = y0 + s * 22;
         const sicht = Math.max(0, (anteil - 0.6) / 0.4);
-        pfeil.setAttribute('d', `M${f(px - 10)} ${f(py + s * -8)} L${f(px)} ${f(py)} L${f(px + 10)} ${f(py + s * -8)}`);
+        pfeil.setAttribute('d', `M${f(knopfX - 9)} ${f(py + s * -7)} L${f(knopfX)} ${f(py)} L${f(knopfX + 9)} ${f(py + s * -7)}`);
         pfeil.setAttribute('opacity', f(sicht));
 
-        /* Der Inhalt sitzt mittig im Fenster, nicht unter dem Menüpunkt */
+        /* Der Inhalt liegt in der voll aufgewölbten Blase */
         const hr = huelle.getBoundingClientRect();
-        inhalt.style.left = `${breite / 2 - hr.left}px`;
+        inhalt.style.left = `${links - hr.left}px`;
       };
 
       const schritt = (jetzt: number) => {
@@ -1015,7 +1078,8 @@ const kategorien = (leistungen.kategorien ?? [])
         anteil = ziel;
         if (ziel === 0) {
           svg.style.display = 'none';
-          delete leiste.dataset.ohneLinie;
+          grund.style.display = 'none';
+          delete linienTraeger.dataset.ohneLinie;
           delete huelle.dataset.aktiv;
           if (knopf.getAttribute('aria-expanded') !== 'true') inhalt.hidden = true;
         }
@@ -1025,7 +1089,7 @@ const kategorien = (leistungen.kategorien ?? [])
         ziel = nachZiel;
         von = anteil;
         start = performance.now();
-        dauer = nachZiel === 1 ? 560 : 380;
+        dauer = nachZiel === 1 ? 620 : 360;
         if (wenigerBewegung) { anteil = ziel; zeichnen(); dauer = 0; start = -1e9; }
         if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
       };
@@ -1037,8 +1101,9 @@ const kategorien = (leistungen.kategorien ?? [])
           inhalt.hidden = false;
           hoehe = inhalt.getBoundingClientRect().height;
           huelle.dataset.aktiv = 'ja';
-          leiste.dataset.ohneLinie = 'ja';
+          linienTraeger.dataset.ohneLinie = 'ja';
           svg.style.display = 'block';
+          grund.style.display = 'block';
           zeichnen();
           requestAnimationFrame(() => { huelle.dataset.offen = 'ja'; });
           animieren(1);
@@ -1086,6 +1151,7 @@ const kategorien = (leistungen.kategorien ?? [])
       window.addEventListener('resize', () => { if (huelle.dataset.aktiv) { hoehe = inhalt.getBoundingClientRect().height; zeichnen(); } }, { passive: true });
       // Beim Seitenwechsel schließen
       document.addEventListener('astro:before-preparation', () => setzen(false));
+      document.addEventListener('astro:after-swap', () => { if (!grund.isConnected) document.body.append(grund); });
     });
 
     // ---- Mobiles Ausklappmenü ----
