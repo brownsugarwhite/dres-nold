@@ -346,6 +346,8 @@ const kategorien = (leistungen.kategorien ?? [])
   .oberpunkt__titel,
   .oberpunkt__kurz,
   .fussknopf__text {
+    font-weight: var(--gewicht-leicht);
+    letter-spacing: 0.015em;
     font-family: var(--schrift-titel);
   }
 
@@ -374,8 +376,11 @@ const kategorien = (leistungen.kategorien ?? [])
     align-items: center;
     color: var(--farbe-primaer);
     font-family: var(--schrift-titel);
-    font-size: var(--text-s);
-    font-weight: var(--gewicht-normal);
+    /* Poppins läuft breiter als Source Sans 3 — die Zeile darf deshalb
+       kleiner und leichter stehen als dort. */
+    font-size: 13px;
+    font-weight: var(--gewicht-leicht);
+    letter-spacing: 0.01em;
     white-space: nowrap;
   }
 
@@ -389,7 +394,7 @@ const kategorien = (leistungen.kategorien ?? [])
      Aufziehen statt mit einem Strich. */
   .kontaktzeile__mail {
     display: inline-block;
-    font-weight: var(--gewicht-halbfett);
+    font-weight: var(--gewicht-mittel);
     transform-origin: center;
     transition: transform var(--dauer-schnell) var(--verlauf);
   }
@@ -577,7 +582,7 @@ const kategorien = (leistungen.kategorien ?? [])
   .mobilmenue__symbol--klein { width: 40px; height: 40px; }
 
   .mobilmenue__untertext { display: flex; flex-direction: column; }
-  .mobilmenue__kurz { color: var(--farbe-text); font-size: 14px; font-weight: 300; line-height: 1.3; }
+  .mobilmenue__kurz { color: var(--farbe-text-gedeckt); font-size: 13px; font-weight: var(--gewicht-leicht); line-height: 1.35; }
 
   @media (prefers-reduced-motion: reduce) {
     .mobilmenue,
@@ -652,6 +657,9 @@ const kategorien = (leistungen.kategorien ?? [])
     justify-content: center;
     height: 80px;
     flex: none;
+    font-size: 15px;
+    font-weight: var(--gewicht-leicht);
+    letter-spacing: 0.015em;
   }
 
   /* Ablauf a-18: 300 ms, easeInOut — einmal hoch, kein Zurückrollen */
@@ -762,7 +770,7 @@ const kategorien = (leistungen.kategorien ?? [])
   .aufklapp__spalten {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 6px;
   }
 
   /* Ein Oberpunkt je Kategorie — Symbol links, Titel und Kurztext rechts */
@@ -770,8 +778,11 @@ const kategorien = (leistungen.kategorien ?? [])
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 4px 10px;
-    margin: 0 -10px;
+    /* Die Luft steckt jetzt im Eintrag selbst statt im Abstand
+       dazwischen — so wächst auch die Fläche, die auf das Zeigen
+       reagiert, und die Einträge stehen ruhiger beieinander. */
+    padding: 10px 12px;
+    margin: 0 -12px;
     border-radius: var(--radius-m);
     color: var(--farbe-primaer);
     text-decoration: none;
@@ -792,17 +803,21 @@ const kategorien = (leistungen.kategorien ?? [])
     flex-direction: column;
   }
 
+  .oberpunkt__text {
+    gap: 2px;
+  }
+
   .oberpunkt__titel {
-    font-size: 20px;
-    font-weight: var(--gewicht-halbfett);
-    line-height: 1.2;
+    font-size: 16px;
+    font-weight: var(--gewicht-mittel);
+    line-height: 1.25;
   }
 
   .oberpunkt__kurz {
-    color: var(--farbe-text);
-    font-size: 14px;
-    font-weight: 300;
-    line-height: 1.3;
+    color: var(--farbe-text-gedeckt);
+    font-size: 13px;
+    font-weight: var(--gewicht-leicht);
+    line-height: 1.35;
   }
 
   /* ---------- Symbolleiste unten ---------- */
@@ -944,7 +959,7 @@ const kategorien = (leistungen.kategorien ?? [])
      zwischen den Symbolen */
   @media (max-width: 479px) {
     .kontaktzeile__inhalt { width: 94%; gap: var(--abstand-2xs); }
-    .kontaktzeile__text { font-size: var(--text-xs); }
+    .kontaktzeile__text { font-size: 12px; }
     .fussleiste__inhalt { width: 94%; }
     .fussleiste__inhalt--klein .fussknopf { flex: 1; }
   }

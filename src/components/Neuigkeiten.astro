@@ -47,7 +47,6 @@ const alsDatum = (iso: string) =>
     z-index: 40;
     padding-block: 60px 100px;
     padding-inline: var(--abstand-m);
-    background: var(--farbe-flaeche);
   }
 
   .neuigkeiten__titel { text-align: center; }
@@ -57,7 +56,7 @@ const alsDatum = (iso: string) =>
     margin-bottom: var(--abstand-l);
     color: var(--farbe-text);
     font-size: 20px;
-    font-weight: 300;
+    font-weight: var(--gewicht-leicht);
     text-align: center;
   }
 
@@ -81,7 +80,6 @@ const alsDatum = (iso: string) =>
     padding: var(--abstand-xs);
     margin: calc(-1 * var(--abstand-xs));
     border-radius: var(--radius-m);
-    background: var(--farbe-flaeche);
     color: inherit;
     text-decoration: none;
     transition: transform var(--dauer-schnell) var(--verlauf);

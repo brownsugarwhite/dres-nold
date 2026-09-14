@@ -126,9 +126,9 @@ const bilder = galerie.eintraege
     align-items: center;
     flex: none;
     width: var(--groesse, 8px);
-    height: var(--groesse, 8px);
-    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1),
-                height 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    height: 11px;
+    overflow: hidden;
+    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .galeriepunkt__knopf {
@@ -138,11 +138,9 @@ const bilder = galerie.eintraege
     border: 0;
     border-radius: var(--radius-rund);
     background: var(--farbe-primaer);
-    opacity: var(--deckkraft, 0.45);
     cursor: pointer;
     transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1),
-                height 300ms cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+                height 300ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Die Punkte sind klein — die Trefferfläche darf es nicht sein. */
@@ -177,8 +175,11 @@ const bilder = galerie.eintraege
    * Ein Klick versetzt die Animationszeit, statt sie neu zu starten:
    * das Band springt an die Stelle und läuft von dort ruhig weiter.
    */
-  const VOLL = 8;
-  const AKTIV = 11;
+  /* Größen wie im Slider von finanzleser: Der aktive Punkt ist der
+     größte, seine Nachbarn werden nach außen hin kleiner. Alle haben
+     dieselbe Farbe — die Staffelung allein trägt die Information. */
+  const GROESSEN = [11, 8, 5, 3];
+  const KLEINST = 3;
 
   function galerieAufbauen() {
     const bereich = document.querySelector<HTMLElement>('[data-galerie]');
@@ -204,28 +205,25 @@ const bilder = galerie.eintraege
       return Math.round(anteil * anzahl) % anzahl;
     };
 
-    /* Sichtfenster wie bei den Instagram-Punkten: höchstens fünf bzw.
-       sieben Punkte, die äußeren geschrumpft. */
-    const fenster = anzahl <= 7 ? 5 : 7;
+    /* Höchstens sieben Punkte gleichzeitig; bei mehr Bildern wandert
+       das Fenster mit. */
+    const fenster = Math.min(anzahl, 7);
 
+    /**
+     * Die Größe hängt am Abstand zum aktiven Punkt: 11 – 8 – 5 – 3.
+     * Punkte außerhalb des Fensters fallen auf 0 und geben ihren Platz
+     * ganz ab; die Reihe bleibt dadurch immer gleich breit.
+     */
     const groesseVon = (i: number, jetzt: number) => {
-      if (anzahl <= fenster) return i === jetzt ? AKTIV : VOLL;
+      const halb = Math.floor(fenster / 2);
+      let start = jetzt - halb;
+      if (start < 0) start = 0;
+      if (start > anzahl - fenster) start = anzahl - fenster;
 
-      let start = Math.min(Math.max(jetzt - 2, 0), anzahl - fenster);
       const platz = i - start;
-      if (i === jetzt) return AKTIV;
       if (platz < 0 || platz >= fenster) return 0;
 
-      const stelle = jetzt - start;
-      const linksEnger = Math.min(1, stelle / 2);
-      const rechtsEnger = Math.min(1, (fenster - 1 - stelle) / 2);
-      const zwischen = (von: number, bis: number, t: number) => von + (bis - von) * t;
-
-      if (platz === 0) return zwischen(VOLL, 3, linksEnger);
-      if (platz === 1) return zwischen(VOLL, 5, linksEnger);
-      if (platz === fenster - 1) return zwischen(VOLL, 3, rechtsEnger);
-      if (platz === fenster - 2) return zwischen(VOLL, 5, rechtsEnger);
-      return VOLL;
+      return GROESSEN[Math.min(Math.abs(i - jetzt), GROESSEN.length - 1)] ?? KLEINST;
     };
 
     let zuletzt = -1;
@@ -240,9 +238,8 @@ const bilder = galerie.eintraege
           const groesse = groesseVon(i, jetzt);
           const knopf = fach.firstElementChild as HTMLElement | null;
           fach.style.setProperty('--groesse', `${groesse}px`);
-          fach.style.width = groesse ? '' : '0px';
+          fach.style.width = groesse ? `${groesse}px` : '0px';
           knopf?.style.setProperty('--groesse', `${groesse}px`);
-          knopf?.style.setProperty('--deckkraft', i === jetzt ? '1' : '0.45');
           knopf?.setAttribute('aria-selected', i === jetzt ? 'true' : 'false');
         });
       }

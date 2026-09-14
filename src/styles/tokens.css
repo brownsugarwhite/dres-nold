@@ -19,8 +19,15 @@
   --farbe-primaer-hell: #a3959f;
   --farbe-dunkel: #554d53;
 
-  --farbe-text: #5c5e61;
-  --farbe-text-gedeckt: #758696;
+  /* Ein einziger Grauton-Verlauf für allen Text, abgestimmt auf das
+     Aubergine: dieselbe Farbfamilie, nur entsättigt und aufgehellt.
+     Vorher lagen hier drei unabhängige Grautöne nebeneinander — ein
+     kühles Blaugrau (#758696), ein neutrales (#5c5e61) und ein warmes
+     (#554d53); nebeneinander wirkte das unruhig und zufällig.
+     Das alte #758696 erreichte auf Weiß außerdem nur 3,75:1 und war
+     damit unter der Vorgabe von 4,5:1 (WCAG 2.1 AA). */
+  --farbe-text: #4d434b;          /* Fließtext — 9,5:1 auf Weiß */
+  --farbe-text-gedeckt: #766c74;  /* Zweitrangiges — 5,0:1 auf Weiß */
   --farbe-text-invers: #ffffff;
 
   --farbe-flaeche: #ffffff;
@@ -58,11 +65,14 @@
   /* Abschnittsüberschriften der Startseite — 60 px wie `.heading` der Vorlage */
   --text-titel: clamp(2.25rem, 1.5rem + 2.6vw, 3.75rem);
 
+  --gewicht-leicht: 300;
   --gewicht-normal: 400;
+  --gewicht-mittel: 500;
   --gewicht-halbfett: 600;
   --gewicht-fett: 700;
 
   --zeilenhoehe-eng: 1.2;
+  --zeilenhoehe-mittel: 1.45;
   --zeilenhoehe-normal: 1.6;
 
   /* --- Abstände -------------------------------------------------

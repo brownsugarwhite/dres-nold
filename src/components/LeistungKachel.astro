@@ -28,16 +28,16 @@ const { id, titel, kurz, icon } = Astro.props;
     flex-direction: column;
     gap: var(--abstand-2xs);
     padding: var(--abstand-m);
-    background: var(--farbe-flaeche);
+    /* Ohne eigene Fläche — die Kachel steht auf dem Grund des Bereichs
+       (Probe von Florian, September 2026). Im Seitenwechsel bekommt sie
+       ihre deckende Fläche von styles/uebergaenge.css. */
     border: 1px solid var(--farbe-linie);
     border-radius: var(--radius-m);
     text-decoration: none;
     color: var(--farbe-text);
-    /* Ablauf a-8: Über den Scrollweg wächst die Kachel von 0,9 auf 1
-       und ihr Grund hellt von #f1f1f1 auf Weiß auf — am Ende wieder
-       zurück. Die Werte setzt das Skript. */
+    /* Ablauf a-8: Über den Scrollweg wächst die Kachel von 0,9 auf 1 —
+       am Ende wieder zurück. Den Wert setzt das Skript. */
     transform: scale(var(--kachel-groesse, 1));
-    background-color: var(--kachel-grund, #fff);
     transition:
       border-color var(--dauer-schnell) var(--verlauf),
       transform var(--dauer-schnell) var(--verlauf);
@@ -110,7 +110,7 @@ const { id, titel, kurz, icon } = Astro.props;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .kachel { transform: none; background-color: #fff; }
+    .kachel { transform: none; }
   }
 
   .kachel__icon {
@@ -149,14 +149,16 @@ const { id, titel, kurz, icon } = Astro.props;
 
 <script>
   /**
-   * Ablauf a-8: Die Kacheln wachsen beim Hereinscrollen von 0,9 auf 1
-   * und hellen dabei von #f1f1f1 auf Weiß auf; am Ende des Scrollwegs
-   * gehen beide Werte zurück.
+   * Ablauf a-8: Die Kacheln wachsen beim Hereinscrollen von 0,9 auf 1;
+   * am Ende des Scrollwegs geht der Wert zurück.
    *
-   *   0 %   Skalierung 0,9 · Grund #f1f1f1
-   *  30 %   Skalierung 1   · Grund Weiß
+   *   0 %   Skalierung 0,9
+   *  30 %   Skalierung 1
    *  75 %   unverändert
-   * 100 %   Skalierung 0,9 · Grund #f1f1f1
+   * 100 %   Skalierung 0,9
+   *
+   * Das Aufhellen des Grundes (#f1f1f1 → Weiß) aus der Vorlage entfällt,
+   * seit die Kacheln keine eigene Fläche mehr haben.
    */
   function kachelnAufbauen() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -182,13 +184,8 @@ const { id, titel, kurz, icon } = Astro.props;
         const groesse = p < 0.3 ? zwischen(p, 0, 0.3, 0.9, 1)
                       : p > 0.75 ? zwischen(p, 0.75, 1, 1, 0.9)
                       : 1;
-        // 241 → 255 → 241
-        const ton = Math.round(p < 0.3 ? zwischen(p, 0, 0.3, 241, 255)
-                             : p > 0.75 ? zwischen(p, 0.75, 1, 255, 241)
-                             : 255);
 
         k.style.setProperty('--kachel-groesse', groesse.toFixed(3));
-        k.style.setProperty('--kachel-grund', `rgb(${ton},${ton},${ton})`);
       });
     };
 

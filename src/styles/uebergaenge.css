@@ -131,6 +131,13 @@
   overflow: hidden;
 }
 
+/* Beim Blättern fahren zwei Karten nebeneinander durch — dort darf
+   nichts beschnitten werden und es braucht keine Fläche. */
+html[data-uebergang] ::view-transition-image-pair(.karte) {
+  background: none;
+  overflow: visible;
+}
+
 /* Beide Abbilder füllen die Hülle immer ganz aus.
    Standardmäßig behalten sie ihr Seitenverhältnis und hängen oben —
    sobald die Hülle breiter wird als hoch, ragt das Abbild unten hinaus
@@ -235,10 +242,14 @@
   deshalb ab (Regel ganz unten) — sonst blieben sie als eigene Ebenen
   stehen und blitzten auf, während die Karte unter ihnen wegfährt.
 */
-@keyframes uebergang-raus-links { to { transform: translateX(-100%); } }
-@keyframes uebergang-raus-rechts { to { transform: translateX(100%); } }
-@keyframes uebergang-rein-links { from { transform: translateX(-100%); } }
-@keyframes uebergang-rein-rechts { from { transform: translateX(100%); } }
+/* Der Weg muss die Karte ganz aus dem Fenster tragen. Sie steht mittig,
+   also: halbe Fensterbreite plus halbe Kartenbreite. Bei reinem
+   `translateX(-100%)` bliebe sie auf breiten Bildschirmen zur Hälfte
+   stehen. */
+@keyframes uebergang-raus-links { to { transform: translateX(calc(-50vw - 50%)); } }
+@keyframes uebergang-raus-rechts { to { transform: translateX(calc(50vw + 50%)); } }
+@keyframes uebergang-rein-links { from { transform: translateX(calc(-50vw - 50%)); } }
+@keyframes uebergang-rein-rechts { from { transform: translateX(calc(50vw + 50%)); } }
 
 /* Der Rest der Seite bleibt stehen — nichts verschwimmt */
 html[data-uebergang] ::view-transition-old(root),
@@ -258,6 +269,11 @@ html[data-uebergang] ::view-transition-new(.karte) {
   animation-delay: 0ms;
   /* Keine Deckkraftänderung: die Karten gleiten, sie blenden nicht */
   opacity: 1;
+  /* Beim Blättern steht die Hülle still — die Abbilder behalten
+     deshalb ihre eigene Größe und werden nicht gedehnt. */
+  width: auto;
+  height: auto;
+  object-fit: none;
 }
 
 html[data-uebergang] ::view-transition-old(.karte) { animation-fill-mode: forwards; }

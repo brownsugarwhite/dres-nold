@@ -35,7 +35,11 @@ const { titel = seite.titel, beschreibung = seite.beschreibung } = Astro.props;
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
 
+    {/* Die Schnitte, die schon in der ersten Bildschirmhöhe stehen:
+        Fließtext und die leichten Beschriftungen der beiden Leisten. */}
     <link rel="preload" href="/fonts/source-sans-3-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/poppins-300.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/poppins-600.woff2" as="font" type="font/woff2" crossorigin />
 
     <link rel="canonical" href={Astro.url.href} />
     <link rel="sitemap" href="/sitemap-index.xml" />

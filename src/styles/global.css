@@ -64,11 +64,20 @@ textarea {
 
 h1 { font-size: var(--text-xxl); }
 h2 { font-size: var(--text-xl); }
-h3 { font-size: var(--text-l); }
+h3 { font-size: var(--text-l); line-height: var(--zeilenhoehe-mittel); }
+h4 { font-size: var(--text-m); line-height: var(--zeilenhoehe-mittel); }
 
 p {
   margin: 0 0 var(--abstand-s);
   max-width: var(--breite-text);
+  /* Verhindert einzelne Wörter in der letzten Zeile — der Browser
+     verteilt den Text dafür auf die vorhergehenden Zeilen um. */
+  text-wrap: pretty;
+}
+
+/* Aufzählungen laufen wie Fließtext */
+li {
+  margin-bottom: var(--abstand-3xs);
 }
 
 /*
@@ -86,6 +95,16 @@ p {
   min-width: 0;
   overflow-x: auto;
   overflow-wrap: anywhere;
+  color: var(--farbe-text);
+}
+
+.redaktionstext :is(h3, h4) {
+  margin-top: var(--abstand-m);
+}
+
+.redaktionstext :is(ul, ol) {
+  margin: 0 0 var(--abstand-m);
+  padding-left: var(--abstand-m);
 }
 
 /* Tabellen nutzen die volle Breite. `auto` statt `fixed`: Spalten
