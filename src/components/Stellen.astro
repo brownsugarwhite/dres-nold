@@ -1,0 +1,102 @@
+---
+/**
+ * Stellenanzeigen — eigener Bereich, von der Praxis pflegbar.
+ * Ist keine Stelle aktiv, erscheint der Bereich gar nicht.
+ */
+import daten from '../content/stellen.json';
+
+const stellen = daten.eintraege
+  .filter((e) => e.aktiv && e.titel)
+  .sort((a, b) => a.position - b.position);
+---
+
+{stellen.length > 0 && (
+  <section class="stellen" id="stellen" data-verlauf aria-labelledby="stellen-titel">
+    <div class="inhalt">
+      <h2 class="stellen__titel" id="stellen-titel">{daten.titel || 'Wir suchen Verstärkung'}</h2>
+      {daten.einleitung && <p class="stellen__einleitung">{daten.einleitung}</p>}
+
+      <ul class="stellen__liste" role="list">
+        {stellen.map((s) => (
+          <li class="stelle">
+            <h3 class="stelle__titel">{s.titel}</h3>
+            {s.umfang && <p class="stelle__umfang">{s.umfang}</p>}
+            <div class="stelle__text" set:html={s.beschreibung} />
+            <p class="stelle__fuss">
+              {s.ansprechpartner && <span>Ansprechperson: {s.ansprechpartner}</span>}
+              {s.pdf_datei && (
+                <a class="stelle__pdf" href={s.pdf_datei} download>Anzeige als PDF</a>
+              )}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .stellen {
+    position: relative;
+    z-index: 40;
+    padding-block: 60px 100px;
+    background: var(--farbe-flaeche);
+  }
+
+  .stellen__titel { text-align: center; }
+
+  .stellen__einleitung {
+    max-width: none;
+    margin-bottom: var(--abstand-l);
+    color: var(--farbe-text);
+    font-size: 20px;
+    font-weight: 300;
+    text-align: center;
+  }
+
+  .stellen__liste {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: var(--abstand-l);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .stelle {
+    padding: var(--abstand-m);
+    border: 1px solid var(--farbe-linie);
+    border-radius: var(--radius-m);
+  }
+
+  .stelle__titel {
+    margin-bottom: var(--abstand-3xs);
+    color: var(--farbe-primaer);
+    font-size: var(--text-l);
+  }
+
+  .stelle__umfang {
+    margin-bottom: var(--abstand-s);
+    color: var(--farbe-text-gedeckt);
+    font-size: var(--text-s);
+  }
+
+  .stelle__text :global(p) { margin-bottom: var(--abstand-s); max-width: none; }
+  .stelle__text :global(ul),
+  .stelle__text :global(ol) { margin: 0 0 var(--abstand-s); padding-left: var(--abstand-m); }
+
+  .stelle__fuss {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--abstand-2xs) var(--abstand-m);
+    margin: var(--abstand-s) 0 0;
+    max-width: none;
+    font-size: var(--text-s);
+    color: var(--farbe-text-gedeckt);
+  }
+
+  .stelle__pdf {
+    font-weight: var(--gewicht-halbfett);
+    color: var(--farbe-primaer);
+  }
+</style>

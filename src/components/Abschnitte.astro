@@ -1,0 +1,113 @@
+---
+/**
+ * Freie Abschnitte im Praxis-Bereich — von der Praxis beliebig anlegbar,
+ * ohne eigenen Menüeintrag (docs/entscheidungen.md). Je Abschnitt:
+ * Überschrift, Text, optional ein Bild, optional ein Verweis oder ein
+ * PDF zum Herunterladen.
+ */
+import daten from '../content/abschnitte.json';
+
+const abschnitte = daten.eintraege
+  .filter((e) => e.aktiv && e.titel)
+  .sort((a, b) => a.position - b.position);
+---
+
+{abschnitte.length > 0 && (
+  <div class="abschnitte inhalt" id="praxis">
+    {abschnitte.map((a, i) => (
+      <section class="abschnitt" id={`abschnitt-${a.id}`} data-mit-bild={a.bild ? 'ja' : undefined} data-gerade={i % 2 ? 'ja' : undefined}>
+        {a.bild && (
+          <img class="abschnitt__bild" src={a.bild} alt={a.bild_alt || ''} width="600" height="400" loading="lazy" />
+        )}
+        <div class="abschnitt__text">
+          <h2>{a.titel}</h2>
+          <div class="abschnitt__inhalt" set:html={a.text} />
+          {(a.link_ziel || a.pdf_datei) && (
+            <p class="abschnitt__knoepfe">
+              {a.link_ziel && (
+                <a class="knopf" href={a.link_ziel} rel={/^https?:/.test(a.link_ziel) ? 'noopener' : undefined}>
+                  {a.link_text || 'Mehr erfahren'}
+                </a>
+              )}
+              {a.pdf_datei && (
+                <a class="knopf knopf--pdf" href={a.pdf_datei} download>
+                  {a.pdf_text || 'PDF herunterladen'}
+                </a>
+              )}
+            </p>
+          )}
+        </div>
+      </section>
+    ))}
+  </div>
+)}
+
+<style>
+  .abschnitte {
+    display: flex;
+    flex-direction: column;
+    gap: var(--abstand-xl);
+    padding-block: var(--abstand-l);
+  }
+
+  .abschnitt {
+    display: grid;
+    gap: var(--abstand-l);
+    align-items: center;
+  }
+
+  .abschnitt[data-mit-bild] {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+
+  /* Jeder zweite Abschnitt mit Bild: Bild rechts */
+  .abschnitt[data-mit-bild][data-gerade] .abschnitt__bild { order: 2; }
+
+  .abschnitt__bild {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-m);
+  }
+
+  .abschnitt__inhalt :global(p) { margin-bottom: var(--abstand-s); }
+  .abschnitt__inhalt :global(ul),
+  .abschnitt__inhalt :global(ol) { margin: 0 0 var(--abstand-s); padding-left: var(--abstand-m); }
+  .abschnitt__inhalt :global(table) { width: 100%; border-collapse: collapse; margin-bottom: var(--abstand-s); }
+  .abschnitt__inhalt :global(th),
+  .abschnitt__inhalt :global(td) { padding: var(--abstand-2xs) var(--abstand-xs); border-bottom: 1px solid var(--farbe-linie); text-align: left; }
+
+  .abschnitt__knoepfe {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--abstand-2xs);
+    margin: var(--abstand-s) 0 0;
+  }
+
+  .knopf {
+    display: inline-block;
+    padding: var(--abstand-2xs) var(--abstand-m);
+    border: 1px solid var(--farbe-primaer);
+    border-radius: var(--radius-rund);
+    background: var(--farbe-primaer);
+    color: var(--farbe-text-invers);
+    font-weight: var(--gewicht-halbfett);
+    text-decoration: none;
+    transition: background-color var(--dauer-schnell) var(--verlauf), color var(--dauer-schnell) var(--verlauf);
+  }
+
+  .knopf:hover,
+  .knopf:focus-visible { background: var(--farbe-dunkel); border-color: var(--farbe-dunkel); }
+
+  .knopf--pdf {
+    background: var(--farbe-flaeche);
+    color: var(--farbe-primaer);
+  }
+
+  .knopf--pdf:hover,
+  .knopf--pdf:focus-visible { background: var(--farbe-flaeche-gedeckt); color: var(--farbe-primaer); border-color: var(--farbe-primaer); }
+
+  @media (max-width: 767px) {
+    .abschnitt[data-mit-bild] { grid-template-columns: 1fr; }
+    .abschnitt[data-mit-bild][data-gerade] .abschnitt__bild { order: 0; }
+  }
+</style>

@@ -10,6 +10,8 @@ import Startbereich from '../components/Startbereich.astro';
 import Oeffnungszeiten from '../components/Oeffnungszeiten.astro';
 import Willkommen from '../components/Willkommen.astro';
 import Galerie from '../components/Galerie.astro';
+import Abschnitte from '../components/Abschnitte.astro';
+import Stellen from '../components/Stellen.astro';
 import Neuigkeiten from '../components/Neuigkeiten.astro';
 import Team from '../components/Team.astro';
 import Kontakt from '../components/Kontakt.astro';
@@ -61,6 +63,7 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
   <main id="inhalt" class="seiteninhalt">
     <Willkommen />
     <Galerie />
+    <Abschnitte />
 
 
     <section id="leistungen" class="inhalt abschnitt">
@@ -102,6 +105,7 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 
   <Neuigkeiten />
   <Team />
+  <Stellen />
   <Kontakt />
   <Fussbereich />
 </Basis>
