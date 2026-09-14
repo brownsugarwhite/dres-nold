@@ -19,7 +19,17 @@
       "position": 2,
       "titel": "Arzt",
       "umfang": "Voll",
-      "beschreibung": "beajfbdivjnsdvvmxdfbndfihbghdifhsvfsvdnfvdns",
+      "beschreibung": "<h3>beajfbdivjnsdvvmxdfbndfihbghdifhsvfsvdnfvdns<br><br>Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.</h3><p><br><table><thead><tr><th>Spalte 1</th><th>Spalte 2</th></tr></thead><tbody><tr><td>…</td><td>…</td></tr><tr><td>…</td><td>…</td></tr><tr><td>…</td><td>…</td></tr><tr><td>…</td><td>…</td></tr></tbody></table><p></p></p>",
+      "ansprechpartner": "",
+      "pdf_datei": "/dokumente/contrato-y-anexos.pdf"
+    },
+    {
+      "id": "assistentin",
+      "aktiv": true,
+      "position": 3,
+      "titel": "Assistentin",
+      "umfang": "eilzeit",
+      "beschreibung": "dfsydfdsyfsd",
       "ansprechpartner": "",
       "pdf_datei": ""
     }
