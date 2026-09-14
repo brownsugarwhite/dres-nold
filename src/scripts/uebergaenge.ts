@@ -15,6 +15,11 @@
  * 3. Blättern: „Vorherige / Nächste" schiebt die Seiten seitlich
  *    durch (styles/uebergaenge.css, `html[data-uebergang]`).
  *
+ * Nebenbei: `data-morph` kennzeichnet die eine Karte, die gerade morpht
+ * — in beiden Richtungen. Nur sie gehört zur Übergangsgruppe „karte"
+ * und liegt damit über den übrigen Karten. Trügen alle Kacheln die
+ * Gruppe, läge die richtige beim Zurückmorphen wieder dazwischen.
+ *
  * 4. Das Schließen-Kreuz bleibt beim Scrollen oben stehen; sobald es
  *    „klebt", zeichnet sich ein Kreis darum.
  */
@@ -50,6 +55,9 @@ document.addEventListener('astro:before-preparation', (ereignis) => {
   const karte = quelle?.closest?.('[data-karte]');
   if (!karte) return;
   karte.setAttribute('data-gehoben', '');
+  /* Damit sie im Übergang über allen anderen Karten liegt — sonst
+     stünde sie zwischen ihren Nachbarn (styles/uebergaenge.css) */
+  karte.setAttribute('data-morph', '');
   const laden = e.loader;
   const start = performance.now();
   e.loader = async () => {
@@ -68,6 +76,10 @@ document.addEventListener('astro:after-swap', () => {
   if (!ziel) return;
   const karte = document.querySelector<HTMLElement>(`[data-karte][href="${ziel}"]`);
   if (!karte) return;
+  /* Auch beim Zurückmorphen muss die Zielkarte über ihren Nachbarn
+     liegen. Dieses Kennzeichen wird noch vor der neuen Momentaufnahme
+     gesetzt — `astro:after-swap` läuft innerhalb des Übergangs. */
+  karte.setAttribute('data-morph', '');
   const r = karte.getBoundingClientRect();
   const oben = window.scrollY + r.top - (window.innerHeight - r.height) / 2;
   window.scrollTo({ top: Math.max(0, oben), behavior: 'instant' as ScrollBehavior });
@@ -85,6 +97,11 @@ document.addEventListener('astro:before-swap', (ereignis) => {
 
 document.addEventListener('astro:page-load', () => {
   delete document.documentElement.dataset.uebergang;
+  /* Aufräumen: Die Kennzeichen gelten nur für den einen Übergang. */
+  for (const k of document.querySelectorAll('[data-morph], [data-gehoben]')) {
+    k.removeAttribute('data-morph');
+    k.removeAttribute('data-gehoben');
+  }
   schliessenKlebenLassen();
 });
 

@@ -46,6 +46,7 @@ const alsDatum = (iso: string) =>
     position: relative;
     z-index: 40;
     padding-block: 60px 100px;
+    padding-inline: var(--abstand-m);
     background: var(--farbe-flaeche);
   }
 
@@ -86,6 +87,12 @@ const alsDatum = (iso: string) =>
     transition:
       box-shadow var(--dauer-schnell) var(--verlauf),
       transform var(--dauer-schnell) var(--verlauf);
+  }
+
+  /* Nur der Beitrag, der gerade morpht, liegt über den anderen —
+     siehe LeistungKachel.astro und scripts/uebergaenge.ts */
+  .beitrag__link[data-morph] {
+    view-transition-class: karte;
   }
 
   /* Angeklickt: legt nur den Schatten darunter — gewachsen wird im

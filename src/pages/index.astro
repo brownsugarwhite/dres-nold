@@ -19,7 +19,6 @@ import Fussbereich from '../components/Fussbereich.astro';
 import Navigation from '../components/Navigation.astro';
 import Basis from '../layouts/Basis.astro';
 import Hinweis from '../components/Hinweis.astro';
-import Trennlinie from '../components/Trennlinie.astro';
 import LeistungKachel from '../components/LeistungKachel.astro';
 import seite from '../content/seite.json';
 import leistungen from '../content/leistungen.json';
@@ -63,9 +62,7 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
   <main id="inhalt" class="seiteninhalt">
     <Willkommen />
     <Galerie />
-    <Trennlinie />
     <Abschnitte />
-    <Trennlinie />
 
     <section id="leistungen" class="inhalt abschnitt">
       <h2>{startseite.leistungen.titel}</h2>
@@ -85,12 +82,9 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
         </>
       ))}
     </section>
-
-    <Trennlinie />
   </main>
 
   <Neuigkeiten />
-  <Trennlinie />
   <Team />
   <Stellen />
   <Kontakt />

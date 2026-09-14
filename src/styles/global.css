@@ -204,6 +204,9 @@ main.seiteninhalt h2:not(.ohne-verlauf),
 [data-verlauf] > h2,
 [data-verlauf] > .inhalt > h2 {
   margin-inline: auto;
+  /* Auf schmalen Handys darf die Überschrift nicht an den Rand stoßen —
+     sie bekommt denselben Seitenrand wie der Inhalt. */
+  max-width: calc(100% - 2 * var(--abstand-m));
   font-size: var(--text-titel);
   /* Nicht enger: Poppins hat tiefere Unterlängen als Source Sans 3.
      Bei `line-height: 1` ragt das „g" aus dem Kasten — und weil der

@@ -50,6 +50,16 @@ const { id, titel, kurz, icon } = Astro.props;
     transform: scale(var(--kachel-groesse, 1)) translateY(-2px);
   }
 
+  /* Nur die Karte, die gerade morpht, gehört zur Gruppe „karte" und
+     liegt dadurch über allen anderen Kacheln (styles/uebergaenge.css).
+     Das Kennzeichen setzt scripts/uebergaenge.ts — beim Öffnen auf der
+     angeklickten Kachel, beim Schließen auf der Kachel, in die
+     zurückgemorpht wird. Bekämen alle Kacheln die Gruppe, stünde die
+     richtige beim Zurückmorphen wieder hinter ihren Nachbarn. */
+  .kachel[data-morph] {
+    view-transition-class: karte;
+  }
+
   /* Angeklickt: legt nur den Schatten darunter — das Größerwerden
      übernimmt der Übergang selbst, damit es EINE Bewegung bleibt
      (styles/uebergaenge.css). */

@@ -84,6 +84,7 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
     align-items: center;
     width: 100%;
     padding-block: 60px 200px;
+    padding-inline: var(--abstand-m);
   }
 
   .kontakt__titel {
@@ -143,7 +144,7 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
     display: flex;
     gap: 40px;
     align-items: stretch;
-    width: min(100% - 2 * var(--abstand-m), var(--breite-inhalt));
+    width: min(100%, var(--breite-inhalt));
     margin-top: 46px;
   }
 
