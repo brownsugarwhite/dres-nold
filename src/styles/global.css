@@ -68,18 +68,55 @@ p {
   max-width: var(--breite-text);
 }
 
-/* Text aus der Redaktion: überlange Wörter (Adressen, Fachbegriffe)
-   brechen um, statt die Seite zu verbreitern; breite Tabellen rollen
-   in ihrem Kasten. */
+/*
+  TEXT AUS DER REDAKTION
+  ==================================================================
+  Ein Satz Regeln für alle Stellen, an denen redigiertes HTML steht:
+  Leistungen, Neuigkeiten, freie Abschnitte, Stellenanzeigen.
+
+  Überlange Wörter (Adressen, Fachbegriffe) brechen um, statt die Seite
+  zu verbreitern. Reicht der Platz für eine Tabelle nicht, rollt der
+  Textbereich waagerecht — die Tabelle selbst bleibt eine Tabelle und
+  richtet ihre Spalten weiter aneinander aus.
+*/
 .redaktionstext {
   min-width: 0;
+  overflow-x: auto;
   overflow-wrap: anywhere;
 }
 
+/* Tabellen nutzen die volle Breite. `auto` statt `fixed`: Spalten
+   richten sich nach ihrem Inhalt, kurze Zahlenspalten bleiben schmal. */
 .redaktionstext table {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
+  width: 100%;
+  min-width: 28rem;
+  table-layout: auto;
+  border-collapse: collapse;
+  margin-bottom: var(--abstand-m);
+}
+
+.redaktionstext th,
+.redaktionstext td {
+  padding: var(--abstand-2xs) var(--abstand-xs);
+  border-bottom: 1px solid var(--farbe-linie);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: normal;
+}
+
+.redaktionstext th {
+  color: var(--farbe-primaer);
+  font-family: var(--schrift-titel);
+  font-weight: var(--gewicht-halbfett);
+}
+
+/* Bilder, die in der Redaktion in den Text gesetzt wurden: immer über
+   die volle Breite, ohne Rundung — wie das Bild oben am Abschnitt. */
+.redaktionstext img {
+  width: 100%;
+  height: auto;
+  margin-block: var(--abstand-m);
+  border-radius: 0;
 }
 
 a {

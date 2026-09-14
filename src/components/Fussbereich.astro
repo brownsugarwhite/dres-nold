@@ -2,8 +2,12 @@
 /**
  * Fußbereich mit den Rechtsverweisen.
  * In der Vorlage ein einzelner Verweis „Datenschutz & Impressum";
- * hier getrennt, weil beides eigene Seiten sind. Dazu der Knopf, der
- * die Einwilligungs-Leiste (Google-Karte) erneut öffnet.
+ * hier getrennt, weil beides eigene Seiten sind.
+ *
+ * Dazu der Knopf, der eine einmal erteilte Zustimmung zur Google-Karte
+ * wieder zurücknimmt. Ein Einwilligungs-Banner beim Seitenaufruf gibt
+ * es nicht — die Karte lädt erst, wenn man das Vorschaubild anklickt
+ * (docs/entscheidungen.md, Abschnitt „Kontakt").
  */
 ---
 <footer class="fuss">
@@ -11,9 +15,12 @@
     <a href="/datenschutz/">Datenschutz</a>
     <span class="punkt" aria-hidden="true"></span>
     <a href="/impressum/">Impressum</a>
-    <span class="punkt" aria-hidden="true"></span>
-    <button class="fuss__knopf" type="button" data-einwilligung-oeffnen>Datenschutz-Einstellungen</button>
+    <span class="fuss__widerruf" data-karte-widerrufen-huelle hidden>
+      <span class="punkt" aria-hidden="true"></span>
+      <button class="fuss__knopf" type="button" data-karte-widerrufen>Zustimmung zur Karte zurücknehmen</button>
+    </span>
   </nav>
+  <p class="fuss__meldung" role="status" aria-live="polite"></p>
 </footer>
 
 <style>
@@ -22,8 +29,10 @@
     position: relative;
     z-index: 40;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: var(--abstand-2xs);
     min-height: 100px;
     padding: var(--abstand-m) var(--abstand-s);
     background: var(--farbe-flaeche) url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
@@ -67,4 +76,50 @@
     border-radius: var(--radius-rund);
     background: var(--farbe-dunkel);
   }
+
+  .fuss__widerruf {
+    display: flex;
+    align-items: center;
+    gap: var(--abstand-s);
+  }
+
+  .fuss__widerruf[hidden] { display: none; }
+
+  .fuss__meldung {
+    margin: 0;
+    max-width: none;
+    color: var(--farbe-text-gedeckt);
+    font-size: var(--text-xs);
+  }
+
+  .fuss__meldung:empty { display: none; }
 </style>
+
+<script>
+  /**
+   * Der Knopf erscheint nur, wenn überhaupt eine Zustimmung zur
+   * Google-Karte gespeichert ist — sonst gäbe es nichts zurückzunehmen.
+   */
+  import { lesen, zuruecksetzen, EREIGNIS } from '../scripts/einwilligung';
+
+  function widerrufAufbauen() {
+    const knopf = document.querySelector<HTMLButtonElement>('[data-karte-widerrufen]');
+    const huelle = document.querySelector<HTMLElement>('[data-karte-widerrufen-huelle]');
+    const meldung = document.querySelector<HTMLElement>('.fuss__meldung');
+    if (!knopf || !huelle || knopf.dataset.bereit) return;
+    knopf.dataset.bereit = 'ja';
+
+    const anzeigen = () => { huelle.hidden = lesen()?.karte !== true; };
+
+    knopf.addEventListener('click', () => {
+      zuruecksetzen();
+      if (meldung) meldung.textContent = 'Die Karte lädt jetzt wieder erst auf Klick.';
+    });
+
+    document.addEventListener(EREIGNIS, anzeigen);
+    anzeigen();
+  }
+
+  widerrufAufbauen();
+  document.addEventListener('astro:page-load', widerrufAufbauen);
+</script>

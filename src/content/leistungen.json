@@ -7,7 +7,8 @@
       "position": 1,
       "aktiv": true,
       "kurz": "Vorsorge, Zahnerhalt und Zahnersatz",
-      "icon": "/icons/kategorien/zahnaerztlich.svg"
+      "icon": "/icons/kategorien/zahnaerztlich.svg",
+      "beschreibung": "<p>Von der Vorsorge über den Zahnerhalt bis zum Zahnersatz — wir behandeln so schonend wie möglich und erhalten Ihre eigenen Zähne so lange wie es geht.</p>"
     },
     {
       "id": "kieferorthopaedie",
@@ -15,7 +16,8 @@
       "position": 2,
       "aktiv": true,
       "kurz": "Zahnspangen für Kinder und Erwachsene",
-      "icon": "/icons/kategorien/kieferorthopaedie.svg"
+      "icon": "/icons/kategorien/kieferorthopaedie.svg",
+      "beschreibung": "<p>An unsere Zahnarztpraxis ist eine kieferorthopädische Fachzahnarztpraxis angeschlossen. Die Kieferorthopädie beschäftigt sich mit der Erkennung, Prävention und Behandlung von Zahn- und Kieferfehlstellungen.</p><p>Neben der rein zahnärztlichen Tätigkeit können wir daher in unserer Praxis ebenfalls kieferorthopädische Behandlungen mit langjähriger Erfahrung fachärztlich durchführen.</p><p>Dabei setzen wir auf ein breites Spektrum in der modernen Kieferorthopädie von der klassischen Funktionskieferorthopädie über die Behandlung mittels nahezu unsichtbaren Kunststoffschienen (Alignern) bis hin zu festsitzenden Apparaturen.</p>"
     },
     {
       "id": "sonstige",
@@ -23,7 +25,8 @@
       "position": 3,
       "aktiv": true,
       "kurz": "Digitale Diagnostik und Ästhetik",
-      "icon": "/icons/kategorien/sonstige.svg"
+      "icon": "/icons/kategorien/sonstige.svg",
+      "beschreibung": "<p>Moderne Technik, die Diagnose und Behandlung genauer und angenehmer macht — vom dreidimensionalen Röntgen bis zur Abformung ohne Abformlöffel.</p>"
     }
   ],
   "eintraege": [

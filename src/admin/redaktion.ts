@@ -52,6 +52,8 @@ const ERLAUBT: Record<string, string[]> = {
   p: [], br: [], strong: [], em: [], b: [], i: [], u: [],
   ul: [], ol: [], li: [], h3: [], h4: [],
   a: ['href'], table: [], thead: [], tbody: [], tr: [], th: [], td: [],
+  /* Bilder im Text: nur Dateien von dieser Seite, mit Alternativtext */
+  img: ['src', 'alt'],
 };
 
 export function htmlBereinigen(html: string): string {
@@ -79,6 +81,10 @@ export function htmlBereinigen(html: string): string {
       for (const attr of [...kind.attributes]) {
         if (!ERLAUBT[tag].includes(attr.name)) kind.removeAttribute(attr.name);
         else if (attr.name === 'href' && /^\s*javascript:/i.test(attr.value)) kind.removeAttribute('href');
+        /* Bilder dürfen nur von dieser Seite kommen — kein fremder
+           Server, kein `data:`. Sonst würde die Redaktion versehentlich
+           eine externe Ressource einbauen (siehe CLAUDE.md). */
+        else if (attr.name === 'src' && !/^\/[a-z0-9._\-/]+$/i.test(attr.value)) kind.remove();
       }
       if (tag === 'b') { const s = document.createElement('strong'); s.innerHTML = kind.innerHTML; kind.replaceWith(s); durchlaufen(s); continue; }
       if (tag === 'i') { const s = document.createElement('em'); s.innerHTML = kind.innerHTML; kind.replaceWith(s); durchlaufen(s); continue; }
@@ -212,6 +218,59 @@ function dateiFeld(feld: Feld, wert: Wert): Baustein {
   return { el: huelle(feld, zeile, id), lesen: () => eingabe.value.trim() };
 }
 
+/**
+ * Bild in den Fließtext setzen.
+ *
+ * Nutzt dieselbe Hochladestrecke wie das eigene Bildfeld
+ * (functions/api/hochladen.ts). Der Alternativtext ist Pflicht —
+ * ohne ihn ist das Bild für blinde Besucher nicht vorhanden
+ * (Barrierefreiheit, siehe CLAUDE.md).
+ */
+function bildEinfuegen(
+  inhalt: HTMLElement,
+  feld: Feld,
+  befehl: (name: string, arg?: string) => () => void,
+): void {
+  const auswahl = document.createElement('input');
+  auswahl.type = 'file';
+  auswahl.accept = 'image/jpeg,image/png,image/webp';
+
+  auswahl.addEventListener('change', async () => {
+    const datei = auswahl.files?.[0];
+    if (!datei) return;
+
+    const beschreibung = window.prompt(
+      'Was ist auf dem Bild zu sehen? (Pflicht — wird blinden Besuchern vorgelesen)',
+      '',
+    );
+    if (beschreibung === null) return;
+    if (!beschreibung.trim()) {
+      window.alert('Ohne Bildbeschreibung kann das Bild nicht eingefügt werden.');
+      return;
+    }
+
+    const form = new FormData();
+    form.append('datei', datei);
+    form.append('ordner', feld.ordner ?? 'allgemein');
+
+    try {
+      const antwort = await fetch('/api/hochladen', { method: 'POST', body: form });
+      const ergebnis = (await antwort.json()) as { ok: boolean; pfad?: string; fehler?: string };
+      if (!ergebnis.ok || !ergebnis.pfad) {
+        window.alert(ergebnis.fehler || 'Hochladen fehlgeschlagen.');
+        return;
+      }
+      const alt = beschreibung.trim().replace(/"/g, '&quot;');
+      inhalt.focus();
+      befehl('insertHTML', `<img src="${ergebnis.pfad}" alt="${alt}"><p></p>`)();
+    } catch {
+      window.alert('Keine Verbindung zum Server.');
+    }
+  });
+
+  auswahl.click();
+}
+
 function richtextFeld(feld: Feld, wert: Wert): Baustein {
   const id = neueId();
   const inhalt = el('div', { class: 'richtext__inhalt', id });
@@ -250,6 +309,7 @@ function richtextFeld(feld: Feld, wert: Wert): Baustein {
       html += '</tbody></table><p></p>';
       befehl('insertHTML', html)();
     }),
+    knopf('Bild', 'Bild in den Text einfügen', () => bildEinfuegen(inhalt, feld, befehl)),
     knopf('Format löschen', 'Alle Auszeichnungen entfernen', befehl('removeFormat')),
   ]);
 

@@ -127,7 +127,7 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
           { name: 'kategorie', label: 'Bereich', typ: 'auswahl', quelle: 'kategorien' },
           { name: 'kurz', label: 'Kurztext auf der Kachel', typ: 'mehrzeilig', hilfe: 'Ein bis zwei Sätze.' },
           { name: 'icon', label: 'Symbol', typ: 'bild', ordner: 'allgemein' },
-          { name: 'inhalt', label: 'Text der Seite', typ: 'richtext' },
+          { name: 'inhalt', label: 'Text der Seite', typ: 'richtext', ordner: 'allgemein', hilfe: 'Mit dem Knopf „Bild" lassen sich Bilder direkt in den Text setzen.' },
         ],
       },
       {
@@ -140,7 +140,7 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         felder: [
           { name: 'titel', label: 'Titel', typ: 'text' },
           { name: 'kurz', label: 'Untertitel', typ: 'text', hilfe: 'Eine Zeile — erscheint im Aufklappmenü.' },
-          { name: 'beschreibung', label: 'Erklärtext über den Kacheln', typ: 'richtext', hilfe: 'Steht auf der Startseite zwischen der Überschrift des Bereichs und den Kacheln.' },
+          { name: 'beschreibung', label: 'Erklärtext über den Kacheln', typ: 'richtext', ordner: 'allgemein', hilfe: 'Steht auf der Startseite zwischen der Überschrift des Bereichs und den Kacheln.' },
           { name: 'icon', label: 'Symbol', typ: 'bild', ordner: 'allgemein' },
         ],
       },
@@ -166,7 +166,7 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
           { name: 'kurz', label: 'Anrisstext', typ: 'mehrzeilig' },
           { name: 'bild', label: 'Bild', typ: 'bild', ordner: 'neuigkeiten' },
           { name: 'bild_alt', label: 'Bildbeschreibung', typ: 'text', hilfe: 'Was ist auf dem Bild zu sehen? Wichtig für blinde Besucher.' },
-          { name: 'inhalt', label: 'Text', typ: 'richtext' },
+          { name: 'inhalt', label: 'Text', typ: 'richtext', ordner: 'neuigkeiten', hilfe: 'Mit dem Knopf „Bild" lassen sich Bilder direkt in den Text setzen.' },
           {
             name: 'dateien',
             label: 'PDF-Anhänge',
@@ -242,14 +242,9 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
             { wert: 'schmal', label: 'Schmal — wie eine aufgeklappte Leistung' },
             { wert: 'breit', label: 'Breit — volle Inhaltsbreite' },
           ] },
-          { name: 'text', label: 'Text', typ: 'richtext', hilfe: 'Bilder lassen sich mit dem Knopf „Bild" direkt in den Text setzen — sie stehen dann über die volle Breite.' },
+          { name: 'text', label: 'Text', typ: 'richtext', ordner: 'abschnitte', hilfe: 'Bilder lassen sich mit dem Knopf „Bild" direkt in den Text setzen — sie stehen dann über die volle Breite.' },
           { name: 'bild', label: 'Bild oben (optional)', typ: 'bild', ordner: 'abschnitte' },
           { name: 'bild_alt', label: 'Bildbeschreibung', typ: 'text' },
-          { name: 'bild_anzeige', label: 'Bild anzeigen', typ: 'auswahl', optionen: [
-            { wert: 'links', label: 'Links, halbe Breite — Text umfließt es' },
-            { wert: 'rechts', label: 'Rechts, halbe Breite — Text umfließt es' },
-            { wert: 'voll', label: 'Volle Breite über dem Text' },
-          ] },
           { name: 'link_text', label: 'Verweis: Beschriftung', typ: 'text' },
           { name: 'link_ziel', label: 'Verweis: Adresse', typ: 'text' },
           { name: 'pdf_text', label: 'PDF-Knopf: Beschriftung', typ: 'text' },
@@ -275,7 +270,7 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         felder: [
           { name: 'titel', label: 'Bezeichnung', typ: 'text' },
           { name: 'umfang', label: 'Umfang', typ: 'text', hilfe: 'z. B. Vollzeit oder Teilzeit' },
-          { name: 'beschreibung', label: 'Beschreibung', typ: 'richtext' },
+          { name: 'beschreibung', label: 'Beschreibung', typ: 'richtext', ordner: 'allgemein' },
           { name: 'ansprechpartner', label: 'Ansprechperson', typ: 'text' },
           { name: 'pdf_datei', label: 'Ausführliche Anzeige als PDF (optional)', typ: 'pdf', ordner: 'dokumente' },
         ],

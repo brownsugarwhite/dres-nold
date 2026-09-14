@@ -170,6 +170,9 @@ body {
 .richtext__inhalt table { border-collapse: collapse; margin-bottom: 0.6em; }
 .richtext__inhalt th, .richtext__inhalt td { padding: 0.2em 0.5em; border: 1px solid var(--farbe-linie); }
 .richtext__inhalt h3 { font-size: var(--text-m); margin: 0.6em 0 0.3em; }
+/* Bilder im Text: im Editor klein halten, damit die Maske bedienbar
+   bleibt. Auf der Seite stehen sie über die volle Breite. */
+.richtext__inhalt img { max-width: 100%; height: auto; margin: 0.6em 0; border: 1px solid var(--farbe-linie); }
 
 /* Bild / PDF */
 .datei { display: flex; flex-wrap: wrap; gap: var(--abstand-2xs); align-items: center; }

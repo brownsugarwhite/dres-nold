@@ -11,15 +11,20 @@
  *                     rechts das Formular (40 %); mobil untereinander
  *   .div-block-22     Karte mit weichem Schatten 1px 1px 17px -12px
  *
- * Die Karte kommt von Google Maps und lädt erst nach Einwilligung
- * (Einwilligung.astro, scripts/einwilligung.ts). Vorher steht ein
- * selbst gehostetes Vorschaubild mit dem Knopf „Karte laden".
+ * Die Karte kommt von Google Maps und lädt erst, wenn der Besucher das
+ * Vorschaubild anklickt (scripts/einwilligung.ts merkt die Entscheidung
+ * im Browser). Vorher steht dort ein selbst gehostetes Bild. Weil bis
+ * dahin nichts von fremden Servern geladen wird, braucht die Seite kein
+ * Einwilligungs-Banner beim Aufruf.
  *
  * Kein Briefumschlag — der gehörte zu einem früheren Provisorium.
  */
 import Kontaktformular from './Kontaktformular.astro';
 import seite from '../content/seite.json';
+import startseite from '../content/startseite.json';
 
+const texte = startseite.kontakt;
+const formulartexte = startseite.formular;
 const { praxis } = seite;
 const adresse = `${praxis.strasse}, ${praxis.plz} ${praxis.ort}`;
 const kartenZiel = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(adresse);
@@ -27,7 +32,8 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
 ---
 
 <section class="kontakt" id="contact" data-verlauf>
-  <h2 class="kontakt__titel">So erreichen Sie uns</h2>
+  <h2 class="kontakt__titel">{texte.titel}</h2>
+  {texte.text && <p class="kontakt__einleitung">{texte.text}</p>}
 
   <div class="kontakt__adresse">
     <address class="kontakt__spalte kontakt__spalte--rechts">
@@ -60,7 +66,8 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
     </div>
 
     <div class="kontakt__formular">
-      <h3 class="kontakt__formulartitel ohne-verlauf">Schreiben Sie uns</h3>
+      <h3 class="kontakt__formulartitel ohne-verlauf">{formulartexte.titel}</h3>
+      {formulartexte.text && <p class="kontakt__formulartext">{formulartexte.text}</p>}
       <Kontaktformular />
     </div>
   </div>
@@ -85,6 +92,13 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
   }
 
   /* .div-block-27: 30 px Abstand darüber */
+  .kontakt__einleitung {
+    max-width: 46rem;
+    margin: var(--abstand-s) 0 0;
+    color: var(--farbe-text);
+    text-align: center;
+  }
+
   .kontakt__adresse {
     display: flex;
     justify-content: center;
@@ -136,8 +150,8 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
   /* .div-block-22: 60 % breit, mindestens 40 vh hoch, weicher Schatten */
   .landkarte {
     position: relative;
-    flex: 3 1 0;
-    min-height: max(40vh, 420px);
+    flex: 1 1 0;
+    min-height: max(60vh, 560px);
     overflow: hidden;
     border-radius: var(--radius-m);
     background: var(--farbe-flaeche-gedeckt);
@@ -214,12 +228,19 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
 
   /* .div-block-23: 40 % breit */
   .kontakt__formular {
-    flex: 2 1 0;
+    flex: 1 1 0;
     min-width: 0;
   }
 
+  .kontakt__formulartext {
+    max-width: none;
+    margin-bottom: var(--abstand-m);
+    color: var(--farbe-text-gedeckt);
+    font-size: var(--text-s);
+  }
+
   .kontakt__formulartitel {
-    margin-bottom: var(--abstand-s);
+    margin-bottom: var(--abstand-2xs);
     color: var(--farbe-primaer);
     font-size: var(--text-l);
     font-weight: var(--gewicht-normal);
@@ -227,15 +248,15 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
 
   @media (max-width: 991px) {
     .kontakt__inhalt { flex-direction: column; }
-    .landkarte { min-height: 320px; }
+    .landkarte { min-height: 420px; }
   }
 
   @media (max-width: 767px) {
     .kontakt { padding-block: 40px 120px; }
+    .landkarte { min-height: 320px; }
     .kontakt__adresse { flex-direction: column; align-items: center; gap: var(--abstand-s); }
     .kontakt__spalte--rechts,
     .kontakt__spalte--links { text-align: center; margin: 0; }
-    .landkarte { min-height: 260px; }
     .landkarte__hinweis { inset: auto var(--abstand-s) var(--abstand-s); padding: var(--abstand-xs) var(--abstand-s); }
   }
 </style>

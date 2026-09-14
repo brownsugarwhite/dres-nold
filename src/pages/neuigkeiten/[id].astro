@@ -167,18 +167,6 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
   .beitrag__inhalt :global(ul),
   .beitrag__inhalt :global(ol) { margin: 0 0 var(--abstand-m); padding-left: var(--abstand-m); }
   .beitrag__inhalt :global(li) { margin-bottom: var(--abstand-3xs); }
-  .beitrag__inhalt :global(table) {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: var(--abstand-m);
-  }
-  .beitrag__inhalt :global(th),
-  .beitrag__inhalt :global(td) {
-    padding: var(--abstand-2xs) var(--abstand-xs);
-    border-bottom: 1px solid var(--farbe-linie);
-    text-align: left;
-  }
-  .beitrag__inhalt :global(th) { font-weight: var(--gewicht-halbfett); color: var(--farbe-primaer); }
 
   .anhaenge {
     margin-top: var(--abstand-xl);

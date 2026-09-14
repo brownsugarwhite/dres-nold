@@ -19,9 +19,11 @@ import Fussbereich from '../components/Fussbereich.astro';
 import Navigation from '../components/Navigation.astro';
 import Basis from '../layouts/Basis.astro';
 import Hinweis from '../components/Hinweis.astro';
+import Trennlinie from '../components/Trennlinie.astro';
 import LeistungKachel from '../components/LeistungKachel.astro';
 import seite from '../content/seite.json';
 import leistungen from '../content/leistungen.json';
+import startseite from '../content/startseite.json';
 import team from '../content/team.json';
 
 const { praxis } = seite;
@@ -61,18 +63,22 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
   <main id="inhalt" class="seiteninhalt">
     <Willkommen />
     <Galerie />
+    <Trennlinie />
     <Abschnitte />
-
+    <Trennlinie />
 
     <section id="leistungen" class="inhalt abschnitt">
-      <h2>Unsere Leistungen</h2>
-      <p class="abschnitt__einleitung">
-        Klicken Sie auf eine Leistung, um mehr zu erfahren.
-      </p>
+      <h2>{startseite.leistungen.titel}</h2>
+      {startseite.leistungen.text && (
+        <p class="abschnitt__einleitung">{startseite.leistungen.text}</p>
+      )}
 
       {gruppen.map((g) => (
         <>
           <h3 class="gruppe" id={`leistungen-${g.id}`}>{g.titel}</h3>
+          {g.beschreibung && (
+            <div class="gruppe__text redaktionstext" set:html={g.beschreibung} />
+          )}
           <div class="kacheln">
             {g.eintraege.map((l) => <LeistungKachel {...l} />)}
           </div>
@@ -80,11 +86,11 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
       ))}
     </section>
 
-
-
+    <Trennlinie />
   </main>
 
   <Neuigkeiten />
+  <Trennlinie />
   <Team />
   <Stellen />
   <Kontakt />
@@ -121,6 +127,21 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
     text-align: center;
   }
 
+  /* Erklärtext zwischen Bereichsüberschrift und Kacheln — aus der
+     Redaktion (leistungen.json → kategorien → beschreibung) */
+  .gruppe__text {
+    max-width: 46rem;
+    margin: 0 auto var(--abstand-m);
+    text-align: center;
+  }
+
+  .gruppe__text :global(p) {
+    max-width: none;
+    margin-bottom: var(--abstand-2xs);
+  }
+
+  .gruppe__text :global(p:last-child) { margin-bottom: 0; }
+
   /* Kacheln: mittig gesetzt. Bleiben in der letzten Reihe weniger übrig,
      werden sie etwas breiter und stehen zentriert — bis zu einer
      Höchstbreite, damit eine einzelne Kachel nicht die Zeile füllt. */
@@ -137,41 +158,9 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
     max-width: 24rem;
   }
 
-  .aerzte {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-    gap: var(--abstand-m);
-    max-width: 46rem;
-  }
 
-  .arzt {
-    margin: 0;
-  }
 
-  .arzt img {
-    width: 100%;
-    aspect-ratio: 3 / 4;
-    object-fit: cover;
-    border-radius: var(--radius-m);
-    margin-bottom: var(--abstand-2xs);
-  }
 
-  .arzt figcaption {
-    display: flex;
-    flex-direction: column;
-    font-size: var(--text-s);
-  }
 
-  .arzt figcaption span {
-    color: var(--farbe-text-gedeckt);
-  }
 
-  .notiz {
-    margin-block: var(--abstand-xl);
-    padding: var(--abstand-s);
-    background: var(--farbe-flaeche-gedeckt);
-    border-left: 4px solid var(--farbe-primaer-hell);
-    color: var(--farbe-text-gedeckt);
-    font-size: var(--text-s);
-  }
 </style>

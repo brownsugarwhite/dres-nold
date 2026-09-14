@@ -186,8 +186,6 @@ export const abschnitteSchema = z.object({
       text: richtext,
       bild: pfad,
       bild_alt: text,
-      /** links / rechts: halbe Breite, der Text umfließt das Bild; voll: volle Breite über dem Text */
-      bild_anzeige: z.enum(['links', 'rechts', 'voll']).default('links'),
       /** schmal: gute Lesebreite wie die aufgeklappten Leistungen; breit: volle Inhaltsbreite */
       breite: z.enum(['schmal', 'breit']).default('schmal'),
       link_text: text,

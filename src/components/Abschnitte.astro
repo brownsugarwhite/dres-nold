@@ -5,24 +5,29 @@
  * Überschrift, Text, optional ein Bild, optional ein Verweis oder ein
  * PDF zum Herunterladen.
  *
- * Das Bild steht wahlweise links oder rechts in halber Breite (der Text
- * umfließt es) oder in voller Breite über dem Text — einstellbar in der
- * Redaktion (`bild_anzeige`).
+ * Die Breite wählt die Redaktion (`breite`):
+ *   schmal  46 rem — dieselbe Lesebreite wie eine aufgeklappte Leistung
+ *   breit   volle Inhaltsbreite wie der Rest der Startseite
+ *
+ * Bilder stehen immer über die volle Breite des Abschnitts und ohne
+ * abgerundete Ecken. Sie lassen sich in der Redaktion direkt in den
+ * Text setzen — dann steht Text darüber und darunter. Das Feld „Bild
+ * oben" bleibt für einfache Fälle erhalten.
  */
 import daten from '../content/abschnitte.json';
 
-type Anzeige = 'links' | 'rechts' | 'voll';
+type Breite = 'schmal' | 'breit';
 
 const abschnitte = daten.eintraege
   .filter((e) => e.aktiv && e.titel)
   .sort((a, b) => a.position - b.position)
-  .map((e) => ({ ...e, anzeige: ((e as { bild_anzeige?: string }).bild_anzeige || 'links') as Anzeige }));
+  .map((e) => ({ ...e, breite: ((e as { breite?: string }).breite || 'schmal') as Breite }));
 ---
 
 {abschnitte.length > 0 && (
-  <div class="abschnitte inhalt" id="abschnitte">
+  <div class="abschnitte" id="abschnitte">
     {abschnitte.map((a) => (
-      <section class="abschnitt" id={`abschnitt-${a.id}`} data-bild={a.bild ? a.anzeige : undefined}>
+      <section class="abschnitt" id={`abschnitt-${a.id}`} data-breite={a.breite}>
         <h2>{a.titel}</h2>
         <div class="abschnitt__koerper">
           {a.bild && (
@@ -57,41 +62,33 @@ const abschnitte = daten.eintraege
     padding-block: var(--abstand-l);
   }
 
+  /* Die Breite gehört zum Abschnitt, nicht zum Container — so kann jeder
+     Abschnitt für sich schmal oder breit stehen. */
+  .abschnitt {
+    margin-inline: auto;
+    width: min(100% - 2 * var(--abstand-m), 46rem);
+  }
+
+  .abschnitt[data-breite='breit'] {
+    width: min(100% - 2 * var(--abstand-m), var(--breite-inhalt));
+  }
+
   .abschnitt h2 { margin-bottom: var(--abstand-l); }
 
-  /* Der Text umfließt das Bild — deshalb `float`, ganz klassisch. */
   .abschnitt__koerper { display: flow-root; }
 
+  /* Bilder stehen über die volle Breite und ohne Rundung — sowohl das
+     Feld „Bild oben" als auch Bilder aus dem Text. */
   .abschnitt__bild {
     width: 100%;
     height: auto;
     margin-bottom: var(--abstand-m);
-    border-radius: var(--radius-m);
-  }
-
-  .abschnitt[data-bild='links'] .abschnitt__bild,
-  .abschnitt[data-bild='rechts'] .abschnitt__bild {
-    width: min(50%, 36rem);
-  }
-
-  .abschnitt[data-bild='links'] .abschnitt__bild {
-    float: left;
-    margin-right: var(--abstand-l);
-  }
-
-  .abschnitt[data-bild='rechts'] .abschnitt__bild {
-    float: right;
-    margin-left: var(--abstand-l);
   }
 
   .abschnitt__inhalt :global(p) { margin-bottom: var(--abstand-s); max-width: none; }
   .abschnitt__inhalt :global(h3) { margin-top: var(--abstand-m); }
   .abschnitt__inhalt :global(ul),
   .abschnitt__inhalt :global(ol) { margin: 0 0 var(--abstand-s); padding-left: var(--abstand-m); }
-  .abschnitt__inhalt :global(table) { width: 100%; border-collapse: collapse; margin-bottom: var(--abstand-s); }
-  .abschnitt__inhalt :global(th),
-  .abschnitt__inhalt :global(td) { padding: var(--abstand-2xs) var(--abstand-xs); border-bottom: 1px solid var(--farbe-linie); text-align: left; }
-  .abschnitt__inhalt :global(th) { color: var(--farbe-primaer); font-weight: var(--gewicht-halbfett); }
 
   .abschnitt__knoepfe {
     display: flex;
@@ -125,11 +122,6 @@ const abschnitte = daten.eintraege
   .knopf--pdf:focus-visible { background: var(--farbe-flaeche-gedeckt); color: var(--farbe-primaer); border-color: var(--farbe-primaer); }
 
   @media (max-width: 767px) {
-    .abschnitt[data-bild='links'] .abschnitt__bild,
-    .abschnitt[data-bild='rechts'] .abschnitt__bild {
-      float: none;
-      width: 100%;
-      margin-inline: 0;
-    }
+    .abschnitte { gap: var(--abstand-xl); }
   }
 </style>

@@ -1,32 +1,69 @@
 ---
 /**
  * Begrüßung zwischen Öffnungszeiten und Galerie.
+ *
+ * Die größte Überschrift der Seite — sie steht für sich allein und darf
+ * deshalb eine Stufe über den übrigen Abschnittsüberschriften liegen.
  * Trägt wie alle Überschriften im Inhalt den bewegten Verlauf.
+ *
+ * Überschrift und Beschreibungstext kommen aus der Redaktion
+ * (src/content/startseite.json).
  */
-import seite from '../content/seite.json';
-const { praxis } = seite;
+import startseite from '../content/startseite.json';
+
+const texte = startseite.willkommen;
+
+/* Die Überschrift darf in der Redaktion umbrechen, wo es passt: ein
+   doppelter Zeilenumbruch im Feld wird zu einem Zeilenumbruch auf der
+   Seite. Ohne Umbruch bricht sie von selbst (`text-wrap: balance`). */
+const zeilen = texte.titel.split('\n').filter((z) => z.trim() !== '');
 ---
 
 <section class="willkommen" id="praxis">
   <h1 class="willkommen__titel">
-    Willkommen in unserer<br />Praxis {praxis.name.replace('Dres. Nold – Zahnarztpraxis und Kieferorthopädie', 'Dres. Nold')}
+    {zeilen.map((zeile, i) => (
+      <>
+        {i > 0 && <br />}
+        {zeile}
+      </>
+    ))}
   </h1>
+
+  {texte.text && <p class="willkommen__text">{texte.text}</p>}
 </section>
 
 <style>
   .willkommen {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     padding-block: var(--abstand-2xl) var(--abstand-xl);
     background: var(--farbe-flaeche);
   }
 
+  /* Eine Stufe größer als `--text-titel` (die übrigen Überschriften) */
   .willkommen__titel {
     max-width: 1000px;
     margin: 0;
-    font-size: clamp(2rem, 1.2rem + 3.4vw, 3.75rem);
+    font-size: clamp(2.25rem, 1.3rem + 4vw, 4.5rem);
     font-weight: var(--gewicht-halbfett);
-    line-height: 100%;
+    line-height: 1.05;
     text-align: center;
+  }
+
+  .willkommen__text {
+    max-width: 46rem;
+    margin: var(--abstand-m) 0 0;
+    color: var(--farbe-text);
+    font-size: var(--text-l);
+    font-weight: var(--gewicht-normal);
+    line-height: 1.45;
+    text-align: center;
+    text-wrap: pretty;
+  }
+
+  @media (max-width: 767px) {
+    .willkommen { padding-block: var(--abstand-xl) var(--abstand-l); }
+    .willkommen__text { font-size: var(--text-m); margin-top: var(--abstand-s); }
   }
 </style>

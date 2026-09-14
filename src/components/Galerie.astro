@@ -5,7 +5,16 @@
  * Die Vorlage nutzt Swiper mit `autoplay.delay: 1` und `speed: 5000` —
  * also keinen klickbaren Slider, sondern ein ruhig durchlaufendes Band.
  * Hier mit einer CSS-Animation nachgebaut: kein Framework, kein
- * JavaScript, gleiche Wirkung.
+ * JavaScript für die Bewegung selbst, gleiche Wirkung.
+ *
+ * Format wie in der Vorlage (`.swiper { height: 450px }`): eine feste
+ * Höhe, die Bilder behalten ihr Seitenverhältnis. Vorher waren sie
+ * quadratisch beschnitten.
+ *
+ * Darunter die Punkte-Anzeige im Instagram-Stil: Sie zeigt nur an,
+ * welches Bild gerade mittig steht, und lässt sich anklicken, um an
+ * diese Stelle im Band zu springen. Das Band läuft dabei weiter — es
+ * wird nicht zum schrittweisen Slider (Festlegung von Florian).
  *
  * Die Bilder werden doppelt ausgegeben, damit der Übergang nahtlos ist.
  */
@@ -17,26 +26,49 @@ const bilder = galerie.eintraege
 ---
 
 {bilder.length > 0 && (
-  <section class="galerie" id="galerie" aria-label="Einblicke in unsere Praxis">
-    <div class="galerie__band">
-      {[...bilder, ...bilder].map((b, i) => (
-        <figure class="galerie__bild">
-          <img
-            src={b.bild}
-            alt={i < bilder.length ? b.alt : ''}
-            aria-hidden={i >= bilder.length ? 'true' : undefined}
-            loading="lazy"
-            width="1323"
-            height="1050"
-          />
-        </figure>
-      ))}
+  <section class="galerie" id="galerie" aria-label="Einblicke in unsere Praxis" data-galerie>
+    <div class="galerie__fenster">
+      <div class="galerie__band" data-galerieband>
+        {[...bilder, ...bilder].map((b, i) => (
+          <figure class="galerie__bild">
+            <img
+              src={b.bild}
+              alt={i < bilder.length ? b.alt : ''}
+              aria-hidden={i >= bilder.length ? 'true' : undefined}
+              loading="lazy"
+              width="1323"
+              height="1050"
+            />
+          </figure>
+        ))}
+      </div>
     </div>
+
+    {bilder.length > 1 && (
+      <div class="galerie__punkte" data-galeriepunkte role="tablist" aria-label="Bild auswählen">
+        {bilder.map((b, i) => (
+          <span class="galeriepunkt" data-punktfach>
+            <button
+              class="galeriepunkt__knopf"
+              type="button"
+              role="tab"
+              aria-selected={i === 0 ? 'true' : 'false'}
+              aria-label={`Bild ${i + 1} von ${bilder.length}`}
+              data-nummer={i}
+            ></button>
+          </span>
+        ))}
+      </div>
+    )}
   </section>
 )}
 
 <style>
   .galerie {
+    width: 100%;
+  }
+
+  .galerie__fenster {
     overflow: hidden;
     width: 100%;
   }
@@ -44,22 +76,24 @@ const bilder = galerie.eintraege
   .galerie__band {
     display: flex;
     width: max-content;
-    /* Ruhig durchlaufend — die Dauer ergibt sich aus der Bildanzahl,
-       damit das Tempo unabhängig davon gleich bleibt. */
+    /* Ruhig durchlaufend. Die Dauer ist fest — je mehr Bilder, desto
+       gemächlicher wandert jedes einzelne vorbei. */
     animation: galerie-lauf 60s linear infinite;
   }
 
+  /* Feste Höhe wie `.swiper` der Vorlage; die Breite ergibt sich aus
+     dem Seitenverhältnis der Datei. */
   .galerie__bild {
     flex: none;
-    width: min(38vw, 30rem);
     margin: 0;
+    height: clamp(240px, 30vw, 450px);
   }
 
   .galerie__bild img {
     display: block;
-    width: 100%;
-    height: min(38vw, 30rem);
-    object-fit: cover;
+    width: auto;
+    height: 100%;
+    max-width: none;
   }
 
   /* Das Band ist doppelt bestückt — nach der halben Strecke
@@ -74,8 +108,160 @@ const bilder = galerie.eintraege
     animation-play-state: paused;
   }
 
+  /* ---------- Punkte-Anzeige ----------
+     Maße wie im Slider von finanzleser: 8 px, aktiv 11 px, 6 px Abstand.
+     Die Randpunkte eines Fensters schrumpfen auf 5 bzw. 3 px, damit die
+     Reihe auch bei vielen Bildern schmal bleibt. */
+  .galerie__punkte {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: var(--abstand-m);
+  }
+
+  .galeriepunkt {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: none;
+    width: var(--groesse, 8px);
+    height: var(--groesse, 8px);
+    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1),
+                height 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .galeriepunkt__knopf {
+    width: var(--groesse, 8px);
+    height: var(--groesse, 8px);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-rund);
+    background: var(--farbe-primaer);
+    opacity: var(--deckkraft, 0.45);
+    cursor: pointer;
+    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1),
+                height 300ms cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Die Punkte sind klein — die Trefferfläche darf es nicht sein. */
+  .galeriepunkt__knopf::before {
+    content: '';
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    margin: -14px 0 0 -14px;
+    inset: 50% auto auto 50%;
+  }
+
+  .galeriepunkt__knopf { position: relative; }
+
   @media (prefers-reduced-motion: reduce) {
     .galerie__band { animation: none; }
-    .galerie { overflow-x: auto; }
+    .galerie__fenster { overflow-x: auto; }
+    .galeriepunkt,
+    .galeriepunkt__knopf { transition: none; }
   }
 </style>
+
+<script>
+  /**
+   * Punkte-Anzeige zum laufenden Band.
+   *
+   * Der Fortschritt kommt aus der laufenden CSS-Animation selbst
+   * (`getAnimations()`), nicht aus einer eigenen Zeitrechnung — so
+   * stimmen Band und Punkte auch dann überein, wenn das Band beim
+   * Zeigen pausiert.
+   *
+   * Ein Klick versetzt die Animationszeit, statt sie neu zu starten:
+   * das Band springt an die Stelle und läuft von dort ruhig weiter.
+   */
+  const VOLL = 8;
+  const AKTIV = 11;
+
+  function galerieAufbauen() {
+    const bereich = document.querySelector<HTMLElement>('[data-galerie]');
+    const band = document.querySelector<HTMLElement>('[data-galerieband]');
+    const reihe = document.querySelector<HTMLElement>('[data-galeriepunkte]');
+    if (!bereich || !band || !reihe || bereich.dataset.bereit) return;
+    bereich.dataset.bereit = 'ja';
+
+    const faecher = [...reihe.querySelectorAll<HTMLElement>('[data-punktfach]')];
+    const anzahl = faecher.length;
+    if (!anzahl) return;
+
+    const lauf = () => band.getAnimations()[0] as Animation | undefined;
+    const dauer = () => {
+      const zeiten = lauf()?.effect?.getComputedTiming();
+      return typeof zeiten?.duration === 'number' ? zeiten.duration : 60000;
+    };
+
+    /** Welches Bild steht gerade mittig? */
+    const aktuell = () => {
+      const zeit = Number(lauf()?.currentTime ?? 0);
+      const anteil = ((zeit / dauer()) % 1 + 1) % 1;
+      return Math.round(anteil * anzahl) % anzahl;
+    };
+
+    /* Sichtfenster wie bei den Instagram-Punkten: höchstens fünf bzw.
+       sieben Punkte, die äußeren geschrumpft. */
+    const fenster = anzahl <= 7 ? 5 : 7;
+
+    const groesseVon = (i: number, jetzt: number) => {
+      if (anzahl <= fenster) return i === jetzt ? AKTIV : VOLL;
+
+      let start = Math.min(Math.max(jetzt - 2, 0), anzahl - fenster);
+      const platz = i - start;
+      if (i === jetzt) return AKTIV;
+      if (platz < 0 || platz >= fenster) return 0;
+
+      const stelle = jetzt - start;
+      const linksEnger = Math.min(1, stelle / 2);
+      const rechtsEnger = Math.min(1, (fenster - 1 - stelle) / 2);
+      const zwischen = (von: number, bis: number, t: number) => von + (bis - von) * t;
+
+      if (platz === 0) return zwischen(VOLL, 3, linksEnger);
+      if (platz === 1) return zwischen(VOLL, 5, linksEnger);
+      if (platz === fenster - 1) return zwischen(VOLL, 3, rechtsEnger);
+      if (platz === fenster - 2) return zwischen(VOLL, 5, rechtsEnger);
+      return VOLL;
+    };
+
+    let zuletzt = -1;
+    const zeichnen = () => {
+      const jetzt = aktuell();
+      if (jetzt !== zuletzt) {
+        zuletzt = jetzt;
+        faecher.forEach((fach, i) => {
+          const groesse = groesseVon(i, jetzt);
+          const knopf = fach.firstElementChild as HTMLElement | null;
+          fach.style.setProperty('--groesse', `${groesse}px`);
+          fach.style.width = groesse ? '' : '0px';
+          knopf?.style.setProperty('--groesse', `${groesse}px`);
+          knopf?.style.setProperty('--deckkraft', i === jetzt ? '1' : '0.45');
+          knopf?.setAttribute('aria-selected', i === jetzt ? 'true' : 'false');
+        });
+      }
+      requestAnimationFrame(zeichnen);
+    };
+
+    reihe.addEventListener('click', (e) => {
+      const knopf = (e.target as Element | null)?.closest<HTMLElement>('[data-nummer]');
+      const spiel = lauf();
+      if (!knopf || !spiel) return;
+      const nummer = Number(knopf.dataset.nummer);
+      /* Die Zeit auf den Anfang des gewünschten Bildes setzen — die
+         Animation läuft dadurch weiter, springt aber an die Stelle. */
+      spiel.currentTime = (nummer / anzahl) * dauer();
+      zuletzt = -1;
+    });
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      requestAnimationFrame(zeichnen);
+    }
+  }
+
+  galerieAufbauen();
+  document.addEventListener('astro:page-load', galerieAufbauen);
+</script>
