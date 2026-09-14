@@ -3,11 +3,11 @@
   "eintraege": [
     {
       "id": "beispiel",
-      "aktiv": false,
+      "aktiv": true,
       "position": 1,
       "titel": "Beispielabschnitt",
       "text": "Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.",
-      "bild": "",
+      "bild": "/bilder/abschnitte/teaser-b-full.png",
       "bild_alt": "",
       "link_text": "",
       "link_ziel": "",
