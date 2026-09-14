@@ -11,11 +11,32 @@
  * Fassung — und die gilt bei uns auf allen Größen (docs/entscheidungen.md).
  */
 
-/** Höhe von `.trigger-oz-scroll`, in Fensterhöhen. */
-export const OZ_WEG = 3.5;
+/**
+ * Höhe von `.trigger-oz-scroll`, in Fensterhöhen — der Weg, über den
+ * die Öffnungszeiten hereinfahren. Auf Handys länger (Florian, 14.
+ * September 2026): Das Logo ist dort groß und braucht mehr Weg, um
+ * sich aufzulösen, bevor die Blase darüberfährt. Muss zu `--oz-weg`
+ * in Oeffnungszeiten.astro passen.
+ */
+export function ozWeg(): number {
+  return window.matchMedia('(max-width: 991px)').matches ? 4.5 : 3.5;
+}
 
-/** Höhe von `.trigger-schnalz`, in Fensterhöhen. */
-export const SCHNALZ_WEG = 2.5;
+/** Bei diesem Anteil von Ablauf a-19 steht die Blase mit voll
+    ausgefahrenem Zipfel; unmittelbar danach zieht er sich ein. */
+export const OZ_RAST = 0.71;
+
+/**
+ * Scrolltiefe (in Fensterhöhen), ab der die Leisten tauschen.
+ *
+ * In der Vorlage hing das an einem eigenen Streifen (`.trigger-schnalz`);
+ * gefühlt geschah es in dem Moment, in dem der Zipfel zu verschwinden
+ * beginnt. Genau daran hängt es jetzt: am Ende der Raststellung von
+ * Ablauf a-19, umgerechnet in Scrolltiefe (siehe beimScrollenSichtbar).
+ */
+export function schnalzWeg(): number {
+  return OZ_RAST * (ozWeg() + 1) - 1;
+}
 
 /**
  * Fortschritt eines Webflow-Auslösers vom Typ „while scrolling in view".

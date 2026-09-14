@@ -865,17 +865,12 @@ const kategorien = (leistungen.kategorien ?? [])
   :global(body[data-gescrollt]) .fussleiste-huelle { transform: translateY(110px); }
 
   /* ---------- Punkte als Trenner ---------- */
-  .punkt--fuss {
+  /* .dot.dot-bottom der Vorlage: in der Hausfarbe, 24 px angehoben —
+     damit sitzen sie auf Höhe der Symbole, nicht der Beschriftung */
+  .punkt.punkt--fuss {
     align-self: center;
-    margin-bottom: var(--abstand-s);
-  }
-
-  /* Der Punkt hinter dem jeweils letzten Knopf entfällt.
-     Auf kleinen Bildschirmen ist das „Team", auf dem Desktop
-     wandert „Öffnungszeiten" ans rechte Ende. */
-  .punkt--fuss[data-nach='team'] { display: none; }
-
-  @media (min-width: 992px) {
+    margin-bottom: 24px;
+    background: var(--farbe-primaer);
   }
 
   /* .dot: 3 × 3 px, schwarz */
@@ -909,32 +904,23 @@ const kategorien = (leistungen.kategorien ?? [])
     .aufklapp { display: none; }
     .kopfleiste__inhalt > .punkt { display: none; }
 
-    /* Untere Leiste: nur Kontakt · Telefon · Öffnungszeiten */
-    .fussknopf[data-klein='nein'],
-    .punkt--fuss[data-klein='nein'] { display: none; }
-
-    .fussknopf[data-punkt='kontakt'] { order: 1; }
-    .punkt--fuss[data-nach='kontakt'] { order: 2; display: block; }
-    .fussknopf[data-punkt='telefon'] { order: 3; }
-    .punkt--fuss[data-nach='telefon'] { order: 4; display: block; }
-    .fussknopf[data-punkt='zeiten'] { order: 5; }
-    .punkt--fuss[data-nach='zeiten'] { display: none; }
   }
 
-  /* Schmale Handys: die Kontaktzeile muss in eine Zeile passen */
+  /* Schmale Handys: die Kontaktzeile muss in eine Zeile passen; die
+     drei Knöpfe unten teilen sich die Breite gleichmäßig (Vorlage:
+     `.nav-bottom-button { flex: 1 }`), so stehen die Punkte genau
+     zwischen den Symbolen */
   @media (max-width: 479px) {
     .kontaktzeile__inhalt { width: 94%; gap: var(--abstand-2xs); }
     .kontaktzeile__text { font-size: 13px; }
     .fussleiste__inhalt { width: 94%; }
+    .fussleiste__inhalt--klein .fussknopf { flex: 1; }
   }
 
-  /* ---------- Ab Tablet ---------- */
-  @media (min-width: 992px) {
-  }
 </style>
 
 <script>
-  import { SCHNALZ_WEG } from '../scripts/scrollwege';
+  import { schnalzWeg } from '../scripts/scrollwege';
   /**
    * Verhalten der Navigation.
    *
@@ -972,11 +958,9 @@ const kategorien = (leistungen.kategorien ?? [])
     let gescrollt = document.body.hasAttribute('data-gescrollt');
     let geplant = false;
 
-    /* Ab welcher Scrolltiefe die Leisten tauschen. Auf Handys stehen die
-       Öffnungszeiten fest im Seitenfluss, der Startbereich ist dort nur
-       eine Fensterhöhe lang — getauscht wird nach der halben. */
-    const schwelle = () =>
-      (window.matchMedia('(max-width: 991px)').matches ? 0.5 : SCHNALZ_WEG) * window.innerHeight;
+    /* Ab welcher Scrolltiefe die Leisten tauschen: sobald der Zipfel der
+       Öffnungszeiten beginnt, sich einzuziehen (scripts/scrollwege.ts) */
+    const schwelle = () => schnalzWeg() * window.innerHeight;
 
     /** Gehört zu dieser Scrolltiefe der gescrollte Zustand? */
     const gescrolltBei = (y: number, startseite: boolean) =>

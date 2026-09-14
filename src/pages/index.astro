@@ -59,9 +59,6 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
   <Navigation />
 
   <main id="inhalt" class="seiteninhalt">
-    {/* Auf Handys stehen die Sprechstunden fest am Anfang des Inhalts;
-        die Blase oben ist dort ausgeblendet (Oeffnungszeiten.astro) */}
-    <Oeffnungszeiten statisch />
     <Willkommen />
     <Galerie />
     <Abschnitte />
@@ -95,13 +92,10 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 </Basis>
 
 <style>
-  /* Der Inhalt schiebt sich über den fixierten Startbereich — auch
-     über das Logo (Ebene 10): Auf Handys ist der Startraum nur eine
-     Fensterhöhe lang, das Logo noch da, wenn der Inhalt hereinkommt.
-     Er deckt es dann wie ein Blatt ab. */
+  /* Der Inhalt schiebt sich über den fixierten Startbereich */
   .seiteninhalt {
     position: relative;
-    z-index: 15;
+    z-index: 5;
     background: var(--farbe-flaeche);
   }
 

@@ -177,7 +177,7 @@ docs/
 
 **Startseite** (`/`) ist und bleibt ein One-Pager mit Ankern:
 
-`#start` · `#oz_anchor` (Öffnungszeiten; auf Handys steht die feste Fassung unter `#sprechstunden`, `scripts/anker.ts` leitet um) · `#galerie` · `#information` (Hinweis) · `#praxis` · `#leistungen` (Kachelübersicht) · `#team` · `#neuigkeiten` · `#contact`
+`#start` · `#oz_anchor` (Öffnungszeiten; `scripts/anker.ts` scrollt zum Rastpunkt der Blase) · `#galerie` · `#information` (Hinweis) · `#praxis` · `#leistungen` (Kachelübersicht) · `#team` · `#neuigkeiten` · `#contact`
 
 **Unterseiten** — von der Startseite aus als Vollbild geöffnet, aber mit eigener Adresse:
 

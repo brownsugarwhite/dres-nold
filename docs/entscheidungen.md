@@ -27,12 +27,16 @@ mit Lottie-Zipfel, nicht die beiden versetzten Kästen der Desktop-Vorlage.
   (Vorlage), auf dem Desktop 90 px
 - Der Bereich sitzt direkt nach dem Logobereich
 - Der graue Symbolgrund erst unterhalb der Öffnungszeiten
-- **Handys (14. September 2026):** Auf Bildschirmen bis 991 px fahren die
-  Öffnungszeiten nicht herein, sondern stehen **vollständig als erster
-  Abschnitt** im Inhalt (`#sprechstunden`). Der Startraum unter dem Logo
-  ist dort nur eine Fensterhöhe lang; der Inhalt schiebt sich darüber.
-  Der Öffnungszeiten-Knopf (Symbolleiste und Menü) scrollt sanft dorthin;
-  auf dem Desktop zum Punkt, an dem die Blase mit Zipfel steht.
+- **Handys (14. September 2026):** dieselbe scrollgesteuerte Blase,
+  nur kompakter gesetzt, damit alle drei Listen samt Zipfel ins Fenster
+  passen — nichts wird abgeschnitten. Der Scrollweg ist dort länger
+  (450vh statt 350vh), damit das große Logo Zeit hat, sich aufzulösen,
+  bevor die Blase darüberfährt.
+- **Leistenwechsel (14. September 2026):** Die Leisten tauschen in dem
+  Moment, in dem der Zipfel beginnt, sich einzuziehen (71 % von Ablauf
+  a-19) — nicht erst, wenn er verschwunden ist.
+- Der Öffnungszeiten-Knopf (Symbolleiste und Menü) scrollt sanft zu
+  dem Punkt, an dem die Blase mit Zipfel steht.
 
 ## Leistungen
 

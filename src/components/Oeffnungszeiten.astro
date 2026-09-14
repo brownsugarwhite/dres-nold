@@ -3,7 +3,8 @@
  * Öffnungszeiten — schnalzen beim Scrollen von unten herein.
  *
  * Aufbau wie in der Vorlage (`.oz` / `.oz-container` / `.div-block-28`):
- *   • Ein 350vh hoher Bereich ganz am Seitenanfang
+ *   • Ein 350vh hoher Bereich ganz am Seitenanfang (Handys: 450vh —
+ *     dort braucht das große Logo mehr Weg, um sich aufzulösen)
  *   • Darin eine Bühne, die über die volle Strecke stehen bleibt und
  *     ihren Überlauf abschneidet — die Blase ist unsichtbar, solange
  *     sie noch unterhalb steht
@@ -48,18 +49,6 @@
  * nach links ab) werden proportional zur eingestellten Länge skaliert.
  */
 import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
-
-interface Props {
-  /**
-   * Feste Ansicht für Handys: die Sprechstunden stehen als normaler
-   * Abschnitt vollständig im Seitenfluss, statt scrollgesteuert
-   * hereinzufahren. Wird auf der Startseite zusätzlich am Anfang des
-   * Inhalts eingesetzt; sichtbar ist je Bildschirmgröße nur eine der
-   * beiden Fassungen (Umbruch bei 991 px wie die Navigation).
-   */
-  statisch?: boolean;
-}
-const { statisch = false } = Astro.props;
 ---
 
 {/*
@@ -75,17 +64,6 @@ const { statisch = false } = Astro.props;
   (docs/entscheidungen.md), das Logo bleibt aber sichtbar, während
   die Blase darüber hereinfährt.
 */}
-{statisch ? (
-  <section class="ozstatisch" id="sprechstunden" aria-labelledby="sprechstunden-titel">
-    <div class="ozstatisch__inhalt">
-      <h2 class="ozstatisch__titel" id="sprechstunden-titel">Sprechstunden</h2>
-      <div class="ozblase__spalten">
-        <OeffnungszeitenListen />
-      </div>
-    </div>
-  </section>
-) : (
-<>
 <div class="ozraum" aria-hidden="true"></div>
 
 <section class="ozbereich" id="oz_anchor" aria-labelledby="oz-titel">
@@ -107,8 +85,6 @@ const { statisch = false } = Astro.props;
     </div>
   </div>
 </section>
-</>
-)}
 
 <style>
   /* Wie lang der Zipfel voll ausgefahren ist. Mobil das Maß der
@@ -118,6 +94,15 @@ const { statisch = false } = Astro.props;
   .ozblase { --zipfel-laenge: 154px; }
   @media (min-width: 60rem) {
     .ozblase { --zipfel-laenge: 90px; }
+  }
+
+  /* Der Scrollweg, über den die Blase hereinfährt — muss zu `ozWeg()`
+     in scripts/scrollwege.ts passen. */
+  .ozraum,
+  .ozbereich { --oz-weg: 350vh; }
+  @media (max-width: 991px) {
+    .ozraum,
+    .ozbereich { --oz-weg: 450vh; }
   }
 
   /* Nimmt den Platz im Seitenfluss ein und deckt den grauen Grund ab.
@@ -130,7 +115,7 @@ const { statisch = false } = Astro.props;
        eingezogen, wäre das nur leerer Raum vor der Begrüßung — der
        folgende Inhalt rückt deshalb um diesen Betrag auf. Der Wert wird
        vom Skript gesetzt; die Vorgabe entspricht der mobilen Vorlage. */
-    height: calc(350vh - var(--oz-ruhe, 264px));
+    height: calc(var(--oz-weg) - var(--oz-ruhe, 264px));
     background: var(--farbe-flaeche);
   }
 
@@ -143,7 +128,7 @@ const { statisch = false } = Astro.props;
     left: 0;
     z-index: 30;
     width: 100%;
-    height: 350vh;
+    height: var(--oz-weg);
   }
 
   /* Bleibt stehen, während der Bereich durchläuft.
@@ -231,51 +216,20 @@ const { statisch = false } = Astro.props;
     align-items: start;
   }
 
+  /* Handys: Listen untereinander, und zwar so kompakt, dass die ganze
+     Blase samt Zipfel über der Symbolleiste ins Fenster passt — nichts
+     wird abgeschnitten, nichts rollt in der Blase (Vorlage: Überschrift
+     16 px, enge Zeilen). Notfalls, auf sehr kleinen Fenstern, rollt sie
+     doch — besser als unerreichbare Zeiten. */
   @media (max-width: 60rem) {
     .ozblase { width: calc(100vw - 2 * var(--abstand-s)); }
-    .ozblase__flaeche { padding: var(--abstand-m); }
-    .ozblase__spalten { grid-template-columns: 1fr; gap: var(--abstand-m); }
-  }
-
-  /* ---------- Feste Ansicht für Handys ----------
-     Auf dem Desktop unsichtbar; auf Handys ersetzt sie die Blase:
-     Die scrollgesteuerte Fassung verschwindet, der weiße Startraum
-     schrumpft auf eine Fensterhöhe (das Logo davor bleibt), und die
-     Sprechstunden stehen vollständig als erster Abschnitt im Inhalt. */
-  .ozstatisch {
-    display: none;
-    background: var(--farbe-flaeche) url('/bilder/deko/punktlinie.png') 50% 100% repeat-x;
-    background-size: auto 1px;
-  }
-
-  .ozstatisch__inhalt {
-    width: min(100% - 2 * var(--abstand-m), 62rem);
-    margin-inline: auto;
-    padding-block: var(--abstand-xl) var(--abstand-l);
-  }
-
-  /* Überschrift wie die übrigen Abschnitte (Verlauf, groß, mittig —
-     styles/global.css); die Listen stehen als Block mittig darunter */
-  .ozstatisch__titel { margin-bottom: var(--abstand-l); }
-
-  .ozstatisch .ozblase__spalten {
-    grid-template-columns: minmax(0, max-content);
-    justify-content: center;
-    gap: var(--abstand-m);
-  }
-
-  @media (max-width: 991px) {
-    .ozstatisch { display: block; }
-    .ozraum { height: 100vh; height: 100dvh; }
-    .ozbereich { display: none; }
-  }
-
-  /* Auf Tablets nebeneinander, wenn Platz ist */
-  @media (min-width: 48rem) and (max-width: 991px) {
-    .ozstatisch .ozblase__spalten {
-      grid-template-columns: repeat(3, max-content);
-      gap: var(--abstand-l);
+    .ozblase__flaeche {
+      padding: var(--abstand-s) var(--abstand-m);
+      max-height: calc(100vh - var(--oz-ruhe, 264px) - 48px);
+      max-height: calc(100dvh - var(--oz-ruhe, 264px) - 48px);
     }
+    .ozblase__titel { margin-bottom: var(--abstand-xs); font-size: 20px; }
+    .ozblase__spalten { grid-template-columns: 1fr; gap: var(--abstand-xs); }
   }
 
   /* Ohne Bewegung: steht ruhig im Seitenfluss */
@@ -290,7 +244,7 @@ const { statisch = false } = Astro.props;
 
 <script>
   import { ausStuetzstellen, type Stuetzstelle } from '../scripts/easing';
-  import { OZ_WEG, beimScrollenSichtbar, nachziehen } from '../scripts/scrollwege';
+  import { ozWeg, beimScrollenSichtbar, nachziehen } from '../scripts/scrollwege';
 
   /** Höhe der Symbolleiste unten — `.fussleiste__inhalt` */
   const LEISTE = 110;
@@ -321,9 +275,6 @@ const { statisch = false } = Astro.props;
     blase.dataset.bereit = 'ja';
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    /* Auf Handys steht die feste Ansicht im Seitenfluss; die Blase ist
-       ausgeblendet und braucht keine Bewegung. */
-    const ausgeblendet = () => bereich.getClientRects().length === 0;
 
     /* ---- Geometrie: wird bei Größenänderung neu vermessen ---- */
     let breite = 0;        // Fensterbreite
@@ -336,7 +287,6 @@ const { statisch = false } = Astro.props;
     const grundlinie = (x: number) => versatzOben + (breite / 2 - x) * VORLAGE.neigung;
 
     const vermessen = () => {
-      if (ausgeblendet()) return;
       breite = document.documentElement.clientWidth;
       laenge = parseFloat(getComputedStyle(blase).getPropertyValue('--zipfel-laenge')) || 154;
 
@@ -433,11 +383,10 @@ const { statisch = false } = Astro.props;
 
     /** Scrollwert wie Webflows „while scrolling in view". */
     function ziel(): number {
-      return beimScrollenSichtbar(OZ_WEG, bereich!.getBoundingClientRect().top);
+      return beimScrollenSichtbar(ozWeg(), bereich!.getBoundingClientRect().top);
     }
 
     const zeichnen = () => {
-      if (ausgeblendet()) return;
       blase.style.setProperty('--oz-versatz', `${ausStuetzstellen(p, BLASE)}px`);
       zipfelZeichnen(ausStuetzstellen(p, ZIPFEL));
     };

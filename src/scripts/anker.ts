@@ -5,24 +5,26 @@
  * sondern gleitet — mit Platz für die feste Kopfleiste. Zwei Ziele
  * sind besonders:
  *
- *   #oz_anchor  Die Öffnungszeiten. Auf dem Desktop fahren sie
- *               scrollgesteuert herein (Oeffnungszeiten.astro) — die
- *               Blase steht erst nach gut zwei Fensterhöhen still, mit
- *               voll ausgefahrenem Zipfel. Genau dorthin wird gescrollt.
- *               Auf Handys stehen sie fest im Inhalt (`#sprechstunden`).
+ *   #oz_anchor  Die Öffnungszeiten fahren scrollgesteuert herein
+ *               (Oeffnungszeiten.astro) — die Blase steht erst nach gut
+ *               zwei Fensterhöhen still, mit voll ausgefahrenem Zipfel.
+ *               Genau dorthin wird gescrollt: knapp vor den Punkt, an
+ *               dem er sich wieder einzieht und die Leisten tauschen.
  *   #start      Ganz nach oben.
  *
  * Astros Router übernimmt Klicks auf Verweise selbst; dieser Zuhörer
  * läuft in der Capture-Phase und ist damit vor ihm dran.
  */
 
+import { ozWeg, OZ_RAST } from './scrollwege';
+
 /** Höhe der Kopfleiste — so viel Luft bleibt über dem Ziel */
 const KOPFLEISTE = 80;
 const LUFT = 16;
 
-/* Der Punkt, an dem die Blase mit ausgefahrenem Zipfel steht: bei 71 %
-   von Ablauf a-19, gezählt über 350vh + 100vh (scripts/scrollwege.ts) */
-const OZ_RUHE = 0.71 * 4.5 - 1;
+/** Scrolltiefe, bei der die Blase mit Zipfel steht (in Fensterhöhen) —
+    eine Spur vor dem Rastpunkt, damit die Leisten noch nicht tauschen */
+const ozRuhe = () => (OZ_RAST - 0.01) * (ozWeg() + 1) - 1;
 
 function wenigerBewegung(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -34,11 +36,7 @@ export function zielTiefe(hash: string): number | null {
   if (!id || id === 'start') return 0;
 
   if (id === 'oz_anchor') {
-    const blase = document.getElementById('oz_anchor');
-    const fest = document.getElementById('sprechstunden');
-    if (blase && blase.getClientRects().length > 0) return Math.round(OZ_RUHE * window.innerHeight);
-    if (fest) return tiefeVon(fest);
-    return null;
+    return document.getElementById('oz_anchor') ? Math.round(ozRuhe() * window.innerHeight) : null;
   }
 
   const element = document.getElementById(id);

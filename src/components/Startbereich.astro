@@ -280,9 +280,14 @@ const { praxis } = seite;
        ist der Grund, warum das Logo so lange stehen bleibt — die Seite
        ist viele Fensterhöhen lang, 10 % davon sind entsprechend weit.
        Genau darüber fahren die Öffnungszeiten herein. */
+    /* Gedeckelt auf anderthalb Fensterhöhen: Je länger die Seite wird
+       (die Praxis legt Beiträge und Abschnitte an), desto länger wären
+       sonst die 10 % — auf Handys stünde das Logo dann noch, wenn die
+       Öffnungszeiten schon darüberfahren. */
     const fortschritt = () => {
       const weg = document.documentElement.scrollHeight - window.innerHeight;
-      return weg > 0 ? window.scrollY / weg : 0;
+      const logoWeg = Math.min(0.1 * weg, 1.5 * window.innerHeight);
+      return logoWeg > 0 ? (window.scrollY / logoWeg) * 0.1 : 0;
     };
 
     let geplant = false;
