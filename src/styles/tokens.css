@@ -91,10 +91,13 @@
   --dauer-langsam: 700ms;
   --verlauf: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
-  /* Seitenwechsel (Morph einer Karte ins Vollbild): etwas länger und
-     mit betonter Kurve — schnell los, weich zum Stillstand. */
-  --dauer-uebergang: 480ms;
-  --verlauf-betont: cubic-bezier(0.2, 0, 0, 1);
+  /* Seitenwechsel (Morph einer Karte ins Vollbild). Länger und mit
+     einer Kurve, die ohne Anlauf losgeht und lange ausschwingt — die
+     Karte soll gleiten, nicht springen. Die frühere Kurve
+     (0.2, 0, 0, 1) zog am Anfang so stark an, dass die Bewegung wie
+     ein Aufreißen wirkte. */
+  --dauer-uebergang: 640ms;
+  --verlauf-betont: cubic-bezier(0.22, 0.61, 0.24, 1);
   /* Wie stark der Rest der Seite dabei verschwimmt */
   --weichzeichner-uebergang: 12px;
 

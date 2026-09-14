@@ -17,26 +17,33 @@
 
   Der Ablauf beim Öffnen einer Karte
   ------------------------------------------------------------------
-    1. Die geklickte Karte hebt sich ab (Schatten, leicht größer) —
-       das passiert noch vor dem Wechsel, siehe scripts/uebergaenge.ts.
-    2. Der Rest der Seite (`root`) verschwimmt und blendet aus.
-    3. Die Hülle der Karte wandert und wächst zur Seite; Symbol und
-       Titel wandern dabei einzeln an ihren Platz.
-    4. Der Seitentext gleitet etwas später von unten herein.
+  EINE Bewegung, kein Hüpfer mit anschließendem Sprung: Die Karte hebt
+  sich ab und wächst im selben Zug zur Seite, während der Rest dahinter
+  verschwimmt und ausblendet. Die Karte liegt dabei über allem außer
+  der Kopfleiste.
+
+  Wichtig für die Ruhe der Bewegung: Der Fließtext der Zielseite trägt
+  KEINEN eigenen Übergangsnamen. Er steckt damit in der Momentaufnahme
+  der Karte und wächst mit ihr — genau wie der Kurztext auf der Kachel,
+  dessen Bewegung schon vorher stimmte. Nur Symbol und Titel wandern
+  für sich, weil sie auf beiden Seiten ein Gegenstück haben.
 
   Zurück (Schließen-Knopf, Escape, Browser-Zurück) läuft derselbe Ablauf
   spiegelbildlich: alt und neu tauschen die Rollen, deshalb sind die
   Regeln unten symmetrisch aufgebaut und brauchen keine Richtung.
 
   Die Namen im Überblick (vergeben in den Komponenten):
-    leistung-<id>          Hülle der Leistungskarte / des Artikels
-    leistung-symbol-<id>   ihr Symbol
-    leistung-titel-<id>    ihr Titel
-    beitrag-<id>           Hülle des Neuigkeiten-Beitrags
-    beitrag-bild-<id>      sein Bild
-    seiteninhalt           Text und Anhang der Zielseite
-    nav-oben / nav-unten   die Leisten — bleiben unbewegt und scharf
-                           (gesetzt per CSS in Navigation.astro)
+    leistung-<id>            Hülle der Leistungskarte / des Artikels
+    leistung-symbol-<id>     ihr Symbol
+    leistung-titel-<id>      ihr Titel
+    beitrag-<id>             Hülle des Neuigkeiten-Beitrags
+    beitrag-bild-<id>        sein Bild — wandert, ohne zu kreuzblenden
+    beitrag-vorschautext-<id>  Text der Vorschaukarte (ohne Gegenstück:
+                             blendet unten an seiner Stelle aus)
+    beitrag-kopf-<id>        Datum und Titel der Beitragsseite (ohne
+                             Gegenstück: blendet oben an seiner Stelle ein)
+    nav-oben / nav-unten     die Leisten — bleiben unbewegt und scharf
+                             (gesetzt per CSS in Navigation.astro)
 */
 
 /* --- Tempo: gilt für alle Hüllen ------------------------------- */
@@ -51,6 +58,12 @@
   animation-timing-function: var(--verlauf-betont);
   /* Kein Aufhellen beim Kreuzen der beiden Zustände */
   mix-blend-mode: normal;
+}
+
+/* Nichts darf über den Fensterrand hinaus sichtbar bleiben — wichtig
+   fürs seitliche Durchschieben beim Blättern. */
+::view-transition {
+  overflow: clip;
 }
 
 /* --- Der Rest der Seite verschwimmt ---------------------------- */
@@ -70,14 +83,14 @@
   }
 }
 
+/* Beide laufen über die volle Dauer und ohne Versatz — so bewegt sich
+   alles in einem Zug, statt nacheinander. */
 ::view-transition-old(root) {
   animation: uebergang-rest-aus var(--dauer-uebergang) var(--verlauf-betont) forwards;
 }
 
 ::view-transition-new(root) {
   animation: uebergang-rest-ein var(--dauer-uebergang) var(--verlauf-betont) both;
-  /* Erst erscheinen, wenn der alte Zustand schon zurücktritt */
-  animation-delay: 60ms;
 }
 
 /* --- Die Karte selbst: alt und neu weich ineinander -------------
@@ -88,14 +101,20 @@
 
 ::view-transition-old(*) {
   animation-name: uebergang-blende-aus;
-  animation-duration: calc(var(--dauer-uebergang) * 0.6);
+  animation-duration: calc(var(--dauer-uebergang) * 0.45);
 }
 
 ::view-transition-new(*) {
   animation-name: uebergang-blende-ein;
-  animation-duration: calc(var(--dauer-uebergang) * 0.7);
+  animation-duration: calc(var(--dauer-uebergang) * 0.55);
   animation-delay: calc(var(--dauer-uebergang) * 0.2);
   animation-fill-mode: both;
+}
+
+/* Die wachsende Karte liegt über dem Seiteninhalt, aber unter der
+   Kopfleiste — sie soll sich VOR der Seite bewegen, nicht darin. */
+::view-transition-group(.karte) {
+  z-index: 90;
 }
 
 /* Symbol, Titel und Bild wandern für sich. Ihre Abbilder werden auf
@@ -111,40 +130,48 @@
   object-fit: contain;
 }
 
-::view-transition-old(.bild),
+/* Sie liegen über der Karte, aus der sie herauswandern */
+::view-transition-group(.symbol),
+::view-transition-group(.titel),
+::view-transition-group(.bild) {
+  z-index: 91;
+}
+
+/* --- Das Bild der Neuigkeiten wandert wirklich ------------------
+   Vorschaukarte und Beitragsseite zeigen dieselbe Datei. Deshalb wird
+   das alte Abbild gar nicht erst eingeblendet, und das neue steht von
+   Anfang an voll da: Was man sieht, ist ein einziges Bild, das an
+   seinen Platz wandert und dabei wächst — kein Überblenden zweier
+   Zuschnitte. */
+::view-transition-old(.bild) {
+  display: none;
+}
+
 ::view-transition-new(.bild) {
+  animation: none;
+  opacity: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* --- Der Seitentext gleitet nach --------------------------------- */
-@keyframes uebergang-von-unten {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-}
-
-@keyframes uebergang-nach-unten {
-  to {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-}
-
-::view-transition-new(seiteninhalt) {
-  animation: uebergang-von-unten calc(var(--dauer-uebergang) * 0.8) var(--verlauf-betont) both;
-  animation-delay: calc(var(--dauer-uebergang) * 0.25);
-}
-
-::view-transition-old(seiteninhalt) {
-  animation: uebergang-nach-unten calc(var(--dauer-uebergang) * 0.5) var(--verlauf-betont) forwards;
-}
-
-/* Die Hülle des Textes soll nicht „wandern" — sie hat kein Gegenstück */
-::view-transition-group(seiteninhalt) {
+/* --- Text der Neuigkeiten kreuzt das Bild nicht -----------------
+   In der Vorschaukarte steht der Text unter dem Bild, auf der Seite
+   darüber. Wandern beide, liefe der Text mitten durchs Bild. Beide
+   tragen deshalb Namen OHNE Gegenstück: Ihre Hüllen stehen still, der
+   Vorschautext blendet unten aus, der Seitenkopf oben ein. */
+::view-transition-group(.beitragtext) {
   animation: none;
+  z-index: 92;
+}
+
+::view-transition-old(.beitragtext) {
+  animation: uebergang-blende-aus calc(var(--dauer-uebergang) * 0.35) var(--verlauf-betont) forwards;
+}
+
+::view-transition-new(.beitragtext) {
+  animation: uebergang-blende-ein calc(var(--dauer-uebergang) * 0.45) var(--verlauf-betont) both;
+  animation-delay: calc(var(--dauer-uebergang) * 0.45);
 }
 
 /* --- Die Leisten bleiben scharf und still ------------------------
@@ -161,10 +188,17 @@
   animation: none;
 }
 
-/* Die Leisten liegen über allem — auch über der wachsenden Karte */
-::view-transition-group(nav-oben),
-::view-transition-group(nav-unten) {
+/* Die Kopfleiste liegt über allem, auch über der wachsenden Karte.
+   Die Symbolleiste unten liegt darunter — die Karte soll sich davor
+   bewegen (Wunsch von Florian, September 2026). */
+::view-transition-group(nav-oben) {
   z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+::view-transition-group(nav-unten) {
+  z-index: 80;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -177,65 +211,63 @@
   animation: none;
 }
 
-/* --- Blättern zwischen zwei Leistungen / Beiträgen ---------------
-   Ausgelöst über „Vorherige / Nächste" (scripts/uebergaenge.ts setzt
-   `data-uebergang` auf <html>). Die alte Seite schiebt sich zur Seite
-   hinaus, die neue kommt von der anderen Seite herein. Der Rest bleibt
-   stehen — nichts verschwimmt. */
-@keyframes uebergang-raus-links { to { opacity: 0; transform: translateX(-12%); } }
-@keyframes uebergang-raus-rechts { to { opacity: 0; transform: translateX(12%); } }
-@keyframes uebergang-rein-links { from { opacity: 0; transform: translateX(-12%); } }
-@keyframes uebergang-rein-rechts { from { opacity: 0; transform: translateX(12%); } }
+/*
+  BLÄTTERN ZWISCHEN ZWEI LEISTUNGEN / BEITRÄGEN
+  ==================================================================
+  Ausgelöst über „Vorherige / Nächste" (scripts/uebergaenge.ts setzt
+  `data-uebergang` auf <html>). Die alte Karte fährt seitlich hinaus,
+  die neue kommt von der gegenüberliegenden Seite herein — ein Slider.
 
+  Damit das ruhig aussieht, muss die Karte EINE Momentaufnahme sein.
+  Symbol, Titel und Bild geben ihre eigenen Namen während des Blätterns
+  deshalb ab (Regel ganz unten) — sonst blieben sie als eigene Ebenen
+  stehen und blitzten auf, während die Karte unter ihnen wegfährt.
+*/
+@keyframes uebergang-raus-links { to { transform: translateX(-100%); } }
+@keyframes uebergang-raus-rechts { to { transform: translateX(100%); } }
+@keyframes uebergang-rein-links { from { transform: translateX(-100%); } }
+@keyframes uebergang-rein-rechts { from { transform: translateX(100%); } }
+
+/* Der Rest der Seite bleibt stehen — nichts verschwimmt */
 html[data-uebergang] ::view-transition-old(root),
 html[data-uebergang] ::view-transition-new(root) {
   animation: none;
 }
 
-/* Die Hüllen der Artikel wandern nicht — ihre Bilder gleiten */
-html[data-uebergang] ::view-transition-group(.karte),
-html[data-uebergang] ::view-transition-group(seiteninhalt) {
+/* Die Hüllen wandern nicht — die Abbilder schieben sich durch */
+html[data-uebergang] ::view-transition-group(.karte) {
   animation: none;
 }
 
 html[data-uebergang] ::view-transition-old(.karte),
-html[data-uebergang] ::view-transition-old(seiteninhalt) {
+html[data-uebergang] ::view-transition-new(.karte) {
   animation-duration: var(--dauer-uebergang);
   animation-timing-function: var(--verlauf-betont);
   animation-delay: 0ms;
-  animation-fill-mode: forwards;
+  /* Keine Deckkraftänderung: die Karten gleiten, sie blenden nicht */
+  opacity: 1;
 }
 
-html[data-uebergang] ::view-transition-new(.karte),
-html[data-uebergang] ::view-transition-new(seiteninhalt) {
-  animation-duration: var(--dauer-uebergang);
-  animation-timing-function: var(--verlauf-betont);
-  animation-delay: 0ms;
-  animation-fill-mode: both;
+html[data-uebergang] ::view-transition-old(.karte) { animation-fill-mode: forwards; }
+html[data-uebergang] ::view-transition-new(.karte) { animation-fill-mode: both; }
+
+html[data-uebergang='vor'] ::view-transition-old(.karte) { animation-name: uebergang-raus-links; }
+html[data-uebergang='vor'] ::view-transition-new(.karte) { animation-name: uebergang-rein-rechts; }
+html[data-uebergang='zurueck'] ::view-transition-old(.karte) { animation-name: uebergang-raus-rechts; }
+html[data-uebergang='zurueck'] ::view-transition-new(.karte) { animation-name: uebergang-rein-links; }
+
+/*
+  Beim Blättern geben Symbol, Titel und Bild ihre Namen ab: Sie sind
+  dann Teil der Karte und fahren mit ihr durch. Die Regel greift, weil
+  `data-uebergang` schon VOR der Momentaufnahme gesetzt wird
+  (scripts/uebergaenge.ts, `astro:before-preparation`).
+*/
+html[data-uebergang] .leistung__icon,
+html[data-uebergang] .leistung__titel,
+html[data-uebergang] .beitrag__bild,
+html[data-uebergang] .beitrag__kopf {
+  view-transition-name: none;
 }
-
-html[data-uebergang='vor'] ::view-transition-old(.karte),
-html[data-uebergang='vor'] ::view-transition-old(seiteninhalt) { animation-name: uebergang-raus-links; }
-html[data-uebergang='vor'] ::view-transition-new(.karte),
-html[data-uebergang='vor'] ::view-transition-new(seiteninhalt) { animation-name: uebergang-rein-rechts; }
-
-html[data-uebergang='zurueck'] ::view-transition-old(.karte),
-html[data-uebergang='zurueck'] ::view-transition-old(seiteninhalt) { animation-name: uebergang-raus-rechts; }
-html[data-uebergang='zurueck'] ::view-transition-new(.karte),
-html[data-uebergang='zurueck'] ::view-transition-new(seiteninhalt) { animation-name: uebergang-rein-links; }
-
-/* Symbol und Titel gleiten mit dem Artikel, statt zu wandern */
-html[data-uebergang] ::view-transition-group(.symbol),
-html[data-uebergang] ::view-transition-group(.titel),
-html[data-uebergang] ::view-transition-group(.bild) {
-  animation: none;
-}
-html[data-uebergang] ::view-transition-old(.symbol),
-html[data-uebergang] ::view-transition-old(.titel),
-html[data-uebergang] ::view-transition-old(.bild) { animation: uebergang-blende-aus calc(var(--dauer-uebergang) * 0.4) both; }
-html[data-uebergang] ::view-transition-new(.symbol),
-html[data-uebergang] ::view-transition-new(.titel),
-html[data-uebergang] ::view-transition-new(.bild) { animation: uebergang-blende-ein calc(var(--dauer-uebergang) * 0.5) both; animation-delay: calc(var(--dauer-uebergang) * 0.4); }
 
 /*
   ÜBER CSS HINAUS

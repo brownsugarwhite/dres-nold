@@ -47,7 +47,8 @@ const zeilen = texte.titel.split('\n').filter((z) => z.trim() !== '');
     margin: 0;
     font-size: clamp(2.25rem, 1.3rem + 4vw, 4.5rem);
     font-weight: var(--gewicht-halbfett);
-    line-height: 1.05;
+    /* Nicht enger — sonst schneidet der Verlauf die Unterlängen ab */
+    line-height: 1.15;
     text-align: center;
   }
 

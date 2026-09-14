@@ -7,7 +7,8 @@
  *
  * Beim Aufruf von der Startseite morpht die zugehörige Kachel in diese
  * Seite hinein: möglich durch die gemeinsamen `transition:name`
- * (Hülle, Symbol, Titel). Der Text gleitet als `seiteninhalt` nach.
+ * (Hülle, Symbol, Titel). Der Fließtext hat bewusst KEINEN eigenen
+ * Namen — er gehört zur Karte und wächst mit ihr.
  * Schließen-Kreuz, „Alle Leistungen" und Escape gehen im Verlauf
  * zurück (scripts/uebergaenge.ts).
  */
@@ -54,7 +55,10 @@ const naechste = alle[i + 1];
         <h1 class="leistung__titel" transition:name={`leistung-titel-${leistung.id}`}>{leistung.titel}</h1>
       </header>
 
-      <div class="leistung__rest" transition:name="seiteninhalt">
+      {/* Kein eigener Übergangsname: So steckt der Fließtext in der
+          Momentaufnahme der Karte und wächst mit ihr, statt separat
+          hereinzugleiten (styles/uebergaenge.css). */}
+      <div class="leistung__rest">
         <div class="leistung__text redaktionstext" set:html={leistung.inhalt} />
 
         <nav class="leistung__nachbarn" aria-label="Weitere Leistungen">

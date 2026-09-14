@@ -20,7 +20,11 @@
  */
 import { navigate } from 'astro:transitions/client';
 
-const ABHEBE_DAUER = 220; // ms — siehe `[data-gehoben]` in LeistungKachel/Neuigkeiten
+/* Nur so lang, dass der Schatten unter der Karte sichtbar wird. Früher
+   waren es 220 ms mit einem Sprung auf scale(1.04) — das wirkte wie ein
+   Hüpfer, dem dann die eigentliche Bewegung folgte. Jetzt ist das
+   Abheben der Anfang derselben Bewegung. */
+const ABHEBE_DAUER = 90; // ms — siehe `[data-gehoben]` in LeistungKachel/Neuigkeiten
 const MERKER = 'uebergang-ziel';
 
 const pause = (ms: number) => new Promise<void>((f) => setTimeout(f, ms));
@@ -67,6 +71,16 @@ document.addEventListener('astro:after-swap', () => {
   const r = karte.getBoundingClientRect();
   const oben = window.scrollY + r.top - (window.innerHeight - r.height) / 2;
   window.scrollTo({ top: Math.max(0, oben), behavior: 'instant' as ScrollBehavior });
+});
+
+/* Astro tauscht beim Wechsel das ganze Dokument aus — die Richtung des
+   Blätterns muss deshalb auch am NEUEN <html> stehen, sonst verlöre die
+   hereinfahrende Seite mitten in der Bewegung ihre Regeln. */
+document.addEventListener('astro:before-swap', (ereignis) => {
+  const richtung = document.documentElement.dataset.uebergang;
+  if (!richtung) return;
+  const neu = (ereignis as Event & { newDocument: Document }).newDocument;
+  neu.documentElement.dataset.uebergang = richtung;
 });
 
 document.addEventListener('astro:page-load', () => {

@@ -2,6 +2,14 @@
 /**
  * Einzelseite eines Beitrags — eigene Adresse, mit Morph-Übergang
  * aus der Übersicht heraus.
+ *
+ * Zum Übergang: Das Bild trägt denselben Namen wie in der
+ * Vorschaukarte und wandert dadurch wirklich an seinen Platz. Datum
+ * und Überschrift stehen hier ÜBER dem Bild, in der Vorschaukarte aber
+ * darunter — wanderten beide, liefe der Text mitten durchs Bild.
+ * Deshalb tragen sie einen Namen ohne Gegenstück: Der Vorschautext
+ * blendet unten an seiner Stelle aus, dieser Kopf oben an seiner
+ * Stelle ein (styles/uebergaenge.css).
  */
 import Basis from '../../layouts/Basis.astro';
 import Navigation from '../../components/Navigation.astro';
@@ -36,16 +44,19 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
         <span aria-hidden="true">←</span> Alle Neuigkeiten
       </a>
 
-      {beitrag.datum && (
-        <time class="beitrag__datum" datetime={beitrag.datum}>{alsDatum(beitrag.datum)}</time>
-      )}
-      <h1 class="beitrag__titel">{beitrag.titel}</h1>
+      <div class="beitrag__kopf" transition:name={`beitrag-kopf-${beitrag.id}`}>
+        {beitrag.datum && (
+          <time class="beitrag__datum" datetime={beitrag.datum}>{alsDatum(beitrag.datum)}</time>
+        )}
+        <h1 class="beitrag__titel">{beitrag.titel}</h1>
+      </div>
 
       {beitrag.bild && (
         <img class="beitrag__bild" src={beitrag.bild} alt={beitrag.bild_alt || ''} width="900" height="500" transition:name={`beitrag-bild-${beitrag.id}`} />
       )}
 
-      <div class="beitrag__rest" transition:name="seiteninhalt">
+      {/* Kein eigener Übergangsname: gehört zur Karte und wächst mit ihr */}
+      <div class="beitrag__rest">
       <div class="beitrag__inhalt redaktionstext" set:html={beitrag.inhalt} />
 
       {anhaenge.length > 0 && (
@@ -146,6 +157,12 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
 
   .beitrag__zurueck:hover,
   .beitrag__zurueck:focus-visible { color: var(--farbe-primaer); }
+
+  /* Der Kopf (Datum + Überschrift) blendet im Übergang an seiner
+     Stelle ein, statt zu wandern — siehe styles/uebergaenge.css */
+  .beitrag__kopf {
+    view-transition-class: beitragtext;
+  }
 
   .beitrag__datum {
     display: block;

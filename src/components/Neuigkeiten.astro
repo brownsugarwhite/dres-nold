@@ -28,7 +28,7 @@ const alsDatum = (iso: string) =>
             {b.bild && (
               <img class="beitrag__bild" src={b.bild} alt={b.bild_alt || ''} width="600" height="360" loading="lazy" transition:name={`beitrag-bild-${b.id}`} />
             )}
-            <div class="beitrag__text">
+            <div class="beitrag__text" transition:name={`beitrag-vorschautext-${b.id}`}>
               {b.datum && <time class="beitrag__datum" datetime={b.datum}>{alsDatum(b.datum)}</time>}
               <h3 class="beitrag__titel">{b.titel}</h3>
               {b.kurz && <p class="beitrag__kurz">{b.kurz}</p>}
@@ -88,12 +88,12 @@ const alsDatum = (iso: string) =>
       transform var(--dauer-schnell) var(--verlauf);
   }
 
-  /* Angeklickt: hebt sich ab, bevor die Seite aus ihm herauswächst */
+  /* Angeklickt: legt nur den Schatten darunter — gewachsen wird im
+     Übergang selbst (styles/uebergaenge.css). */
   .beitrag__link[data-gehoben] {
     position: relative;
     z-index: 2;
     box-shadow: 0 18px 40px -12px rgb(0 0 0 / 30%);
-    transform: scale(1.03);
   }
 
   .beitrag__bild {
@@ -104,11 +104,14 @@ const alsDatum = (iso: string) =>
     view-transition-class: bild;
   }
 
+  /* Blendet im Übergang unten an seiner Stelle aus, statt durch das
+     Bild nach oben zu wandern — siehe styles/uebergaenge.css */
   .beitrag__text {
     display: flex;
     flex-direction: column;
     flex: 1;
     gap: var(--abstand-3xs);
+    view-transition-class: beitragtext;
   }
 
   .beitrag__datum {
