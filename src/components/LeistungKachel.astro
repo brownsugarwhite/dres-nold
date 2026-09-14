@@ -28,9 +28,10 @@ const { id, titel, kurz, icon } = Astro.props;
     flex-direction: column;
     gap: var(--abstand-2xs);
     padding: var(--abstand-m);
-    /* Ohne eigene Fläche — die Kachel steht auf dem Grund des Bereichs
-       (Probe von Florian, September 2026). Im Seitenwechsel bekommt sie
-       ihre deckende Fläche von styles/uebergaenge.css. */
+    /* Ohne eigene Fläche: Die Kachel steht auf dem weißen Grund des
+       Bereichs, nur der Rahmen zeichnet sie ab (Florian, September
+       2026). Im Seitenwechsel bekommt sie ihre deckende Fläche von
+       styles/uebergaenge.css. */
     border: 1px solid var(--farbe-linie);
     border-radius: var(--radius-m);
     text-decoration: none;

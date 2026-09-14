@@ -92,24 +92,12 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 </Basis>
 
 <style>
-  /* Der Inhalt schiebt sich über den fixierten Startbereich.
-     Kein flächiges Weiß mehr — welche Bereiche weiß stehen und welche
-     den grauen Symbolgrund durchscheinen lassen, entscheidet jeder
-     Bereich für sich (Probe von Florian, September 2026). */
+  /* Der Inhalt schiebt sich über den fixierten Startbereich */
   .seiteninhalt {
     position: relative;
     z-index: 5;
-  }
-
-  /* Begrüßung, Galerie und die freien Abschnitte stehen auf Weiß …  */
-  .seiteninhalt > :global(.willkommen),
-  .seiteninhalt > :global(.galerie),
-  .seiteninhalt > :global(.abschnitte) {
     background: var(--farbe-flaeche);
   }
-
-  /* … die Leistungen zeigen den grauen Symbolgrund, wie der
-     Kontaktbereich weiter unten. */
 
 
 
