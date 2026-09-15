@@ -121,33 +121,30 @@
   z-index: 90;
 }
 
-/* Die Karte ist eine deckende weiße Fläche.
-   Ohne sie sähe man während des Kreuzens der beiden Abbilder — beide
-   sind dann halb durchsichtig — die Kacheln dahinter durchscheinen; es
-   wirkte, als läge die Karte unter ihren Nachbarn. */
+/* Die Karte bringt keine eigene Fläche mit — weder auf der Seite noch
+   im Übergang. Ein weißer Grund an dieser Stelle setzt sich als harter
+   Kasten von der verschwimmenden Seite dahinter ab. Und nichts wird
+   beschnitten: Was in der Karte steht, darf beim Wachsen nicht unten
+   abreißen (Florian, September 2026). */
 ::view-transition-image-pair(.karte) {
-  background: var(--farbe-flaeche);
-  border-radius: var(--radius-m);
-  overflow: hidden;
-}
-
-/* Beim Blättern fahren zwei Karten nebeneinander durch — dort darf
-   nichts beschnitten werden und es braucht keine Fläche. */
-html[data-uebergang] ::view-transition-image-pair(.karte) {
   background: none;
   overflow: visible;
 }
 
-/* Beide Abbilder füllen die Hülle immer ganz aus.
+/* Beide Abbilder füllen die Hülle immer ganz aus und machen damit
+   Bewegung und Skalierung der Karte mit.
+
    Standardmäßig behalten sie ihr Seitenverhältnis und hängen oben —
-   sobald die Hülle breiter wird als hoch, ragt das Abbild unten hinaus
-   und wird abgeschnitten (bei den Neuigkeiten verschwand so das
-   „Weiterlesen"). So bleibt alles in der Karte und macht ihre Bewegung
-   und Skalierung mit. */
+   sobald die Hülle breiter wird als hoch, ragt das Abbild unten hinaus.
+   Deshalb beide Schreibweisen: `width`/`height` und die logischen
+   Entsprechungen, die der Browser in seinem eigenen Regelsatz
+   verwendet. */
 ::view-transition-old(.karte),
 ::view-transition-new(.karte) {
   width: 100%;
   height: 100%;
+  inline-size: 100%;
+  block-size: 100%;
   object-fit: fill;
 }
 
