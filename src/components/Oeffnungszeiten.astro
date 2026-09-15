@@ -169,7 +169,9 @@ const texte = startseite.sprechstunden;
        Oberkante der Symbolleiste. Vom Skript gesetzt. */
     bottom: var(--oz-ruhe, 264px);
     left: 50%;
-    width: min(calc(100vw - 2 * var(--abstand-m)), 62rem);
+    /* `100%` statt `100vw`: `vw` zählt die Rollleiste mit, die Blase
+       säße dadurch ein paar Pixel zu weit rechts. */
+    width: min(calc(100% - 2 * var(--abstand-m)), 68rem);
     /* Vom Skript gesetzt */
     transform: translate(-50%, var(--oz-versatz, 700px));
     pointer-events: auto;
@@ -259,15 +261,21 @@ const texte = startseite.sprechstunden;
        die breiteste Spalte abgeschnitten. */
     grid-template-columns: repeat(3, auto);
     justify-content: space-between;
-    gap: clamp(var(--abstand-l), 6vw, var(--abstand-2xl));
+    /* Nur ein Mindestabstand — den Rest verteilt `space-between` über
+       den tatsächlich freien Platz. Ein fester Anteil der Fenster-
+       breite (6vw) schob die dritte Spalte aus der Blase hinaus. */
+    gap: var(--abstand-l);
     align-items: start;
   }
 
   /* Handys: Listen untereinander. Die Blase darf höher sein als der
      Platz über der Leiste — sie ist kein Rollkasten; was oben hinaus-
      steht, kommt beim Weiterscrollen zum Vorschein. */
-  @media (max-width: 60rem) {
-    .ozblase { width: calc(100vw - 2 * var(--abstand-s)); }
+  /* Die drei Listen brauchen nebeneinander rund 840 px; darunter
+     stehen sie untereinander. Vorher lag die Grenze bei 60 rem — dort
+     passten sie schon nicht mehr und liefen seitlich heraus. */
+  @media (max-width: 68rem) {
+    .ozblase { width: calc(100% - 2 * var(--abstand-s)); }
     .ozblase__flaeche { padding: var(--abstand-m); }
     .ozblase__spalten { grid-template-columns: 1fr; gap: var(--abstand-m); }
   }
