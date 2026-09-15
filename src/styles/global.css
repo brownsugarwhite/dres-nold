@@ -35,9 +35,6 @@ h1, h2, h3, h4 {
   line-height: var(--zeilenhoehe-eng);
   font-weight: var(--gewicht-halbfett);
   text-wrap: balance;
-  /* Poppins hat tiefe Unterlängen (g, y, p). Ohne diesen Zuschlag
-     schneidet der Verlauf aus `background-clip: text` sie unten ab. */
-  padding-bottom: 0.04em;
 }
 
 /*
@@ -62,8 +59,10 @@ textarea {
   font-family: var(--schrift);
 }
 
-h1 { font-size: var(--text-xxl); }
-h2 { font-size: var(--text-xl); }
+/* Große Grade laufen in Source Sans 3 etwas locker — eine Spur enger
+   gesetzt wirken die Überschriften geschlossener. */
+h1 { font-size: var(--text-xxl); letter-spacing: -0.015em; }
+h2 { font-size: var(--text-xl); letter-spacing: -0.012em; }
 h3 { font-size: var(--text-l); line-height: var(--zeilenhoehe-mittel); }
 h4 { font-size: var(--text-m); line-height: var(--zeilenhoehe-mittel); }
 
@@ -227,12 +226,10 @@ main.seiteninhalt h2:not(.ohne-verlauf),
      sie bekommt denselben Seitenrand wie der Inhalt. */
   max-width: calc(100% - 2 * var(--abstand-m));
   font-size: var(--text-titel);
-  /* Nicht enger: Poppins hat tiefere Unterlängen als Source Sans 3.
-     Bei `line-height: 1` ragt das „g" aus dem Kasten — und weil der
-     bewegte Verlauf nur innerhalb des Kastens gezeichnet wird
-     (`background-clip: text`), wäre es unten abgeschnitten. */
-  line-height: 1.15;
-  padding-bottom: 0.08em;
+  /* Etwas mehr als 1: Der bewegte Verlauf wird nur innerhalb des
+     Kastens gezeichnet (`background-clip: text`) — bei genau 1 ragt
+     das „g" darunter heraus und bliebe farblos. */
+  line-height: 1.08;
   text-align: center;
   text-wrap: balance;
 }

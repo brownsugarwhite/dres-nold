@@ -3,7 +3,19 @@
   ==================================================================
   Ersatz für Myriad Pro (Adobe Typekit), das mit dem Webflow-Umzug
   entfällt. Beide stammen von Robert Slimbach und sind in Proportion
-  und Duktus nahezu deckungsgleich.
+  und Duktus nahezu deckungsgleich — Source Sans wurde als freier
+  Myriad-Ersatz entworfen.
+
+  Myriad Pro selbst lässt sich nicht einbauen: Adobe liefert
+  Web-Schriften ausschließlich von eigenen Servern aus, und die Lizenz
+  verbietet das Selbsthosten. Beides verträgt sich nicht mit der
+  Grundregel dieses Projekts, nichts von fremden Servern zu laden
+  (CLAUDE.md).
+
+  Diese eine Schrift trägt die ganze Seite — Fließtext wie
+  Überschriften. Ein zweiter Schriftschnitt für Überschriften (Poppins)
+  war im September 2026 kurz im Einsatz und wurde wieder entfernt, weil
+  er zu weit von der Vorlage wegführte.
 
   Eingebunden als "variable font": EINE Datei deckt alle Strichstärken
   von 200 bis 900 ab. Zwei Dateien insgesamt (aufrecht und kursiv),
@@ -35,89 +47,6 @@
   src: url('/fonts/source-sans-3-italic.woff2') format('woff2-variations');
   font-weight: 200 900;
   font-style: italic;
-  font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-                 U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
-                 U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
-                 U+FFFD;
-}
-
-/*
-  SCHRIFT — Poppins (Überschriften und Bedienelemente)
-  ==================================================================
-  Alles, was kein Fließtext ist, steht in Poppins: Überschriften,
-  Menübeschriftungen, Knöpfe, Namen im Team. Der Fließtext bleibt
-  Source Sans 3 — die beiden ergänzen sich gut, weil Poppins geometrisch
-  und ruhig wirkt, Source Sans 3 dagegen auf Lesbarkeit in langen
-  Absätzen ausgelegt ist.
-
-  Poppins gibt es nicht als variable Schrift, deshalb einzelne Schnitte:
-  300 (leicht), 400 (normal), 500 (mittel), 600 (halbfett) und 700
-  (fett). Jede Datei ist rund 8 KB groß und auf lateinische Zeichen
-  beschränkt — Umlaute, ß, Gedankenstriche, Anführungszeichen und €
-  sind enthalten.
-
-  Der leichte Schnitt trägt die Beschriftungen in den Leisten: Poppins
-  wirkt in 400 schon recht kräftig, für eine ruhige Kopf- und
-  Symbolleiste ist 300 die bessere Wahl.
-
-  Selbst gehostet unter public/fonts/, wie Source Sans 3.
-  Lizenz: SIL Open Font License 1.1 (public/fonts/poppins-LICENSE.txt).
-*/
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/poppins-400.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-                 U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
-                 U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
-                 U+FFFD;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/poppins-600.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-                 U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
-                 U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
-                 U+FFFD;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/poppins-700.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-                 U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
-                 U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
-                 U+FFFD;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/poppins-300.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-                 U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
-                 U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
-                 U+FFFD;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/poppins-500.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
   font-display: swap;
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
                  U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,

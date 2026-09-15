@@ -98,9 +98,12 @@ Eigener Bereich, von der Praxis pflegbar, blendet sich aus wenn leer.
 
 - Analytics **cookielos** (Cloudflare Web Analytics), kein Google Analytics
 - Barrierefrei nach WCAG 2.1 AA
-- Schrift: **Poppins** für Überschriften und Bedienelemente,
-  **Source Sans 3** für den Fließtext — beide selbst gehostet
-  (14. September 2026; vorher Source Sans 3 allein)
+- Schrift: **Source Sans 3** für die ganze Seite, selbst gehostet.
+  Myriad Pro selbst ist nicht möglich (Adobe hostet nur selbst und
+  verbietet das Selbsthosten); Source Sans stammt vom selben Gestalter
+  und ist als Myriad-Ersatz entworfen. Ein Versuch mit Poppins für die
+  Überschriften lief einen Tag und wurde zurückgenommen — zu
+  geometrisch, zu weit von der Vorlage (15. September 2026)
 - Sauberer Neubau, kein Webflow-Export als Codebasis
 - Keine externen Ressourcen — Voraussetzung dafür, dass kein Cookie-Banner nötig ist
 
@@ -144,9 +147,9 @@ Verlassen **nicht** zurück.
 
 Aus Florians Durchsicht der fertigen Seite:
 
-- **Schrift:** Überschriften, Menü- und Knopfbeschriftungen stehen in
-  Poppins; der Fließtext bleibt Source Sans 3. Faustregel: Was man
-  liest, ist Source Sans 3; was man überfliegt oder anklickt, Poppins.
+- **Schrift:** Eine Schrift für alles — Source Sans 3. Das Token
+  `--schrift-titel` bleibt als Einstiegspunkt bestehen, falls die
+  Überschriften später doch eine zweite Schrift bekommen sollen.
 - **Sprechstunden:** längerer Zipfel auf dem Desktop, mehr Luft
   zwischen den drei Spalten, kräftigere Spaltenüberschriften, graue
   Wochentage, vollwertige Überschrift mit Beschreibungstext und ein
@@ -175,3 +178,18 @@ Aus Florians Durchsicht der fertigen Seite:
   unter denen sich beim Hineinklicken eine Linie in der Hausfarbe
   zeichnet. Sendeknopf als Pille mit gleitendem Pfeil, Bestätigung als
   gezeichneter Kreis mit Haken.
+
+## Schrift und Textfarben (15. September 2026)
+
+- **Eine Schrift:** Source Sans 3 trägt Fließtext und Überschriften.
+  Poppins ist wieder raus (siehe oben).
+- **Ein Grauton-Verlauf:** Vorher lagen drei unabhängige Grautöne
+  nebeneinander — ein kühles Blaugrau (#758696), ein neutrales
+  (#5c5e61) und ein warmes (#554d53). Jetzt eine Familie, abgestimmt
+  auf das Aubergine: `--farbe-text: #4d434b` (9,5:1 auf Weiß),
+  `--farbe-text-gedeckt: #766c74` (5,0:1). Das alte #758696 lag mit
+  3,75:1 unter der Vorgabe von 4,5:1.
+- **Karten ohne eigene Fläche:** Leistungskacheln und
+  Neuigkeiten-Karten haben keinen eigenen Hintergrund mehr, nur ihren
+  Rahmen. Die Bereiche darunter bleiben weiß.
+- **Öffnungszeiten** stehen zusätzlich in der Kopfleiste.

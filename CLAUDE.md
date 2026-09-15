@@ -99,18 +99,15 @@ Redaktion ──► dres-nold.de/login
 
 ### Schrift
 
-Die Vorlage nutzt **Myriad Pro** über Adobe Typekit. Typekit entfällt beim Umzug. Zwei Schriften treten an seine Stelle:
+Die Vorlage nutzt **Myriad Pro** über Adobe Typekit. Typekit entfällt beim Umzug.
 
-| | Schrift | Token | Wofür |
-|---|---|---|---|
-| Fließtext | **Source Sans 3** | `--schrift` | Alles, was man liest: Absätze, Listen, Tabellen |
-| Überschriften | **Poppins** | `--schrift-titel` | Alles, was man überfliegt oder anklickt: Überschriften, Menü- und Knopfbeschriftungen, Namen, Formularbeschriftungen |
+**Ersatz: Source Sans 3** — vom selben Schriftgestalter (Robert Slimbach), als freier Myriad-Ersatz entworfen, praktisch deckungsgleiche Proportionen, frei lizenziert (SIL OFL), selbst hostbar. Eine Schrift für die ganze Seite: Fließtext wie Überschriften.
 
-Source Sans 3 stammt vom selben Schriftgestalter wie Myriad Pro (Robert Slimbach) und ist in den Proportionen praktisch deckungsgleich. Poppins ist Florians Wahl für die Überschriften (14. September 2026); es ist geometrisch und ruhig und setzt sich klar vom Fließtext ab.
+**Myriad Pro selbst geht nicht.** Adobe liefert Web-Schriften ausschließlich von eigenen Servern (`use.typekit.net`) und verbietet das Selbsthosten; ein Creative-Cloud-Abo deckt Web-Einbettung nicht ab. Beides verträgt sich nicht mit der Grundregel, nichts von fremden Servern zu laden. Geprüft und verworfen am 15. September 2026.
 
-Beide sind frei lizenziert (SIL OFL) und selbst gehostet unter `public/fonts/`, `font-display: swap`, nur die tatsächlich benötigten Schnitte: Source Sans 3 als variable Schrift (aufrecht und kursiv), Poppins in 400, 600 und 700.
+Einbindung: selbst gehostet unter `public/fonts/` als variable Schrift (aufrecht und kursiv), `font-display: swap`, auf lateinische Zeichen beschränkt.
 
-*Vorsicht:* Poppins hat tiefere Unterlängen als Source Sans 3. Überschriften brauchen deshalb etwas mehr Zeilenhöhe — bei `line-height: 1` schneidet der bewegte Verlauf (`background-clip: text`) das „g" unten ab.
+Das Token `--schrift-titel` gibt es weiterhin und zeigt auf `--schrift`. Wer den Überschriften später eine zweite Schrift geben will, ändert nur diese eine Zeile. Ein solcher Versuch mit **Poppins** lief vom 14. bis 15. September 2026 und wurde wieder zurückgenommen: geometrisch gebaut, führte es zu weit von der Vorlage weg.
 
 ### Design-Tokens
 

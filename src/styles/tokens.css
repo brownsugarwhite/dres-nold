@@ -49,11 +49,14 @@
      lizenziert und selbst gehostet unter public/fonts/. */
   --schrift: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  /* Überschriften und Bedienelemente stehen in Poppins — geometrisch,
-     ruhig, mit klar gezeichneten Rundungen. Fließtext bleibt Source
-     Sans 3. Regel: Alles, was man liest, ist Source Sans 3; alles, was
-     man überfliegt oder anklickt, ist Poppins. */
-  --schrift-titel: 'Poppins', 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Überschriften und Bedienelemente nutzen dieselbe Schrift wie der
+     Fließtext. Das eigene Token bleibt bestehen: Wer den Überschriften
+     später eine zweite Schrift geben will, ändert nur diese eine Zeile.
+
+     Zwischenzeitlich stand hier Poppins. Es ist geometrisch gebaut und
+     lag damit deutlich weiter von Myriad Pro entfernt als Source Sans 3
+     (Florian, 15. September 2026). */
+  --schrift-titel: var(--schrift);
 
   /* Fließende Größen: passen sich stufenlos der Fensterbreite an */
   --text-xs: clamp(0.78rem, 0.76rem + 0.1vw, 0.84rem);

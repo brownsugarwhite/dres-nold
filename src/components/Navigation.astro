@@ -347,7 +347,6 @@ const kategorien = (leistungen.kategorien ?? [])
   .oberpunkt__kurz,
   .fussknopf__text {
     font-weight: var(--gewicht-normal);
-    letter-spacing: 0.015em;
     font-family: var(--schrift-titel);
   }
 
@@ -376,11 +375,8 @@ const kategorien = (leistungen.kategorien ?? [])
     align-items: center;
     color: var(--farbe-primaer);
     font-family: var(--schrift-titel);
-    /* Poppins läuft breiter als Source Sans 3 — die Zeile darf deshalb
-       kleiner und leichter stehen als dort. */
-    font-size: 13px;
-    font-weight: var(--gewicht-leicht);
-    letter-spacing: 0.01em;
+    font-size: var(--text-s);
+    font-weight: var(--gewicht-normal);
     white-space: nowrap;
   }
 
@@ -582,7 +578,7 @@ const kategorien = (leistungen.kategorien ?? [])
   .mobilmenue__symbol--klein { width: 40px; height: 40px; }
 
   .mobilmenue__untertext { display: flex; flex-direction: column; }
-  .mobilmenue__kurz { color: var(--farbe-text-gedeckt); font-size: 13px; font-weight: var(--gewicht-leicht); line-height: 1.35; }
+  .mobilmenue__kurz { color: var(--farbe-text-gedeckt); font-size: var(--text-s); font-weight: var(--gewicht-normal); line-height: 1.35; }
 
   @media (prefers-reduced-motion: reduce) {
     .mobilmenue,
@@ -657,9 +653,8 @@ const kategorien = (leistungen.kategorien ?? [])
     justify-content: center;
     height: 80px;
     flex: none;
-    font-size: 15px;
+    font-size: var(--text-s);
     font-weight: var(--gewicht-normal);
-    letter-spacing: 0.015em;
   }
 
   /* Ablauf a-18: 300 ms, easeInOut — einmal hoch, kein Zurückrollen */
@@ -808,15 +803,15 @@ const kategorien = (leistungen.kategorien ?? [])
   }
 
   .oberpunkt__titel {
-    font-size: 16px;
-    font-weight: var(--gewicht-mittel);
+    font-size: var(--text-m);
+    font-weight: var(--gewicht-halbfett);
     line-height: 1.25;
   }
 
   .oberpunkt__kurz {
     color: var(--farbe-text-gedeckt);
-    font-size: 13px;
-    font-weight: var(--gewicht-leicht);
+    font-size: var(--text-s);
+    font-weight: var(--gewicht-normal);
     line-height: 1.35;
   }
 
@@ -959,7 +954,7 @@ const kategorien = (leistungen.kategorien ?? [])
      zwischen den Symbolen */
   @media (max-width: 479px) {
     .kontaktzeile__inhalt { width: 94%; gap: var(--abstand-2xs); }
-    .kontaktzeile__text { font-size: 12px; }
+    .kontaktzeile__text { font-size: var(--text-xs); }
     .fussleiste__inhalt { width: 94%; }
     .fussleiste__inhalt--klein .fussknopf { flex: 1; }
   }
