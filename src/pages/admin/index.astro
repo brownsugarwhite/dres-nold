@@ -16,7 +16,7 @@ import { bereiche, reihenfolge } from '../../admin/bereiche';
   <ul class="bereiche">
     {reihenfolge.map((id) => (
       <li>
-        <a class="bereich" href={`/admin/${id}/`}>
+        <a class="bereich" href={`/admin/${id}/`} data-astro-prefetch="false">
           <img src={bereiche[id].symbol} alt="" width="44" height="44" />
           <span>
             <span class="bereich__titel">{bereiche[id].titel}</span>

@@ -70,6 +70,7 @@ Jede Änderung ist ein Commit im GitHub-Repo. Auf github.com unter
 |---|---|---|
 | Redaktion meldet „Nicht gespeichert … von jemand anderem geändert" | zwei Personen gleichzeitig | Seite neu laden, Änderung erneut vornehmen |
 | Redaktion meldet „Anmeldung erforderlich" | Access-Sitzung abgelaufen | erneut über `/login` anmelden |
+| Nach dem Anmelden wirft der erste Klick zurück auf den Anmeldebildschirm | Ein Verweis auf `/cdn-cgi/access/logout` wird vorgeholt und meldet dabei ab | Alle Verweise der Redaktion brauchen `data-astro-prefetch="false"` (siehe `src/layouts/Redaktion.astro`) |
 | Speichern schlägt mit „GitHub: … (401)" fehl | `GITHUB_TOKEN` abgelaufen | Token erneuern (oben) |
 | Änderung nach 5 Minuten nicht online | Workflow fehlgeschlagen | GitHub → Actions → letzten Lauf öffnen; meist eine kaputte Inhaltsdatei (steht dort im Klartext) |
 | Kontaktformular: „Der Versand ist noch nicht eingerichtet" | `RESEND_API_KEY` fehlt | in Cloudflare Pages setzen |

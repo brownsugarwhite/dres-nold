@@ -5,6 +5,17 @@
  * Bewusst ohne die Skripte und Übergänge der öffentlichen Seite: ein
  * schlichtes Werkzeug. Zugang nur nach Anmeldung über Cloudflare Access
  * (functions/_middleware.ts).
+ *
+ * ACHTUNG — `data-astro-prefetch="false"` an JEDEM Verweis hier:
+ * astro.config.mjs holt mit `prefetchAll` jede verlinkte Seite schon
+ * vor, sobald ihr Verweis im Fenster steht. Für die öffentliche Seite
+ * ist das gewollt (der Morph muss nicht aufs Netz warten). In der
+ * Redaktion war es fatal: Der Verweis „Abmelden" zeigt auf
+ * /cdn-cgi/access/logout — das Vorholen MELDETE DIE PERSON AB, sobald
+ * die Seite geladen war. Die offene Seite lief weiter, aber der nächste
+ * Klick landete auf dem Anmeldebildschirm (Florian, 17. September 2026).
+ *
+ * Wer hier einen Verweis ergänzt, setzt das Attribut mit.
  */
 import '../styles/schrift.css';
 import '../styles/tokens.css';
@@ -28,14 +39,15 @@ const { titel } = Astro.props;
   <body>
     <div class="redaktion">
       <header class="redaktion__kopf">
-        <a class="redaktion__marke" href="/admin/">
+        <a class="redaktion__marke" href="/admin/" data-astro-prefetch="false">
           <img src="/icons/logo.svg" alt="" width="44" height="44" />
           Redaktion dres-nold.de
         </a>
         <nav class="redaktion__links" aria-label="Redaktion">
-          <a href="/admin/">Übersicht</a>
-          <a href="/" target="_blank" rel="noopener">Seite ansehen</a>
-          <a href="/cdn-cgi/access/logout">Abmelden</a>
+          <a href="/admin/" data-astro-prefetch="false">Übersicht</a>
+          <a href="/" target="_blank" rel="noopener" data-astro-prefetch="false">Seite ansehen</a>
+          {/* Niemals vorholen — das Vorholen meldet ab. Siehe oben. */}
+          <a href="/cdn-cgi/access/logout" data-astro-prefetch="false" rel="nofollow">Abmelden</a>
         </nav>
       </header>
       <main id="inhalt">

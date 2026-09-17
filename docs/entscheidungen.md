@@ -530,3 +530,40 @@ einer Fehlerseite des Servers, und auch das wurde zu „Keine Verbindung".
 Wie lange eine Anmeldung hält, steht nicht im Code, sondern in der
 Access-Anwendung im Zero-Trust-Dashboard (Session Duration). Wer lange
 am Stück redigiert, kann sie dort verlängern.
+
+### Das Vorholen meldete ab (17. September 2026)
+
+**Der Fehler:** Anmelden ging, aber der erste Klick in der Redaktion
+landete wieder auf dem Anmeldebildschirm — jedes Mal, mit jedem neuen
+Code.
+
+**Die Ursache:** `astro.config.mjs` holt mit `prefetchAll: true` und
+`defaultStrategy: 'viewport'` jede verlinkte Seite vor, sobald ihr
+Verweis im Fenster steht. Für die öffentliche Seite ist das gewollt: Der
+Morph muss beim Klick nicht mehr aufs Netz warten.
+
+In der Redaktion steht in der Kopfzeile aber der Verweis **„Abmelden" →
+`/cdn-cgi/access/logout`**. Der wurde damit bei jedem Seitenaufbau
+vorgeholt — und das Vorholen ist ein ganz normaler GET mit Cookie.
+Cloudflare Access hat die Sitzung also **beim Laden der Seite beendet.**
+Die offene Seite lief weiter (sie war ja schon da), der nächste Klick
+lief ins Leere.
+
+Im Netzwerkprotokoll ist es eindeutig: Beim Laden von `/admin/` ging ein
+`GET /cdn-cgi/access/logout` hinaus, noch bevor irgendetwas angeklickt
+war.
+
+**Warum erst jetzt:** Das Vorholen kam am 14. September in die
+Konfiguration, die Redaktionsseiten wurden aber erst am 17. September
+neu gebaut und aufgespielt. Bis dahin lag dort noch eine Fassung ohne
+das Vorhol-Skript.
+
+**Die Abhilfe:** Alle Verweise der Redaktion tragen
+`data-astro-prefetch="false"`. Das Vorholen bleibt für die öffentliche
+Seite, wo es nützt.
+
+**Regel für später:** Ein Verweis, dessen bloßer Aufruf etwas verändert
+— Abmelden, Löschen, Bestätigen —, darf nie vorgeholt werden. Am besten
+gehört so etwas gar nicht hinter einen Verweis; solange es das tut,
+steht `data-astro-prefetch="false"` daran (Kommentar in
+`src/layouts/Redaktion.astro`).
