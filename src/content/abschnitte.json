@@ -2,33 +2,14 @@
   "_hinweis_fuer_die_redaktion": "Frei anlegbare Abschnitte, die im Praxis-Bereich erscheinen — ohne eigenen Menüeintrag. Ein Abschnitt besteht aus einem oder mehreren Bereichen; jeder Bereich zeigt ein Bild neben dem Text, links oder rechts. Reihenfolge über 'position', Ausblenden über 'aktiv'.",
   "eintraege": [
     {
-      "id": "beispiel",
+      "id": "digitale-abformung-statt-abformloeffel",
       "aktiv": true,
       "position": 1,
       "titel": "Digitale Abformung statt Abformlöffel",
       "bereiche": [
         {
           "titel": "",
-          "text": "<h3><p>Abformungen mit dem Löffel gehören für viele Patienten zu den unangenehmen Erfahrungen beim Zahnarzt. Der Intraoralscanner nimmt Ihre Zähne stattdessen berührungslos in drei Dimensionen auf — das Ergebnis steht sofort auf dem Bildschirm und lässt sich gemeinsam ansehen.</p><p>Für Kronen, Brücken und Aligner geht der Datensatz direkt ins Labor. Das spart einen Termin und macht das Ergebnis genauer.<br><br></p><ol><li>Keine Abformmasse, kein Würgereiz — die Aufnahme ist berührungslos.</li><li>Das Modell steht sofort auf dem Bildschirm und lässt sich gemeinsam besprechen.<br></li><li>Der Datensatz geht direkt ins Labor. Das spart einen Termin.</li></ol><p></p></h3>",
-          "bild": "/bilder/abschnitte/teaser-b-full.png",
-          "bild_alt": "ein bild",
-          "bild_seite": "links"
-        }
-      ],
-      "link_text": "Mehr zur Leistung",
-      "link_ziel": "/Leistungen",
-      "pdf_text": "/#leistungen-zahnaerztlich",
-      "pdf_datei": "/dokumente/contrato-y-anexos.pdf"
-    },
-    {
-      "id": "digitale-abformung-statt-abformloeffel",
-      "aktiv": true,
-      "position": 2,
-      "titel": "Digitale Abformung statt Abformlöffel",
-      "bereiche": [
-        {
-          "titel": "",
-          "text": "<h3><p>Abformungen mit dem Löffel gehören für viele Patienten zu den unangenehmen Erfahrungen beim Zahnarzt. Der Intraoralscanner nimmt Ihre Zähne stattdessen berührungslos in drei Dimensionen auf — das Ergebnis steht sofort auf dem Bildschirm und lässt sich gemeinsam ansehen.</p><p>Für Kronen, Brücken und Aligner geht der Datensatz direkt ins Labor. Das spart einen Termin und macht das Ergebnis genauer.</p></h3>",
+          "text": "<p>Abformungen mit dem Löffel gehören für viele Patienten zu den unangenehmen Erfahrungen beim Zahnarzt. Der Intraoralscanner nimmt Ihre Zähne stattdessen berührungslos in drei Dimensionen auf — das Ergebnis steht sofort auf dem Bildschirm und lässt sich gemeinsam ansehen.</p><p>Für Kronen, Brücken und Aligner geht der Datensatz direkt ins Labor. Das spart einen Termin und macht das Ergebnis genauer.</p>",
           "bild": "/bilder/abschnitte/bildschirmfoto-2026-09-17-um-09-05-19.png",
           "bild_alt": "Bildschirmfoto einer Newsletter-Anmeldung",
           "bild_seite": "links"
