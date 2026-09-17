@@ -195,6 +195,51 @@ export function eingefuegtesAufbereiten(html: string, text: string): string {
 }
 
 /* ------------------------------------------------------------------ */
+/* Anfragen an die Schnittstellen                                      */
+/* ------------------------------------------------------------------ */
+
+export const ABGEMELDET =
+  'Die Anmeldung ist abgelaufen. Ihre Eingaben stehen noch hier: Bitte in einem '
+  + 'neuen Tab /login öffnen, anmelden — und dann hier noch einmal auf '
+  + '„Speichern und veröffentlichen" drücken.';
+
+/**
+ * Anfrage an /api/… — mit `redirect: 'manual'`.
+ *
+ * Läuft die Anmeldung ab, antwortet Cloudflare Access nicht mit einem
+ * Fehler, sondern mit einer Umleitung auf seine Anmeldeseite. Die liegt
+ * auf einem anderen Server; folgt der Browser ihr, bricht er die
+ * Anfrage aus Sicherheitsgründen ab — in der Redaktion kam dann
+ * „Keine Verbindung" an, obwohl die Verbindung stand (Florian,
+ * 17. September 2026).
+ *
+ * Mit `redirect: 'manual'` wird die Umleitung nicht verfolgt. Sie kommt
+ * als Antwort mit `type === 'opaqueredirect'` zurück und ist damit als
+ * das erkennbar, was sie ist: eine abgelaufene Anmeldung.
+ */
+export function anfrage(pfad: string, optionen: RequestInit = {}): Promise<Response> {
+  return fetch(pfad, { redirect: 'manual', ...optionen });
+}
+
+/** Steht die Anmeldung noch? */
+export function angemeldet(antwort: Response): boolean {
+  return antwort.type !== 'opaqueredirect' && antwort.status !== 401 && antwort.status !== 403;
+}
+
+/**
+ * Antwort als JSON lesen. Kommt kein JSON — etwa eine Fehlerseite des
+ * Servers —, sagt die Meldung wenigstens, welcher Status kam.
+ */
+export async function alsJson<T>(antwort: Response): Promise<T> {
+  const text = await antwort.text();
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new Error(`Unerwartete Antwort vom Server (${antwort.status || 'keine Angabe'}).`);
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Felder                                                              */
 /* ------------------------------------------------------------------ */
 
@@ -296,8 +341,9 @@ function dateiFeld(feld: Feld, wert: Wert): Baustein {
     form.append('datei', f);
     form.append('ordner', feld.ordner ?? 'allgemein');
     try {
-      const antwort = await fetch('/api/hochladen', { method: 'POST', body: form });
-      const ergebnis = (await antwort.json()) as { ok: boolean; pfad?: string; fehler?: string };
+      const antwort = await anfrage('/api/hochladen', { method: 'POST', body: form });
+      if (!angemeldet(antwort)) { status.textContent = ABGEMELDET; return; }
+      const ergebnis = await alsJson<{ ok: boolean; pfad?: string; fehler?: string }>(antwort);
       if (ergebnis.ok && ergebnis.pfad) {
         eingabe.value = ergebnis.pfad;
         zeigen();
@@ -305,8 +351,8 @@ function dateiFeld(feld: Feld, wert: Wert): Baustein {
       } else {
         status.textContent = ergebnis.fehler || 'Hochladen fehlgeschlagen.';
       }
-    } catch {
-      status.textContent = 'Keine Verbindung.';
+    } catch (e) {
+      status.textContent = e instanceof Error && e.message ? e.message : 'Keine Verbindung.';
     }
     datei.value = '';
   });
@@ -351,8 +397,9 @@ function bildEinfuegen(
     form.append('ordner', feld.ordner ?? 'allgemein');
 
     try {
-      const antwort = await fetch('/api/hochladen', { method: 'POST', body: form });
-      const ergebnis = (await antwort.json()) as { ok: boolean; pfad?: string; fehler?: string };
+      const antwort = await anfrage('/api/hochladen', { method: 'POST', body: form });
+      if (!angemeldet(antwort)) { window.alert(ABGEMELDET); return; }
+      const ergebnis = await alsJson<{ ok: boolean; pfad?: string; fehler?: string }>(antwort);
       if (!ergebnis.ok || !ergebnis.pfad) {
         window.alert(ergebnis.fehler || 'Hochladen fehlgeschlagen.');
         return;
@@ -360,8 +407,8 @@ function bildEinfuegen(
       const alt = beschreibung.trim().replace(/"/g, '&quot;');
       inhalt.focus();
       befehl('insertHTML', `<img src="${ergebnis.pfad}" alt="${alt}"><p></p>`)();
-    } catch {
-      window.alert('Keine Verbindung zum Server.');
+    } catch (e) {
+      window.alert(e instanceof Error && e.message ? e.message : 'Keine Verbindung zum Server.');
     }
   });
 
@@ -629,9 +676,9 @@ async function start() {
   let daten: Eintrag;
   let sha: string;
   try {
-    const antwort = await fetch(`/api/inhalt?bereich=${bereich}`, { headers: { Accept: 'application/json' } });
-    if (antwort.status === 401) { laden.textContent = 'Bitte zuerst anmelden: /login'; return; }
-    const ergebnis = (await antwort.json()) as { daten?: Eintrag; sha?: string; fehler?: string };
+    const antwort = await anfrage(`/api/inhalt?bereich=${bereich}`, { headers: { Accept: 'application/json' } });
+    if (!angemeldet(antwort)) { laden.textContent = 'Bitte zuerst anmelden: /login öffnen und danach diese Seite neu laden.'; return; }
+    const ergebnis = await alsJson<{ daten?: Eintrag; sha?: string; fehler?: string }>(antwort);
     if (!ergebnis.daten || !ergebnis.sha) throw new Error(ergebnis.fehler || 'Laden fehlgeschlagen');
     daten = ergebnis.daten;
     sha = ergebnis.sha;
@@ -656,24 +703,32 @@ async function start() {
     knopf.disabled = true;
     sagen('', 'Wird gespeichert …');
     try {
-      const antwort = await fetch('/api/save', {
+      const antwort = await anfrage('/api/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ bereich, daten: neu, sha, bisher: daten }),
       });
-      const ergebnis = (await antwort.json()) as { ok: boolean; commit?: string; fehler?: string[] };
+      /* Nichts ist verloren: Das Formular steht unverändert da. Nach dem
+         Anmelden im zweiten Tab genügt ein erneuter Druck auf den Knopf. */
+      if (!angemeldet(antwort)) { sagen('fehler', ABGEMELDET); return; }
+
+      const ergebnis = await alsJson<{ ok: boolean; commit?: string; fehler?: string[] }>(antwort);
       if (ergebnis.ok) {
         ungespeichert = false;
         sagen('erfolg', 'Gespeichert. Die Seite wird jetzt neu gebaut — in etwa einer Minute ist die Änderung online.');
         /* Neuen Stand holen, damit ein zweites Speichern nicht abgelehnt wird */
-        const frisch = await fetch(`/api/inhalt?bereich=${bereich}`).then((r) => r.json()).catch(() => null) as { sha?: string } | null;
+        const frisch = await anfrage(`/api/inhalt?bereich=${bereich}`)
+          .then((r) => (angemeldet(r) ? alsJson<{ sha?: string }>(r) : null))
+          .catch(() => null);
         if (frisch?.sha) sha = frisch.sha;
         daten = neu;
       } else {
         sagen('fehler', 'Nicht gespeichert. Bitte prüfen:', ergebnis.fehler ?? ['Unbekannter Fehler']);
       }
-    } catch {
-      sagen('fehler', 'Keine Verbindung — bitte später noch einmal versuchen.');
+    } catch (e) {
+      sagen('fehler', e instanceof Error && e.message
+        ? `${e.message} Ihre Eingaben stehen noch hier — bitte noch einmal versuchen.`
+        : 'Keine Verbindung — bitte später noch einmal versuchen.');
     } finally {
       knopf.disabled = false;
     }

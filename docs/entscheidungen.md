@@ -494,3 +494,39 @@ mit ihren Bereichen war nicht zu erkennen, welcher Knopf wozu gehört
 Sicherheitsabfrage. Einträge ohne eigenen Titel heißen in der Kopfzeile
 „Bereich 1", „Bereich 2" statt „(ohne Titel)" — die Nummer wird beim
 Verschieben und Entfernen nachgezogen.
+
+### „Keine Verbindung" beim Speichern (17. September 2026)
+
+Die Meldung war irreführend: Die Verbindung stand, **die Anmeldung war
+abgelaufen.**
+
+Cloudflare Access schützt nicht nur `/admin`, sondern auch `/api/…`.
+Ist die Sitzung abgelaufen, antwortet Access nicht mit einem Fehler,
+sondern mit einer **Umleitung auf seine Anmeldeseite** — und die liegt
+auf einem anderen Server (`dres-nold.cloudflareaccess.com`). Folgt der
+Browser ihr, bricht er die Anfrage aus Sicherheitsgründen ab; `fetch`
+wirft dann `TypeError: Failed to fetch`. In der Redaktion landete das im
+allgemeinen Auffangnetz — also „Keine Verbindung".
+
+Nachgemessen auf der veröffentlichten Seite:
+
+| Anfrage | Ergebnis |
+|---|---|
+| `fetch('/api/inhalt')` | wirft `TypeError: Failed to fetch` |
+| `fetch('/api/inhalt', { redirect: 'manual' })` | `type: 'opaqueredirect'`, `status: 0` |
+
+Alle Anfragen der Redaktion laufen jetzt über `anfrage()` mit
+`redirect: 'manual'`. Die Umleitung wird damit nicht mehr verfolgt,
+sondern ist an `type === 'opaqueredirect'` erkennbar — zusammen mit 401
+und 403 heißt das: abgemeldet. Die Meldung sagt das jetzt und nennt den
+Weg: in einem neuen Tab `/login` öffnen, anmelden, hier noch einmal auf
+Speichern drücken. **Die Eingaben bleiben dabei im Formular stehen** —
+es geht nichts verloren, auch nicht bei einem langen Text.
+
+Zweitens liest `alsJson()` die Antwort jetzt erst als Text und meldet
+bei allem, was kein JSON ist, den Status-Code. Vorher warf `.json()` bei
+einer Fehlerseite des Servers, und auch das wurde zu „Keine Verbindung".
+
+Wie lange eine Anmeldung hält, steht nicht im Code, sondern in der
+Access-Anwendung im Zero-Trust-Dashboard (Session Duration). Wer lange
+am Stück redigiert, kann sie dort verlängern.
