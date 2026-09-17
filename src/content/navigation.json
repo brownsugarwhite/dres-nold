@@ -66,7 +66,7 @@
       "id": "zeiten",
       "aktiv": true,
       "position": 6,
-      "titel": "Öffnungszeiten",
+      "titel": "Sprechstunden",
       "ziel": "#oz_anchor",
       "icon": "/icons/navigation/oeffnungszeiten.svg",
       "in_kopfleiste": true,

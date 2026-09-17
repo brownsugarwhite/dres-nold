@@ -8,42 +8,59 @@
  * wieder zurücknimmt. Ein Einwilligungs-Banner beim Seitenaufruf gibt
  * es nicht — die Karte lädt erst, wenn man das Vorschaubild anklickt
  * (docs/entscheidungen.md, Abschnitt „Kontakt").
+ *
+ * Punktlinie oben, darunter nur die Verweise — schmal und ruhig. Das
+ * Logo aus dem Entwurf ist wieder heraus (Florian, 17. September 2026):
+ * Es steht schon in der Kopfleiste und im Startbereich.
+ *
+ * Der große Innenabstand unten hält die Symbolleiste frei, die auf der
+ * Startseite dort steht.
  */
 ---
 <footer class="fuss">
-  <nav class="fuss__links" aria-label="Rechtliches">
-    <a href="/datenschutz/">Datenschutz</a>
-    <span class="punkt" aria-hidden="true"></span>
-    <a href="/impressum/">Impressum</a>
-    <span class="fuss__widerruf" data-karte-widerrufen-huelle hidden>
+  <div class="fuss__inhalt">
+    <nav class="fuss__links" aria-label="Rechtliches">
+      <a href="/datenschutz/">Datenschutz</a>
       <span class="punkt" aria-hidden="true"></span>
-      <button class="fuss__knopf" type="button" data-karte-widerrufen>Zustimmung zur Karte zurücknehmen</button>
-    </span>
-  </nav>
+      <a href="/impressum/">Impressum</a>
+      <span class="fuss__widerruf" data-karte-widerrufen-huelle hidden>
+        <span class="punkt" aria-hidden="true"></span>
+        <button class="fuss__knopf" type="button" data-karte-widerrufen>Zustimmung zur Karte zurücknehmen</button>
+      </span>
+    </nav>
+  </div>
+
   <p class="fuss__meldung" role="status" aria-live="polite"></p>
 </footer>
 
 <style>
-  /* .div-block-31: 100 px hoch, Punktlinie oben */
+  /* Punktlinie oben wie an den Leisten */
   .fuss {
     position: relative;
     z-index: 40;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: var(--abstand-2xs);
-    min-height: 100px;
-    padding: var(--abstand-m) var(--abstand-s);
+    width: 100%;
     background: var(--farbe-flaeche) url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
     background-size: auto 1px;
   }
 
+  .fuss__inhalt {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
+    margin-inline: auto;
+    /* Unten so viel Luft, dass die Symbolleiste nichts verdeckt */
+    padding-block: var(--abstand-m) clamp(120px, 14vw, 150px);
+  }
+
   .fuss__links {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--abstand-s);
-    font-size: var(--text-s);
+    gap: 14px;
+    font-size: 14.5px;
+    line-height: 1;
   }
 
   .fuss__links a,
@@ -53,6 +70,7 @@
     background: none;
     color: var(--farbe-text);
     font: inherit;
+    font-family: var(--schrift);
     text-decoration: none;
     cursor: pointer;
   }
@@ -63,36 +81,38 @@
   .fuss__knopf:focus-visible {
     color: var(--farbe-primaer);
     text-decoration: underline;
-  }
-
-  /* Schmale Handys: die drei Verweise brechen mittig um */
-  @media (max-width: 479px) {
-    .fuss__links { flex-wrap: wrap; justify-content: center; row-gap: var(--abstand-2xs); text-align: center; }
+    text-underline-offset: 0.22em;
   }
 
   .punkt {
     width: 3px;
     height: 3px;
     border-radius: var(--radius-rund);
-    background: var(--farbe-dunkel);
+    background: var(--farbe-text-leise);
   }
 
   .fuss__widerruf {
     display: flex;
     align-items: center;
-    gap: var(--abstand-s);
+    gap: 14px;
   }
 
   .fuss__widerruf[hidden] { display: none; }
 
   .fuss__meldung {
-    margin: 0;
+    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
+    margin: -1rem auto 0;
     max-width: none;
+    padding-bottom: var(--abstand-m);
     color: var(--farbe-text-gedeckt);
     font-size: var(--text-xs);
   }
 
   .fuss__meldung:empty { display: none; }
+
+  @media (max-width: 560px) {
+    .fuss__links { justify-content: center; width: 100%; row-gap: var(--abstand-2xs); }
+  }
 </style>
 
 <script>

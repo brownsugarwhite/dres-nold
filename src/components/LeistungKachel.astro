@@ -5,6 +5,17 @@
  * Der `transition:name` verbindet diese Kachel mit dem gleichnamigen
  * Element auf der Zielseite. Der Browser morpht dann beim Klick das
  * eine ins andere — Position, Größe und Form berechnet er selbst.
+ *
+ * Beim Zeigen: Der Rahmen nimmt die Hausfarbe an, die Kachel hebt sich
+ * 3 px, das Symbol wächst leicht. Bewusst OHNE Schlagschatten — der
+ * Entwurf sah einen vor, die feine Rahmenbewegung gefällt besser
+ * (Florian, 17. September 2026).
+ *
+ * Beim Scrollen läuft außerdem Ablauf a-8 der Vorlage (Skript unten):
+ * Die Kachel wächst von 0,9 auf 1 und ihr Grund hellt dabei von Grau
+ * auf Weiß auf. Zwischendurch war das durch das Einblenden aus 18 px
+ * Tiefe ersetzt — das war zu wenig, der Ablauf ist wieder da, mitsamt
+ * dem Aufhellen (Florian).
  */
 interface Props {
   id: string;
@@ -19,35 +30,69 @@ const { id, titel, kurz, icon } = Astro.props;
   <img class="kachel__icon" src={icon} alt="" width="64" height="64" transition:name={`leistung-symbol-${id}`} />
   <h3 class="kachel__titel" transition:name={`leistung-titel-${id}`}>{titel}</h3>
   <p class="kachel__kurz">{kurz}</p>
-  <span class="kachel__mehr" aria-hidden="true">Mehr erfahren →</span>
+  <span class="kachel__mehr">
+    <span class="tl">
+      Mehr erfahren
+      <span class="tl__pfeil" aria-hidden="true">
+        <svg viewBox="0 0 55 28" focusable="false">
+          <polyline
+            fill="none"
+            stroke="currentColor"
+            stroke-miterlimit="10"
+            points="0.35 0.45 27.55 27.65 54.75 0.35"
+            transform="rotate(-90 27.5 14)"
+          />
+        </svg>
+      </span>
+    </span>
+  </span>
 </a>
 
 <style>
   .kachel {
     display: flex;
     flex-direction: column;
-    gap: var(--abstand-2xs);
-    padding: var(--abstand-m);
-    /* Ohne eigene Fläche: Die Kachel steht auf dem weißen Grund des
-       Bereichs, nur der Rahmen zeichnet sie ab (Florian, September
-       2026). Im Seitenwechsel bekommt sie ihre deckende Fläche von
-       styles/uebergaenge.css. */
+    gap: 11px;
+    padding: 28px 26px 24px;
+    /* Der Grund gehört zu Ablauf a-8: grau beim Hereinscrollen, weiß in
+       der Mitte des Wegs, am Ende wieder grau. Den Anteil (0 = grau,
+       1 = weiß) setzt das Skript unten.
+
+       In Ruhe — und ohne Skript — steht hier Weiß. Die Kachel bleibt
+       damit die Kachel ohne eigene Fläche, die nur ihr Rahmen
+       abzeichnet (Florian, September 2026); im Seitenwechsel bekommt
+       sie ihre deckende Fläche von styles/uebergaenge.css.
+
+       Die erste Zeile ist der Rückfall für Browser ohne color-mix. */
+    background: var(--farbe-flaeche);
+    background: color-mix(
+      in srgb,
+      var(--farbe-flaeche) calc(var(--kachel-grund, 1) * 100%),
+      var(--farbe-flaeche-kachel)
+    );
     border: 1px solid var(--farbe-linie);
     border-radius: var(--radius-m);
     text-decoration: none;
     color: var(--farbe-text);
-    /* Ablauf a-8: Über den Scrollweg wächst die Kachel von 0,9 auf 1 —
-       am Ende wieder zurück. Den Wert setzt das Skript. */
+    /* Der zweite Teil von a-8: Über den Scrollweg wächst die Kachel von
+       0,9 auf 1 — am Ende wieder zurück. Auch diesen Wert setzt das
+       Skript. Die Anhebung beim Zeigen kommt in denselben `transform`;
+       deshalb steht die Skalierung dort noch einmal. */
     transform: scale(var(--kachel-groesse, 1));
     transition:
-      border-color var(--dauer-schnell) var(--verlauf),
+      border-color 0.45s var(--verlauf-betont),
       transform var(--dauer-schnell) var(--verlauf);
   }
 
   .kachel:hover,
   .kachel:focus-visible {
     border-color: var(--farbe-primaer);
-    transform: scale(var(--kachel-groesse, 1)) translateY(-2px);
+    transform: scale(var(--kachel-groesse, 1)) translateY(-3px);
+  }
+
+  .kachel:hover .kachel__icon,
+  .kachel:focus-visible .kachel__icon {
+    transform: scale(1.07);
   }
 
   /*
@@ -71,15 +116,63 @@ const { id, titel, kurz, icon } = Astro.props;
     view-transition-class: karte;
   }
 
+  /* Die morphende Karte gibt ihre Zeige-Zustände ab: Das Kennzeichen
+     steht schon VOR der Momentaufnahme (astro:before-preparation), der
+     Morph beginnt also bei der ruhenden Kachel — ohne Anhebung und
+     ohne vergrößertes Symbol. */
+  .kachel[data-morph],
+  .kachel[data-morph] .kachel__icon {
+    transform: none;
+    transition: none;
+  }
+
+  /* Ebenso der Grund: Die morphende Karte startet auf Weiß, egal wo auf
+     dem Scrollweg sie gerade steht. */
+  .kachel[data-morph] {
+    background: var(--farbe-flaeche);
+  }
+
   .kachel:not([data-morph]),
   .kachel:not([data-morph]) .kachel__icon,
   .kachel:not([data-morph]) .kachel__titel {
     view-transition-name: none;
   }
 
+  .kachel__icon {
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+    transition: transform 0.55s var(--verlauf-betont);
+    /* Gruppe für den Übergang, siehe styles/uebergaenge.css */
+    view-transition-class: symbol;
+  }
+
+  .kachel__titel {
+    margin: 0;
+    color: var(--farbe-primaer);
+    font-size: 19px;
+    font-weight: var(--gewicht-halbfett);
+    line-height: 1.3;
+    letter-spacing: -0.012em;
+    view-transition-class: titel;
+  }
+
+  .kachel__kurz {
+    margin: 0;
+    max-width: none;
+    color: var(--farbe-text-gedeckt);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .kachel__mehr {
+    margin-top: auto;
+    padding-top: 14px;
+  }
+
   /* Handys: kompakter. Symbol links neben dem Titel statt darüber,
-     weniger Innenabstand, Anriss auf zwei Zeilen — sonst stehen zwölf
-     Kacheln à 200 px untereinander. */
+     weniger Innenabstand — sonst stehen zwölf Kacheln à 200 px
+     untereinander. */
   @media (max-width: 600px) {
     .kachel {
       display: grid;
@@ -102,49 +195,25 @@ const { id, titel, kurz, icon } = Astro.props;
 
     .kachel__kurz {
       grid-column: 1 / -1;
+      /* Anriss auf zwei Zeilen begrenzen */
+      display: -webkit-box;
       -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    /* „Mehr erfahren →" ist auf dem Handy überflüssig — die ganze
+    /* „Mehr erfahren" ist auf dem Handy überflüssig — die ganze
        Kachel ist ohnehin anklickbar. */
     .kachel__mehr { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .kachel { transform: none; }
-  }
-
-  .kachel__icon {
-    width: 3.5rem;
-    height: 3.5rem;
-    object-fit: contain;
-    /* Gruppe für den Übergang, siehe styles/uebergaenge.css */
-    view-transition-class: symbol;
-  }
-
-  .kachel__titel {
-    margin: 0;
-    font-size: var(--text-l);
-    view-transition-class: titel;
-  }
-
-  .kachel__kurz {
-    margin: 0;
-    font-size: var(--text-s);
-    color: var(--farbe-text-gedeckt);
-    /* Anriss auf drei Zeilen begrenzen */
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .kachel__mehr {
-    margin-top: auto;
-    padding-top: var(--abstand-2xs);
-    font-size: var(--text-s);
-    font-weight: var(--gewicht-halbfett);
-    color: var(--farbe-primaer);
+    .kachel,
+    .kachel__icon { transition: none; transform: none; }
+    .kachel:hover,
+    .kachel:focus-visible { transform: none; }
+    .kachel:hover .kachel__icon,
+    .kachel:focus-visible .kachel__icon { transform: none; }
   }
 </style>
 
@@ -153,13 +222,15 @@ const { id, titel, kurz, icon } = Astro.props;
    * Ablauf a-8: Die Kacheln wachsen beim Hereinscrollen von 0,9 auf 1;
    * am Ende des Scrollwegs geht der Wert zurück.
    *
-   *   0 %   Skalierung 0,9
-   *  30 %   Skalierung 1
+   *   0 %   Skalierung 0,9   Grund grau
+   *  30 %   Skalierung 1     Grund weiß
    *  75 %   unverändert
-   * 100 %   Skalierung 0,9
+   * 100 %   Skalierung 0,9   Grund grau
    *
-   * Das Aufhellen des Grundes (#f1f1f1 → Weiß) aus der Vorlage entfällt,
-   * seit die Kacheln keine eigene Fläche mehr haben.
+   * Beide Werte gehen als Anteil an die Kachel: `--kachel-groesse` als
+   * Faktor, `--kachel-grund` als Mischung zwischen `--farbe-flaeche-kachel`
+   * (0) und Weiß (1). Die Vorlage blendet #f1f1f1 auf Weiß; das Token
+   * hat denselben Helligkeitsschritt, nur in der Farbfamilie der Seite.
    */
   function kachelnAufbauen() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -186,7 +257,12 @@ const { id, titel, kurz, icon } = Astro.props;
                       : p > 0.75 ? zwischen(p, 0.75, 1, 1, 0.9)
                       : 1;
 
+        const grund = p < 0.3 ? zwischen(p, 0, 0.3, 0, 1)
+                    : p > 0.75 ? zwischen(p, 0.75, 1, 1, 0)
+                    : 1;
+
         k.style.setProperty('--kachel-groesse', groesse.toFixed(3));
+        k.style.setProperty('--kachel-grund', grund.toFixed(3));
       });
     };
 

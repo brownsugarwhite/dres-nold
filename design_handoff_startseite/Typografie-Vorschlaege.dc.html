@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<style>
+@font-face{font-family:'Source Sans 3';src:url('assets/fonts/source-sans-3-normal.woff2') format('woff2-variations');font-weight:200 900;font-style:normal;font-display:swap}
+body{margin:0;background:#edeaea;font-family:'Source Sans 3',system-ui,sans-serif;color:#2f282c;-webkit-font-smoothing:antialiased}
+a{color:#6c1a51}
+a:hover{color:#4a1137}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}
+.dv-opts{display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}
+.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.10);border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.07);overflow:hidden}
+.dv-opt:target .dv-oid{background:#6c1a51;color:#fff}
+.dv-next{margin:22px 0 0;font:12px/1.6 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t3">
+<div class="dv-thd"><a class="dv-tid" href="#t3">3</a><span class="dv-tname">Der Übergang vom Startbereich in den Inhalt — drei Auflösungen</span></div>
+
+<div style="max-width:1000px;margin:0 0 30px;font:400 13.5px/1.68 system-ui,sans-serif;color:#4d434b">
+<div style="font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:10px">Du hast recht — und trotzdem ist es kein Widerspruch</div>
+<p style="margin:0 0 10px;max-width:none">Dein Startbereich ist <strong>ein Emblem, keine Textseite</strong>: ein Logo, ein Satz, ein Pfeil, dazu zwei symmetrische Leisten. So etwas gehört mittig — das ist ein Titelblatt. Bücher, Plakate und Programmhefte machen das seit jeher so und setzen den Fließtext danach trotzdem linksbündig. Der Bruch entsteht nicht durch die Mischung an sich, sondern <strong>wenn man ihn nicht markiert</strong>: Ein zentriertes Logo, direkt gefolgt von einer linksbündigen Überschrift, sieht nach Versehen aus.</p>
+<p style="margin:0;max-width:none">Drei saubere Wege, jeweils mit dem nachgebauten Startbereich davor, damit du den Übergang wirklich siehst. <a class="dv-oid" href="#3b">3b</a> ist mein Vorschlag.</p>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+
+<div class="dv-opt" id="3a">
+<div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a>Durchgehend mittig — Startbereich bleibt, Inhalt folgt ihm</div>
+<div class="dv-card" style="width:1180px">
+
+<div style="display:flex;justify-content:center;align-items:center;height:40px"><div style="display:flex;justify-content:space-between;align-items:center;width:700px;font:400 15.7px/1 'Source Sans 3',sans-serif;color:#6c1a51">
+<span>Rosenstraße 1</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>76467 Bietigheim</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>07245 7171</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span style="font-weight:500">info@dres-nold.de</span>
+</div></div>
+<div style="height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+<div style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:508px;background:#fff">
+<img src="assets/icons/logo.svg" alt="Dres. Nold" style="width:330px;height:224px;object-fit:contain"/>
+<p style="max-width:250px;margin:28px 0 10px;font:400 16px/1.25 'Source Sans 3',sans-serif;color:#6c1a51;text-align:center">Scrollen Sie, um mehr von unserer Praxis zu entdecken</p>
+<span style="width:40px;height:20px;background:url('assets/icons/ui/pfeil-runter.svg') center / contain no-repeat"></span>
+</div>
+<div style="height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+<div style="display:flex;justify-content:center;height:110px"><div style="display:flex;justify-content:space-between;align-items:center;width:980px;height:110px">
+<sc-for list="{{ fussleisteMitPunkt }}" as="f" hint-placeholder-count="11">
+<sc-if value="{{ f.istPunkt }}" hint-placeholder-val="{{ false }}">
+<span style="width:3px;height:3px;border-radius:50%;background:#6c1a51;margin-bottom:24px"></span>
+</sc-if>
+<sc-if value="{{ f.istKnopf }}" hint-placeholder-val="{{ true }}">
+<span style="display:flex;flex-direction:column;align-items:center;margin-top:4px">
+<img src="{{ f.icon }}" alt="" style="width:60px;height:60px;margin-bottom:5px;object-fit:contain"/>
+<span style="font:400 14px/1 'Source Sans 3',sans-serif;color:#6c1a51">{{ f.titel }}</span>
+</span>
+</sc-if>
+</sc-for>
+</div></div>
+
+<div style="padding:24px 0;background:#f6f2f4;border-block:1px solid #e4e0e2;text-align:center;font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:#766c74">Ab hier gescrollt — der Inhalt</div>
+
+<div style="padding:92px 44px 88px;display:flex;flex-direction:column;align-items:center;text-align:center">
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#766c74">Zahnmedizin &amp; Kieferorthopädie</div>
+<h1 style="margin:20px 0 0;font:300 54px/1.12 'Source Sans 3',sans-serif;letter-spacing:-.02em;color:#6c1a51;max-width:19ch;text-wrap:balance">Willkommen in unserer Praxis Dres. Nold</h1>
+<p style="margin:16px 0 0;max-width:30rem;font:400 19px/1.62 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">Zahnmedizin und Kieferorthopädie unter einem Dach — in Bietigheim. Wir nehmen uns Zeit für Sie, erklären jeden Schritt und behandeln so schonend wie möglich.</p>
+</div>
+<div style="display:flex;justify-content:center"><div style="width:1000px;height:1px;background:#e4e0e2"></div></div>
+<div style="padding:96px 44px;display:flex;flex-direction:column;align-items:center;text-align:center">
+<h2 style="margin:0;font:300 36px/1.16 'Source Sans 3',sans-serif;letter-spacing:-.02em;color:#6c1a51">Unsere Leistungen</h2>
+<p style="margin:16px 0 0;max-width:30rem;font:400 17px/1.66 'Source Sans 3',sans-serif;color:#766c74">Klicken Sie auf eine Leistung, um mehr zu erfahren.</p>
+<div style="margin-top:44px;display:grid;grid-template-columns:repeat(3,300px);gap:20px">
+<sc-for list="{{ drei }}" as="k" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:30px 22px 26px;border:1px solid #e4e0e2;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:52px;height:52px;object-fit:contain"/>
+<div style="font:500 19px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.01em">{{ k.titel }}</div>
+<p style="margin:0;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ k.kurz }}</p>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="padding:18px 44px 26px;background:#faf8f9;border-top:1px solid #e4e0e2;font:400 13px/1.6 system-ui,sans-serif;color:#4d434b;text-align:center">Kein Bruch, nichts zu erklären. Preis dafür: die Mitte trägt auch lange Fließtexte und Tabellen — dort wird sie schnell zäh, und Listen und Tabellen lassen sich zentriert nicht sauber setzen.</div>
+
+</div>
+</div>
+
+<div class="dv-opt" id="3b">
+<div class="dv-olabel"><a class="dv-oid" href="#3b">3b</a>Mittiges Scharnier — Titelblatt und Begrüßung mittig, danach linke Achse · mein Vorschlag</div>
+<div class="dv-card" style="width:1180px">
+
+<div style="display:flex;justify-content:center;align-items:center;height:40px"><div style="display:flex;justify-content:space-between;align-items:center;width:700px;font:400 15.7px/1 'Source Sans 3',sans-serif;color:#6c1a51">
+<span>Rosenstraße 1</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>76467 Bietigheim</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>07245 7171</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span style="font-weight:500">info@dres-nold.de</span>
+</div></div>
+<div style="height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+<div style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:508px;background:#fff">
+<img src="assets/icons/logo.svg" alt="Dres. Nold" style="width:330px;height:224px;object-fit:contain"/>
+<p style="max-width:250px;margin:28px 0 10px;font:400 16px/1.25 'Source Sans 3',sans-serif;color:#6c1a51;text-align:center">Scrollen Sie, um mehr von unserer Praxis zu entdecken</p>
+<span style="width:40px;height:20px;background:url('assets/icons/ui/pfeil-runter.svg') center / contain no-repeat"></span>
+</div>
+<div style="height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+<div style="display:flex;justify-content:center;height:110px"><div style="display:flex;justify-content:space-between;align-items:center;width:980px;height:110px">
+<sc-for list="{{ fussleisteMitPunkt }}" as="f" hint-placeholder-count="11">
+<sc-if value="{{ f.istPunkt }}" hint-placeholder-val="{{ false }}">
+<span style="width:3px;height:3px;border-radius:50%;background:#6c1a51;margin-bottom:24px"></span>
+</sc-if>
+<sc-if value="{{ f.istKnopf }}" hint-placeholder-val="{{ true }}">
+<span style="display:flex;flex-direction:column;align-items:center;margin-top:4px">
+<img src="{{ f.icon }}" alt="" style="width:60px;height:60px;margin-bottom:5px;object-fit:contain"/>
+<span style="font:400 14px/1 'Source Sans 3',sans-serif;color:#6c1a51">{{ f.titel }}</span>
+</span>
+</sc-if>
+</sc-for>
+</div></div>
+
+<div style="padding:24px 0;background:#f6f2f4;border-block:1px solid #e4e0e2;text-align:center;font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:#766c74">Ab hier gescrollt — der Inhalt</div>
+
+<div style="padding:104px 44px 96px;display:flex;flex-direction:column;align-items:center;text-align:center">
+<img src="assets/icons/logo.svg" alt="" style="width:64px;height:44px;object-fit:contain;opacity:.55"/>
+<h1 style="margin:32px 0 0;font:200 64px/1.06 'Source Sans 3',sans-serif;letter-spacing:-.025em;color:#6c1a51;max-width:18ch;text-wrap:balance">Willkommen in unserer Praxis Dres. Nold</h1>
+<p style="margin:22px 0 0;max-width:32rem;font:400 21px/1.6 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">Zahnmedizin und Kieferorthopädie unter einem Dach — in Bietigheim. Wir nehmen uns Zeit für Sie, erklären jeden Schritt und behandeln so schonend wie möglich.</p>
+</div>
+
+<div style="width:100%;overflow:hidden">
+<div style="display:flex;width:max-content">
+<sc-for list="{{ galerie }}" as="g" hint-placeholder-count="7">
+<img src="{{ g }}" alt="Blick in die Praxisräume" style="flex:none;height:300px;width:auto;max-width:none;display:block"/>
+</sc-for>
+</div>
+</div>
+
+<div style="padding:18px 44px 0;display:flex;align-items:center;gap:6px">
+<span style="width:11px;height:11px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:8px;height:8px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:5px;height:5px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:3px;height:3px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:3px;height:3px;border-radius:50%;background:#6c1a51"></span>
+</div>
+
+<div style="padding:112px 44px 96px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Behandlung</div>
+<h2 style="margin:20px 0 0;font:200 48px/1.1 'Source Sans 3',sans-serif;letter-spacing:-.022em;color:#6c1a51">Unsere Leistungen</h2>
+<p style="margin:20px 0 0;max-width:34rem;font:400 17px/1.68 'Source Sans 3',sans-serif;color:#766c74">Klicken Sie auf eine Leistung, um mehr zu erfahren.</p>
+<div style="margin-top:44px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+<sc-for list="{{ drei }}" as="k" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;gap:10px;padding:26px 24px 22px;border:1px solid #e4e0e2;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:44px;height:44px;object-fit:contain"/>
+<div style="font:600 20px/1.28 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.012em">{{ k.titel }}</div>
+<p style="margin:0;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ k.kurz }}</p>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="padding:18px 44px 26px;background:#faf8f9;border-top:1px solid #e4e0e2;font:400 13px/1.65 system-ui,sans-serif;color:#4d434b">
+<strong>Warum das funktioniert:</strong> Titelblatt und Begrüßung bilden zusammen die Eröffnung — beide mittig, beide ohne Fließtext, verbunden durch das kleine Logo als Echo. Danach kommt die randlose Galerie als <em>Zäsur</em>: ein Bildstreifen über die volle Breite, der die Mitte auflöst. Erst dahinter setzt die linke Achse ein, und zwar für alles, was man wirklich liest. Der Wechsel wirkt dadurch gewollt statt zufällig — und Tabellen, Listen und lange Texte stehen endlich links.
+</div>
+
+</div>
+</div>
+
+<div class="dv-opt" id="3c">
+<div class="dv-olabel"><a class="dv-oid" href="#3c">3c</a>Durchgehend links — auch der Startbereich rückt auf die Achse</div>
+<div class="dv-card" style="width:1180px">
+
+<div style="display:flex;justify-content:center;align-items:center;height:40px"><div style="display:flex;align-items:center;gap:20px;width:1092px;font:400 14px/1 'Source Sans 3',sans-serif;color:#6c1a51">
+<span>Rosenstraße 1</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>76467 Bietigheim</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>07245 7171</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span style="font-weight:500">info@dres-nold.de</span>
+</div></div>
+<div style="height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+<div style="display:flex;flex-direction:column;justify-content:center;height:508px;background:#fff;padding:0 44px">
+<img src="assets/icons/logo.svg" alt="Dres. Nold" style="width:330px;height:224px;object-fit:contain;margin-left:-14px"/>
+<p style="max-width:250px;margin:32px 0 10px;font:400 16px/1.25 'Source Sans 3',sans-serif;color:#6c1a51">Scrollen Sie, um mehr von unserer Praxis zu entdecken</p>
+<span style="width:40px;height:20px;background:url('assets/icons/ui/pfeil-runter.svg') left center / contain no-repeat"></span>
+</div>
+<div style="height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+<div style="display:flex;justify-content:center;height:110px"><div style="display:flex;align-items:center;gap:52px;width:1092px;height:110px">
+<sc-for list="{{ fussleiste }}" as="f" hint-placeholder-count="6">
+<span style="display:flex;flex-direction:column;align-items:center;margin-top:4px">
+<img src="{{ f.icon }}" alt="" style="width:60px;height:60px;margin-bottom:5px;object-fit:contain"/>
+<span style="font:400 14px/1 'Source Sans 3',sans-serif;color:#6c1a51">{{ f.titel }}</span>
+</span>
+</sc-for>
+</div></div>
+
+<div style="padding:24px 0;background:#f6f2f4;border-block:1px solid #e4e0e2;text-align:center;font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:#766c74">Ab hier gescrollt — der Inhalt</div>
+
+<div style="padding:104px 44px 96px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Zahnmedizin &amp; Kieferorthopädie · Bietigheim</div>
+<h1 style="margin:24px 0 0;font:200 72px/1.04 'Source Sans 3',sans-serif;letter-spacing:-.025em;color:#6c1a51;max-width:16ch">Willkommen in unserer Praxis Dres. Nold</h1>
+<p style="margin:22px 0 0;max-width:34rem;font:400 21px/1.6 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">Zahnmedizin und Kieferorthopädie unter einem Dach — in Bietigheim. Wir nehmen uns Zeit für Sie, erklären jeden Schritt und behandeln so schonend wie möglich.</p>
+</div>
+<div style="padding:0 44px"><div style="height:1px;background:#e4e0e2"></div></div>
+<div style="padding:96px 44px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Behandlung</div>
+<h2 style="margin:20px 0 0;font:200 48px/1.1 'Source Sans 3',sans-serif;letter-spacing:-.022em;color:#6c1a51">Unsere Leistungen</h2>
+<div style="margin-top:44px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+<sc-for list="{{ drei }}" as="k" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;gap:10px;padding:26px 24px 22px;border:1px solid #e4e0e2;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:44px;height:44px;object-fit:contain"/>
+<div style="font:600 20px/1.28 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.012em">{{ k.titel }}</div>
+<p style="margin:0;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ k.kurz }}</p>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="padding:18px 44px 26px;background:#faf8f9;border-top:1px solid #e4e0e2;font:400 13px/1.65 system-ui,sans-serif;color:#4d434b">Am konsequentesten — und der größte Eingriff. Das Logo wächst weiterhin um seine eigene Mitte (Ablauf a-7 bleibt unberührt), aber die ganze Eröffnung verliert ihre Symmetrie. Für ein Praxis-Emblem, das erkennbar auf Mitte gezeichnet ist, ist das ein Verlust — deshalb nicht meine erste Wahl.</div>
+
+</div>
+</div>
+
+</div>
+
+<p class="dv-next">Weiter: „nimm <a class="dv-oid" href="#3b">3b</a>“ · „<a class="dv-oid" href="#3b">3b</a>, aber ohne das kleine Logo über der Begrüßung“ · „zeig <a class="dv-oid" href="#3b">3b</a> bei 1920 px“ · „doch lieber <a class="dv-oid" href="#3a">3a</a> — dann bau <a class="dv-oid" href="#1b">1b</a> weiter aus“</p>
+</section>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname"><a class="dv-oid" href="#1a">1a</a> auf großem Schirm — mit Galerie und Team</span></div>
+
+<div style="max-width:1000px;margin:0 0 30px;font:400 13.5px/1.68 system-ui,sans-serif;color:#4d434b">
+<div style="font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:10px">Die Regel für große Schirme</div>
+<p style="margin:0 0 10px;max-width:none">Linksbündig heißt nicht „am Fensterrand“. Der Text hängt an der <strong>linken Kante eines mittigen Inhaltsblocks</strong> — heute 1200 px, für <a class="dv-oid" href="#1a">1a</a> würde ich auf <code>min(100% − 96px, 1360px)</code> gehen. Auf 1920 px stehen dann links und rechts je 280 px Luft, auf 2560 px je 600 px. Die Achse wandert nie weiter nach außen, und die Schriftgrade wachsen ab 1360 px nicht mehr mit (<code>clamp()</code> deckelt sie).</p>
+<p style="margin:0;max-width:none">Was mit der Breite wächst, ist nur die <strong>Anzahl der Spalten</strong>: Kacheln 3 → 4, Mitarbeitende 4 → 6. Und drei Elemente brechen bewusst aus dem Block aus und laufen über die volle Fensterbreite — Galerie, Gruppenfoto, Karte. Dieser Wechsel aus schmaler Textachse und randlosen Bildern ist das, was auf großen Schirmen überhaupt erst Rhythmus erzeugt.</p>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+
+<div class="dv-opt" id="2a">
+<div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>1a bei 1920 px · Galerie randlos, Team im selben Raster — mein Vorschlag</div>
+<div class="dv-card" style="width:1920px">
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);background:#faf8f9;border-bottom:1px solid #e4e0e2;font:400 11.5px/1.5 ui-monospace,Menlo,monospace;color:#5f545c">
+<div style="padding:16px 24px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Inhaltsblock</div>min(100% − 96px, 1360px)<br>mittig, Text an der linken Kante<br>Grade ab 1360 px gedeckelt</div>
+<div style="padding:16px 24px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Spalten</div>Kacheln 3 → 4 ab 1440<br>Ärzte 3 · Mitarbeitende 6<br>Abstand überall 24</div>
+<div style="padding:16px 24px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Randlos</div>Galerie · Gruppenfoto · Karte<br>alles andere im Block<br>Punktlinie als Naht</div>
+<div style="padding:16px 24px"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Bewegung bleibt</div>Band läuft weiter (60 s)<br>Foto-Parallaxe a-3 unverändert<br>Porträt-Ausschnitt a/a-2 bleibt</div>
+</div>
+
+<div style="background:#fff">
+<div style="width:1360px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:88px">
+<div style="display:flex;align-items:center;gap:32px">
+<img src="assets/icons/logo.svg" alt="" style="width:56px;height:56px"/>
+<div style="display:flex;align-items:center;gap:20px;font:500 15px/1 'Source Sans 3',sans-serif;letter-spacing:.015em;color:#6c1a51">
+<span>Praxis</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>Leistungen</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>Team</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>Neuigkeiten</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>Kontakt</span>
+</div>
+</div>
+<div style="font:400 15px/1 'Source Sans 3',sans-serif;color:#766c74">Rosenstraße 1, Bietigheim · 07245 7171</div>
+</div>
+</div>
+<div style="height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+
+<div style="width:1360px;margin:0 auto;padding:120px 0 104px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Zahnmedizin &amp; Kieferorthopädie · Bietigheim</div>
+<h1 style="margin:24px 0 0;font:200 76px/1.04 'Source Sans 3',sans-serif;letter-spacing:-.025em;color:#6c1a51;max-width:16ch">Willkommen in unserer Praxis Dres. Nold</h1>
+<p style="margin:22px 0 0;max-width:34rem;font:400 21px/1.6 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">Zahnmedizin und Kieferorthopädie unter einem Dach — in Bietigheim. Wir nehmen uns Zeit für Sie, erklären jeden Schritt und behandeln so schonend wie möglich.</p>
+</div>
+
+<div style="width:1360px;margin:0 auto 22px;display:flex;align-items:baseline;justify-content:space-between">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Einblicke in unsere Praxis</div>
+<div style="font:400 14px/1 'Source Sans 3',sans-serif;color:#766c74">Das Band läuft von selbst · zum Anhalten darauf zeigen</div>
+</div>
+<div style="width:100%;overflow:hidden">
+<div style="display:flex;width:max-content">
+<sc-for list="{{ galerie }}" as="g" hint-placeholder-count="7">
+<img src="{{ g }}" alt="Blick in die Praxisräume" style="flex:none;height:420px;width:auto;max-width:none;display:block"/>
+</sc-for>
+</div>
+</div>
+<div style="width:1360px;margin:20px auto 0;display:flex;align-items:center;gap:6px">
+<span style="width:11px;height:11px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:8px;height:8px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:5px;height:5px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:3px;height:3px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:3px;height:3px;border-radius:50%;background:#6c1a51"></span>
+</div>
+
+<div style="width:1360px;margin:0 auto;padding:120px 0 0"><div style="height:1px;background:#e4e0e2"></div></div>
+
+<div style="width:1360px;margin:0 auto;padding:112px 0">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Behandlung</div>
+<h2 style="margin:20px 0 0;font:200 48px/1.1 'Source Sans 3',sans-serif;letter-spacing:-.022em;color:#6c1a51">Unsere Leistungen</h2>
+<p style="margin:20px 0 0;max-width:34rem;font:400 17px/1.68 'Source Sans 3',sans-serif;color:#766c74">Klicken Sie auf eine Leistung, um mehr zu erfahren.</p>
+
+<div style="margin-top:56px;display:flex;align-items:baseline;gap:16px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b">Zahnärztliche Leistungen</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+<sc-for list="{{ zahn }}" as="k" hint-placeholder-count="6">
+<div style="display:flex;flex-direction:column;gap:10px;padding:26px 24px 22px;border:1px solid #e4e0e2;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:44px;height:44px;object-fit:contain"/>
+<div style="font:600 20px/1.28 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.012em">{{ k.titel }}</div>
+<p style="margin:0;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ k.kurz }}</p>
+<div style="margin-top:auto;padding-top:10px;font:600 14px/1 'Source Sans 3',sans-serif;color:#6c1a51">Mehr erfahren →</div>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top:56px;display:flex;align-items:baseline;gap:16px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b">Sonstige Leistungen</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+<sc-for list="{{ sonst }}" as="k" hint-placeholder-count="4">
+<div style="display:flex;flex-direction:column;gap:10px;padding:26px 24px 22px;border:1px solid #e4e0e2;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:44px;height:44px;object-fit:contain"/>
+<div style="font:600 20px/1.28 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.012em">{{ k.titel }}</div>
+<p style="margin:0;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ k.kurz }}</p>
+<div style="margin-top:auto;padding-top:10px;font:600 14px/1 'Source Sans 3',sans-serif;color:#6c1a51">Mehr erfahren →</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="position:relative;width:100%;height:560px;overflow:hidden">
+<img src="assets/bilder/aerzteteam.webp" alt="Das Ärzteteam der Praxis Dres. Nold" style="width:100%;height:100%;object-fit:cover"/>
+<div style="position:absolute;inset:auto 0 0;height:76%;background:linear-gradient(to top,rgb(30 8 22 / 80%),rgb(30 8 22 / 52%) 38%,rgb(30 8 22 / 0))"></div>
+<div style="position:absolute;inset:auto 0 48px;width:1360px;margin:0 auto">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#fff;text-shadow:0 0 18px rgb(0 0 0 / 55%)">Unser Team</div>
+<div style="margin-top:18px;font:300 72px/1.02 'Source Sans 3',sans-serif;letter-spacing:-.025em;color:#fff;text-shadow:0 0 18px rgb(0 0 0 / 55%)">Wir freuen uns auf Sie</div>
+</div>
+</div>
+
+<div style="width:1360px;margin:0 auto;padding:104px 0 112px">
+<div style="display:flex;align-items:baseline;gap:16px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b">Ärztinnen und Ärzte</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+<sc-for list="{{ aerzte }}" as="p" hint-placeholder-count="3">
+<div>
+<div style="position:relative;height:420px;overflow:hidden;background:#f4f2f3">
+<img src="{{ p.foto }}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top"/>
+<span style="position:absolute;inset:auto 0 0;height:14px;background:url('assets/icons/ui/linie-schatten.svg') 50% 100% / cover no-repeat"></span>
+<span style="position:absolute;inset:auto 0 0;height:16px;background:url('assets/icons/ui/pfeil-team.svg') 50% 100% / auto 16px no-repeat"></span>
+</div>
+<div style="margin-top:16px;font:500 20px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.01em">{{ p.name }}</div>
+<div style="margin-top:4px;font:400 15px/1.5 'Source Sans 3',sans-serif;color:#766c74">{{ p.funktion }}</div>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top:72px;display:flex;align-items:baseline;gap:16px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b">Unser Praxisteam</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:24px">
+<sc-for list="{{ mitarbeitende }}" as="p" hint-placeholder-count="12">
+<div>
+<div style="position:relative;height:212px;overflow:hidden;background:#f4f2f3">
+<img src="{{ p.foto }}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top"/>
+<span style="position:absolute;inset:auto 0 0;height:14px;background:url('assets/icons/ui/linie-schatten.svg') 50% 100% / cover no-repeat"></span>
+<span style="position:absolute;inset:auto 0 0;height:16px;background:url('assets/icons/ui/pfeil-team.svg') 50% 100% / auto 16px no-repeat"></span>
+</div>
+<div style="margin-top:14px;font:500 17px/1.3 'Source Sans 3',sans-serif;color:#6c1a51">{{ p.name }}</div>
+<div style="margin-top:3px;font:400 14px/1.45 'Source Sans 3',sans-serif;color:#766c74">{{ p.funktion }}</div>
+<div style="margin-top:8px;display:flex;align-items:center;gap:8px;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6c1a51">Tätigkeiten<span style="width:14px;height:8px;background:url('assets/icons/ui/pfeil-runter.svg') center / contain no-repeat"></span></div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="width:1360px;margin:0 auto;padding:0 0 24px"><div style="height:1px;background:#e4e0e2"></div></div>
+
+<div style="width:1360px;margin:0 auto;padding:96px 0 40px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Kontakt</div>
+<h2 style="margin:20px 0 0;font:200 48px/1.1 'Source Sans 3',sans-serif;letter-spacing:-.022em;color:#6c1a51">So erreichen Sie uns</h2>
+<div style="margin-top:36px;display:flex;gap:80px;font:400 17px/1.7 'Source Sans 3',sans-serif;color:#4d434b">
+<div><div style="font-weight:600;color:#6c1a51">Praxis Dres. Nold</div>Rosenstraße 1<br>76467 Bietigheim</div>
+<div>Telefon 07245 7171<br>Fax 07245 939269<br><span style="color:#6c1a51;font-weight:600">info@dres-nold.de</span></div>
+</div>
+</div>
+<div style="width:100%;height:420px;overflow:hidden"><img src="assets/deko/karte-vorschau.jpg" alt="" style="width:100%;height:100%;object-fit:cover;filter:saturate(.6)"/></div>
+
+</div>
+</div>
+
+<div class="dv-opt" id="2b">
+<div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Galerie-Alternative · Band an der Textachse, rechts angeschnitten</div>
+<div class="dv-card" style="width:1180px">
+<div style="padding:56px 44px 0">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Einblicke in unsere Praxis</div>
+<p style="margin:16px 0 0;max-width:34rem;font:400 17px/1.68 'Source Sans 3',sans-serif;color:#4d434b">Statt randlos beginnt das Band an derselben Linie wie die Überschriften und läuft nach rechts aus dem Bild. Die Achse bleibt dadurch auch im Bildbereich sichtbar — konsequenter zu <a href="#1a">1a</a>, aber weniger großzügig als <a href="#2a">2a</a>.</p>
+</div>
+<div style="margin-top:32px;padding-left:44px;overflow:hidden">
+<div style="display:flex;width:max-content">
+<sc-for list="{{ galerie }}" as="g" hint-placeholder-count="7">
+<img src="{{ g }}" alt="Blick in die Praxisräume" style="flex:none;height:320px;width:auto;max-width:none;display:block"/>
+</sc-for>
+</div>
+</div>
+<div style="padding:18px 44px 56px;display:flex;align-items:center;gap:6px">
+<span style="width:11px;height:11px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:8px;height:8px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:5px;height:5px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:3px;height:3px;border-radius:50%;background:#6c1a51"></span>
+<span style="width:3px;height:3px;border-radius:50%;background:#6c1a51"></span>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="2c">
+<div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Team-Alternative · Foto ohne Schrift, Überschrift darunter auf der Achse</div>
+<div class="dv-card" style="width:1180px">
+<div style="width:100%;height:420px;overflow:hidden"><img src="assets/bilder/aerzteteam.webp" alt="Das Ärzteteam der Praxis Dres. Nold" style="width:100%;height:100%;object-fit:cover"/></div>
+<div style="padding:72px 44px 64px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Unser Team</div>
+<h2 style="margin:20px 0 0;font:200 48px/1.1 'Source Sans 3',sans-serif;letter-spacing:-.022em;color:#6c1a51">Wir freuen uns auf Sie</h2>
+<p style="margin:20px 0 0;max-width:34rem;font:400 17px/1.68 'Source Sans 3',sans-serif;color:#766c74">Die 86-px-Schrift im Foto ist der lauteste Ton der ganzen Seite und arbeitet gegen die feine Typografie. Hier bleibt das Foto ein Bild, und die Überschrift steht auf derselben Achse wie alles andere. Die Parallaxe (a-3) läuft unverändert weiter.</p>
+<div style="margin-top:48px;display:flex;align-items:baseline;gap:16px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b">Ärztinnen und Ärzte</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+<sc-for list="{{ aerzte }}" as="p" hint-placeholder-count="3">
+<div>
+<div style="position:relative;height:380px;overflow:hidden;background:#f4f2f3">
+<img src="{{ p.foto }}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top"/>
+<span style="position:absolute;inset:auto 0 0;height:14px;background:url('assets/icons/ui/linie-schatten.svg') 50% 100% / cover no-repeat"></span>
+<span style="position:absolute;inset:auto 0 0;height:16px;background:url('assets/icons/ui/pfeil-team.svg') 50% 100% / auto 16px no-repeat"></span>
+</div>
+<div style="margin-top:16px;font:500 20px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.01em">{{ p.name }}</div>
+<div style="margin-top:4px;font:400 15px/1.5 'Source Sans 3',sans-serif;color:#766c74">{{ p.funktion }}</div>
+</div>
+</sc-for>
+</div>
+<div style="margin-top:64px;display:flex;align-items:baseline;gap:16px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b">Unser Praxisteam</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+<sc-for list="{{ mitarbeitende }}" as="p" hint-placeholder-count="12">
+<div>
+<div style="position:relative;height:250px;overflow:hidden;background:#f4f2f3">
+<img src="{{ p.foto }}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top"/>
+<span style="position:absolute;inset:auto 0 0;height:14px;background:url('assets/icons/ui/linie-schatten.svg') 50% 100% / cover no-repeat"></span>
+<span style="position:absolute;inset:auto 0 0;height:16px;background:url('assets/icons/ui/pfeil-team.svg') 50% 100% / auto 16px no-repeat"></span>
+</div>
+<div style="margin-top:14px;font:500 18px/1.3 'Source Sans 3',sans-serif;color:#6c1a51">{{ p.name }}</div>
+<div style="margin-top:3px;font:400 14px/1.45 'Source Sans 3',sans-serif;color:#766c74">{{ p.funktion }}</div>
+<div style="margin-top:8px;display:flex;align-items:center;gap:8px;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6c1a51">Tätigkeiten<span style="width:14px;height:8px;background:url('assets/icons/ui/pfeil-runter.svg') center / contain no-repeat"></span></div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<p class="dv-next">Weiter: „nimm <a class="dv-oid" href="#2a">2a</a>, aber Galerie wie <a class="dv-oid" href="#2b">2b</a>“ · „Team-Überschrift raus aus dem Foto wie <a class="dv-oid" href="#2c">2c</a>“ · „zeig <a class="dv-oid" href="#2a">2a</a> auch bei 1440 und 2560 px“ · „setz <a class="dv-oid" href="#1a">1a</a> + <a class="dv-oid" href="#2a">2a</a> in tokens.css um“</p>
+</section>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Ist-Zustand und drei Wege für Schrift, Größen und Abstände</span></div>
+
+<div style="max-width:1000px;margin:0 0 18px;font:400 13.5px/1.65 system-ui,sans-serif;color:#4d434b">
+<div style="font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:10px">Was ich im Code gefunden habe</div>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 28px">
+<div>· Sechs Grautöne nebeneinander: <code>#4d434b</code>, <code>#766c74</code>, <code>#554d53</code>, <code>#dddddd</code>, Trennpunkte in <code>#000</code>, dazu das Aubergine. Das ist die Unruhe, die du siehst.</div>
+<div>· Einleitungstexte laufen über die volle Inhaltsbreite (<code>max-width:none</code> in <code>index.astro</code>) — bis zu 1200 px lange Zeilen, zentriert. Der größte Lesbarkeitsfehler der Startseite.</div>
+<div>· Kein durchgehender Abschnittsrhythmus: Leistungen 40 px, freie Abschnitte 96 px, Team 100/140 px, Kontakt 60/200 px.</div>
+<div>· Überschriften stehen auf Gewicht 600 bei 55–68 px. Für „fein und filigran“ sind das zwei Stufen zu viel — die Schriftdatei kann 200.</div>
+<div>· Kacheln: 16 px Abstand bei 24 px Innenabstand, <code>flex: 1 1 15rem</code>. Die zwölf Kacheln reißen dadurch in ungleiche Reihen.</div>
+<div>· Leiste 700 px, Inhalt 1200 px. Das Menü ist nicht zu klein — es steht auf einer anderen Achse als alles darunter.</div>
+</div>
+</div>
+
+<div style="max-width:1000px;margin:0 0 30px;padding:14px 18px;background:#fff;border-left:2px solid #6c1a51;font:400 13px/1.65 system-ui,sans-serif;color:#4d434b">
+<strong>Schriftwahl unter eurer Grundregel.</strong> Die Seite darf nichts von fremden Servern laden — eine neue Schrift muss als Datei nach <code>public/fonts/</code>. Alle drei Vorschläge sind deshalb <em>heute schon</em> umsetzbar: Sie nutzen ausschließlich die vorhandene variable Datei <code>source-sans-3-normal.woff2</code>, die Gewicht 200 bis 900 enthält — im Einsatz sind bislang nur 300 bis 700. Das filigrane Ende liegt ungenutzt herum. <a href="#1c">1c</a> zeigt zusätzlich die Antiqua-Richtung; dafür wäre <strong>Source Serif 4</strong> die richtige Datei (gleicher Hersteller wie Source Sans, SIL OFL, selbst hostbar). Sag Bescheid, dann lege ich sie an — bis dahin zeigt die Vorschau eine systemeigene Antiqua als Platzhalter.<br><br>Alle vier Karten zeigen denselben echten Inhalt aus <code>leistungen.json</code> und <code>abschnitte.json</code> — inklusive des Beispielabschnitts mit Tabelle, Liste und den beiden Knöpfen.</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+
+<div class="dv-opt" id="1ist">
+<div class="dv-olabel"><a class="dv-oid" href="#1ist">Ist</a>Heutiger Stand, aus dem Quellcode nachgebaut — Vergleichsmaßstab</div>
+<div class="dv-card" style="width:1180px;border-color:#c9bfc5">
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);background:#f6f2f4;border-bottom:1px solid #e4e0e2;font:400 11.5px/1.5 ui-monospace,Menlo,monospace;color:#5f545c">
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Schrift</div>Source Sans 3<br>Überschrift 600 · Text 400<br>ein Grad für alles</div>
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Skala</div>H1 68 / H2 55 / H3 23,5<br>Lead 23,5 · Text 17,7 · Klein 15,7<br>Gruppe 17,7 · 0,08 em</div>
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Abstände</div>Leistungen 40 · Abschnitte 96<br>Kontakt 60 / 200<br>Kacheln 16</div>
+<div style="padding:16px 20px"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Zeilenbreite</div>Einleitung <em>unbegrenzt</em> (1200 px)<br>Fließtext 46 rem<br>Leiste 700 px, Inhalt 1200 px</div>
+</div>
+
+<div style="display:flex;justify-content:center;height:80px;background:#fff">
+<div style="display:flex;justify-content:space-around;align-items:center;width:700px;height:80px">
+<img src="assets/icons/logo.svg" alt="" style="width:80px;height:80px"/>
+<span style="width:3px;height:3px;border-radius:50%;background:#000"></span>
+<span style="font:400 15.7px/1 'Source Sans 3',sans-serif;color:#6c1a51">Praxis</span>
+<span style="width:3px;height:3px;border-radius:50%;background:#000"></span>
+<span style="font:400 15.7px/1 'Source Sans 3',sans-serif;color:#6c1a51">Leistungen</span>
+<span style="width:3px;height:3px;border-radius:50%;background:#000"></span>
+<span style="font:400 15.7px/1 'Source Sans 3',sans-serif;color:#6c1a51">Team</span>
+<span style="width:3px;height:3px;border-radius:50%;background:#000"></span>
+<span style="font:400 15.7px/1 'Source Sans 3',sans-serif;color:#6c1a51">Neuigkeiten</span>
+<span style="width:3px;height:3px;border-radius:50%;background:#000"></span>
+<span style="font:400 15.7px/1 'Source Sans 3',sans-serif;color:#6c1a51">Kontakt</span>
+</div>
+</div>
+<div style="height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+
+<div style="display:flex;flex-direction:column;align-items:center;padding:96px 24px 64px">
+<h1 style="margin:0;max-width:1000px;font:600 68px/1.08 'Source Sans 3',sans-serif;letter-spacing:-.015em;color:#6c1a51;text-align:center">Willkommen in unserer<br>Praxis Dres. Nold</h1>
+<p style="margin:24px 0 0;max-width:46rem;font:400 23.5px/1.45 'Source Sans 3',sans-serif;color:#4d434b;text-align:center;text-wrap:pretty">Zahnmedizin und Kieferorthopädie unter einem Dach — in Bietigheim. Wir nehmen uns Zeit für Sie, erklären jeden Schritt und behandeln so schonend wie möglich.</p>
+</div>
+
+<div style="width:1132px;margin:0 auto;padding:40px 0">
+<h2 style="margin:0 auto 16px;font:600 55px/1.08 'Source Sans 3',sans-serif;letter-spacing:-.012em;color:#6c1a51;text-align:center">Unsere Leistungen</h2>
+<p style="margin:0 0 40px;max-width:none;font:400 17.7px/1.6 'Source Sans 3',sans-serif;color:#766c74;text-align:center">Klicken Sie auf eine Leistung, um mehr zu erfahren.</p>
+
+<h3 style="margin:40px 0 16px;font:600 17.7px/1.45 'Source Sans 3',sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#766c74;text-align:center">Zahnärztliche Leistungen</h3>
+<div style="max-width:46rem;margin:0 auto 24px;text-align:center;font:400 17.7px/1.6 'Source Sans 3',sans-serif;color:#4d434b">Von der Vorsorge über den Zahnerhalt bis zum Zahnersatz — wir behandeln so schonend wie möglich und erhalten Ihre eigenen Zähne so lange wie es geht.</div>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-bottom:24px">
+<sc-for list="{{ zahn }}" as="k" hint-placeholder-count="6">
+<div style="flex:1 1 15rem;max-width:24rem;display:flex;flex-direction:column;gap:8px;padding:24px;border:1px solid #dddddd;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:56px;height:56px;object-fit:contain"/>
+<h3 style="margin:0;font:600 23.5px/1.45 'Source Sans 3',sans-serif;color:#6c1a51">{{ k.titel }}</h3>
+<p style="margin:0;font:400 15.7px/1.6 'Source Sans 3',sans-serif;color:#766c74;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ k.kurz }}</p>
+<span style="margin-top:auto;padding-top:8px;font:600 15.7px/1.6 'Source Sans 3',sans-serif;color:#6c1a51">Mehr erfahren →</span>
+</div>
+</sc-for>
+</div>
+
+<h3 style="margin:40px 0 16px;font:600 17.7px/1.45 'Source Sans 3',sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#766c74;text-align:center">Kieferorthopädie</h3>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-bottom:24px">
+<sc-for list="{{ kfo }}" as="k" hint-placeholder-count="2">
+<div style="flex:1 1 15rem;max-width:24rem;display:flex;flex-direction:column;gap:8px;padding:24px;border:1px solid #dddddd;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:56px;height:56px;object-fit:contain"/>
+<h3 style="margin:0;font:600 23.5px/1.45 'Source Sans 3',sans-serif;color:#6c1a51">{{ k.titel }}</h3>
+<p style="margin:0;font:400 15.7px/1.6 'Source Sans 3',sans-serif;color:#766c74;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ k.kurz }}</p>
+<span style="margin-top:auto;padding-top:8px;font:600 15.7px/1.6 'Source Sans 3',sans-serif;color:#6c1a51">Mehr erfahren →</span>
+</div>
+</sc-for>
+</div>
+
+<h3 style="margin:40px 0 16px;font:600 17.7px/1.45 'Source Sans 3',sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#766c74;text-align:center">Sonstige Leistungen</h3>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px">
+<sc-for list="{{ sonst }}" as="k" hint-placeholder-count="4">
+<div style="flex:1 1 15rem;max-width:24rem;display:flex;flex-direction:column;gap:8px;padding:24px;border:1px solid #dddddd;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:56px;height:56px;object-fit:contain"/>
+<h3 style="margin:0;font:600 23.5px/1.45 'Source Sans 3',sans-serif;color:#6c1a51">{{ k.titel }}</h3>
+<p style="margin:0;font:400 15.7px/1.6 'Source Sans 3',sans-serif;color:#766c74;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ k.kurz }}</p>
+<span style="margin-top:auto;padding-top:8px;font:600 15.7px/1.6 'Source Sans 3',sans-serif;color:#6c1a51">Mehr erfahren →</span>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="padding:40px 0">
+<div style="width:46rem;margin:0 auto">
+<h2 style="margin:0 auto 40px;font:600 55px/1.08 'Source Sans 3',sans-serif;letter-spacing:-.012em;color:#6c1a51;text-align:center">Beispielabschnitt</h2>
+<img src="assets/bilder/teaser-b-full.png" alt="ein bild" style="width:100%;margin-bottom:24px"/>
+<p style="margin:0 0 16px;max-width:none;font:400 17.7px/1.6 'Source Sans 3',sans-serif;color:#4d434b">Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.</p>
+<table style="width:100%;min-width:28rem;border-collapse:collapse;margin-bottom:24px;font:400 17.7px/1.6 'Source Sans 3',sans-serif;color:#4d434b">
+<thead><tr><th style="padding:8px 12px;border-bottom:1px solid #dddddd;text-align:left;color:#6c1a51;font-weight:600">Spalte 1</th><th style="padding:8px 12px;border-bottom:1px solid #dddddd;text-align:left;color:#6c1a51;font-weight:600">Spalte 2</th></tr></thead>
+<tbody>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #dddddd">test5</td><td style="padding:8px 12px;border-bottom:1px solid #dddddd">5</td></tr>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #dddddd">eefe</td><td style="padding:8px 12px;border-bottom:1px solid #dddddd">…eere</td></tr>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #dddddd">…ere</td><td style="padding:8px 12px;border-bottom:1px solid #dddddd">ere</td></tr>
+</tbody>
+</table>
+<h3 style="margin:24px 0 16px;font:600 23.5px/1.45 'Source Sans 3',sans-serif;color:#6c1a51">adsasdasdad</h3>
+<ol style="margin:0 0 16px;padding-left:24px;font:400 17.7px/1.6 'Source Sans 3',sans-serif;color:#4d434b"><li>ddssad</li><li>sdsdsasdad</li><li>aadasdasad</li><li>asdasdaa</li></ol>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px">
+<span style="padding:8px 24px;border:1px solid #6c1a51;border-radius:999px;background:#6c1a51;color:#fff;font:600 17.7px/1.6 'Source Sans 3',sans-serif">adadsds</span>
+<span style="padding:8px 24px;border:1px solid #6c1a51;border-radius:999px;background:#fff;color:#6c1a51;font:600 17.7px/1.6 'Source Sans 3',sans-serif">Ein Dokument zum runerladen</span>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;align-items:center;padding:60px 24px 200px">
+<h2 style="margin:0;font:600 55px/1.08 'Source Sans 3',sans-serif;letter-spacing:-.012em;color:#6c1a51;text-align:center">So erreichen Sie uns</h2>
+<div style="display:flex;justify-content:center;width:100%;margin-top:30px;font:300 20px/26px 'Source Sans 3',sans-serif;color:#4d434b">
+<div style="text-align:right;margin:0 40px 0 18px"><strong style="font-weight:700">Praxis Dres. Nold</strong><br>Rosenstraße 1<br>76467 Bietigheim</div>
+<div style="text-align:left;margin-left:40px">Telefon 07245 7171<br>Fax 07245 939269<br><span style="color:#6c1a51;font-weight:600">info@dres-nold.de</span></div>
+</div>
+<div style="display:flex;gap:40px;width:1132px;margin-top:46px;align-items:stretch">
+<div style="flex:1 1 0;border-radius:8px;overflow:hidden;box-shadow:1px 1px 17px -12px rgb(0 0 0 / 50%)"><img src="assets/deko/karte-vorschau.jpg" alt="" style="width:100%;height:560px;object-fit:cover;filter:saturate(.6)"/></div>
+<div style="flex:1 1 0">
+<h3 style="margin:0 0 8px;font:400 23.5px/1.45 'Source Sans 3',sans-serif;color:#6c1a51">Schreiben Sie uns</h3>
+<p style="margin:0 0 24px;max-width:none;font:400 15.7px/1.6 'Source Sans 3',sans-serif;color:#766c74">Wir melden uns zurück, sobald wir Ihre Nachricht gelesen haben. Bitte schicken Sie uns keine Angaben zu Ihrer Gesundheit — dafür rufen Sie uns bitte an.</p>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div><div style="font:400 15.7px/1.6 'Source Sans 3',sans-serif;color:#4d434b;margin-bottom:4px">Name</div><div style="height:44px;border:1px solid #dddddd;border-radius:4px"></div></div>
+<div><div style="font:400 15.7px/1.6 'Source Sans 3',sans-serif;color:#4d434b;margin-bottom:4px">E-Mail</div><div style="height:44px;border:1px solid #dddddd;border-radius:4px"></div></div>
+<div><div style="font:400 15.7px/1.6 'Source Sans 3',sans-serif;color:#4d434b;margin-bottom:4px">Nachricht</div><div style="height:120px;border:1px solid #dddddd;border-radius:4px"></div></div>
+<div><span style="display:inline-block;padding:8px 24px;border-radius:999px;background:#6c1a51;color:#fff;font:600 17.7px/1.6 'Source Sans 3',sans-serif">Absenden</span></div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Feine Achse · linksbündig · Source Sans 3 ExtraLight 200</div>
+<div class="dv-card" style="width:1180px">
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);background:#faf8f9;border-bottom:1px solid #e4e0e2;font:400 11.5px/1.5 ui-monospace,Menlo,monospace;color:#5f545c">
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Schrift</div>Source Sans 3, vorhanden<br>Überschrift 200 · Text 400<br>Marken 600 · keine neue Datei</div>
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Skala</div>H1 76 / H2 48 / H3 20<br>Lead 21 · Text 17 · Klein 15<br>Marke 12 · 0,18 em</div>
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Abstände</div>Abschnitt 112 px, überall gleich<br>Titel→Lead 20 · Lead→Inhalt 56<br>Kacheln 24 · Raster 8</div>
+<div style="padding:16px 20px"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Zeilenbreite</div>Lead 34 rem<br>Text 33 rem (≈ 68 Zeichen)<br>Achse: alles links</div>
+</div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;height:82px;padding:0 44px;background:#fff">
+<div style="display:flex;align-items:center;gap:28px">
+<img src="assets/icons/logo.svg" alt="" style="width:52px;height:52px"/>
+<div style="display:flex;align-items:center;gap:18px;font:500 14px/1 'Source Sans 3',sans-serif;letter-spacing:.015em;color:#6c1a51">
+<span>Praxis</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>Leistungen</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>Team</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>Neuigkeiten</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>Kontakt</span>
+</div>
+</div>
+<div style="font:400 14px/1 'Source Sans 3',sans-serif;color:#766c74">Rosenstraße 1, Bietigheim · 07245 7171</div>
+</div>
+<div style="height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+
+<div style="padding:104px 44px 96px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Zahnmedizin &amp; Kieferorthopädie · Bietigheim</div>
+<h1 style="margin:24px 0 0;font:200 76px/1.04 'Source Sans 3',sans-serif;letter-spacing:-.025em;color:#6c1a51;max-width:16ch">Willkommen in unserer Praxis Dres. Nold</h1>
+<p style="margin:22px 0 0;max-width:34rem;font:400 21px/1.6 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">Zahnmedizin und Kieferorthopädie unter einem Dach — in Bietigheim. Wir nehmen uns Zeit für Sie, erklären jeden Schritt und behandeln so schonend wie möglich.</p>
+</div>
+
+<div style="padding:0 44px"><div style="height:1px;background:#e4e0e2"></div></div>
+
+<div style="padding:112px 44px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Behandlung</div>
+<h2 style="margin:20px 0 0;font:200 48px/1.1 'Source Sans 3',sans-serif;letter-spacing:-.022em;color:#6c1a51">Unsere Leistungen</h2>
+<p style="margin:20px 0 0;max-width:34rem;font:400 17px/1.68 'Source Sans 3',sans-serif;color:#766c74">Klicken Sie auf eine Leistung, um mehr zu erfahren.</p>
+
+<div style="margin-top:56px;display:flex;align-items:baseline;gap:16px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b">Zahnärztliche Leistungen</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<p style="margin:16px 0 0;max-width:33rem;font:400 17px/1.68 'Source Sans 3',sans-serif;color:#4d434b">Von der Vorsorge über den Zahnerhalt bis zum Zahnersatz — wir behandeln so schonend wie möglich und erhalten Ihre eigenen Zähne so lange wie es geht.</p>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+<sc-for list="{{ zahn }}" as="k" hint-placeholder-count="6">
+<div style="display:flex;flex-direction:column;gap:10px;padding:26px 24px 22px;border:1px solid #e4e0e2;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:44px;height:44px;object-fit:contain"/>
+<div style="font:600 20px/1.28 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.012em">{{ k.titel }}</div>
+<p style="margin:0;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ k.kurz }}</p>
+<div style="margin-top:auto;padding-top:10px;font:600 14px/1 'Source Sans 3',sans-serif;color:#6c1a51">Mehr erfahren →</div>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top:56px;display:flex;align-items:baseline;gap:16px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b">Kieferorthopädie</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+<sc-for list="{{ kfo }}" as="k" hint-placeholder-count="2">
+<div style="display:flex;flex-direction:column;gap:10px;padding:26px 24px 22px;border:1px solid #e4e0e2;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:44px;height:44px;object-fit:contain"/>
+<div style="font:600 20px/1.28 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.012em">{{ k.titel }}</div>
+<p style="margin:0;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ k.kurz }}</p>
+<div style="margin-top:auto;padding-top:10px;font:600 14px/1 'Source Sans 3',sans-serif;color:#6c1a51">Mehr erfahren →</div>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top:56px;display:flex;align-items:baseline;gap:16px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b">Sonstige Leistungen</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+<sc-for list="{{ sonst }}" as="k" hint-placeholder-count="4">
+<div style="display:flex;flex-direction:column;gap:10px;padding:26px 24px 22px;border:1px solid #e4e0e2;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:44px;height:44px;object-fit:contain"/>
+<div style="font:600 20px/1.28 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.012em">{{ k.titel }}</div>
+<p style="margin:0;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ k.kurz }}</p>
+<div style="margin-top:auto;padding-top:10px;font:600 14px/1 'Source Sans 3',sans-serif;color:#6c1a51">Mehr erfahren →</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="padding:0 44px"><div style="height:1px;background:#e4e0e2"></div></div>
+
+<div style="padding:112px 44px">
+<div style="display:grid;grid-template-columns:15rem minmax(0,33rem);gap:56px">
+<div>
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Aus der Praxis</div>
+<h2 style="margin:18px 0 0;font:200 38px/1.12 'Source Sans 3',sans-serif;letter-spacing:-.022em;color:#6c1a51">Beispielabschnitt</h2>
+</div>
+<div>
+<img src="assets/bilder/teaser-b-full.png" alt="ein bild" style="width:100%;margin-bottom:28px"/>
+<p style="margin:0 0 20px;font:400 17px/1.68 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.</p>
+<table style="width:100%;border-collapse:collapse;margin-bottom:28px;font:400 16px/1.6 'Source Sans 3',sans-serif;color:#4d434b">
+<thead><tr><th style="padding:9px 14px 9px 0;border-bottom:1px solid #d6ced2;text-align:left;font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#766c74">Spalte 1</th><th style="padding:9px 14px 9px 0;border-bottom:1px solid #d6ced2;text-align:left;font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#766c74">Spalte 2</th></tr></thead>
+<tbody>
+<tr><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">test5</td><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">5</td></tr>
+<tr><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">eefe</td><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">…eere</td></tr>
+<tr><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">…ere</td><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">ere</td></tr>
+</tbody>
+</table>
+<div style="margin:0 0 12px;font:600 20px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.012em">adsasdasdad</div>
+<ol style="margin:0;padding-left:20px;font:400 17px/1.68 'Source Sans 3',sans-serif;color:#4d434b"><li>ddssad</li><li>sdsdsasdad</li><li>aadasdasad</li><li>asdasdaa</li></ol>
+<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px">
+<span style="padding:11px 26px;border-radius:999px;background:#6c1a51;color:#fff;font:500 15px/1 'Source Sans 3',sans-serif">adadsds</span>
+<span style="padding:11px 26px;border-radius:999px;border:1px solid #d6ced2;color:#6c1a51;font:500 15px/1 'Source Sans 3',sans-serif">Ein Dokument zum runerladen</span>
+</div>
+</div>
+</div>
+</div>
+
+<div style="padding:0 44px"><div style="height:1px;background:#e4e0e2"></div></div>
+
+<div style="padding:112px 44px 100px">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Kontakt</div>
+<h2 style="margin:20px 0 0;font:200 48px/1.1 'Source Sans 3',sans-serif;letter-spacing:-.022em;color:#6c1a51">So erreichen Sie uns</h2>
+
+<div style="margin-top:36px;display:flex;gap:72px;font:400 17px/1.7 'Source Sans 3',sans-serif;color:#4d434b">
+<div><div style="font-weight:600;color:#6c1a51">Praxis Dres. Nold</div>Rosenstraße 1<br>76467 Bietigheim</div>
+<div>Telefon 07245 7171<br>Fax 07245 939269<br><span style="color:#6c1a51;font-weight:600">info@dres-nold.de</span></div>
+</div>
+
+<div style="margin-top:56px;display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:start">
+<div style="border-radius:8px;overflow:hidden;border:1px solid #e4e0e2"><img src="assets/deko/karte-vorschau.jpg" alt="" style="width:100%;height:360px;object-fit:cover;filter:saturate(.6)"/></div>
+<div>
+<div style="font:300 28px/1.22 'Source Sans 3',sans-serif;letter-spacing:-.018em;color:#6c1a51">Schreiben Sie uns</div>
+<p style="margin:12px 0 28px;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">Wir melden uns zurück, sobald wir Ihre Nachricht gelesen haben. Bitte schicken Sie uns keine Angaben zu Ihrer Gesundheit — dafür rufen Sie uns bitte an.</p>
+<div style="display:flex;flex-direction:column;gap:22px">
+<div><div style="font:500 12px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:8px">Name</div><div style="height:1px;background:#d6ced2"></div></div>
+<div><div style="font:500 12px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:8px">E-Mail</div><div style="height:1px;background:#d6ced2"></div></div>
+<div><div style="font:500 12px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:8px">Nachricht</div><div style="height:56px;border-bottom:1px solid #d6ced2"></div></div>
+<div><span style="display:inline-block;padding:11px 28px;border-radius:999px;background:#6c1a51;color:#fff;font:500 15px/1 'Source Sans 3',sans-serif">Absenden</span></div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Eine Stimme · konsequent zentriert · Source Sans 3 Light 300</div>
+<div class="dv-card" style="width:1180px">
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);background:#faf8f9;border-bottom:1px solid #e4e0e2;font:400 11.5px/1.5 ui-monospace,Menlo,monospace;color:#5f545c">
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Schrift</div>Source Sans 3, vorhanden<br>Überschrift 300 · Text 400<br>Marken 600 · Versalien</div>
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Skala</div>H1 54 / H2 36 / H3 19<br>Lead 19 · Text 17 · Klein 15<br>Marke 11,5 · 0,2 em</div>
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Abstände</div>Abschnitt 96 px, überall gleich<br>Titel→Lead 16 · Lead→Inhalt 48<br>Kacheln 20 · Raster 8</div>
+<div style="padding:16px 20px"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Zeilenbreite</div>Lead 30 rem · Text 31 rem<br>Leiste 1000 px = Inhalt 1000 px<br>Achse: eine Mitte, überall</div>
+</div>
+
+<div style="display:flex;justify-content:center;height:82px;background:#fff">
+<div style="display:flex;align-items:center;justify-content:space-between;width:1000px">
+<div style="font:400 13.5px/1 'Source Sans 3',sans-serif;letter-spacing:.03em;color:#766c74">Rosenstraße 1 · 76467 Bietigheim</div>
+<div style="display:flex;align-items:center;gap:20px;font:400 14.5px/1 'Source Sans 3',sans-serif;letter-spacing:.02em;color:#6c1a51">
+<span>Praxis</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>Leistungen</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<img src="assets/icons/logo.svg" alt="" style="width:52px;height:52px"/>
+<span>Team</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>Kontakt</span>
+</div>
+<div style="font:400 13.5px/1 'Source Sans 3',sans-serif;letter-spacing:.03em;color:#766c74">07245 7171</div>
+</div>
+</div>
+<div style="height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+
+<div style="padding:92px 44px 88px;display:flex;flex-direction:column;align-items:center;text-align:center">
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#766c74">Zahnmedizin &amp; Kieferorthopädie</div>
+<h1 style="margin:20px 0 0;font:300 54px/1.12 'Source Sans 3',sans-serif;letter-spacing:-.02em;color:#6c1a51;max-width:19ch;text-wrap:balance">Willkommen in unserer Praxis Dres. Nold</h1>
+<p style="margin:16px 0 0;max-width:30rem;font:400 19px/1.62 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">Zahnmedizin und Kieferorthopädie unter einem Dach — in Bietigheim. Wir nehmen uns Zeit für Sie, erklären jeden Schritt und behandeln so schonend wie möglich.</p>
+</div>
+
+<div style="display:flex;justify-content:center"><div style="width:1000px;height:1px;background:#e4e0e2"></div></div>
+
+<div style="padding:96px 44px;display:flex;flex-direction:column;align-items:center;text-align:center">
+<h2 style="margin:0;font:300 36px/1.16 'Source Sans 3',sans-serif;letter-spacing:-.02em;color:#6c1a51">Unsere Leistungen</h2>
+<p style="margin:16px 0 0;max-width:30rem;font:400 17px/1.66 'Source Sans 3',sans-serif;color:#766c74">Klicken Sie auf eine Leistung, um mehr zu erfahren.</p>
+
+<div style="margin-top:48px;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#4d434b">Zahnärztliche Leistungen</div>
+<p style="margin:14px 0 0;max-width:30rem;font:400 16px/1.62 'Source Sans 3',sans-serif;color:#4d434b">Von der Vorsorge über den Zahnerhalt bis zum Zahnersatz — wir behandeln so schonend wie möglich und erhalten Ihre eigenen Zähne so lange wie es geht.</p>
+<div style="margin-top:26px;display:grid;grid-template-columns:repeat(3,320px);gap:20px">
+<sc-for list="{{ zahn }}" as="k" hint-placeholder-count="6">
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:30px 22px 26px;border:1px solid #e4e0e2;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:52px;height:52px;object-fit:contain"/>
+<div style="font:500 19px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.01em">{{ k.titel }}</div>
+<p style="margin:0;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ k.kurz }}</p>
+<div style="margin-top:auto;padding-top:8px;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6c1a51">Mehr erfahren</div>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top:48px;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#4d434b">Kieferorthopädie</div>
+<div style="margin-top:26px;display:grid;grid-template-columns:repeat(3,320px);gap:20px">
+<sc-for list="{{ kfo }}" as="k" hint-placeholder-count="2">
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:30px 22px 26px;border:1px solid #e4e0e2;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:52px;height:52px;object-fit:contain"/>
+<div style="font:500 19px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.01em">{{ k.titel }}</div>
+<p style="margin:0;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ k.kurz }}</p>
+<div style="margin-top:auto;padding-top:8px;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6c1a51">Mehr erfahren</div>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top:48px;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#4d434b">Sonstige Leistungen</div>
+<div style="margin-top:26px;display:grid;grid-template-columns:repeat(3,320px);gap:20px">
+<sc-for list="{{ sonst }}" as="k" hint-placeholder-count="4">
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:30px 22px 26px;border:1px solid #e4e0e2;border-radius:8px">
+<img src="{{ k.icon }}" alt="" style="width:52px;height:52px;object-fit:contain"/>
+<div style="font:500 19px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.01em">{{ k.titel }}</div>
+<p style="margin:0;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ k.kurz }}</p>
+<div style="margin-top:auto;padding-top:8px;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6c1a51">Mehr erfahren</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="display:flex;justify-content:center"><div style="width:1000px;height:1px;background:#e4e0e2"></div></div>
+
+<div style="padding:96px 44px;display:flex;flex-direction:column;align-items:center">
+<h2 style="margin:0;font:300 32px/1.18 'Source Sans 3',sans-serif;letter-spacing:-.02em;color:#6c1a51;text-align:center">Beispielabschnitt</h2>
+<div style="margin-top:32px;width:31rem">
+<img src="assets/bilder/teaser-b-full.png" alt="ein bild" style="width:100%;margin-bottom:24px"/>
+<p style="margin:0 0 20px;font:400 17px/1.7 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.</p>
+<table style="width:100%;border-collapse:collapse;margin-bottom:24px;font:400 16px/1.6 'Source Sans 3',sans-serif;color:#4d434b">
+<thead><tr><th style="padding:9px 14px 9px 0;border-bottom:1px solid #d6ced2;text-align:left;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#766c74">Spalte 1</th><th style="padding:9px 14px 9px 0;border-bottom:1px solid #d6ced2;text-align:left;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#766c74">Spalte 2</th></tr></thead>
+<tbody>
+<tr><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">test5</td><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">5</td></tr>
+<tr><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">eefe</td><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">…eere</td></tr>
+<tr><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">…ere</td><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">ere</td></tr>
+</tbody>
+</table>
+<div style="margin:0 0 12px;font:500 19px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.01em">adsasdasdad</div>
+<ol style="margin:0;padding-left:20px;font:400 17px/1.7 'Source Sans 3',sans-serif;color:#4d434b"><li>ddssad</li><li>sdsdsasdad</li><li>aadasdasad</li><li>asdasdaa</li></ol>
+</div>
+<div style="display:flex;gap:12px;margin-top:32px">
+<span style="padding:11px 26px;border-radius:999px;background:#6c1a51;color:#fff;font:500 15px/1 'Source Sans 3',sans-serif">adadsds</span>
+<span style="padding:11px 26px;border-radius:999px;border:1px solid #d6ced2;color:#6c1a51;font:500 15px/1 'Source Sans 3',sans-serif">Ein Dokument zum runerladen</span>
+</div>
+</div>
+
+<div style="display:flex;justify-content:center"><div style="width:1000px;height:1px;background:#e4e0e2"></div></div>
+
+<div style="padding:96px 44px 88px;display:flex;flex-direction:column;align-items:center">
+<h2 style="margin:0;font:300 36px/1.16 'Source Sans 3',sans-serif;letter-spacing:-.02em;color:#6c1a51;text-align:center">So erreichen Sie uns</h2>
+
+<div style="margin-top:26px;text-align:center;font:400 17px/1.75 'Source Sans 3',sans-serif;color:#4d434b">
+<div style="font-weight:600;color:#6c1a51">Praxis Dres. Nold</div>
+Rosenstraße 1 · 76467 Bietigheim<br>
+Telefon 07245 7171 · Fax 07245 939269<br>
+<span style="color:#6c1a51;font-weight:600">info@dres-nold.de</span>
+</div>
+
+<div style="margin-top:48px;display:grid;grid-template-columns:1.2fr 1fr;gap:36px;width:1000px;align-items:start">
+<div style="border-radius:8px;overflow:hidden;border:1px solid #e4e0e2"><img src="assets/deko/karte-vorschau.jpg" alt="" style="width:100%;height:350px;object-fit:cover;filter:saturate(.6)"/></div>
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center">
+<div style="font:300 26px/1.22 'Source Sans 3',sans-serif;letter-spacing:-.018em;color:#6c1a51">Schreiben Sie uns</div>
+<p style="margin:10px 0 24px;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">Wir melden uns zurück, sobald wir Ihre Nachricht gelesen haben. Bitte schicken Sie uns keine Angaben zu Ihrer Gesundheit — dafür rufen Sie uns bitte an.</p>
+<div style="display:flex;flex-direction:column;gap:14px;width:100%">
+<div style="height:46px;border:1px solid #e4e0e2;border-radius:6px"></div>
+<div style="height:46px;border:1px solid #e4e0e2;border-radius:6px"></div>
+<div style="height:88px;border:1px solid #e4e0e2;border-radius:6px"></div>
+<div><span style="display:inline-block;padding:11px 28px;border-radius:999px;background:#6c1a51;color:#fff;font:500 15px/1 'Source Sans 3',sans-serif">Absenden</span></div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Praxismagazin · Köpfe zentriert, Inhalt links · Antiqua (Source Serif 4 nachzurüsten)</div>
+<div class="dv-card" style="width:1180px">
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);background:#faf8f9;border-bottom:1px solid #e4e0e2;font:400 11.5px/1.5 ui-monospace,Menlo,monospace;color:#5f545c">
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Schrift</div>Überschrift+Text: Antiqua<br>Empfehlung Source Serif 4<br>Bedienung Source Sans 3</div>
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Skala</div>H1 58 / H2 38 / H3 20<br>Lead 21 · Text 19 · Klein 16<br>Marke 11,5 · 0,16 em</div>
+<div style="padding:16px 20px;border-right:1px solid #e9e5e7"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Abstände</div>Abschnitt 120 px, überall gleich<br>Titel→Lead 20 · Lead→Inhalt 60<br>Kacheln 24 · Raster 8</div>
+<div style="padding:16px 20px"><div style="font-weight:600;color:#6c1a51;margin-bottom:6px">Zeilenbreite</div>Lead 34 rem · Text 36 rem<br>Antiqua braucht mehr Grad<br>Achse: Kopf Mitte, Inhalt links</div>
+</div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;height:82px;padding:0 44px;background:#fff">
+<img src="assets/icons/logo.svg" alt="" style="width:52px;height:52px"/>
+<div style="display:flex;align-items:center;gap:24px;font:600 12.5px/1 'Source Sans 3',sans-serif;letter-spacing:.11em;text-transform:uppercase;color:#6c1a51">
+<span>Praxis</span><span>Leistungen</span><span>Team</span><span>Neuigkeiten</span><span>Kontakt</span>
+<span style="padding:9px 18px;border:1px solid #d6ced2;border-radius:999px;letter-spacing:.05em">07245 7171</span>
+</div>
+</div>
+<div style="height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+
+<div style="padding:108px 44px 100px;display:flex;flex-direction:column;align-items:center;text-align:center">
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#766c74">Zahnmedizin &amp; Kieferorthopädie · Bietigheim</div>
+<h1 style="margin:22px 0 0;font:400 58px/1.14 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;letter-spacing:-.012em;color:#6c1a51;max-width:19ch;text-wrap:balance">Willkommen in unserer Praxis Dres. Nold</h1>
+<p style="margin:20px 0 0;max-width:34rem;font:400 21px/1.6 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;color:#4d434b;text-wrap:pretty">Zahnmedizin und Kieferorthopädie unter einem Dach — in Bietigheim. Wir nehmen uns Zeit für Sie, erklären jeden Schritt und behandeln so schonend wie möglich.</p>
+</div>
+
+<div style="display:flex;justify-content:center"><div style="width:1092px;height:1px;background:#e4e0e2"></div></div>
+
+<div style="padding:120px 44px">
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center">
+<h2 style="margin:0;font:400 38px/1.18 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;letter-spacing:-.01em;color:#6c1a51">Unsere Leistungen</h2>
+<p style="margin:20px 0 0;max-width:34rem;font:400 19px/1.65 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#766c74">Klicken Sie auf eine Leistung, um mehr zu erfahren.</p>
+</div>
+
+<div style="margin-top:60px">
+<div style="display:flex;align-items:baseline;gap:16px">
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#4d434b">Zahnärztliche Leistungen</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<p style="margin:18px 0 0;max-width:36rem;font:400 19px/1.7 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#4d434b">Von der Vorsorge über den Zahnerhalt bis zum Zahnersatz — wir behandeln so schonend wie möglich und erhalten Ihre eigenen Zähne so lange wie es geht.</p>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+<sc-for list="{{ zahn }}" as="k" hint-placeholder-count="6">
+<div style="display:grid;grid-template-columns:50px 1fr;gap:8px 18px;padding:26px 24px;border:1px solid #e4e0e2;border-radius:8px;align-content:start">
+<img src="{{ k.icon }}" alt="" style="grid-row:1 / span 3;width:50px;height:50px;object-fit:contain"/>
+<div style="font:600 20px/1.3 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#6c1a51">{{ k.titel }}</div>
+<p style="margin:0;font:400 16px/1.6 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#766c74">{{ k.kurz }}</p>
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6c1a51">Mehr erfahren</div>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top:60px;display:flex;align-items:baseline;gap:16px">
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#4d434b">Kieferorthopädie</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+<sc-for list="{{ kfo }}" as="k" hint-placeholder-count="2">
+<div style="display:grid;grid-template-columns:50px 1fr;gap:8px 18px;padding:26px 24px;border:1px solid #e4e0e2;border-radius:8px;align-content:start">
+<img src="{{ k.icon }}" alt="" style="grid-row:1 / span 3;width:50px;height:50px;object-fit:contain"/>
+<div style="font:600 20px/1.3 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#6c1a51">{{ k.titel }}</div>
+<p style="margin:0;font:400 16px/1.6 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#766c74">{{ k.kurz }}</p>
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6c1a51">Mehr erfahren</div>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top:60px;display:flex;align-items:baseline;gap:16px">
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#4d434b">Sonstige Leistungen</div>
+<div style="flex:1;height:1px;background:#e4e0e2"></div>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+<sc-for list="{{ sonst }}" as="k" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:50px 1fr;gap:8px 18px;padding:26px 24px;border:1px solid #e4e0e2;border-radius:8px;align-content:start">
+<img src="{{ k.icon }}" alt="" style="grid-row:1 / span 3;width:50px;height:50px;object-fit:contain"/>
+<div style="font:600 20px/1.3 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#6c1a51">{{ k.titel }}</div>
+<p style="margin:0;font:400 16px/1.6 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#766c74">{{ k.kurz }}</p>
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6c1a51">Mehr erfahren</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+
+<div style="display:flex;justify-content:center"><div style="width:1092px;height:1px;background:#e4e0e2"></div></div>
+
+<div style="padding:120px 44px">
+<h2 style="margin:0 0 44px;font:400 34px/1.2 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;letter-spacing:-.01em;color:#6c1a51;text-align:center">Beispielabschnitt</h2>
+<div style="max-width:36rem;margin:0 auto">
+<img src="assets/bilder/teaser-b-full.png" alt="ein bild" style="width:100%;margin-bottom:28px"/>
+<p style="margin:0 0 22px;font:400 19px/1.72 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#4d434b;text-wrap:pretty">Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.Dieser Abschnitt zeigt, wie ein frei angelegter Bereich aussieht. Er kann ein Bild enthalten, einen weiterführenden Link oder einen Knopf zum Herunterladen eines PDF-Dokuments.</p>
+<table style="width:100%;border-collapse:collapse;margin-bottom:28px;font:400 17px/1.6 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#4d434b">
+<thead><tr><th style="padding:9px 14px 9px 0;border-bottom:1px solid #d6ced2;text-align:left;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#766c74">Spalte 1</th><th style="padding:9px 14px 9px 0;border-bottom:1px solid #d6ced2;text-align:left;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#766c74">Spalte 2</th></tr></thead>
+<tbody>
+<tr><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">test5</td><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">5</td></tr>
+<tr><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">eefe</td><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">…eere</td></tr>
+<tr><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">…ere</td><td style="padding:10px 14px 10px 0;border-bottom:1px solid #eeeaec">ere</td></tr>
+</tbody>
+</table>
+<div style="margin:0 0 12px;font:600 20px/1.3 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#6c1a51">adsasdasdad</div>
+<ol style="margin:0;padding-left:20px;font:400 19px/1.72 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#4d434b"><li>ddssad</li><li>sdsdsasdad</li><li>aadasdasad</li><li>asdasdaa</li></ol>
+<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px">
+<span style="padding:12px 26px;border-radius:999px;background:#6c1a51;color:#fff;font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.11em;text-transform:uppercase">adadsds</span>
+<span style="padding:12px 26px;border-radius:999px;border:1px solid #d6ced2;color:#6c1a51;font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.11em;text-transform:uppercase">Ein Dokument zum runerladen</span>
+</div>
+</div>
+</div>
+
+<div style="display:flex;justify-content:center"><div style="width:1092px;height:1px;background:#e4e0e2"></div></div>
+
+<div style="padding:120px 44px 104px">
+<h2 style="margin:0;font:400 38px/1.18 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;letter-spacing:-.01em;color:#6c1a51;text-align:center">So erreichen Sie uns</h2>
+
+<div style="margin-top:48px;display:grid;grid-template-columns:1.2fr 1fr;gap:44px;align-items:start">
+<div>
+<div style="display:flex;gap:56px;font:400 18px/1.72 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#4d434b">
+<div><div style="font-weight:600;color:#6c1a51">Praxis Dres. Nold</div>Rosenstraße 1<br>76467 Bietigheim</div>
+<div>Telefon 07245 7171<br>Fax 07245 939269<br><span style="color:#6c1a51;font-weight:600">info@dres-nold.de</span></div>
+</div>
+<div style="margin-top:28px;border-radius:8px;overflow:hidden;border:1px solid #e4e0e2"><img src="assets/deko/karte-vorschau.jpg" alt="" style="width:100%;height:330px;object-fit:cover;filter:saturate(.6)"/></div>
+</div>
+<div>
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#766c74">Nachricht</div>
+<div style="margin-top:14px;font:400 26px/1.25 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#6c1a51">Schreiben Sie uns</div>
+<p style="margin:12px 0 28px;font:400 16px/1.68 'Source Serif 4','Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;color:#766c74">Wir melden uns zurück, sobald wir Ihre Nachricht gelesen haben. Bitte schicken Sie uns keine Angaben zu Ihrer Gesundheit — dafür rufen Sie uns bitte an.</p>
+<div style="display:flex;flex-direction:column;gap:20px">
+<div><div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:9px">Name</div><div style="height:1px;background:#d6ced2"></div></div>
+<div><div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:9px">E-Mail</div><div style="height:1px;background:#d6ced2"></div></div>
+<div><div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:9px">Nachricht</div><div style="height:60px;border-bottom:1px solid #d6ced2"></div></div>
+<div><span style="display:inline-block;padding:12px 28px;border-radius:999px;background:#6c1a51;color:#fff;font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.11em;text-transform:uppercase">Absenden</span></div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+
+<div style="max-width:1000px;margin:34px 0 0;padding:22px 26px;background:#fff;border:1px solid #e4e0e2;border-radius:8px;font:400 13.5px/1.7 system-ui,sans-serif;color:#4d434b">
+<div style="font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:12px">Gilt für alle drei — die Grautöne</div>
+<p style="margin:0 0 14px;max-width:none">Statt sechs Tönen nur noch vier, alle im Farbton des Auberginen (<code>#6c1a51</code>), damit sie eine Familie ergeben. <code>--farbe-dunkel</code> entfällt (geht in <code>--farbe-text</code> auf), die Trennpunkte in <code>#000</code> ebenfalls.</p>
+<div style="display:flex;gap:26px;flex-wrap:wrap">
+<div style="display:flex;align-items:center;gap:10px"><span style="width:26px;height:26px;border-radius:4px;background:#6c1a51"></span><span><code>#6c1a51</code> Überschrift</span></div>
+<div style="display:flex;align-items:center;gap:10px"><span style="width:26px;height:26px;border-radius:4px;background:#4d434b"></span><span><code>#4d434b</code> Fließtext · 9,5:1</span></div>
+<div style="display:flex;align-items:center;gap:10px"><span style="width:26px;height:26px;border-radius:4px;background:#766c74"></span><span><code>#766c74</code> Zweitrangig · 5,0:1</span></div>
+<div style="display:flex;align-items:center;gap:10px"><span style="width:26px;height:26px;border-radius:4px;background:#c6bcc2"></span><span><code>#c6bcc2</code> Punkte, Zeichen</span></div>
+<div style="display:flex;align-items:center;gap:10px"><span style="width:26px;height:26px;border-radius:4px;background:#e4e0e2;border:1px solid #d6ced2"></span><span><code>#e4e0e2</code> Linien statt <code>#dddddd</code></span></div>
+</div>
+<p style="margin:14px 0 0;max-width:none">Drei Hinweise: Der bewegte Verlauf wird bei Gewicht 200 (<a href="#1a">1a</a>) in den dünnen Strichen unruhig — dort nur für die H1 der Startseite verwenden. <code>line-height: 1.08</code> in <code>global.css</code> schneidet das „g“ an; 1,10–1,14 reicht. Und der <code>-webkit-line-clamp: 3</code> auf dem Anrisstext kann entfallen, sobald die Kacheln im festen Dreierraster stehen — dann sind sie ohnehin gleich hoch.</p>
+</div>
+
+<p class="dv-next">Weiter: „nimm <a class="dv-oid" href="#1a">1a</a>, aber zentriert wie <a class="dv-oid" href="#1b">1b</a>“ · „lege Source Serif 4 an und zeig <a class="dv-oid" href="#1c">1c</a> echt“ · „zeig mir <a class="dv-oid" href="#1a">1a</a> auch für Team und Öffnungszeiten“ · „setz <a class="dv-oid" href="#1a">1a</a> in tokens.css um“</p>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const L = (titel, kurz, icon) => ({ titel, kurz, icon: 'assets/icons/' + icon + '.svg' });
+    const P = (name, funktion, foto) => ({ name, funktion, foto: 'assets/bilder/team/' + foto + '.jpg' });
+    const N = (titel, icon) => ({ titel, icon: 'assets/icons/navigation/' + icon + '.svg' });
+    return {
+      fussleiste: [
+        N('Kontakt', 'kontakt'),
+        N('Praxis', 'praxis'),
+        N('Leistungen', 'leistungen'),
+        N('Team', 'team'),
+        N('Neuigkeiten', 'neuigkeiten'),
+        N('Öffnungszeiten', 'oeffnungszeiten')
+      ],
+      fussleisteMitPunkt: [
+        N('Kontakt', 'kontakt'), { istPunkt: true },
+        N('Praxis', 'praxis'), { istPunkt: true },
+        N('Leistungen', 'leistungen'), { istPunkt: true },
+        N('Team', 'team'), { istPunkt: true },
+        N('Neuigkeiten', 'neuigkeiten'), { istPunkt: true },
+        N('Öffnungszeiten', 'oeffnungszeiten')
+      ].map((e) => ({ ...e, istKnopf: !e.istPunkt })),
+      drei: [
+        L('Prophylaxe & Professionelle Zahnreinigung', 'Unserem Anspruch des maximalen Zahnerhaltes entsprechend ist unser wichtigstes Behandlungsziel Ihre eigenen Zähne zu erhalten.', 'prophylaxe'),
+        L('Zahnerhaltung - Füllung & Inlays', 'Wurde an einem Zahn Karies diagnostiziert, muss die erkrankte Zahnsubstanz entfernt werden, damit sich der Defekt nicht weiter ausbreitet und zu …', 'zahnerhaltung'),
+        L('Endodontologie - Wurzelkanalbehandlung', 'Ein Schwerpunkt in unserer Praxis stellt die Wurzelkanalbehandlung (Endodontie) als letzte Maßnahme vor einem möglichen Zahnverlust dar.', 'wurzelkanalbehandlung')
+      ],
+      galerie: [
+        'assets/bilder/galerie/gallery02.jpg',
+        'assets/bilder/galerie/gallery03.jpg',
+        'assets/bilder/galerie/gallery04.jpg',
+        'assets/bilder/galerie/gallery05.jpg',
+        'assets/bilder/galerie/gallery06.jpg',
+        'assets/bilder/galerie/gallery02.jpg',
+        'assets/bilder/galerie/gallery03.jpg'
+      ],
+      aerzte: [
+        P('Dr. Paul Nold', 'Zahnarzt', 'paul'),
+        P('Dr. Sarah Buchgeister-Nold', 'Zahnärztin', 'sarah'),
+        P('Dr. Inge Wilhelm-Nold', 'Fachzahnärztin für Kieferorthopädie', 'inge')
+      ],
+      mitarbeitende: [
+        P('Adriana', 'Zahnmedizinische Fachangestellte', 'adriana'),
+        P('Anne', 'Zahnmedizinische Fachangestellte', 'anne'),
+        P('Carmen', 'Zahnmedizinische Fachangestellte', 'carmen'),
+        P('Dzeni', 'Zahnärztliche Assistenz', 'dzeni'),
+        P('Francesca', 'Zahnärztliche Assistenz', 'francesca'),
+        P('Jessica', 'Zahnmedizinische Fachangestellte', 'jessica'),
+        P('Lisa', 'Auszubildende', 'lisa'),
+        P('Martina', 'Zahnärztliche & kieferorthopädische Laborarbeiten', 'martina'),
+        P('Olga', 'Zahnmedizinische Fachangestellte', 'olga'),
+        P('Petra', 'Zahnmedizinische Fachangestellte', 'petra'),
+        P('Verena', 'Zahnmedizinische Fachangestellte', 'verena'),
+        P('Vlora', 'Zahnmedizinische Fachangestellte', 'vlora')
+      ],
+      zahn: [
+        L('Prophylaxe & Professionelle Zahnreinigung', 'Unserem Anspruch des maximalen Zahnerhaltes entsprechend ist unser wichtigstes Behandlungsziel Ihre eigenen Zähne zu erhalten.', 'prophylaxe'),
+        L('Zahnerhaltung - Füllung & Inlays', 'Wurde an einem Zahn Karies diagnostiziert, muss die erkrankte Zahnsubstanz entfernt werden, damit sich der Defekt nicht weiter ausbreitet und zu …', 'zahnerhaltung'),
+        L('Endodontologie - Wurzelkanalbehandlung', 'Ein Schwerpunkt in unserer Praxis stellt die Wurzelkanalbehandlung (Endodontie) als letzte Maßnahme vor einem möglichen Zahnverlust dar.', 'wurzelkanalbehandlung'),
+        L('Parodontitis - Zahnfleischbehandlung', 'Die Parodontitis ist eine entzündliche Erkrankung des Zahnhalteapparates, die durch Bakterien verursacht wird.', 'parodontitis'),
+        L('Zahnersatz - Kronen, Brücken & Prothesen', 'Ist ein Zahn durch Karies so geschwächt, dass er nicht mehr mit einer Füllung zu rekonstruieren ist, muss er mit einer künstlichen Zahnkrone versorgt werden.', 'zahnersatz'),
+        L('Implantate', 'Ein Zahnimplantat ist eine künstliche Zahnwurzel aus Titan oder Keramik.', 'implantate')
+      ],
+      kfo: [
+        L('Kieferorthopädie für Kinder & Jugendliche', 'Wir empfehlen, früh mit regelmäßigen Kontrollen zu beginnen, um mögliche Probleme rechtzeitig zu erkennen.', 'kieferorthopaedie-kinder'),
+        L('Kieferorthopädie für Erwachsene', 'Eine optisch unauffällige Lösung für gerade Zähne stellt die Behandlung mit dünnen Schienen, sogenannten Alignern, dar.', 'kieferorthopaedie-erwachsene')
+      ],
+      sonst: [
+        L('Dentale-Volumen-Tomographie', 'Die Dentale Volumentomographie (kurz DVT) ist ein modernes 3D Röntgen-Verfahren, das eine dreidimensionale Darstellung der Zahn- und …', '3d-roentgen'),
+        L('Bleaching - Zahnaufhellung', 'Nahrungs- und Genussmittel, insbesondere Kaffee, Tee, Rotwein oder Tabak, hinterlassen Farbpartikel an den Zahnoberflächen, die im Laufe der Zeit in …', 'bleaching'),
+        L('Intraoralscanner - Präzise digitale Abformung', 'Abformungen mit dem Abformlöffel gehören für viele Patienten zu den unangenehmen Erfahrungen beim Zahnarzt.', 'intraoralscanner'),
+        L('Beispielleistung', 'Platzhalter — zeigt, wie eine weitere Leistung im Raster und als eigene Seite aussieht. Vor dem Start ersetzen oder auf „aktiv: false“ setzen.', 'intraoralscanner')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

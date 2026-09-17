@@ -2,14 +2,20 @@
 /**
  * Startseite — One-Pager.
  *
- * STAND: Prototyp. Die Gestaltung folgt in Phase 2 der Webflow-Vorlage;
- * hier geht es zunächst darum, den Seitenwechsel zu den Leistungen zu
- * zeigen. Siehe CLAUDE.md.
+ * Reihenfolge:
+ *
+ *   Einstieg (Begrüßung + Bilderband + Sprechstunden, fährt gemeinsam
+ *   über das Logo herein)  →  freie Abschnitte  →  Leistungen  →
+ *   Neuigkeiten  →  Team  →  Stellen  →  Kontakt  →  Fuß
+ *
+ * Begrüßung und Bilderband stehen seit dem 17. September 2026 IN der
+ * Sprechstunden-Karte (Oeffnungszeiten.astro). Vorher waren sie eigene
+ * Abschnitte im Fluss — und weil die Karte über das fest stehende Logo
+ * fahren muss, stand sie zwangsläufig davor. Jetzt fährt alles
+ * gemeinsam herein und die Reihenfolge stimmt.
  */
 import Startbereich from '../components/Startbereich.astro';
 import Oeffnungszeiten from '../components/Oeffnungszeiten.astro';
-import Willkommen from '../components/Willkommen.astro';
-import Galerie from '../components/Galerie.astro';
 import Abschnitte from '../components/Abschnitte.astro';
 import Stellen from '../components/Stellen.astro';
 import Neuigkeiten from '../components/Neuigkeiten.astro';
@@ -20,12 +26,8 @@ import Navigation from '../components/Navigation.astro';
 import Basis from '../layouts/Basis.astro';
 import Hinweis from '../components/Hinweis.astro';
 import LeistungKachel from '../components/LeistungKachel.astro';
-import seite from '../content/seite.json';
 import leistungen from '../content/leistungen.json';
 import startseite from '../content/startseite.json';
-import team from '../content/team.json';
-
-const { praxis } = seite;
 
 const aktiv = leistungen.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
 
@@ -37,9 +39,6 @@ const gruppen = (leistungen.kategorien ?? [])
   .sort((a, b) => a.position - b.position)
   .map((k) => ({ ...k, eintraege: aktiv.filter((e) => e.kategorie === k.id) }))
   .filter((k) => k.eintraege.length > 0);
-
-const personen = team.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
-const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
 ---
 
 <Basis>
@@ -48,10 +47,9 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
   {/*
     Reihenfolge wie in der Vorlage: `.oz` steht VOR dem Logobereich im
     Seitenfluss und beginnt damit am Dokumentanfang. Nur so fährt die
-    Blase über das fest stehende Logo hinweg herein. Der Logobereich
+    Karte über das fest stehende Logo hinweg herein. Der Logobereich
     selbst liegt fest im Fenster und nimmt keinen Platz im Fluss ein;
-    im Fluss folgt nach den 350vh der Öffnungszeiten nur noch sein
-    weißer Startraum (130vh).
+    im Fluss folgt nach den 350vh des Einstiegs nur noch der Inhalt.
   */}
   <Oeffnungszeiten />
 
@@ -60,27 +58,34 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
   <Navigation />
 
   <main id="inhalt" class="seiteninhalt">
-    <Willkommen />
-    <Galerie />
     <Abschnitte />
 
-    <section id="leistungen" class="inhalt abschnitt">
-      <h2>{startseite.leistungen.titel}</h2>
-      {startseite.leistungen.text && (
-        <p class="abschnitt__einleitung">{startseite.leistungen.text}</p>
-      )}
+    <section id="leistungen" class="leistungen bereich bereich--ohne-oben">
+      <div class="bereich__inhalt">
+        <div class="kicker" data-rein>Behandlung</div>
+        <h2 class="bereich__titel" data-rein>{startseite.leistungen.titel}</h2>
+        {startseite.leistungen.text && (
+          <p class="bereich__einleitung" data-rein>{startseite.leistungen.text}</p>
+        )}
 
-      {gruppen.map((g) => (
-        <>
-          <h3 class="gruppe" id={`leistungen-${g.id}`}>{g.titel}</h3>
-          {g.beschreibung && (
-            <div class="gruppe__text redaktionstext" set:html={g.beschreibung} />
-          )}
-          <div class="kacheln">
-            {g.eintraege.map((l) => <LeistungKachel {...l} />)}
+        {gruppen.map((g) => (
+          <div class="gruppe">
+            <h3 class="gruppenzeile" id={`leistungen-${g.id}`} data-rein>
+              {g.icon && <img class="gruppenzeile__symbol" src={g.icon} alt="" width="34" height="34" />}
+              <span class="gruppenzeile__text">{g.titel}</span>
+              <span class="gruppenzeile__linie" aria-hidden="true"></span>
+            </h3>
+
+            {g.beschreibung && (
+              <div class="gruppe__text redaktionstext" data-rein set:html={g.beschreibung} />
+            )}
+
+            <div class="kacheln">
+              {g.eintraege.map((l) => <LeistungKachel {...l} />)}
+            </div>
           </div>
-        </>
-      ))}
+        ))}
+      </div>
     </section>
   </main>
 
@@ -99,62 +104,34 @@ const aerzte = personen.filter((e) => e.gruppe === 'aerzte');
     background: var(--farbe-flaeche);
   }
 
+  .gruppe { margin-top: var(--abstand-gruppe); }
 
+  /* Die Gruppenzeile ist zugleich Überschrift — ihre Gestaltung steht
+     als `.gruppenzeile` in styles/global.css, weil das Team dasselbe
+     Muster verwendet. */
+  .gruppe > .gruppenzeile { margin: 0; }
 
-  .abschnitt {
-    padding-block: var(--abstand-l);
-  }
-
-  .abschnitt__einleitung {
-    max-width: none;
-    margin-bottom: var(--abstand-l);
-    color: var(--farbe-text-gedeckt);
-    text-align: center;
-  }
-
-  .gruppe {
-    margin-top: var(--abstand-l);
-    font-size: var(--text-m);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--farbe-text-gedeckt);
-    text-align: center;
-  }
-
-  /* Erklärtext zwischen Bereichsüberschrift und Kacheln — aus der
-     Redaktion (leistungen.json → kategorien → beschreibung) */
+  /* Erklärtext zwischen Gruppenzeile und Kacheln — aus der Redaktion
+     (leistungen.json → kategorien → beschreibung) */
   .gruppe__text {
-    max-width: 46rem;
-    margin: 0 auto var(--abstand-m);
-    text-align: center;
+    max-width: var(--breite-absatz);
+    margin-top: 20px;
   }
 
   .gruppe__text :global(p) {
     max-width: none;
     margin-bottom: var(--abstand-2xs);
+    color: var(--farbe-text-gedeckt);
+    font-size: 16px;
+    line-height: 1.65;
   }
 
   .gruppe__text :global(p:last-child) { margin-bottom: 0; }
 
-  /* Kacheln: mittig gesetzt. Bleiben in der letzten Reihe weniger übrig,
-     werden sie etwas breiter und stehen zentriert — bis zu einer
-     Höchstbreite, damit eine einzelne Kachel nicht die Zeile füllt. */
   .kacheln {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--abstand-s);
-    margin-bottom: var(--abstand-m);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 22px;
+    margin-top: 28px;
   }
-
-  .kacheln > :global(.kachel) {
-    flex: 1 1 15rem;
-    max-width: 24rem;
-  }
-
-
-
-
-
-
 </style>

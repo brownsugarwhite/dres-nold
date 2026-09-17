@@ -1,56 +1,98 @@
 ---
 /**
  * Freie Abschnitte im Praxis-Bereich — von der Praxis beliebig anlegbar,
- * ohne eigenen Menüeintrag (docs/entscheidungen.md). Je Abschnitt:
- * Überschrift, Text, optional ein Bild, optional ein Verweis oder ein
- * PDF zum Herunterladen.
+ * ohne eigenen Menüeintrag (docs/entscheidungen.md).
  *
- * Die Breite wählt die Redaktion (`breite`):
- *   schmal  46 rem — dieselbe Lesebreite wie eine aufgeklappte Leistung
- *   breit   volle Inhaltsbreite wie der Rest der Startseite
+ * Aufbau (Florian, 17. September 2026)
+ * ------------------------------------
+ * Ein Abschnitt hat eine Überschrift und darunter einen oder mehrere
+ * BEREICHE. Jeder Bereich zeigt ein Bild NEBEN seinem Text — in der
+ * Redaktion ist nur zu wählen, ob es links oder rechts steht. Der Text
+ * umfließt das Bild nicht mehr.
  *
- * Bilder stehen immer über die volle Breite des Abschnitts und ohne
- * abgerundete Ecken. Sie lassen sich in der Redaktion direkt in den
- * Text setzen — dann steht Text darüber und darunter. Das Feld „Bild
- * oben" bleibt für einfache Fälle erhalten.
+ * Mehrere Bereiche ergeben einen langen Abschnitt mit mehreren Bildern.
+ * Ab dem zweiten Bereich ist eine Zwischenüberschrift sinnvoll.
+ *
+ * Vorher hatte ein Abschnitt genau ein Bild über dem Text, dazu eine
+ * wählbare Breite (schmal / breit). Beides ist entfallen: Der Abschnitt
+ * nutzt immer die volle Inhaltsbreite, weil er zwei Spalten trägt.
+ *
+ * Verweis und PDF-Knopf gelten für den ganzen Abschnitt und stehen im
+ * Textteil des letzten Bereichs — bei einem einzelnen Bereich also
+ * genau dort, wo der Entwurf sie zeigt.
  */
 import daten from '../content/abschnitte.json';
 
-type Breite = 'schmal' | 'breit';
-
 const abschnitte = daten.eintraege
   .filter((e) => e.aktiv && e.titel)
-  .sort((a, b) => a.position - b.position)
-  .map((e) => ({ ...e, breite: ((e as { breite?: string }).breite || 'schmal') as Breite }));
+  .sort((a, b) => a.position - b.position);
+
+/** Ohne Bild steht der Text allein — dann braucht es keine zwei Spalten. */
+const seite = (b: { bild?: string; bild_seite?: string }) =>
+  b.bild ? (b.bild_seite === 'rechts' ? 'rechts' : 'links') : 'ohne';
 ---
 
 {abschnitte.length > 0 && (
   <div class="abschnitte" id="abschnitte">
-    {abschnitte.map((a) => (
-      <section class="abschnitt" id={`abschnitt-${a.id}`} data-breite={a.breite}>
-        <h2>{a.titel}</h2>
-        <div class="abschnitt__koerper">
-          {a.bild && (
-            <img class="abschnitt__bild" src={a.bild} alt={a.bild_alt || ''} width="900" height="600" loading="lazy" />
-          )}
-          <div class="abschnitt__inhalt redaktionstext" set:html={a.text} />
-          {(a.link_ziel || a.pdf_datei) && (
-            <p class="abschnitt__knoepfe">
-              {a.link_ziel && (
-                <a class="knopf" href={a.link_ziel} rel={/^https?:/.test(a.link_ziel) ? 'noopener' : undefined}>
-                  {a.link_text || 'Mehr erfahren'}
-                </a>
-              )}
-              {a.pdf_datei && (
-                <a class="knopf knopf--pdf" href={a.pdf_datei} download>
-                  {a.pdf_text || 'PDF herunterladen'}
-                </a>
-              )}
-            </p>
-          )}
-        </div>
-      </section>
-    ))}
+    {abschnitte.map((a) => {
+      const bereiche = a.bereiche ?? [];
+      const knoepfe = a.link_ziel || a.pdf_datei;
+
+      return (
+        <section class="abschnitt" id={`abschnitt-${a.id}`}>
+          <div class="abschnitt__inhalt">
+            <div class="kicker" data-rein>Aus der Praxis</div>
+            <h2 class="bereich__titel" data-rein>{a.titel}</h2>
+
+            {bereiche.map((b, i) => (
+              <div class="block" data-bild={seite(b)} data-rein>
+                {b.bild && (
+                  <div class="block__bild">
+                    <img src={b.bild} alt={b.bild_alt} width="900" height="675" loading="lazy" />
+                  </div>
+                )}
+
+                <div class="block__text">
+                  {b.titel && <h3 class="block__titel">{b.titel}</h3>}
+                  <div class="redaktionstext" set:html={b.text} />
+
+                  {knoepfe && i === bereiche.length - 1 && (
+                    <div class="abschnitt__knoepfe">
+                      {a.link_ziel && (
+                        <a class="kn" href={a.link_ziel} rel={/^https?:/.test(a.link_ziel) ? 'noopener' : undefined}>
+                          <span class="kn__f" aria-hidden="true"></span>{a.link_text || 'Mehr erfahren'}
+                        </a>
+                      )}
+                      {a.pdf_datei && (
+                        <a class="kn" href={a.pdf_datei} download>
+                          <span class="kn__f" aria-hidden="true"></span>{a.pdf_text || 'PDF herunterladen'}
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Abschnitt ohne Bereiche: die Knöpfe stehen dann für sich */}
+            {knoepfe && bereiche.length === 0 && (
+              <div class="abschnitt__knoepfe abschnitt__knoepfe--allein" data-rein>
+                {a.link_ziel && (
+                  <a class="kn" href={a.link_ziel} rel={/^https?:/.test(a.link_ziel) ? 'noopener' : undefined}>
+                    <span class="kn__f" aria-hidden="true"></span>{a.link_text || 'Mehr erfahren'}
+                  </a>
+                )}
+                {a.pdf_datei && (
+                  <a class="kn" href={a.pdf_datei} download>
+                    <span class="kn__f" aria-hidden="true"></span>{a.pdf_text || 'PDF herunterladen'}
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+      );
+    })}
   </div>
 )}
 
@@ -58,70 +100,95 @@ const abschnitte = daten.eintraege
   .abschnitte {
     display: flex;
     flex-direction: column;
-    gap: var(--abstand-2xl);
-    padding-block: var(--abstand-l);
+    gap: var(--abstand-abschnitt);
+    padding-block: var(--abstand-abschnitt);
+    padding-inline: var(--abstand-seitenrand);
   }
 
-  /* Die Breite gehört zum Abschnitt, nicht zum Container — so kann jeder
-     Abschnitt für sich schmal oder breit stehen. */
-  .abschnitt {
+  .abschnitt__inhalt {
+    width: min(100%, var(--breite-inhalt));
     margin-inline: auto;
-    width: min(100% - 2 * var(--abstand-m), 46rem);
   }
 
-  .abschnitt[data-breite='breit'] {
-    width: min(100% - 2 * var(--abstand-m), var(--breite-inhalt));
+  /*
+    Ein Bereich: Bild und Text nebeneinander. Welche Spalte das Bild
+    bekommt, entscheidet die Redaktion — die Reihenfolge im HTML bleibt
+    dieselbe (Bild, dann Text), damit Vorleseprogramme immer dasselbe
+    hören.
+  */
+  .block {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(32px, 4vw, 64px);
+    align-items: start;
+    margin-top: 48px;
   }
 
-  .abschnitt h2 { margin-bottom: var(--abstand-l); }
+  .block[data-bild='rechts'] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  }
 
-  .abschnitt__koerper { display: flow-root; }
+  .block[data-bild='rechts'] .block__bild { grid-column: 2; grid-row: 1; }
+  .block[data-bild='rechts'] .block__text { grid-column: 1; grid-row: 1; }
 
-  /* Bilder stehen über die volle Breite und ohne Rundung — sowohl das
-     Feld „Bild oben" als auch Bilder aus dem Text. */
-  .abschnitt__bild {
+  /* Ohne Bild: nur Text, auf Lesebreite */
+  .block[data-bild='ohne'] { grid-template-columns: minmax(0, 1fr); }
+  .block[data-bild='ohne'] .block__text { max-width: 46rem; }
+
+  .block__bild {
+    overflow: hidden;
+    border-radius: var(--radius-m);
+  }
+
+  .block__bild img {
     width: 100%;
-    height: auto;
-    margin-bottom: var(--abstand-m);
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
   }
 
-  .abschnitt__inhalt :global(p) { margin-bottom: var(--abstand-s); max-width: none; }
-  .abschnitt__inhalt :global(h3) { margin-top: var(--abstand-m); }
-  .abschnitt__inhalt :global(ul),
-  .abschnitt__inhalt :global(ol) { margin: 0 0 var(--abstand-s); padding-left: var(--abstand-m); }
+  .block__text { min-width: 0; }
+
+  .block__titel {
+    margin: 0 0 var(--abstand-m);
+    font-size: var(--text-titel-klein);
+    font-weight: var(--gewicht-leicht);
+    line-height: 1.22;
+    letter-spacing: -0.011em;
+  }
+
+  /* Die Spalte ist schon schmal genug — der Absatz braucht keine
+     eigene Höchstbreite mehr. */
+  .block__text :global(p) {
+    max-width: none;
+    margin-bottom: var(--abstand-m);
+    font-size: var(--text-flies);
+    line-height: var(--zeilenhoehe-lese);
+  }
+
+  .block__text :global(p:last-child) { margin-bottom: 0; }
 
   .abschnitt__knoepfe {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--abstand-2xs);
-    clear: both;
-    margin: var(--abstand-s) 0 0;
+    gap: 14px;
+    margin-top: 34px;
   }
 
-  .knopf {
-    display: inline-block;
-    padding: var(--abstand-2xs) var(--abstand-m);
-    border: 1px solid var(--farbe-primaer);
-    border-radius: var(--radius-rund);
-    background: var(--farbe-primaer);
-    color: var(--farbe-text-invers);
-    font-weight: var(--gewicht-halbfett);
-    text-decoration: none;
-    transition: background-color var(--dauer-schnell) var(--verlauf), color var(--dauer-schnell) var(--verlauf);
-  }
+  .abschnitt__knoepfe--allein { margin-top: 44px; }
 
-  .knopf:hover,
-  .knopf:focus-visible { background: var(--farbe-dunkel); border-color: var(--farbe-dunkel); }
+  /* Schmale Schirme: untereinander, Bild immer zuerst */
+  @media (max-width: 800px) {
+    .block,
+    .block[data-bild='rechts'] {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--abstand-m);
+      margin-top: 36px;
+    }
 
-  .knopf--pdf {
-    background: var(--farbe-flaeche);
-    color: var(--farbe-primaer);
-  }
-
-  .knopf--pdf:hover,
-  .knopf--pdf:focus-visible { background: var(--farbe-flaeche-gedeckt); color: var(--farbe-primaer); border-color: var(--farbe-primaer); }
-
-  @media (max-width: 767px) {
-    .abschnitte { gap: var(--abstand-xl); }
+    .block[data-bild='rechts'] .block__bild,
+    .block[data-bild='rechts'] .block__text {
+      grid-column: auto;
+      grid-row: auto;
+    }
   }
 </style>

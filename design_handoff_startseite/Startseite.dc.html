@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<style>
+@font-face{font-family:'Source Sans 3';src:url('assets/fonts/source-sans-3-normal.woff2') format('woff2-variations');font-weight:200 900;font-style:normal;font-display:swap}
+*,*::before,*::after{box-sizing:border-box}
+html{overflow-x:clip;scroll-behavior:smooth}
+body{margin:0;font-family:'Source Sans 3',system-ui,sans-serif;color:#4d434b;background:#fff;-webkit-font-smoothing:antialiased}
+a{color:#6c1a51;text-underline-offset:.2em}
+a:hover{color:#4a1137}
+img{max-width:100%;height:auto;display:block}
+:focus-visible{outline:2px solid #6c1a51;outline-offset:3px;border-radius:4px}
+
+/* Animierter Verlauf durch die Buchstaben — wie auf der Live-Seite */
+.vl{background:url('assets/deko/verlauf.gif') center / cover no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#6c1a51}
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){.vl{background:none;-webkit-text-fill-color:#6c1a51}}
+@media (forced-colors:active){.vl{background:none;-webkit-text-fill-color:CanvasText}}
+
+/* Knopf — Linienführung wie die Icons: Haarlinie, runde Form, ruhiges Füllen */
+.kn{--x:50%;--y:50%;position:relative;display:inline-flex;align-items:center;gap:0;padding:15px 30px;border:1px solid #6c1a51;border-radius:999px;background:#fff;color:#6c1a51;font:500 15px/1 'Source Sans 3',sans-serif;letter-spacing:.01em;text-decoration:none;cursor:pointer;overflow:hidden;z-index:0;transition:color .45s cubic-bezier(.22,.61,.24,1),padding .55s cubic-bezier(.22,.61,.24,1)}
+.kn > *{position:relative;z-index:1}
+.kn > .kn__f{position:absolute;z-index:-1;left:var(--x);top:var(--y);width:230%;aspect-ratio:1;height:auto;border-radius:50%;pointer-events:none;background:radial-gradient(circle at center,#83306a 0%,#6c1a51 52%,#5b1342 100%);transform:translate(-50%,-50%) scale(0);opacity:0;transition:transform .7s cubic-bezier(.22,.61,.24,1),opacity .5s cubic-bezier(.22,.61,.24,1)}
+.kn:hover,.kn:focus-visible{color:#fff;padding-left:33px;padding-right:33px}
+.kn--klein:hover,.kn--klein:focus-visible{padding-left:25px;padding-right:25px}
+.kn:hover > .kn__f,.kn:focus-visible > .kn__f{transform:translate(-50%,-50%) scale(1);opacity:1}
+.kn:active > .kn__f{transition-duration:.25s,.2s}
+.kn--voll{color:#fff;background:#6c1a51}
+.kn--voll > .kn__f{background:radial-gradient(circle at center,#fff 0%,#fdfbfc 55%,#f4eff2 100%)}
+.kn--voll:hover,.kn--voll:focus-visible{color:#6c1a51}
+.kn--klein{padding:11px 22px;font-size:14px}
+
+/* Textlink mit gepunkteter Linie — greift die Punktlinie der Leisten auf */
+.tl{display:inline-flex;align-items:center;gap:9px;color:#6c1a51;font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;padding-bottom:6px;background:linear-gradient(to right,#6c1a51,#6c1a51) left bottom / 0 1px no-repeat;transition:background-size .5s cubic-bezier(.22,.61,.24,1)}
+.tl:hover,.tl:focus-visible{background-size:100% 1px}
+.tl .pf{transition:transform .5s cubic-bezier(.22,.61,.24,1)}
+.tl:hover .pf{transform:translateX(5px)}
+
+/* Kachel */
+.kachel{display:flex;flex-direction:column;gap:11px;padding:28px 26px 24px;border:1px solid #e4e0e2;border-radius:10px;background:#fff;text-decoration:none;color:#4d434b;transition:border-color .45s cubic-bezier(.22,.61,.24,1),transform .45s cubic-bezier(.22,.61,.24,1),box-shadow .45s cubic-bezier(.22,.61,.24,1)}
+.kachel:hover,.kachel:focus-visible{border-color:#6c1a51;transform:translateY(-3px);box-shadow:0 18px 40px -28px rgba(108,26,81,.55)}
+.kachel img{transition:transform .55s cubic-bezier(.22,.61,.24,1)}
+.kachel:hover img{transform:scale(1.07)}
+
+/* Leisten-Zustände */
+[data-leiste="kontakt"]{height:40px;overflow:hidden;transition:height 300ms cubic-bezier(0,0,.58,1)}
+[data-leiste="kopf"]{height:0;overflow:hidden;transition:height 300ms cubic-bezier(0,0,.58,1)}
+[data-gescrollt="ja"] [data-leiste="kontakt"]{height:0}
+[data-gescrollt="ja"] [data-leiste="kopf"]{height:84px}
+[data-fussleiste]{transform:translateY(0);transition:transform 300ms cubic-bezier(0,0,.58,1)}
+[data-gescrollt="ja"] [data-fussleiste]{transform:translateY(130px)}
+[data-menue="ja"] [data-mobilmenue]{height:calc(100dvh - 84px)}
+[data-mobilmenue]{height:0;overflow:hidden;transition:height 600ms cubic-bezier(.42,0,.58,1)}
+[data-menue="ja"] [data-leiste="kopf"]{height:84px}
+
+/* Einblenden beim Hereinscrollen */
+[data-rein]{opacity:0;transform:translateY(18px);transition:opacity .8s cubic-bezier(.22,.61,.24,1),transform .8s cubic-bezier(.22,.61,.24,1)}
+[data-rein="da"]{opacity:1;transform:none}
+
+@keyframes lauf{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+[data-band]{animation:lauf 70s linear infinite}
+[data-galerie]:hover [data-band],[data-galerie]:focus-within [data-band]{animation-play-state:paused}
+
+@keyframes blase{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+
+/* Schmale Schirme */
+[data-nav-mobil]{display:none}
+@media (max-width:980px){
+  [data-nav-desktop]{display:none !important}
+  [data-nav-mobil]{display:flex !important}
+  [data-fuss-lang]{display:none !important}
+  [data-fuss-kurz]{display:flex !important}
+}
+@media (max-width:700px){
+  [data-opt]{display:none !important}
+  [data-stapel]{grid-template-columns:1fr !important}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  [data-rein]{opacity:1;transform:none}
+}
+</style>
+</helmet>
+
+<div data-gescrollt="{{ gescrollt }}" data-menue="{{ menueOffen }}" style="position:relative">
+
+<sc-if value="{{ hinweisOffen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;background:#13000d99;backdrop-filter:blur(3px)">
+<div style="position:relative;max-width:520px;width:100%;padding:40px 40px 36px;background:#fff;border-radius:14px;box-shadow:0 40px 80px -40px rgba(0,0,0,.6);animation:blase .5s cubic-bezier(.22,.61,.24,1) both">
+<button type="button" onClick="{{ hinweisSchliessen }}" aria-label="Hinweis schließen" style="position:absolute;top:16px;right:16px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:none;color:#766c74;font:200 26px/1 'Source Sans 3',sans-serif;cursor:pointer;transition:background-color .3s,color .3s,transform .4s cubic-bezier(.22,.61,.24,1)" style-hover="background:#f4f2f3;color:#6c1a51;transform:rotate(90deg)">×</button>
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Hinweis</div>
+<div class="vl" style="margin-top:16px;font:300 34px/1.16 'Source Sans 3',sans-serif;letter-spacing:-.011em">Sommerpause</div>
+<p style="margin:14px 0 0;font:400 17px/1.65 'Source Sans 3',sans-serif;color:#4d434b">Vom 17. August bis 4. September bleibt die Praxis geschlossen. Unser Anrufbeantworter nennt Ihnen die zuständige Vertretungspraxis.</p>
+<div style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap">
+<a class="kn kn--voll" href="#neuigkeiten" onClick="{{ hinweisSchliessen }}"><span class="kn__f" aria-hidden="true"></span>Mehr erfahren</a>
+</div>
+</div>
+</div>
+</sc-if>
+
+<div style="position:fixed;inset:0 0 auto;z-index:100;display:flex;flex-direction:column;align-items:center;width:100%;background:rgb(255 255 255 / 86%);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
+
+<div data-leiste="kontakt" style="display:flex;justify-content:center;width:100%">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:18px;width:min(100% - 48px,1360px);height:40px;font:400 14px/1 'Source Sans 3',sans-serif;color:#6c1a51">
+<span style="display:flex;align-items:center;gap:18px">
+<span>Rosenstraße 1</span><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<span>76467 Bietigheim</span>
+</span>
+<span style="display:flex;align-items:center;gap:18px">
+<a href="tel:072457171" style="color:inherit;text-decoration:none" data-opt>07245 7171</a><span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2" data-opt></span>
+<a href="mailto:info@dres-nold.de" style="color:inherit;text-decoration:none;font-weight:500">info@dres-nold.de</a>
+</span>
+</div>
+</div>
+
+<header data-leiste="kopf" style="display:flex;justify-content:center;width:100%">
+<div style="display:flex;align-items:center;justify-content:space-between;width:min(100% - 48px,1360px);height:84px">
+<a href="#start" aria-label="Zur Startseite" style="flex:none"><img src="assets/icons/logo.svg" alt="" style="width:56px;height:56px;object-fit:contain"/></a>
+
+<nav data-nav-desktop style="display:flex;align-items:center;gap:20px" aria-label="Hauptnavigation">
+<sc-for list="{{ navi }}" as="n" hint-placeholder-count="6">
+<a href="{{ n.ziel }}" style="position:relative;padding:6px 0;color:#6c1a51;font:500 15px/1 'Source Sans 3',sans-serif;letter-spacing:.012em;text-decoration:none;background:linear-gradient(to right,#6c1a51,#6c1a51) left bottom / 0 1px no-repeat;transition:background-size .45s cubic-bezier(.22,.61,.24,1)" style-hover="background-size:100% 1px">{{ n.titel }}</a>
+<span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+</sc-for>
+<a href="tel:072457171" class="kn kn--klein"><span class="kn__f" aria-hidden="true"></span>07245 7171</a>
+</nav>
+
+<button data-nav-mobil type="button" onClick="{{ menueUmschalten }}" aria-label="Menü" aria-expanded="{{ menueOffenBool }}" style="width:48px;height:48px;align-items:center;justify-content:center;flex-direction:column;gap:6px;border:0;background:none;cursor:pointer">
+<span style="display:block;width:26px;height:1.5px;background:#6c1a51;border-radius:2px;transition:transform .4s cubic-bezier(.22,.61,.24,1),opacity .3s;transform:{{ burger1 }}"></span>
+<span style="display:block;width:26px;height:1.5px;background:#6c1a51;border-radius:2px;transition:opacity .3s;opacity:{{ burgerMitte }}"></span>
+<span style="display:block;width:26px;height:1.5px;background:#6c1a51;border-radius:2px;transition:transform .4s cubic-bezier(.22,.61,.24,1);transform:{{ burger3 }}"></span>
+</button>
+</div>
+</header>
+
+<div data-mobilmenue style="width:100%;background:rgb(255 255 255 / 96%)">
+<div style="display:flex;flex-direction:column;width:min(100% - 48px,1360px);margin:8px auto 0">
+<sc-for list="{{ naviMobil }}" as="n" hint-placeholder-count="6">
+<a href="{{ n.ziel }}" onClick="{{ menueSchliessen }}" style="display:flex;align-items:center;gap:18px;padding:10px 0;color:#6c1a51;text-decoration:none;border-bottom:1px solid #f0ecee">
+<img src="{{ n.icon }}" alt="" style="width:52px;height:52px;object-fit:contain"/>
+<span style="font:400 19px/1.2 'Source Sans 3',sans-serif">{{ n.titel }}</span>
+</a>
+</sc-for>
+<div style="display:flex;justify-content:center;gap:28px;padding:22px 0;font:400 14px/1 'Source Sans 3',sans-serif">
+<a href="#" style="color:#4d434b;text-decoration:none">Datenschutz</a>
+<a href="#" style="color:#4d434b;text-decoration:none">Impressum</a>
+</div>
+</div>
+</div>
+
+<div style="width:100%;height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+</div>
+
+<div data-fussleiste style="position:fixed;inset:auto 0 0;z-index:100;width:100%;background:rgb(255 255 255 / 86%);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
+<div style="width:100%;height:1px;background:url('assets/deko/punktlinie.png') 0 0 repeat-x"></div>
+<nav style="display:flex;justify-content:center" aria-label="Schnellzugriff">
+<div data-fuss-lang style="display:flex;justify-content:space-between;align-items:center;width:min(100% - 48px,980px);height:112px">
+<sc-for list="{{ fussleiste }}" as="f" hint-placeholder-count="11">
+<sc-if value="{{ f.istPunkt }}" hint-placeholder-val="{{ false }}">
+<span style="width:3px;height:3px;border-radius:50%;background:#6c1a51;margin-bottom:24px"></span>
+</sc-if>
+<sc-if value="{{ f.istKnopf }}" hint-placeholder-val="{{ true }}">
+<a href="{{ f.ziel }}" style="display:flex;flex-direction:column;align-items:center;margin-top:4px;color:#6c1a51;text-decoration:none">
+<img src="{{ f.icon }}" alt="" style="width:58px;height:58px;margin-bottom:5px;object-fit:contain;transition:transform .5s cubic-bezier(.22,.61,.24,1)" style-hover="transform:translateY(-3px)"/>
+<span style="font:400 14px/1 'Source Sans 3',sans-serif">{{ f.titel }}</span>
+</a>
+</sc-if>
+</sc-for>
+</div>
+<div data-fuss-kurz style="display:none;justify-content:space-around;align-items:center;width:min(100% - 32px,520px);height:104px">
+<sc-for list="{{ fussKurz }}" as="f" hint-placeholder-count="3">
+<a href="{{ f.ziel }}" style="display:flex;flex-direction:column;align-items:center;color:#6c1a51;text-decoration:none">
+<img src="{{ f.icon }}" alt="" style="width:52px;height:52px;margin-bottom:4px;object-fit:contain"/>
+<span style="font:400 13px/1 'Source Sans 3',sans-serif">{{ f.titel }}</span>
+</a>
+</sc-for>
+</div>
+</nav>
+</div>
+
+<div id="start" style="position:sticky;top:0;z-index:1;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100dvh;background:#f3f3f3 url('assets/deko/icon-hintergrund.png') center / 600px">
+<div ref="{{ logoRef }}" style="display:flex;flex-direction:column;align-items:center;will-change:transform,opacity">
+<img src="assets/icons/logo.svg" alt="Dres. Nold" style="width:min(52vh,68vw);height:auto;object-fit:contain"/>
+<p style="max-width:250px;margin:36px 0 12px;font:400 16px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;text-align:center">Scrollen Sie, um mehr von unserer Praxis zu entdecken</p>
+<span style="width:40px;height:20px;background:url('assets/icons/ui/pfeil-runter.svg') center / contain no-repeat"></span>
+</div>
+</div>
+
+<main style="position:relative;z-index:5;background:#fff">
+
+<section id="praxis" style="padding:clamp(72px,9vw,124px) 24px clamp(56px,7vw,96px);display:flex;flex-direction:column;align-items:center;text-align:center">
+<img src="assets/icons/logo.svg" alt="" data-rein style="width:66px;height:46px;object-fit:contain;opacity:.5"/>
+<h1 class="vl" data-rein style="margin:30px 0 0;max-width:19ch;font:300 clamp(2.6rem,1.1rem + 5vw,4.9rem)/1.07 'Source Sans 3',sans-serif;letter-spacing:-.013em;text-wrap:balance">Willkommen in unserer Praxis Dres. Nold</h1>
+<p data-rein style="margin:26px 0 0;max-width:34rem;font:400 clamp(1.06rem,.95rem + .5vw,1.32rem)/1.6 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">Zahnmedizin und Kieferorthopädie unter einem Dach — in Bietigheim. Wir nehmen uns Zeit für Sie, erklären jeden Schritt und behandeln so schonend wie möglich.</p>
+<div data-rein style="margin-top:36px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px">
+<a class="kn kn--voll" href="#contact"><span class="kn__f" aria-hidden="true"></span>Termin vereinbaren</a>
+<a class="kn" href="#leistungen"><span class="kn__f" aria-hidden="true"></span>Unsere Leistungen</a>
+</div>
+</section>
+
+<section id="galerie" data-galerie aria-label="Einblicke in unsere Praxis" style="margin-top:clamp(24px,4vw,48px)">
+<div style="overflow:hidden;width:100%">
+<div data-band ref="{{ bandRef }}" style="display:flex;width:max-content">
+<sc-for list="{{ galerieDoppelt }}" as="g" hint-placeholder-count="10">
+<img src="{{ g.bild }}" alt="{{ g.alt }}" style="flex:none;height:clamp(230px,32vw,430px);width:auto;max-width:none"/>
+</sc-for>
+</div>
+</div>
+<div style="width:min(100% - 48px,1360px);margin:26px auto 0;display:flex;align-items:center;gap:20px">
+<button type="button" ref="{{ leisteRef }}" onClick="{{ leisteSpringen }}" aria-label="Im Bildlauf springen" style="position:relative;flex:1;height:22px;padding:0;border:0;background:none;cursor:pointer">
+<span style="position:absolute;inset:50% 0 auto;height:1px;margin-top:-.5px;background:#e4e0e2"></span>
+<span ref="{{ fortschrittRef }}" style="position:absolute;inset:50% 0 auto;height:1px;margin-top:-.5px;background:#6c1a51;transform-origin:left center;transform:scaleX(0)"></span>
+<span ref="{{ reiterRef }}" style="position:absolute;top:50%;left:0;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:#6c1a51"></span>
+</button>
+<span ref="{{ zaehlerRef }}" style="flex:none;font:500 12px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;color:#766c74;font-variant-numeric:tabular-nums">01 / 05</span>
+</div>
+</section>
+
+<section id="sprechstunden" style="padding:clamp(80px,9vw,124px) 24px 0">
+<div style="width:min(100%,1360px);margin:0 auto">
+<div data-rein style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Sprechstunden</div>
+<h2 class="vl" data-rein style="margin:20px 0 0;font:300 clamp(1.9rem,1.1rem + 2.6vw,3rem)/1.12 'Source Sans 3',sans-serif;letter-spacing:-.012em">Wann Sie uns antreffen</h2>
+<p data-rein style="margin:20px 0 0;max-width:34rem;font:400 17px/1.68 'Source Sans 3',sans-serif;color:#766c74">Termine vereinbaren wir gerne auch außerhalb dieser Zeiten. Rufen Sie uns einfach an.</p>
+
+<div data-stapel style="margin-top:52px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+<sc-for list="{{ zeiten }}" as="z" hint-placeholder-count="3">
+<div data-rein style="padding:32px 30px 28px;border:1px solid #e4e0e2;border-radius:10px;background:#faf8f9">
+<div style="font:600 12px/1.3 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6c1a51">{{ z.titel }}</div>
+<div style="margin-top:22px;display:flex;flex-direction:column;gap:0">
+<sc-for list="{{ z.zeilen }}" as="r" hint-placeholder-count="5">
+<div style="display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid #e9e4e7;font:400 16px/1.4 'Source Sans 3',sans-serif">
+<span style="color:#4d434b">{{ r.tag }}</span>
+<span style="color:#766c74;text-align:right">{{ r.zeit }}</span>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ z.zusatz }}" hint-placeholder-val="{{ false }}">
+<div style="margin-top:16px;font:400 15px/1.5 'Source Sans 3',sans-serif;color:#766c74;font-style:italic">{{ z.zusatz }}</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section id="abschnitt-praxis" style="padding:clamp(80px,9vw,124px) 24px">
+<div style="width:min(100%,1360px);margin:0 auto">
+<div data-rein style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Aus der Praxis</div>
+<h2 class="vl" data-rein style="margin:20px 0 0;font:300 clamp(1.9rem,1.1rem + 2.6vw,3rem)/1.12 'Source Sans 3',sans-serif;letter-spacing:-.012em">Digitale Abformung statt Abformlöffel</h2>
+
+<div data-stapel style="margin-top:48px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(32px,4vw,64px);align-items:start">
+<div data-rein style="overflow:hidden;border-radius:10px"><img src="assets/bilder/galerie/gallery04.jpg" alt="Behandlungszimmer mit digitalem Röntgengerät" style="width:100%;aspect-ratio:4 / 3;object-fit:cover"/></div>
+<div data-rein>
+<p style="margin:0 0 20px;max-width:34rem;font:400 clamp(1.02rem,.95rem + .3vw,1.18rem)/1.68 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">Abformungen mit dem Löffel gehören für viele Patienten zu den unangenehmen Erfahrungen beim Zahnarzt. Der Intraoralscanner nimmt Ihre Zähne stattdessen berührungslos in drei Dimensionen auf — das Ergebnis steht sofort auf dem Bildschirm und lässt sich gemeinsam ansehen.</p>
+<p style="margin:0;max-width:34rem;font:400 clamp(1.02rem,.95rem + .3vw,1.18rem)/1.68 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">Für Kronen, Brücken und Aligner geht der Datensatz direkt ins Labor. Das spart einen Termin und macht das Ergebnis genauer.</p>
+
+<div style="margin-top:34px;display:flex;flex-direction:column">
+<sc-for list="{{ vorteile }}" as="v" hint-placeholder-count="3">
+<div style="display:flex;align-items:baseline;gap:18px;padding:16px 0;border-top:1px solid #e4e0e2">
+<span style="flex:none;font:600 12px/1.4 'Source Sans 3',sans-serif;letter-spacing:.1em;color:#c6bcc2">{{ v.nr }}</span>
+<span style="font:400 16px/1.55 'Source Sans 3',sans-serif;color:#4d434b">{{ v.text }}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="margin-top:34px;display:flex;flex-wrap:wrap;gap:14px">
+<a class="kn" href="#leistungen"><span class="kn__f" aria-hidden="true"></span>Mehr zur Leistung</a>
+<a class="kn" href="#" download><span class="kn__f" aria-hidden="true"></span>Anamnesebogen (PDF)</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="leistungen" style="padding:0 24px clamp(80px,9vw,124px)">
+<div style="width:min(100%,1360px);margin:0 auto">
+<div data-rein style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Behandlung</div>
+<h2 class="vl" data-rein style="margin:20px 0 0;font:300 clamp(1.9rem,1.1rem + 2.6vw,3rem)/1.12 'Source Sans 3',sans-serif;letter-spacing:-.012em">Unsere Leistungen</h2>
+<p data-rein style="margin:20px 0 0;max-width:34rem;font:400 17px/1.68 'Source Sans 3',sans-serif;color:#766c74">Klicken Sie auf eine Leistung, um mehr zu erfahren.</p>
+
+<sc-for list="{{ gruppen }}" as="g" hint-placeholder-count="3">
+<div style="margin-top:clamp(48px,6vw,72px)">
+<div data-rein style="display:flex;align-items:center;gap:18px">
+<img src="{{ g.icon }}" alt="" style="width:34px;height:34px;object-fit:contain;flex:none"/>
+<span style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b;white-space:nowrap">{{ g.titel }}</span>
+<span style="flex:1;height:1px;background:#e4e0e2"></span>
+</div>
+<p data-rein style="margin:20px 0 0;max-width:34rem;font:400 16px/1.65 'Source Sans 3',sans-serif;color:#766c74">{{ g.beschreibung }}</p>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:22px">
+<sc-for list="{{ g.eintraege }}" as="l" hint-placeholder-count="6">
+<a class="kachel" data-rein href="{{ l.href }}">
+<img src="{{ l.icon }}" alt="" style="width:46px;height:46px;object-fit:contain"/>
+<span style="font:600 19px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.012em">{{ l.titel }}</span>
+<span style="font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ l.kurz }}</span>
+<span style="margin-top:auto;padding-top:14px"><span class="tl">Mehr erfahren<span class="pf"><svg viewBox="0 0 55 28" style="width:15px;height:9px;display:block"><polyline fill="none" stroke="currentColor" stroke-miterlimit="10" points="0.35 0.45 27.55 27.65 54.75 0.35" transform="rotate(-90 27.5 14)"/></svg></span></span></span>
+</a>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section id="team">
+<div style="position:relative;width:100%;height:clamp(340px,42vw,560px);overflow:hidden">
+<img src="assets/bilder/aerzteteam.webp" alt="Das Ärzteteam der Praxis Dres. Nold" ref="{{ teamBildRef }}" style="width:100%;height:100%;object-fit:cover;will-change:transform"/>
+<div style="position:absolute;inset:auto 0 0;height:78%;background:linear-gradient(to top,rgb(30 8 22 / 82%),rgb(30 8 22 / 52%) 38%,rgb(30 8 22 / 0))"></div>
+<div style="position:absolute;inset:auto 0 clamp(28px,4vw,52px);width:min(100% - 48px,1360px);margin:0 auto">
+<div style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#fff;text-shadow:0 0 18px rgb(0 0 0 / 55%)">Unser Team</div>
+<div style="margin-top:16px;font:300 clamp(2rem,1.1rem + 3.4vw,4.2rem)/1.02 'Source Sans 3',sans-serif;letter-spacing:-.013em;color:#fff;text-shadow:0 0 20px rgb(0 0 0 / 55%)">Wir freuen uns auf Sie</div>
+</div>
+</div>
+
+<div style="padding:clamp(64px,8vw,104px) 24px clamp(72px,9vw,112px)">
+<div style="width:min(100%,1360px);margin:0 auto">
+<div data-rein style="display:flex;align-items:center;gap:18px">
+<span style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b;white-space:nowrap">Ärztinnen und Ärzte</span>
+<span style="flex:1;height:1px;background:#e4e0e2"></span>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
+<sc-for list="{{ aerzte }}" as="p" hint-placeholder-count="3">
+<div data-rein>
+<div style="position:relative;aspect-ratio:3 / 4;overflow:hidden;background:#f4f2f3">
+<img src="{{ p.foto }}" alt="{{ p.alt }}" style="width:100%;height:100%;object-fit:cover;object-position:top;transition:transform .8s cubic-bezier(.22,.61,.24,1)" style-hover="transform:scale(1.04)"/>
+<span style="position:absolute;inset:auto 0 0;height:14px;background:url('assets/icons/ui/linie-schatten.svg') 50% 100% / cover no-repeat"></span>
+<span style="position:absolute;inset:auto 0 0;height:16px;background:url('assets/icons/ui/pfeil-team.svg') 50% 100% / auto 16px no-repeat"></span>
+</div>
+<div style="margin-top:18px;font:500 20px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.01em">{{ p.name }}</div>
+<div style="margin-top:5px;font:400 15px/1.5 'Source Sans 3',sans-serif;color:#766c74">{{ p.funktion }}</div>
+</div>
+</sc-for>
+</div>
+
+<div data-rein style="margin-top:clamp(52px,6vw,80px);display:flex;align-items:center;gap:18px">
+<span style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4d434b;white-space:nowrap">Unser Praxisteam</span>
+<span style="flex:1;height:1px;background:#e4e0e2"></span>
+</div>
+<div style="margin-top:28px;display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:24px;align-items:start">
+<sc-for list="{{ mitarbeitende }}" as="p" hint-placeholder-count="12">
+<div data-rein>
+<div style="position:relative;aspect-ratio:1 / 1;overflow:hidden;background:#f4f2f3">
+<img src="{{ p.foto }}" alt="{{ p.alt }}" style="width:100%;height:100%;object-fit:cover;object-position:top;transition:transform .8s cubic-bezier(.22,.61,.24,1)" style-hover="transform:scale(1.05)"/>
+<span style="position:absolute;inset:auto 0 0;height:14px;background:url('assets/icons/ui/linie-schatten.svg') 50% 100% / cover no-repeat"></span>
+<span style="position:absolute;inset:auto 0 0;height:16px;background:url('assets/icons/ui/pfeil-team.svg') 50% 100% / auto 16px no-repeat"></span>
+</div>
+<div style="margin-top:14px;font:500 17px/1.3 'Source Sans 3',sans-serif;color:#6c1a51">{{ p.name }}</div>
+<div style="margin-top:3px;font:400 14px/1.45 'Source Sans 3',sans-serif;color:#766c74">{{ p.funktion }}</div>
+<sc-if value="{{ p.hatTaetigkeiten }}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{ p.umschalten }}" aria-expanded="{{ p.offenBool }}" style="margin-top:10px;display:flex;align-items:center;gap:8px;padding:0;border:0;background:none;color:#6c1a51;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer">
+Tätigkeiten
+<span style="width:13px;height:8px;background:url('assets/icons/ui/pfeil-runter.svg') center / contain no-repeat;transition:transform .4s cubic-bezier(.22,.61,.24,1);transform:{{ p.pfeilDreh }}"></span>
+</button>
+<div style="display:grid;grid-template-rows:{{ p.zeilen }};transition:grid-template-rows .4s cubic-bezier(.22,.61,.24,1)">
+<ul style="overflow:hidden;min-height:0;margin:0;padding:0;list-style:none">
+<sc-for list="{{ p.taetigkeiten }}" as="t" hint-placeholder-count="3">
+<li style="margin-top:7px;font:400 14px/1.45 'Source Sans 3',sans-serif;color:#766c74">{{ t }}</li>
+</sc-for>
+</ul>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</section>
+
+<section id="neuigkeiten" style="padding:0 24px clamp(80px,9vw,124px)">
+<div style="width:min(100%,1360px);margin:0 auto">
+<div data-rein style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Aktuelles</div>
+<h2 class="vl" data-rein style="margin:20px 0 0;font:300 clamp(1.9rem,1.1rem + 2.6vw,3rem)/1.12 'Source Sans 3',sans-serif;letter-spacing:-.012em">Neuigkeiten</h2>
+<div style="margin-top:44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px">
+<sc-for list="{{ neuigkeiten }}" as="n" hint-placeholder-count="2">
+<a class="kachel" data-rein href="{{ n.href }}" style="padding:0;overflow:hidden;gap:0">
+<span style="display:block;overflow:hidden"><img src="{{ n.bild }}" alt="{{ n.alt }}" style="width:100%;aspect-ratio:16 / 9;object-fit:cover"/></span>
+<span style="display:flex;flex-direction:column;gap:11px;padding:28px 28px 26px">
+<span style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#766c74">{{ n.datum }}</span>
+<span style="font:600 21px/1.3 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.014em">{{ n.titel }}</span>
+<span style="font:400 16px/1.6 'Source Sans 3',sans-serif;color:#766c74">{{ n.kurz }}</span>
+<span style="margin-top:10px"><span class="tl">Beitrag lesen<span class="pf"><svg viewBox="0 0 55 28" style="width:15px;height:9px;display:block"><polyline fill="none" stroke="currentColor" stroke-miterlimit="10" points="0.35 0.45 27.55 27.65 54.75 0.35" transform="rotate(-90 27.5 14)"/></svg></span></span></span>
+</span>
+</a>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section id="stellen" style="padding:0 24px clamp(80px,9vw,124px)">
+<div style="width:min(100%,1360px);margin:0 auto">
+<div data-rein style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Stellenangebote</div>
+<h2 class="vl" data-rein style="margin:20px 0 0;font:300 clamp(1.9rem,1.1rem + 2.6vw,3rem)/1.12 'Source Sans 3',sans-serif;letter-spacing:-.012em">Wir suchen Verstärkung</h2>
+<p data-rein style="margin:20px 0 0;max-width:34rem;font:400 17px/1.68 'Source Sans 3',sans-serif;color:#766c74">Sie möchten Teil unseres Teams werden? Wir freuen uns auf Ihre Bewerbung — gerne auch formlos per E-Mail.</p>
+
+<div data-rein style="margin-top:44px;border-top:1px solid #e4e0e2">
+<sc-for list="{{ stellen }}" as="st" hint-placeholder-count="3">
+<div style="border-bottom:1px solid #e4e0e2">
+<button type="button" onClick="{{ st.umschalten }}" aria-expanded="{{ st.offenBool }}" style="display:flex;align-items:center;gap:clamp(16px,2.5vw,40px);width:100%;padding:clamp(22px,2.6vw,32px) 0;border:0;background:none;text-align:left;cursor:pointer">
+<span style="flex:none;font:500 12px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;color:#c6bcc2;font-variant-numeric:tabular-nums">{{ st.nr }}</span>
+<span style="flex:1;min-width:0;font:500 clamp(1.15rem,1rem + .7vw,1.6rem)/1.28 'Source Sans 3',sans-serif;color:#6c1a51;letter-spacing:-.012em">{{ st.titel }}</span>
+<span data-opt style="flex:none;padding:7px 16px;border:1px solid #e4e0e2;border-radius:999px;font:500 13px/1 'Source Sans 3',sans-serif;color:#766c74;white-space:nowrap">{{ st.umfang }}</span>
+<span style="flex:none;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #e4e0e2;border-radius:50%;transition:background-color .4s cubic-bezier(.22,.61,.24,1),border-color .4s">
+<span style="width:13px;height:8px;background:url('assets/icons/ui/pfeil-runter.svg') center / contain no-repeat;transition:transform .45s cubic-bezier(.22,.61,.24,1);transform:{{ st.pfeilDreh }}"></span>
+</span>
+</button>
+<div style="display:grid;grid-template-rows:{{ st.zeilen }};transition:grid-template-rows .5s cubic-bezier(.22,.61,.24,1)">
+<div style="overflow:hidden;min-height:0">
+<div data-stapel style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:clamp(24px,3vw,56px);padding:0 0 clamp(28px,3vw,40px)">
+<div>
+<p style="margin:0 0 16px;max-width:34rem;font:400 16.5px/1.68 'Source Sans 3',sans-serif;color:#4d434b;text-wrap:pretty">{{ st.text }}</p>
+<div style="display:flex;flex-direction:column;gap:0;margin-top:22px">
+<sc-for list="{{ st.punkte }}" as="p" hint-placeholder-count="3">
+<div style="display:flex;align-items:baseline;gap:14px;padding:10px 0;border-top:1px solid #f0ecee">
+<span style="flex:none;width:3px;height:3px;margin-top:8px;border-radius:50%;background:#6c1a51"></span>
+<span style="font:400 15.5px/1.55 'Source Sans 3',sans-serif;color:#4d434b">{{ p }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:22px">
+<div style="font:400 15.5px/1.6 'Source Sans 3',sans-serif;color:#4d434b">
+<span style="display:block;font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:8px">Ansprechpartner</span>{{ st.ansprechpartner }}
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:12px">
+<a class="kn kn--voll kn--klein" href="{{ st.mailto }}"><span class="kn__f" aria-hidden="true"></span>Jetzt bewerben</a>
+<sc-if value="{{ st.hatPdf }}" hint-placeholder-val="{{ false }}">
+<a class="kn kn--klein" href="#" download><span class="kn__f" aria-hidden="true"></span>Ausschreibung (PDF)</a>
+</sc-if>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+
+<p data-rein style="margin:28px 0 0;font:400 15.5px/1.6 'Source Sans 3',sans-serif;color:#766c74">Keine passende Stelle dabei? Wir freuen uns auch über eine <a href="mailto:info@dres-nold.de">unaufgeforderte Bewerbung</a>.</p>
+</div>
+</section>
+
+<section id="contact" style="padding:0 24px clamp(64px,8vw,96px)">
+<div style="width:min(100%,1360px);margin:0 auto">
+<div data-rein style="font:600 12px/1 'Source Sans 3',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#766c74">Kontakt</div>
+<h2 class="vl" data-rein style="margin:20px 0 0;font:300 clamp(1.9rem,1.1rem + 2.6vw,3rem)/1.12 'Source Sans 3',sans-serif;letter-spacing:-.012em">So erreichen Sie uns</h2>
+
+<div data-rein style="margin-top:36px;display:flex;flex-wrap:wrap;gap:clamp(28px,5vw,80px);font:400 17px/1.75 'Source Sans 3',sans-serif;color:#4d434b">
+<div><div style="font-weight:600;color:#6c1a51">Praxis Dres. Nold</div>Rosenstraße 1<br>76467 Bietigheim</div>
+<div>Telefon <a href="tel:072457171" style="color:inherit;text-decoration:none">07245 7171</a><br>Fax 07245 939269<br><a href="mailto:info@dres-nold.de" style="font-weight:600">info@dres-nold.de</a></div>
+</div>
+
+<div data-stapel style="margin-top:clamp(40px,5vw,64px);display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(28px,3.5vw,48px);align-items:start">
+
+<div data-rein style="position:relative;border:1px solid #e4e0e2;border-radius:10px;overflow:hidden;min-height:clamp(300px,34vw,470px)">
+<sc-if value="{{ karteAus }}" hint-placeholder-val="{{ true }}">
+<img src="assets/deko/karte-vorschau.jpg" alt="Kartenausschnitt: Rosenstraße 1, 76467 Bietigheim" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.55)"/>
+<div style="position:absolute;inset:auto 20px 20px;padding:20px 24px;background:rgb(255 255 255 / 94%);border-radius:10px;box-shadow:0 18px 40px -22px rgba(0,0,0,.4);backdrop-filter:blur(6px)">
+<p style="margin:0 0 14px;font:400 15px/1.55 'Source Sans 3',sans-serif;color:#4d434b">Die Karte wird von Google Maps geladen. Dabei erhält Google Ihre IP-Adresse.</p>
+<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+<button type="button" class="kn kn--voll kn--klein" onClick="{{ karteLaden }}"><span class="kn__f" aria-hidden="true"></span>Karte laden</button>
+<a class="tl" href="https://www.google.com/maps/search/?api=1&amp;query=Rosenstra%C3%9Fe%201%2C%2076467%20Bietigheim" target="_blank" rel="noopener">In Maps öffnen</a>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ karteAn }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#f4f2f3;text-align:center;padding:24px">
+<img src="assets/icons/navigation/kontakt.svg" alt="" style="width:54px;height:54px;opacity:.5"/>
+<div style="font:400 16px/1.6 'Source Sans 3',sans-serif;color:#766c74;max-width:26rem">Hier stünde jetzt die eingebettete Google-Karte. In diesem Entwurf wird sie nicht nachgeladen.</div>
+<button type="button" class="kn kn--klein" onClick="{{ karteZurueck }}"><span class="kn__f" aria-hidden="true"></span>Zustimmung zurücknehmen</button>
+</div>
+</sc-if>
+</div>
+
+<div data-rein>
+<div style="font:600 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#766c74">Nachricht</div>
+<div class="vl" style="margin-top:14px;font:300 clamp(1.5rem,1.1rem + 1.2vw,2rem)/1.22 'Source Sans 3',sans-serif;letter-spacing:-.011em">Schreiben Sie uns</div>
+<p style="margin:12px 0 30px;max-width:30rem;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">Wir melden uns zurück, sobald wir Ihre Nachricht gelesen haben. Bitte schicken Sie uns keine Angaben zu Ihrer Gesundheit — dafür rufen Sie uns bitte an.</p>
+
+<sc-if value="{{ gesendet }}" hint-placeholder-val="{{ false }}">
+<div style="padding:28px 30px;border:1px solid #6c1a51;border-radius:10px;background:#faf8f9">
+<div style="font:500 20px/1.3 'Source Sans 3',sans-serif;color:#6c1a51">Vielen Dank — Ihre Nachricht ist unterwegs.</div>
+<p style="margin:10px 0 20px;font:400 15px/1.6 'Source Sans 3',sans-serif;color:#766c74">Wir antworten in der Regel innerhalb eines Werktags.</p>
+<button type="button" class="kn kn--klein" onClick="{{ nochmal }}"><span class="kn__f" aria-hidden="true"></span>Neue Nachricht</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ formularOffen }}" hint-placeholder-val="{{ true }}">
+<form onSubmit="{{ absenden }}" noValidate style="display:flex;flex-direction:column;gap:26px">
+<sc-for list="{{ felder }}" as="f" hint-placeholder-count="3">
+<div>
+<label for="{{ f.id }}" style="display:block;font:500 11.5px/1 'Source Sans 3',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#766c74;margin-bottom:9px">{{ f.label }}</label>
+<sc-if value="{{ f.einzeilig }}" hint-placeholder-val="{{ true }}">
+<input id="{{ f.id }}" name="{{ f.id }}" type="{{ f.typ }}" value="{{ f.wert }}" onChange="{{ f.aendern }}" aria-invalid="{{ f.fehlerhaft }}" style="width:100%;padding:8px 0 11px;border:0;border-bottom:1px solid {{ f.linie }};background:none;color:#4d434b;font:400 17px/1.4 'Source Sans 3',sans-serif;outline:none;transition:border-color .35s ease" style-focus="border-bottom-color:#6c1a51"/>
+</sc-if>
+<sc-if value="{{ f.mehrzeilig }}" hint-placeholder-val="{{ false }}">
+<textarea id="{{ f.id }}" name="{{ f.id }}" rows="4" value="{{ f.wert }}" onChange="{{ f.aendern }}" aria-invalid="{{ f.fehlerhaft }}" style="width:100%;padding:8px 0 11px;border:0;border-bottom:1px solid {{ f.linie }};background:none;color:#4d434b;font:400 17px/1.55 'Source Sans 3',sans-serif;outline:none;resize:vertical;transition:border-color .35s ease" style-focus="border-bottom-color:#6c1a51"></textarea>
+</sc-if>
+<sc-if value="{{ f.fehlerhaft }}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="margin-top:9px;font:400 14px/1.4 'Source Sans 3',sans-serif;color:#a4243b">{{ f.fehler }}</div>
+</sc-if>
+</div>
+</sc-for>
+<div><button type="submit" class="kn kn--voll"><span class="kn__f" aria-hidden="true"></span>Absenden</button></div>
+</form>
+</sc-if>
+</div>
+</div>
+</div>
+</section>
+
+<footer style="width:100%;background:#fff url('assets/deko/punktlinie.png') 0 0 repeat-x;background-size:auto 1px">
+<div style="width:min(100% - 48px,1360px);margin:0 auto;padding:clamp(40px,5vw,64px) 0 clamp(120px,14vw,150px);display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start;justify-content:space-between">
+<img src="assets/icons/logo.svg" alt="" style="width:78px;height:54px;object-fit:contain"/>
+<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;font:400 14.5px/1 'Source Sans 3',sans-serif">
+<a href="#" style="color:#4d434b;text-decoration:none">Datenschutz</a>
+<span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<a href="#" style="color:#4d434b;text-decoration:none">Impressum</a>
+<sc-if value="{{ karteAn }}" hint-placeholder-val="{{ false }}">
+<span style="width:3px;height:3px;border-radius:50%;background:#c6bcc2"></span>
+<button type="button" onClick="{{ karteZurueck }}" style="padding:0;border:0;background:none;color:#4d434b;font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:.22em">Zustimmung zur Karte zurücknehmen</button>
+</sc-if>
+</div>
+</div>
+</footer>
+
+</main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = {
+    gescrollt: 'nein', menueOffen: 'nein', hinweisOffen: true,
+    offenesMitglied: null, offeneStelle: '01', karte: false, gesendet: false,
+    werte: { name: '', email: '', nachricht: '' }, fehler: {}
+  };
+
+  componentDidMount() {
+    this.logoEl = null; this.bandEl = null; this.teamBildEl = null;
+    this.wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    this.zeichnen = () => {
+      const y = window.scrollY, vh = window.innerHeight;
+      const gescrollt = y > vh * 0.62 ? 'ja' : 'nein';
+      if (gescrollt !== this.state.gescrollt) this.setState({ gescrollt });
+      if (this.logoEl && !this.wenigerBewegung) {
+        const p = Math.min(1, Math.max(0, y / (vh * 0.7)));
+        this.logoEl.style.transform = 'scale(' + (1 + 0.28 * p) + ')';
+        this.logoEl.style.opacity = String(1 - p);
+      }
+      if (this.teamBildEl && !this.wenigerBewegung) {
+        const r = this.teamBildEl.getBoundingClientRect();
+        const q = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
+        this.teamBildEl.style.transform = 'translateY(' + (-18 + 48 * q) + 'px) scale(' + (1.1 + 0.04 * q) + ')';
+      }
+      this.geplant = false;
+    };
+    this.beiScroll = () => { if (!this.geplant) { this.geplant = true; requestAnimationFrame(this.zeichnen); } };
+    window.addEventListener('scroll', this.beiScroll, { passive: true });
+    window.addEventListener('resize', this.beiScroll, { passive: true });
+    this.zeichnen();
+
+    this.beobachter = new IntersectionObserver((e) => {
+      e.forEach((x) => { if (x.isIntersecting) { x.target.setAttribute('data-rein', 'da'); this.beobachter.unobserve(x.target); } });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    this.reinBeobachten();
+
+    /* Fortschrittsleiste der Galerie: direkt aus der laufenden CSS-Animation
+       gelesen und ohne Zustandswechsel gezeichnet — sonst würde die ganze
+       Seite mehrmals pro Sekunde neu gerendert. */
+    this.anzahl = this.bilder().length;
+    this.leiste = () => {
+      const lauf = this.bandEl && this.bandEl.getAnimations()[0];
+      if (lauf) {
+        const anteil = ((((Number(lauf.currentTime) || 0) / this.zeiten()) % 1) + 1) % 1;
+        if (this.fortschrittEl) this.fortschrittEl.style.transform = 'scaleX(' + anteil.toFixed(4) + ')';
+        if (this.reiterEl) this.reiterEl.style.left = (anteil * 100).toFixed(2) + '%';
+        if (this.zaehlerEl) {
+          const i = Math.floor(anteil * this.anzahl) % this.anzahl;
+          const txt = String(i + 1).padStart(2, '0') + ' / ' + String(this.anzahl).padStart(2, '0');
+          if (this.zaehlerEl.textContent !== txt) this.zaehlerEl.textContent = txt;
+        }
+      }
+      this.takt = requestAnimationFrame(this.leiste);
+    };
+    this.takt = requestAnimationFrame(this.leiste);
+
+    /* Knopf-Verlauf startet an der Stelle, an der der Zeiger den Knopf
+       berührt — deshalb werden die Koordinaten am Element hinterlegt. */
+    this.beiZeiger = (e) => {
+      const kn = e.target && e.target.closest && e.target.closest('.kn');
+      if (!kn) return;
+      const r = kn.getBoundingClientRect();
+      kn.style.setProperty('--x', (((e.clientX - r.left) / r.width) * 100).toFixed(1) + '%');
+      kn.style.setProperty('--y', (((e.clientY - r.top) / r.height) * 100).toFixed(1) + '%');
+    };
+    document.addEventListener('pointerenter', this.beiZeiger, true);
+    document.addEventListener('pointerdown', this.beiZeiger, true);
+  }
+
+  componentDidUpdate() { this.reinBeobachten(); }
+
+  reinBeobachten() {
+    if (!this.beobachter) return;
+    document.querySelectorAll('[data-rein]:not([data-rein="da"]):not([data-beob])').forEach((el) => {
+      el.setAttribute('data-beob', '1'); this.beobachter.observe(el);
+    });
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.beiScroll);
+    window.removeEventListener('resize', this.beiScroll);
+    if (this.beobachter) this.beobachter.disconnect();
+    cancelAnimationFrame(this.takt);
+    document.removeEventListener('pointerenter', this.beiZeiger, true);
+    document.removeEventListener('pointerdown', this.beiZeiger, true);
+  }
+
+  zeiten() {
+    const lauf = this.bandEl && this.bandEl.getAnimations()[0];
+    const d = lauf && lauf.effect && lauf.effect.getComputedTiming().duration;
+    return typeof d === 'number' ? d : 70000;
+  }
+
+  bilder() {
+    return [
+      { bild: 'assets/bilder/galerie/gallery02.jpg', alt: 'Blick in die Praxisräume' },
+      { bild: 'assets/bilder/galerie/gallery03.jpg', alt: 'Behandlungszimmer der Praxis' },
+      { bild: 'assets/bilder/galerie/gallery04.jpg', alt: 'Digitales Röntgengerät im Behandlungsraum' },
+      { bild: 'assets/bilder/galerie/gallery05.jpg', alt: 'Empfangsbereich der Praxis' },
+      { bild: 'assets/bilder/galerie/gallery06.jpg', alt: 'Beratungsgespräch am Behandlungsstuhl' }
+    ];
+  }
+
+  leistungen() {
+    const L = (id, titel, kurz, icon, kategorie) => ({ id, titel, kurz, icon: 'assets/icons/' + icon + '.svg', kategorie, href: '#leistungen' });
+    return [
+      L('prophylaxe', 'Prophylaxe & Professionelle Zahnreinigung', 'Unserem Anspruch des maximalen Zahnerhaltes entsprechend ist unser wichtigstes Behandlungsziel Ihre eigenen Zähne zu erhalten.', 'prophylaxe', 'zahnaerztlich'),
+      L('zahnerhaltung', 'Zahnerhaltung — Füllung & Inlays', 'Wurde an einem Zahn Karies diagnostiziert, muss die erkrankte Zahnsubstanz entfernt werden, damit sich der Defekt nicht weiter ausbreitet.', 'zahnerhaltung', 'zahnaerztlich'),
+      L('wurzelkanalbehandlung', 'Endodontologie — Wurzelkanalbehandlung', 'Ein Schwerpunkt in unserer Praxis stellt die Wurzelkanalbehandlung als letzte Maßnahme vor einem möglichen Zahnverlust dar.', 'wurzelkanalbehandlung', 'zahnaerztlich'),
+      L('parodontitis', 'Parodontitis — Zahnfleischbehandlung', 'Die Parodontitis ist eine entzündliche Erkrankung des Zahnhalteapparates, die durch Bakterien verursacht wird.', 'parodontitis', 'zahnaerztlich'),
+      L('zahnersatz', 'Zahnersatz — Kronen, Brücken & Prothesen', 'Ist ein Zahn durch Karies so geschwächt, dass er nicht mehr mit einer Füllung zu rekonstruieren ist, versorgen wir ihn mit einer Krone.', 'zahnersatz', 'zahnaerztlich'),
+      L('implantate', 'Implantate', 'Ein Zahnimplantat ist eine künstliche Zahnwurzel aus Titan oder Keramik — das Fundament für festsitzenden Zahnersatz.', 'implantate', 'zahnaerztlich'),
+      L('kieferorthopaedie-kinder', 'Kieferorthopädie für Kinder & Jugendliche', 'Wir empfehlen, früh mit regelmäßigen Kontrollen zu beginnen, um mögliche Probleme rechtzeitig zu erkennen.', 'kieferorthopaedie-kinder', 'kieferorthopaedie'),
+      L('kieferorthopaedie-erwachsene', 'Kieferorthopädie für Erwachsene', 'Eine optisch unauffällige Lösung für gerade Zähne stellt die Behandlung mit dünnen Schienen, sogenannten Alignern, dar.', 'kieferorthopaedie-erwachsene', 'kieferorthopaedie'),
+      L('3d-roentgen', 'Dentale-Volumen-Tomographie', 'Ein modernes 3D-Röntgenverfahren, das die Zahn- und Knochenstrukturen dreidimensional darstellt — bei deutlich geringerer Strahlendosis als ein CT.', '3d-roentgen', 'sonstige'),
+      L('bleaching', 'Bleaching — Zahnaufhellung', 'Kaffee, Tee, Rotwein oder Tabak hinterlassen Farbpartikel an den Zahnoberflächen, die im Laufe der Zeit in die Zahnsubstanz eindringen.', 'bleaching', 'sonstige'),
+      L('intraoralscanner', 'Intraoralscanner — Präzise digitale Abformung', 'Abformungen mit dem Abformlöffel gehören für viele Patienten zu den unangenehmen Erfahrungen beim Zahnarzt. Es geht auch berührungslos.', 'intraoralscanner', 'sonstige')
+    ];
+  }
+
+  personen() {
+    const P = (name, funktion, foto, gruppe, taetigkeiten) => ({ id: foto, name, funktion, foto: 'assets/bilder/team/' + foto + '.jpg', alt: 'Porträtfoto von ' + name, gruppe, taetigkeiten: taetigkeiten || [] });
+    return [
+      P('Dr. Paul Nold', 'Zahnarzt', 'paul', 'aerzte'),
+      P('Dr. Sarah Buchgeister-Nold', 'Zahnärztin', 'sarah', 'aerzte'),
+      P('Dr. Inge Wilhelm-Nold', 'Fachzahnärztin für Kieferorthopädie', 'inge', 'aerzte'),
+      P('Adriana', 'Zahnmedizinische Fachangestellte', 'adriana', 'team', ['Zahnärztliche Assistenz', 'Prophylaxe', 'Rezeption', 'Verwaltung']),
+      P('Anne', 'Zahnmedizinische Fachangestellte', 'anne', 'team', ['Zahnärztliche & kieferorthopädische Assistenz', 'Prophylaxe', 'Praxismanagement']),
+      P('Carmen', 'Zahnmedizinische Fachangestellte', 'carmen', 'team', ['Zahnärztliche Assistenz', 'Prophylaxe', 'Rezeption & Verwaltung', 'Qualitätsmanagement']),
+      P('Dzeni', 'Zahnärztliche Assistenz', 'dzeni', 'team', ['Materialmanagement']),
+      P('Francesca', 'Zahnärztliche Assistenz', 'francesca', 'team', ['Verwaltung', 'Rezeption']),
+      P('Jessica', 'Zahnmedizinische Fachangestellte', 'jessica', 'team', ['Zahnärztliche & kieferorthopädische Assistenz', 'Materialmanagement']),
+      P('Lisa', 'Auszubildende', 'lisa', 'team', ['Zahnärztliche & kieferorthopädische Assistenz']),
+      P('Martina', 'Zahnärztliche & kieferorthopädische Laborarbeiten', 'martina', 'team'),
+      P('Olga', 'Zahnmedizinische Fachangestellte', 'olga', 'team', ['Prophylaxe', 'Zahnärztliche Assistenz']),
+      P('Petra', 'Zahnmedizinische Fachangestellte', 'petra', 'team', ['Rezeption', 'Verwaltung', 'Abrechnungswesen']),
+      P('Verena', 'Zahnmedizinische Fachangestellte', 'verena', 'team', ['Rezeption', 'Verwaltung', 'Kieferorthopädische Assistenz']),
+      P('Vlora', 'Zahnmedizinische Fachangestellte', 'vlora', 'team', ['Zahnärztliche & kieferorthopädische Assistenz'])
+    ];
+  }
+
+  feldAendern(name) {
+    return (e) => {
+      const v = e.target.value;
+      this.setState((s) => ({ werte: { ...s.werte, [name]: v }, fehler: { ...s.fehler, [name]: null } }));
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const bilder = this.bilder();
+    const alle = this.leistungen();
+    const personen = this.personen();
+
+    const kat = [
+      { id: 'zahnaerztlich', titel: 'Zahnärztliche Leistungen', icon: 'assets/icons/kategorien/zahnaerztlich.svg', beschreibung: 'Von der Vorsorge über den Zahnerhalt bis zum Zahnersatz — wir behandeln so schonend wie möglich und erhalten Ihre eigenen Zähne so lange wie es geht.' },
+      { id: 'kieferorthopaedie', titel: 'Kieferorthopädie', icon: 'assets/icons/kategorien/kieferorthopaedie.svg', beschreibung: 'An unsere Zahnarztpraxis ist eine kieferorthopädische Fachzahnarztpraxis angeschlossen — von der klassischen Funktionskieferorthopädie über Aligner bis zu festsitzenden Apparaturen.' },
+      { id: 'sonstige', titel: 'Sonstige Leistungen', icon: 'assets/icons/kategorien/sonstige.svg', beschreibung: 'Moderne Technik, die Diagnose und Behandlung genauer und angenehmer macht — vom dreidimensionalen Röntgen bis zur Abformung ohne Abformlöffel.' }
+    ];
+
+    const navi = [
+      { titel: 'Praxis', ziel: '#praxis' }, { titel: 'Leistungen', ziel: '#leistungen' },
+      { titel: 'Team', ziel: '#team' }, { titel: 'Neuigkeiten', ziel: '#neuigkeiten' },
+      { titel: 'Kontakt', ziel: '#contact' }, { titel: 'Öffnungszeiten', ziel: '#sprechstunden' }
+    ];
+    const N = (titel, icon, ziel) => ({ titel, ziel, icon: 'assets/icons/navigation/' + icon + '.svg' });
+    const fussBasis = [N('Kontakt', 'kontakt', '#contact'), N('Praxis', 'praxis', '#praxis'), N('Leistungen', 'leistungen', '#leistungen'), N('Team', 'team', '#team'), N('Neuigkeiten', 'neuigkeiten', '#neuigkeiten'), N('Öffnungszeiten', 'oeffnungszeiten', '#sprechstunden')];
+    const fussleiste = [];
+    fussBasis.forEach((f, i) => { fussleiste.push({ ...f, istKnopf: true }); if (i < fussBasis.length - 1) fussleiste.push({ istPunkt: true }); });
+
+    const zeit = (r) => r.nachmittag ? r.vormittag + ' · ' + r.nachmittag : r.vormittag;
+    const zeiten = [
+      { titel: 'Zahnärztliche Sprechstunde', zusatz: '', zeilen: [
+        { tag: 'Montag', vormittag: '8.00 – 12.00 Uhr', nachmittag: '14.00 – 18.00 Uhr' },
+        { tag: 'Dienstag', vormittag: '8.00 – 12.00 Uhr', nachmittag: '14.00 – 18.00 Uhr' },
+        { tag: 'Mittwoch', vormittag: '8.00 – 12.00 Uhr', nachmittag: '' },
+        { tag: 'Donnerstag', vormittag: '8.00 – 12.00 Uhr', nachmittag: '14.00 – 18.00 Uhr' },
+        { tag: 'Freitag', vormittag: '8.00 – 13.00 Uhr', nachmittag: '' }] },
+      { titel: 'Kieferorthopädische Sprechstunde', zusatz: '… und nach Vereinbarung', zeilen: [
+        { tag: 'Mittwoch', vormittag: '14.00 – 18.00 Uhr', nachmittag: '' },
+        { tag: 'Freitag', vormittag: '13.00 – 16.00 Uhr', nachmittag: '' }] },
+      { titel: 'Telefonische Erreichbarkeit', zusatz: '', zeilen: [
+        { tag: 'Montag', vormittag: '8.00 – 12.00 Uhr', nachmittag: '14.00 – 18.00 Uhr' },
+        { tag: 'Dienstag', vormittag: '8.00 – 12.00 Uhr', nachmittag: '14.00 – 18.00 Uhr' },
+        { tag: 'Mittwoch', vormittag: '8.00 – 12.00 Uhr', nachmittag: '14.00 – 18.00 Uhr' },
+        { tag: 'Donnerstag', vormittag: '8.00 – 12.00 Uhr', nachmittag: '14.00 – 18.00 Uhr' },
+        { tag: 'Freitag', vormittag: '8.00 – 11.00 Uhr', nachmittag: '13.00 – 16.00 Uhr' }] }
+    ].map((z) => ({ ...z, zeilen: z.zeilen.map((r) => ({ tag: r.tag, zeit: zeit(r) })) }));
+
+    const stellen = [
+      { nr: '01', titel: 'Zahnmedizinische Fachangestellte (m/w/d)', umfang: 'Voll- oder Teilzeit', ansprechpartner: 'Dr. Paul Nold', hatPdf: true,
+        text: 'Sie assistieren bei zahnärztlichen und kieferorthopädischen Behandlungen, betreuen unsere Patienten am Empfang und übernehmen Aufgaben in der Verwaltung. Erfahrung ist willkommen, aber keine Voraussetzung — wir arbeiten Sie ein.',
+        punkte: ['Feste Arbeitszeiten ohne Wochenenddienst', 'Fortbildungen werden von der Praxis getragen', 'Eingespieltes Team von fünfzehn Kolleginnen und Kollegen'] },
+      { nr: '02', titel: 'Auszubildende zur ZFA (m/w/d)', umfang: 'Ausbildung, Start August', ansprechpartner: 'Dr. Sarah Buchgeister-Nold', hatPdf: false,
+        text: 'Sie lernen bei uns alles, was zum Beruf gehört — von der Assistenz am Stuhl über die Prophylaxe bis zur Abrechnung. Voraussetzung ist ein guter Schulabschluss und Freude am Umgang mit Menschen.',
+        punkte: ['Betreuung durch eine feste Ausbildungsbeauftragte', 'Übernahme nach erfolgreichem Abschluss angestrebt', 'Praktikum zum Kennenlernen jederzeit möglich'] },
+      { nr: '03', titel: 'Zahnmedizinische Prophylaxeassistentin (m/w/d)', umfang: 'Teilzeit, 20–30 Std.', ansprechpartner: 'Dr. Inge Wilhelm-Nold', hatPdf: true,
+        text: 'Sie übernehmen eigenverantwortlich die professionelle Zahnreinigung und die Prophylaxe für Kinder und Erwachsene — in einem eigenen Behandlungszimmer und mit ausreichend Zeit pro Termin.',
+        punkte: ['Eigenes Behandlungszimmer, 60 Minuten je Termin', 'Weiterbildung zur DH wird unterstützt', 'Vergütung über Tarif'] }
+    ].map((st) => ({
+      ...st,
+      mailto: 'mailto:info@dres-nold.de?subject=' + encodeURIComponent('Bewerbung: ' + st.titel),
+      offenBool: s.offeneStelle === st.nr,
+      pfeilDreh: s.offeneStelle === st.nr ? 'rotate(180deg)' : 'none',
+      zeilen: s.offeneStelle === st.nr ? '1fr' : '0fr',
+      umschalten: () => this.setState((p) => ({ offeneStelle: p.offeneStelle === st.nr ? null : st.nr }))
+    }));
+
+    const felder = [
+      { id: 'name', label: 'Ihr Name', typ: 'text', einzeilig: true, mehrzeilig: false },
+      { id: 'email', label: 'E-Mail-Adresse', typ: 'email', einzeilig: true, mehrzeilig: false },
+      { id: 'nachricht', label: 'Nachricht', typ: 'text', einzeilig: false, mehrzeilig: true }
+    ].map((f) => ({
+      ...f, wert: s.werte[f.id], fehler: s.fehler[f.id] || '',
+      fehlerhaft: s.fehler[f.id] ? true : false,
+      linie: s.fehler[f.id] ? '#a4243b' : '#d6ced2',
+      aendern: this.feldAendern(f.id)
+    }));
+
+    return {
+      gescrollt: s.gescrollt, menueOffen: s.menueOffen, menueOffenBool: s.menueOffen === 'ja',
+      burger1: s.menueOffen === 'ja' ? 'translateY(7.5px) rotate(45deg)' : 'none',
+      burger3: s.menueOffen === 'ja' ? 'translateY(-7.5px) rotate(-45deg)' : 'none',
+      burgerMitte: s.menueOffen === 'ja' ? '0' : '1',
+      menueUmschalten: () => this.setState((p) => ({ menueOffen: p.menueOffen === 'ja' ? 'nein' : 'ja' })),
+      menueSchliessen: () => this.setState({ menueOffen: 'nein' }),
+      hinweisOffen: s.hinweisOffen,
+      hinweisSchliessen: () => this.setState({ hinweisOffen: false }),
+
+      navi, naviMobil: fussBasis, fussleiste,
+      fussKurz: [N('Kontakt', 'kontakt', '#contact'), N('Telefon', 'telefon', 'tel:072457171'), N('Zeiten', 'oeffnungszeiten', '#sprechstunden')],
+
+      logoRef: (el) => { this.logoEl = el; },
+      bandRef: (el) => { this.bandEl = el; },
+      teamBildRef: (el) => { this.teamBildEl = el; },
+
+      galerieDoppelt: bilder.concat(bilder), zeiten, stellen,
+      fortschrittRef: (el) => { this.fortschrittEl = el; },
+      reiterRef: (el) => { this.reiterEl = el; },
+      zaehlerRef: (el) => { this.zaehlerEl = el; },
+      leisteRef: (el) => { this.leisteEl = el; },
+      leisteSpringen: (e) => {
+        const el = this.leisteEl; const lauf = this.bandEl && this.bandEl.getAnimations()[0];
+        if (!el || !lauf) return;
+        const r = el.getBoundingClientRect();
+        const anteil = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+        lauf.currentTime = anteil * this.zeiten();
+      },
+
+      vorteile: [
+        { nr: '01', text: 'Keine Abformmasse, kein Würgereiz — die Aufnahme ist berührungslos.' },
+        { nr: '02', text: 'Das Modell steht sofort auf dem Bildschirm und lässt sich gemeinsam besprechen.' },
+        { nr: '03', text: 'Der Datensatz geht direkt ins Labor. Das spart einen Termin.' }
+      ],
+
+      gruppen: kat.map((k) => ({ ...k, eintraege: alle.filter((l) => l.kategorie === k.id) })),
+
+      aerzte: personen.filter((p) => p.gruppe === 'aerzte'),
+      mitarbeitende: personen.filter((p) => p.gruppe === 'team').map((p) => ({
+        ...p,
+        hatTaetigkeiten: p.taetigkeiten.length > 0,
+        offenBool: s.offenesMitglied === p.id,
+        pfeilDreh: s.offenesMitglied === p.id ? 'rotate(180deg)' : 'none',
+        zeilen: s.offenesMitglied === p.id ? '1fr' : '0fr',
+        umschalten: () => this.setState((prev) => ({ offenesMitglied: prev.offenesMitglied === p.id ? null : p.id }))
+      })),
+
+      neuigkeiten: [
+        { href: '#neuigkeiten', datum: '29. August 2026', titel: 'Unsere neue Behandlungseinheit', kurz: 'Seit dieser Woche behandeln wir in Zimmer 2 an einer neuen Einheit — leiser, bequemer und mit besserer Sicht für Sie auf dem Monitor.', bild: 'assets/bilder/galerie/gallery03.jpg', alt: 'Behandlungszimmer der Praxis' },
+        { href: '#neuigkeiten', datum: '15. August 2026', titel: 'Auch im Urlaub für Sie erreichbar', kurz: 'Während unserer Sommerpause vom 17. August bis 4. September erreichen Sie über unseren Anrufbeantworter die zuständige Vertretungspraxis.', bild: 'assets/bilder/galerie/gallery05.jpg', alt: 'Empfangsbereich der Praxis' }
+      ],
+
+      karteAus: !s.karte, karteAn: s.karte,
+      karteLaden: () => this.setState({ karte: true }),
+      karteZurueck: () => this.setState({ karte: false }),
+
+      felder, gesendet: s.gesendet, formularOffen: !s.gesendet,
+      nochmal: () => this.setState({ gesendet: false, werte: { name: '', email: '', nachricht: '' }, fehler: {} }),
+      absenden: (e) => {
+        e.preventDefault();
+        const w = this.state.werte; const f = {};
+        if (!w.name.trim()) f.name = 'Bitte nennen Sie uns Ihren Namen.';
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(w.email.trim())) f.email = 'Bitte prüfen Sie Ihre E-Mail-Adresse.';
+        if (w.nachricht.trim().length < 10) f.nachricht = 'Bitte schreiben Sie uns etwas mehr — mindestens zehn Zeichen.';
+        if (Object.keys(f).length) this.setState({ fehler: f });
+        else this.setState({ gesendet: true, fehler: {} });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

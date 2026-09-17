@@ -10,6 +10,12 @@
  * dadurch von selbst — niemand muss daran denken.
  *
  * Maße und Farben stammen aus der Vorlage (siehe docs/referenz/).
+ *
+ * Der Entwurf vom 17. September 2026 zeigt hier eine schlichte Karte
+ * ohne Zipfel. Die Sprechblase bleibt (CLAUDE.md nennt sie die
+ * wichtigste Funktion für die Praxis, und sie ist das Erkennungsbild
+ * der alten Seite); übernommen sind Kicker, die leichte Überschrift mit
+ * bewegtem Verlauf und der Knopf der ganzen Seite.
  */
 import daten from '../content/hinweis.json';
 
@@ -40,13 +46,15 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
 
       <div class="hinweis__blase">
         <button class="hinweis__schliessen" type="button" aria-label="Hinweis schließen"></button>
-        <h2 class="hinweis__titel" id="hinweis-titel">{daten.titel}</h2>
+        <div class="kicker kicker--klein">Hinweis</div>
+        <h2 class="hinweis__titel verlauf" id="hinweis-titel">{daten.titel}</h2>
         <div class="hinweis__text redaktionstext" set:html={daten.text} />
 
         {daten.mehr_erfahren_ziel && (
           <div class="hinweis__mehr">
-            <a class="hinweis__knopf" href={daten.mehr_erfahren_ziel}>
-              {daten.mehr_erfahren_text || 'mehr erfahren'}
+            <a class="kn kn--voll" href={daten.mehr_erfahren_ziel}>
+              <span class="kn__f" aria-hidden="true"></span>
+              {daten.mehr_erfahren_text || 'Mehr erfahren'}
             </a>
           </div>
         )}
@@ -114,7 +122,7 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
     position: relative;
     background: var(--farbe-flaeche);
     border-radius: 30px;
-    padding: var(--abstand-m) var(--abstand-l) var(--abstand-l);
+    padding: var(--abstand-l) var(--abstand-l) var(--abstand-m);
     max-width: 34rem;
     max-height: 80vh;
     overflow-y: auto;
@@ -141,8 +149,16 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
   }
 
   .hinweis__titel {
-    margin-bottom: var(--abstand-s);
+    margin: 16px 0 var(--abstand-s);
     padding-right: var(--abstand-l);
+    font-size: 34px;
+    font-weight: var(--gewicht-leicht);
+    line-height: 1.16;
+    letter-spacing: -0.011em;
+  }
+
+  @media (max-width: 30rem) {
+    .hinweis__titel { font-size: 28px; }
   }
 
   .hinweis__text :global(p) {
@@ -155,25 +171,10 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
 
   .hinweis__mehr {
     display: flex;
-    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
     width: 100%;
-    margin-top: var(--abstand-s);
-  }
-
-  .hinweis__knopf {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100px;
-    height: 100px;
-    border-radius: var(--radius-rund);
-    background: var(--farbe-primaer);
-    color: var(--farbe-text-invers);
-    font-weight: var(--gewicht-halbfett);
-    text-align: center;
-    text-decoration: none;
-    line-height: var(--zeilenhoehe-eng);
+    margin-top: 28px;
   }
 
   @media (max-width: 40rem) {

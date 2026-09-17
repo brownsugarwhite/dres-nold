@@ -39,6 +39,8 @@ export type Feld = {
   standard?: boolean;
   /** für eintraege: welches Feld die Überschrift eines Eintrags liefert */
   titelfeld?: string;
+  /** für richtext: keinen „Bild"-Knopf zeigen — Bilder kommen woanders her */
+  ohneBild?: boolean;
   /** Feld anzeigen, aber nicht ändern lassen */
   gesperrt?: boolean;
 };
@@ -227,7 +229,7 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
 
   abschnitte: {
     titel: 'Eigene Abschnitte',
-    beschreibung: 'Frei anlegbare Abschnitte im Praxis-Bereich — ohne eigenen Menüeintrag.',
+    beschreibung: 'Frei anlegbare Abschnitte im Praxis-Bereich — ohne eigenen Menüeintrag. Jeder Abschnitt besteht aus einem oder mehreren Bereichen; in jedem steht ein Bild neben dem Text.',
     symbol: '/icons/navigation/praxis.svg',
     felder: [
       {
@@ -237,14 +239,24 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         standard: true,
         titelfeld: 'titel',
         felder: [
-          { name: 'titel', label: 'Überschrift', typ: 'text' },
-          { name: 'breite', label: 'Breite des Abschnitts', typ: 'auswahl', hilfe: 'Schmal liest sich angenehmer, breit wirkt großzügiger.', optionen: [
-            { wert: 'schmal', label: 'Schmal — wie eine aufgeklappte Leistung' },
-            { wert: 'breit', label: 'Breit — volle Inhaltsbreite' },
-          ] },
-          { name: 'text', label: 'Text', typ: 'richtext', ordner: 'abschnitte', hilfe: 'Bilder lassen sich mit dem Knopf „Bild" direkt in den Text setzen — sie stehen dann über die volle Breite.' },
-          { name: 'bild', label: 'Bild oben (optional)', typ: 'bild', ordner: 'abschnitte' },
-          { name: 'bild_alt', label: 'Bildbeschreibung', typ: 'text' },
+          { name: 'titel', label: 'Überschrift des Abschnitts', typ: 'text' },
+          {
+            name: 'bereiche',
+            label: 'Bereiche',
+            typ: 'eintraege',
+            titelfeld: 'titel',
+            hilfe: 'Jeder Bereich zeigt ein Bild neben seinem Text. Für einen langen Abschnitt mit mehreren Bildern legen Sie einfach mehrere Bereiche an — sie stehen dann untereinander.',
+            felder: [
+              { name: 'titel', label: 'Zwischenüberschrift (optional)', typ: 'text', hilfe: 'Beim ersten Bereich meist leer — dort steht schon die Überschrift des Abschnitts.' },
+              { name: 'bild', label: 'Bild', typ: 'bild', ordner: 'abschnitte' },
+              { name: 'bild_alt', label: 'Bildbeschreibung', typ: 'text', hilfe: 'Pflicht, sobald ein Bild gewählt ist — Vorlese­programme lesen sie vor.' },
+              { name: 'bild_seite', label: 'Bild steht', typ: 'auswahl', optionen: [
+                { wert: 'links', label: 'links, Text rechts daneben' },
+                { wert: 'rechts', label: 'rechts, Text links daneben' },
+              ] },
+              { name: 'text', label: 'Text', typ: 'richtext', ohneBild: true, hilfe: 'Bilder kommen aus dem Feld darüber — ein Bild je Bereich.' },
+            ],
+          },
           { name: 'link_text', label: 'Verweis: Beschriftung', typ: 'text' },
           { name: 'link_ziel', label: 'Verweis: Adresse', typ: 'text' },
           { name: 'pdf_text', label: 'PDF-Knopf: Beschriftung', typ: 'text' },

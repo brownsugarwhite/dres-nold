@@ -26,8 +26,18 @@
  *
  * Die Tätigkeiten der Mitarbeitenden liegen zugeklappt hinter dem Namen
  * (Accordion wie in der Vorlage, nur eines gleichzeitig offen).
+ *
+ * Handoff, 17. September 2026: Kicker und Titel stehen links unten im
+ * Banner statt mittig; darunter gliedern Gruppenzeilen mit Haarlinie.
+ * Alles linksbündig. Über dem Banner liegt ein SEHR leichter Verlauf —
+ * gerade so viel, dass die weiße Schrift sicher lesbar bleibt (der
+ * Entwurf hatte ihn deutlich kräftiger, Florian wollte ihn zurück).
+ * Die Bewegung des Banners (Ablauf a-3) bleibt unverändert.
  */
 import team from '../content/team.json';
+import startseite from '../content/startseite.json';
+
+const texte = startseite.team;
 
 const personen = team.eintraege
   .filter((e) => e.aktiv)
@@ -42,17 +52,32 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
 <section class="team" id="team">
   <div class="team__kopf" data-teamkopf>
     <div class="team__bild" data-teambild role="img" aria-label="Das Ärzteteam der Praxis Dres. Nold"></div>
-    <h2 class="team__titel ohne-verlauf">Wir freuen uns auf Sie</h2>
+    <span class="team__schleier" aria-hidden="true"></span>
+    <div class="team__banner">
+      <div class="team__kicker kicker">Unser Team</div>
+      <h2 class="team__titel ohne-verlauf">{texte.titel}</h2>
+    </div>
   </div>
 
   <div class="team__inhalt">
+    <div class="gruppenzeile" data-rein>
+      <span class="gruppenzeile__text">Ärztinnen und Ärzte</span>
+      <span class="gruppenzeile__linie"></span>
+    </div>
+
     <ul class="aerzte" role="list">
       {aerzte.map((a) => (
         <li class="arzt">
-          <div class="portraet portraet--gross" data-portraet>
-            <div class="portraet__ausschnitt">
-              <img class="portraet__bild" src={foto(a)} alt={a.foto_alt} width="720" height="960" loading="lazy" />
+          <div class="portraetfeld">
+            <div class="portraet" data-portraet>
+              <div class="portraet__ausschnitt">
+                <img class="portraet__bild" src={foto(a)} alt={a.foto_alt} width="720" height="960" loading="lazy" />
+              </div>
             </div>
+            {/* Saum und Pfeil liegen AUSSERHALB des beschnittenen
+                Rahmens: Nur so kann der Saum in die Lücke zwischen zwei
+                Karten hineinreichen und die Reihe zu einer
+                durchgehenden Linie schließen. */}
             <span class="portraet__schatten" aria-hidden="true"></span>
             <span class="portraet__pfeil" aria-hidden="true"></span>
           </div>
@@ -64,30 +89,45 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
       ))}
     </ul>
 
+    <div class="gruppenzeile gruppenzeile--zweite" data-rein>
+      <span class="gruppenzeile__text">Unser Praxisteam</span>
+      <span class="gruppenzeile__linie"></span>
+    </div>
+
     <ul class="mitarbeitende" role="list">
       {mitarbeitende.map((m) => {
         const taetigkeiten = (m.taetigkeiten || []).filter(Boolean);
         return (
           <li class="mitglied" data-mitglied>
-            <div class="portraet" data-portraet>
-              <div class="portraet__ausschnitt">
-                <img class="portraet__bild" src={foto(m)} alt={m.foto_alt} width="820" height="1093" loading="lazy" />
+            <div class="portraetfeld">
+              <div class="portraet" data-portraet>
+                <div class="portraet__ausschnitt">
+                  <img class="portraet__bild" src={foto(m)} alt={m.foto_alt} width="820" height="1093" loading="lazy" />
+                </div>
               </div>
               <span class="portraet__schatten" aria-hidden="true"></span>
               <span class="portraet__pfeil" aria-hidden="true"></span>
             </div>
 
-            {taetigkeiten.length > 0 ? (
+            <p class="person">
+              <span class="person__name">{m.name}</span>
+              <span class="person__funktion">{m.funktion}</span>
+            </p>
+
+            {taetigkeiten.length > 0 && (
               <>
+                {/* Name und Funktion stehen für sich; die Tätigkeiten
+                    klappen darunter auf — so ist der Name auch dann
+                    lesbar, wenn nichts aufgeklappt ist. */}
                 <button
-                  class="person person--knopf"
+                  class="taetigkeitenknopf"
                   type="button"
                   aria-expanded="false"
                   aria-controls={`taetigkeiten-${m.id}`}
+                  aria-label={`Tätigkeiten von ${m.name}`}
                   data-aufklapper
                 >
-                  <span class="person__name">{m.name}</span>
-                  <span class="person__funktion">{m.funktion}</span>
+                  Tätigkeiten
                   <span class="person__pfeil" aria-hidden="true"></span>
                 </button>
                 <div class="taetigkeiten" id={`taetigkeiten-${m.id}`} data-taetigkeiten>
@@ -96,11 +136,6 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
                   </ul>
                 </div>
               </>
-            ) : (
-              <p class="person">
-                <span class="person__name">{m.name}</span>
-                <span class="person__funktion">{m.funktion}</span>
-              </p>
             )}
           </li>
         );
@@ -122,11 +157,11 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
 
   /* ---------- Gruppenfoto ---------- */
 
-  /* .team-header-container */
+  /* .team-header-container — Höhe aus dem Handoff */
   .team__kopf {
     position: relative;
     width: 100%;
-    height: 580px;
+    height: clamp(340px, 42vw, 560px);
     overflow: hidden;
   }
 
@@ -150,30 +185,60 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     initial-value: 0%;
   }
 
-  /* .heading-3: 86 px, Gewicht 600, weiß mit weichem Schatten,
-     am unteren Rand mit 40 px Abstand */
-  .team__titel {
+  /* Ein sehr leichter Schleier über der unteren Hälfte — er soll die
+     Schrift tragen, nicht das Bild abdunkeln. Der Entwurf setzte hier
+     82 % Deckung an; das nahm dem Foto die Wirkung (Florian,
+     17. September 2026). */
+  .team__schleier {
     position: absolute;
     inset: auto 0 0;
-    margin: 0 0 40px;
+    height: 55%;
+    background: linear-gradient(
+      to top,
+      rgb(30 8 22 / 46%),
+      rgb(30 8 22 / 18%) 45%,
+      rgb(30 8 22 / 0)
+    );
+    pointer-events: none;
+  }
+
+  /* Kicker und Titel stehen links unten, auf der Inhaltsbreite */
+  .team__banner {
+    position: absolute;
+    inset: auto 0 clamp(28px, 4vw, 52px);
+    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
+    margin-inline: auto;
+  }
+
+  .team__kicker {
     color: var(--farbe-text-invers);
-    font-size: 86px;
-    font-weight: var(--gewicht-halbfett);
-    line-height: 1;
-    text-align: center;
-    text-shadow: 0 0 18px rgb(0 0 0 / 30%);
+    text-shadow: 0 0 18px rgb(0 0 0 / 55%);
+  }
+
+  .team__titel {
+    margin: 16px 0 0;
+    color: var(--farbe-text-invers);
+    font-size: var(--text-banner);
+    font-weight: var(--gewicht-leicht);
+    line-height: 1.02;
+    letter-spacing: -0.013em;
+    text-align: left;
+    text-shadow: 0 0 20px rgb(0 0 0 / 55%);
   }
 
   /* ---------- Porträts ---------- */
 
-  /* .team-container: 100 px oben, 140 px unten */
+  /* Alles linksbündig auf der Inhaltsbreite (Handoff) */
   .team__inhalt {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 100%;
-    padding-block: 100px 140px;
+    align-items: stretch;
+    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
+    margin-inline: auto;
+    padding-block: clamp(64px, 8vw, 104px) clamp(72px, 9vw, 112px);
   }
+
+  .gruppenzeile--zweite { margin-top: clamp(52px, 6vw, 80px); }
 
   ul[role='list'] {
     list-style: none;
@@ -181,57 +246,81 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     padding: 0;
   }
 
-  /* .docs-list-wrapper: drei Spalten in max. 900 px */
+  /* Drei Spalten wie in der Vorlage, aber linksbündig und eine Spur
+     schmaler. Der Entwurf zeigte die Ärzte im 3:4-Format über die volle
+     Breite — das war zu groß (Florian, 17. September 2026). */
+  /* Beide Raster teilen sich die Lücke — der Schattensaum greift sie
+     auf, um zwischen zwei Karten durchzulaufen. */
+  .aerzte,
+  .mitarbeitende { --luecke: 24px; }
+
+  /* Drei Spalten in den Maßen der alten Seite: Rahmen 300 px hoch, das
+     Foto darin in seinem eigenen Format. Der Entwurf zeigte die Ärzte
+     formatfüllend über die ganze Breite — das war zu groß (Florian). */
   .aerzte {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--luecke);
     width: 100%;
-    max-width: 900px;
+    max-width: 948px;
+    margin-top: 28px;
   }
 
   .arzt {
     display: flex;
     flex-direction: column;
-    align-items: center;
-  }
-
-  /* .team-list-wrapper: max. 1400 px, 40 px unter den Ärzten;
-     .accordion: umbrechend, mittig, oben ausgerichtet */
-  .mitarbeitende {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
     align-items: flex-start;
-    width: 100%;
-    max-width: 1400px;
-    margin-top: 40px;
+    min-width: 0;
   }
 
-  /* .accordion__item: 260 px breit */
+  /* Raster statt umbrechendem Flex: So füllen die Karten die
+     Inhaltsbreite gleichmäßig aus, statt am rechten Rand Platz
+     liegen zu lassen. */
+  .mitarbeitende {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
+    gap: var(--luecke);
+    align-items: start;
+    width: 100%;
+    margin-top: 28px;
+  }
+
   .mitglied {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 260px;
+    align-items: flex-start;
+    min-width: 0;
   }
 
   /* .div-block-19 / .team-image-container: Rahmen mit abgeschnittenem
      Überlauf; das Foto sitzt unten, Pfeil und Schatten liegen darüber */
+  /* Das Feld ist der Bezug für Saum und Pfeil; der Rahmen darin
+     beschneidet das Foto. */
+  .portraetfeld {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Rahmenhöhen der alten Seite: Ärzte 300 px, Praxisteam 260 px.
+     Das Foto steht in seinem eigenen Format mittig darin — es füllt den
+     Rahmen NICHT aus. Nur so schaut die Person ganz aus dem Schattensaum
+     heraus, statt an der Brust beschnitten zu werden (Florian). */
   .portraet {
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
-    width: 260px;
-    height: 260px;
+    width: 100%;
+    height: var(--portraet-hoehe, 260px);
     overflow: hidden;
+    /* Weiß, nicht grau: Der Ausschnitt darin ist beim Hereinscrollen
+       nur 80 % hoch (Ablauf a/a-2). Ein grauer Grund stünde in dieser
+       Zeit als Balken über dem Foto. */
+    background: var(--farbe-flaeche);
   }
 
-  .portraet--gross {
-    width: 100%;
-    height: 300px;
-  }
+  .arzt .portraet { --portraet-hoehe: 300px; }
 
   /* Der sichtbare Ausschnitt: 80 % → 100 % der Rahmenhöhe (Ablauf a / a-2),
      dabei 1,2 → 1 skaliert. Das Foto darin behält seine volle Höhe und
@@ -248,58 +337,83 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     transform: scale(var(--groesse, 1));
   }
 
+  /* Feste Höhe in Bildpunkten, nicht 100 % des Ausschnitts: Beim
+     Hereinscrollen ist der Ausschnitt nur 80 % hoch (Ablauf a/a-2) —
+     er soll dann WENIGER zeigen, nicht ein kleineres Bild. */
   .portraet__bild {
     width: auto;
     max-width: none;
-    height: 300px;
+    height: var(--portraet-hoehe, 260px);
+    /* Beim Zeigen wächst das Foto leicht im Ausschnitt (Handoff). Die
+       Skalierung sitzt auf dem Bild, nicht auf dem Ausschnitt — der
+       trägt schon die scrollgebundene Bewegung der Vorlage. */
+    transition: transform 0.8s var(--verlauf-betont);
   }
 
-  .portraet:not(.portraet--gross) .portraet__bild { height: 260px; }
+  .portraetfeld:hover .portraet__bild,
+  .arzt:focus-within .portraet__bild,
+  .mitglied:focus-within .portraet__bild { transform: scale(1.04); }
 
-  /* .team-shadow: 14 px hoher Schattensaum, über die volle Breite.
-     Er sitzt je Porträt; nebeneinander ergeben sie eine durchgehende
-     Linie. An den beiden Enden einer Reihe brach sie bisher hart ab —
-     dort läuft sie jetzt aus. Welche Karte am Anfang bzw. Ende einer
-     Reihe steht, kann CSS bei umbrechendem Flex nicht wissen; das
-     setzt das Skript unten als `data-reihe`. */
+  /* .team-shadow: 14 px hoher Schattensaum an der Unterkante.
+     Er sitzt je Karte, reicht aber um eine halbe Lücke nach links und
+     rechts über sie hinaus — nebeneinander ergibt das EINE durchgehende
+     Linie über die ganze Reihe, auch mit Abstand zwischen den Karten.
+
+     Welche Karte am Anfang bzw. Ende einer Reihe steht, kann CSS bei
+     einem umbrechenden Raster nicht wissen; das setzt das Skript unten
+     als `data-reihe`. */
   .portraet__schatten {
     position: absolute;
-    inset: auto 0 0;
     z-index: 1;
-    height: 14px;
+    bottom: 0;
+    left: calc(var(--luecke, 24px) / -2);
+    right: calc(var(--luecke, 24px) / -2);
+    /* Höher und dadurch weicher als die 14 px der Vorlage: Der Verlauf
+       der Zeichnung wird über mehr Pixel gestreckt und die Deckung
+       etwas zurückgenommen (Florian, 17. September 2026). */
+    height: 24px;
+    opacity: 0.9;
     background: url('/icons/ui/linie-schatten.svg') 50% 100% / cover no-repeat;
   }
 
-  /* Der Verlauf zieht sich über die ganze Karte und bleibt außen lange
-     sichtbar — er soll auslaufen, nicht abreißen. Die Zwischenstufen
-     halten ihn im äußeren Drittel noch gut erkennbar. */
+  /* An den Reihenenden läuft die Linie aus, statt abzureißen: Sie ragt
+     dafür 64 px über die Inhaltsbreite hinaus und verliert sich auf
+     dieser Strecke. */
+  [data-reihe='anfang'] .portraet__schatten,
+  [data-reihe='allein'] .portraet__schatten { left: -64px; }
+
+  [data-reihe='ende'] .portraet__schatten,
+  [data-reihe='allein'] .portraet__schatten { right: -64px; }
+
   [data-reihe='anfang'] .portraet__schatten {
     mask-image: linear-gradient(to right,
       rgb(0 0 0 / 0) 0%,
-      rgb(0 0 0 / 0.35) 25%,
-      rgb(0 0 0 / 0.7) 55%,
-      rgb(0 0 0 / 1) 95%);
+      rgb(0 0 0 / 0.25) 20%,
+      rgb(0 0 0 / 0.6) 45%,
+      rgb(0 0 0 / 0.9) 70%,
+      rgb(0 0 0 / 1) 90%);
   }
 
   [data-reihe='ende'] .portraet__schatten {
     mask-image: linear-gradient(to left,
       rgb(0 0 0 / 0) 0%,
-      rgb(0 0 0 / 0.35) 25%,
-      rgb(0 0 0 / 0.7) 55%,
-      rgb(0 0 0 / 1) 95%);
+      rgb(0 0 0 / 0.25) 20%,
+      rgb(0 0 0 / 0.6) 45%,
+      rgb(0 0 0 / 0.9) 70%,
+      rgb(0 0 0 / 1) 90%);
   }
 
   [data-reihe='allein'] .portraet__schatten {
     mask-image: linear-gradient(to right,
       rgb(0 0 0 / 0) 0%,
-      rgb(0 0 0 / 0.5) 20%,
-      rgb(0 0 0 / 1) 45%,
-      rgb(0 0 0 / 1) 55%,
-      rgb(0 0 0 / 0.5) 80%,
+      rgb(0 0 0 / 0.5) 18%,
+      rgb(0 0 0 / 1) 40%,
+      rgb(0 0 0 / 1) 60%,
+      rgb(0 0 0 / 0.5) 82%,
       rgb(0 0 0 / 0) 100%);
   }
 
-  /* .team-arrow: weißer Pfeil, 16 px hoch, unten mittig */
+  /* .team-arrow: weißer Pfeil, 16 px hoch, unten mittig auf der Karte */
   .portraet__pfeil {
     position: absolute;
     inset: auto 0 0;
@@ -313,64 +427,93 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
   .person {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     margin: 0;
     padding: 0;
     border: 0;
     background: none;
     font: inherit;
-    text-align: center;
+    text-align: left;
   }
 
-  .person--knopf { cursor: pointer; }
+  .taetigkeitenknopf {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--farbe-primaer);
+    font-size: var(--text-kicker-klein);
+    font-weight: var(--gewicht-halbfett);
+    line-height: 1;
+    letter-spacing: var(--sperrung-kicker-klein);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
 
-  .person--knopf:focus-visible {
+  .taetigkeitenknopf:focus-visible {
     outline: 2px solid var(--farbe-primaer);
-    outline-offset: 2px;
+    outline-offset: 3px;
     border-radius: var(--radius-s);
   }
 
-  /* .heading-2 / .heading-4: 22/26 px, Gewicht 400, 13 px Abstand oben */
+  /* Namen tragen Gewicht 500 — kräftiger als der Fließtext, aber
+     leichter als die gesperrten Beschriftungen (Handoff). */
   .person__name {
     display: block;
-    width: 200px;
-    margin-top: 13px;
+    width: 100%;
+    margin-top: 14px;
     color: var(--farbe-primaer);
-    font-size: 22px;
-    font-weight: var(--gewicht-normal);
-    line-height: 26px;
+    font-size: 17px;
+    font-weight: var(--gewicht-mittel);
+    line-height: 1.3;
   }
 
-  /* .text-block-2 / -3: 16 px, Gewicht 300, 7 px Abstand */
+  .arzt .person__name {
+    margin-top: 18px;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    /* Platz für zwei Zeilen: Ein langer Doppelname bricht um, und dann
+       stünden die Funktionsangaben der drei Ärzte auf verschiedenen
+       Höhen. */
+    min-height: 2.6em;
+  }
+
   .person__funktion {
     display: block;
-    width: 200px;
-    margin-top: 7px;
-    color: var(--farbe-text);
-    font-size: 16px;
-    font-weight: var(--gewicht-leicht);
-    line-height: var(--zeilenhoehe-mittel);
+    width: 100%;
+    margin-top: 3px;
+    color: var(--farbe-text-gedeckt);
+    font-size: 14px;
+    font-weight: var(--gewicht-normal);
+    line-height: 1.45;
   }
 
-  /* Kleiner Pfeil als Hinweis, dass mehr dahinter steckt */
+  .arzt .person__funktion {
+    margin-top: 5px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
   .person__pfeil {
     display: block;
-    width: 14px;
+    width: 13px;
     height: 8px;
-    margin-top: 6px;
     background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
-    transition: transform 300ms var(--verlauf);
+    transition: transform 400ms var(--verlauf-betont);
   }
 
-  .person--knopf[aria-expanded='true'] .person__pfeil { transform: rotate(180deg); }
+  .taetigkeitenknopf[aria-expanded='true'] .person__pfeil { transform: rotate(180deg); }
 
-  /* Tätigkeiten: klappen in 300 ms auf (wie `slideToggle(300)`) */
+  /* Tätigkeiten: klappen über die Zeilenhöhe des Rasters auf */
   .taetigkeiten {
     display: grid;
     grid-template-rows: 0fr;
     width: 100%;
-    transition: grid-template-rows 300ms var(--verlauf);
+    transition: grid-template-rows 400ms var(--verlauf-betont);
   }
 
   .taetigkeiten[data-offen] { grid-template-rows: 1fr; }
@@ -378,29 +521,26 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
   .taetigkeiten__liste {
     overflow: hidden;
     min-height: 0;
-    text-align: center;
+    text-align: left;
   }
 
   .taetigkeiten__liste li {
-    width: 60%;
-    margin: 7px auto 0;
-    color: var(--farbe-text);
-    font-size: 16px;
-    font-weight: var(--gewicht-leicht);
-    line-height: 1.4;
+    width: auto;
+    margin: 7px 0 0;
+    color: var(--farbe-text-gedeckt);
+    font-size: 14px;
+    font-weight: var(--gewicht-normal);
+    line-height: 1.45;
   }
 
   /* ---------- Umbrüche wie in der Vorlage ---------- */
 
   @media (max-width: 991px) {
-    .team__kopf { height: 400px; }
-    .team__titel { font-size: 60px; }
-    .portraet--gross { height: 260px; }
-    .portraet--gross .portraet__bild { height: 260px; }
+    .arzt .portraet { --portraet-hoehe: 260px; }
   }
 
   @media (max-width: 767px) {
-    .team__kopf { height: 600px; }
+    .team__kopf { height: 460px; }
     /* Das Foto ist doppelt so breit wie das Fenster und fährt beim
        Hereinscrollen von −50 % auf 0 % (Abläufe a-22 / a-23) */
     .team__bild {
@@ -410,30 +550,27 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
       --kopf-fahrt: -50%;
     }
     .team__kopf[data-sichtbar] .team__bild { --kopf-fahrt: 0%; }
-    .team__titel { font-size: 50px; }
-    .aerzte { grid-template-columns: repeat(2, 1fr); }
-    .mitglied { width: 50%; }
-    .portraet { width: 100%; }
-    .person__name { width: auto; font-size: 20px; line-height: 1.1; }
+    .aerzte { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+    .mitarbeitende { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
   }
 
   @media (max-width: 479px) {
-    .team__kopf { height: 500px; }
+    .team__kopf { height: 420px; }
     .team__bild { background-size: cover; }
-    .team__titel { font-size: 60px; }
-    /* Foto passt in den Rahmen, unten verankert */
-    .portraet__ausschnitt { align-items: flex-end; }
-    .portraet__bild,
-    .portraet--gross .portraet__bild,
-    .portraet:not(.portraet--gross) .portraet__bild { height: 100%; }
-    .person__name { font-size: 18px; line-height: 1.2; }
-    .person__funktion,
-    .taetigkeiten__liste li { width: auto; }
+    .aerzte,
+    .mitarbeitende { --luecke: 14px; }
+    .mitarbeitende { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    /* Auf schmalen Handys ist die Spalte schmaler als das Foto — dann
+       darf es mitschrumpfen, sonst wird es seitlich beschnitten. */
+    .portraet { height: auto; aspect-ratio: 1 / 1.15; }
+    .portraet__bild { width: 100%; height: 100%; object-fit: contain; object-position: bottom; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .team__bild { transform: none; transition: none; }
     .portraet__ausschnitt { height: 100%; transform: none; }
+    .portraet__bild { transition: none; }
+    .portraetfeld:hover .portraet__bild { transform: none; }
     .taetigkeiten, .person__pfeil { transition: none; }
   }
 </style>

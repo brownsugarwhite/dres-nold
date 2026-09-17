@@ -1,13 +1,18 @@
 ---
 /**
- * Begrüßung zwischen Öffnungszeiten und Galerie.
+ * Begrüßung — der erste Abschnitt, der sich über das Logo schiebt.
  *
- * Die größte Überschrift der Seite — sie steht für sich allein und darf
- * deshalb eine Stufe über den übrigen Abschnittsüberschriften liegen.
- * Trägt wie alle Überschriften im Inhalt den bewegten Verlauf.
+ * Als einziger Abschnitt steht er mittig: Er nimmt die Zentrierung des
+ * Logos darüber auf. Alles Weitere auf der Seite ist linksbündig.
+ *
+ * Der Entwurf zeigte darüber noch ein kleines Echo des Logos. Das ist
+ * wieder heraus (Florian, 17. September 2026): Das große Logo steht
+ * unmittelbar davor, ein zweites daneben wäre eine Wiederholung.
  *
  * Überschrift und Beschreibungstext kommen aus der Redaktion
- * (src/content/startseite.json).
+ * (src/content/startseite.json). Die beiden Knöpfe darunter führen an
+ * feste Stellen derselben Seite und stehen deshalb hier im Code, nicht
+ * in der Redaktion.
  */
 import startseite from '../content/startseite.json';
 
@@ -20,7 +25,7 @@ const zeilen = texte.titel.split('\n').filter((z) => z.trim() !== '');
 ---
 
 <section class="willkommen" id="praxis">
-  <h1 class="willkommen__titel">
+  <h1 class="willkommen__titel" data-rein>
     {zeilen.map((zeile, i) => (
       <>
         {i > 0 && <br />}
@@ -29,7 +34,12 @@ const zeilen = texte.titel.split('\n').filter((z) => z.trim() !== '');
     ))}
   </h1>
 
-  {texte.text && <p class="willkommen__text">{texte.text}</p>}
+  {texte.text && <p class="willkommen__text" data-rein>{texte.text}</p>}
+
+  <div class="willkommen__knoepfe" data-rein>
+    <a class="kn kn--voll" href="#contact"><span class="kn__f" aria-hidden="true"></span>Termin vereinbaren</a>
+    <a class="kn" href="#leistungen"><span class="kn__f" aria-hidden="true"></span>Unsere Leistungen</a>
+  </div>
 </section>
 
 <style>
@@ -37,34 +47,40 @@ const zeilen = texte.titel.split('\n').filter((z) => z.trim() !== '');
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-block: var(--abstand-2xl) var(--abstand-xl);
-    padding-inline: var(--abstand-m);
+    padding-block: clamp(72px, 9vw, 124px) clamp(56px, 7vw, 96px);
+    padding-inline: var(--abstand-seitenrand);
     background: var(--farbe-flaeche);
+    text-align: center;
   }
 
-  /* Eine Stufe größer als `--text-titel` (die übrigen Überschriften) */
+  /* Eine Stufe größer als `--text-titel` (die übrigen Überschriften).
+     Leicht gesetzt (300) und eng gesperrt — der Grundsatz der ganzen
+     Seite: Größe trägt die Hierarchie, nicht Fettung. */
   .willkommen__titel {
-    max-width: 1000px;
+    max-width: 19ch;
     margin: 0;
-    font-size: clamp(2.25rem, 1.3rem + 4vw, 4.5rem);
-    font-weight: var(--gewicht-halbfett);
-    line-height: 1.08;
-    text-align: center;
+    font-size: var(--text-willkommen);
+    font-weight: var(--gewicht-leicht);
+    line-height: 1.07;
+    letter-spacing: -0.013em;
+    text-wrap: balance;
   }
 
   .willkommen__text {
-    max-width: 46rem;
-    margin: var(--abstand-m) 0 0;
+    max-width: var(--breite-absatz);
+    margin: 26px 0 0;
     color: var(--farbe-text);
-    font-size: var(--text-l);
+    font-size: var(--text-lead);
     font-weight: var(--gewicht-normal);
-    line-height: 1.45;
-    text-align: center;
+    line-height: 1.6;
     text-wrap: pretty;
   }
 
-  @media (max-width: 767px) {
-    .willkommen { padding-block: var(--abstand-xl) var(--abstand-l); }
-    .willkommen__text { font-size: var(--text-m); margin-top: var(--abstand-s); }
+  .willkommen__knoepfe {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 36px;
   }
 </style>

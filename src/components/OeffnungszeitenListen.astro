@@ -4,10 +4,20 @@
  * in Oeffnungszeiten.astro. Auf allen Bildschirmgrößen dieselbe Blase
  * (docs/entscheidungen.md); auf dem Desktop stehen die Listen
  * nebeneinander, auf Handys untereinander.
+ *
+ * Gestaltung nach dem Handoff vom 17. September 2026: Spaltentitel als
+ * gesperrte Versalien in der Hausfarbe, darunter Zeilen auf Haarlinien —
+ * Wochentag links, Zeit rechts. Vor- und Nachmittag stehen in einer
+ * Angabe, getrennt durch einen Mittelpunkt. Der Kasten des Entwurfs
+ * entfällt: Hier ist die Blase selbst der Kasten.
  */
 import oz from '../content/oeffnungszeiten.json';
 
 const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
+
+/** „08:00–12:00 · 14:00–18:00" — leere Hälften fallen weg. */
+const zeit = (z: { vormittag?: string; nachmittag?: string }) =>
+  [z.vormittag, z.nachmittag].filter(Boolean).join(' · ');
 ---
 
 {listen.map((liste) => (
@@ -20,8 +30,7 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
           .map((z) => (
             <tr>
               <th scope="row">{z.tag}</th>
-              <td>{z.vormittag}</td>
-              <td>{z.nachmittag}</td>
+              <td>{zeit(z)}</td>
             </tr>
           ))}
       </tbody>
@@ -31,46 +40,53 @@ const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 ))}
 
 <style>
+  .ozliste { min-width: 0; }
+
+  /* Spaltenüberschrift als Kicker in der Hausfarbe */
   .ozliste__titel {
-    margin-bottom: var(--abstand-2xs);
+    margin: 0 0 var(--abstand-m);
     color: var(--farbe-primaer);
-    font-size: var(--text-m);
+    font-size: var(--text-kicker);
     font-weight: var(--gewicht-halbfett);
+    line-height: 1.3;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
   }
 
-  /* Wochentag, Vormittag, Nachmittag — drei Spalten, damit die
-     Zeitangaben nicht umbrechen. In der Vorlage stehen sie ebenso
-     nebeneinander. */
   .ozzeiten {
+    width: 100%;
     border-collapse: collapse;
-    font-size: var(--text-s);
-    color: var(--farbe-primaer);
+    font-size: 16px;
   }
 
   .ozzeiten th,
   .ozzeiten td {
-    padding: 0.1rem 0;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--farbe-linie-zeile);
     font-weight: var(--gewicht-normal);
-    white-space: nowrap;
+    line-height: 1.4;
     vertical-align: baseline;
+    white-space: nowrap;
   }
 
-  /* Der Wochentag tritt zurück — er ist Beschriftung, nicht Angabe.
-     Gleiche Farbe wie der Fließtext, die Zeiten bleiben in der
-     Hausfarbe. */
+  /* Der Wochentag tritt zurück — er ist Beschriftung, nicht Angabe. */
   .ozzeiten th {
-    color: var(--farbe-text);
-    text-align: right;
     padding-right: var(--abstand-s);
+    color: var(--farbe-text);
+    text-align: left;
   }
 
-  .ozzeiten td + td { padding-left: var(--abstand-xs); }
+  .ozzeiten td {
+    color: var(--farbe-text-gedeckt);
+    text-align: right;
+  }
 
   .ozliste__zusatz {
-    margin: var(--abstand-2xs) 0 0;
-    color: var(--farbe-primaer);
-    font-size: var(--text-s);
-    text-align: right;
+    max-width: none;
+    margin: var(--abstand-s) 0 0;
+    color: var(--farbe-text-gedeckt);
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.5;
   }
-
 </style>

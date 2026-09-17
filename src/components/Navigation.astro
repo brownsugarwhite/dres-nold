@@ -79,6 +79,12 @@ const kategorien = (leistungen.kategorien ?? [])
 {/* Kontaktzeile — oben auf der Seite sichtbar */}
 <div class="kontaktzeile" data-leiste="kontakt">
   <div class="kontaktzeile__inhalt">
+    {/* Der Praxisname steht der Anschrift voran — nur auf dem Desktop,
+        darunter wird die Zeile sonst zu lang (Florian, 17. September
+        2026). Er steht fest im Code: `seite.json` führt allein den
+        langen Namen „Dres. Nold – Zahnarztpraxis und Kieferorthopädie". */}
+    <span class="kontaktzeile__text kontaktzeile__text--ab-tablet kontaktzeile__name">Praxis Dres. Nold</span>
+    <span class="punkt punkt--ab-tablet" aria-hidden="true"></span>
     <span class="kontaktzeile__text">{praxis.strasse}</span>
     <span class="punkt" aria-hidden="true"></span>
     <span class="kontaktzeile__text">{praxis.plz} {praxis.ort}</span>
@@ -116,8 +122,11 @@ const kategorien = (leistungen.kategorien ?? [])
     <a class="logo logo--desktop" href="/" aria-label={`${praxis.name} — zur Startseite`}>
       <img src="/icons/logo.svg" alt="" width="80" height="80" />
     </a>
-    <span class="punkt" aria-hidden="true"></span>
 
+    {/* Menüpunkte und Telefonnummer stehen rechts, das Logo links —
+        beide an der Inhaltsbreite ausgerichtet (Entwurf, 17. September
+        2026). Vorher saß der ganze Block mittig in 700 px. */}
+    <div class="kopfleiste__rechts">
     {kopf.map((e, i) => (
       <>
         {e.id === 'leistungen' ? (
@@ -153,9 +162,14 @@ const kategorien = (leistungen.kategorien ?? [])
             </span>
           </a>
         )}
-        {i < kopf.length - 1 && <span class="punkt" aria-hidden="true"></span>}
+        <span class="punkt" aria-hidden="true"></span>
       </>
     ))}
+
+    <a class="kn kn--klein kopfleiste__telefon" href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>
+      <span class="kn__f" aria-hidden="true"></span>{praxis.telefon}
+    </a>
+    </div>
   </nav>
 </header>
   {/* Ausklappmenü für Handys — fährt unter der Kopfleiste auf (Ablauf a-25) */}
@@ -361,12 +375,14 @@ const kategorien = (leistungen.kategorien ?? [])
     transition: height 300ms cubic-bezier(0, 0, 0.58, 1);
   }
 
+  /* Auf der Inhaltsbreite wie die Kopfleiste darunter — die Zeile stand
+     vorher in 60 % / höchstens 700 px in der Mitte und war mit dem
+     Praxisnamen davor zu eng (Florian, 17. September 2026). */
   .kontaktzeile__inhalt {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 60%;
-    max-width: 700px;
+    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
     height: 40px;
   }
 
@@ -379,6 +395,10 @@ const kategorien = (leistungen.kategorien ?? [])
     font-weight: var(--gewicht-normal);
     white-space: nowrap;
   }
+
+  /* Der Name trägt die Zeile — halbfett, damit er sich von den Angaben
+     dahinter absetzt. */
+  .kontaktzeile__name { font-weight: var(--gewicht-halbfett); }
 
   .kontaktzeile__text a {
     color: inherit;
@@ -428,14 +448,25 @@ const kategorien = (leistungen.kategorien ?? [])
 
 
 
+  /* Logo links, Menü und Telefonnummer rechts — auf der Inhaltsbreite,
+     wie jeder andere Abschnitt der Seite. */
   .kopfleiste__inhalt {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    width: 60%;
-    max-width: 700px;
+    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
     height: 80px;
   }
+
+  .kopfleiste__rechts {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  /* Die Telefonnummer steht als Knopf ganz außen — mit etwas mehr Luft
+     zum letzten Menüpunkt als zwischen den Punkten selbst. */
+  .kopfleiste__telefon { margin-left: 4px; }
 
   /* .nav-buttons-mobile / -desktop: beide 80 px hoch */
   .kopfleiste__mobil {
@@ -915,13 +946,15 @@ const kategorien = (leistungen.kategorien ?? [])
     background: var(--farbe-primaer);
   }
 
-  /* .dot: 3 × 3 px, schwarz */
+  /* .dot: 3 × 3 px. In der Vorlage schwarz — das sprang neben der
+     Aubergine heraus. Jetzt der leiseste Ton der Farbfamilie: ein
+     Trennzeichen, kein Text (Handoff, 17. September 2026). */
   .punkt {
     flex: none;
     width: 3px;
     height: 3px;
     border-radius: 50%;
-    background: #000;
+    background: var(--farbe-text-leise);
   }
 
   /* ---------- Kleine Bildschirme ---------- */
@@ -942,9 +975,7 @@ const kategorien = (leistungen.kategorien ?? [])
     /* Statt der Menüpunkte: Logo mit Menü-Knopf */
     .kopfleiste__mobil { display: flex; }
     .logo--desktop,
-    .menuepunkt,
-    .aufklapp { display: none; }
-    .kopfleiste__inhalt > .punkt { display: none; }
+    .kopfleiste__rechts { display: none; }
 
   }
 
@@ -1001,7 +1032,7 @@ const kategorien = (leistungen.kategorien ?? [])
     let geplant = false;
 
     /* Ab welcher Scrolltiefe die Leisten tauschen: sobald der Zipfel der
-       Öffnungszeiten beginnt, sich einzuziehen (scripts/scrollwege.ts) */
+       Sprechstunden beginnt, sich einzuziehen (scripts/scrollwege.ts) */
     const schwelle = () => schnalzWeg() * window.innerHeight;
 
     /** Gehört zu dieser Scrolltiefe der gescrollte Zustand? */

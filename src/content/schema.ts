@@ -176,6 +176,30 @@ export const galerieSchema = z.object({
   ),
 });
 
+/**
+ * Ein Bereich innerhalb eines freien Abschnitts: ein Bild NEBEN dem
+ * Text, links oder rechts. Mehrere Bereiche ergeben einen langen
+ * Abschnitt mit mehreren Bildern (Florian, 17. September 2026).
+ *
+ * Bis dahin hatte ein Abschnitt genau ein Bild, das über dem Text
+ * stand. Das Feld `breite` (schmal / breit) ist damit entfallen: Der
+ * Abschnitt nutzt immer die volle Inhaltsbreite, weil er zwei Spalten
+ * trägt.
+ */
+const abschnittsbereich = z
+  .object({
+    /** Zwischenüberschrift — meist nur ab dem zweiten Bereich sinnvoll */
+    titel: text,
+    text: richtext,
+    bild: pfad,
+    bild_alt: text,
+    bild_seite: z.enum(['links', 'rechts']).default('links'),
+  })
+  .refine((b) => !b.bild || b.bild_alt.trim() !== '', {
+    path: ['bild_alt'],
+    message: 'Bildbeschreibung ist Pflicht, sobald ein Bild gewählt ist (Barrierefreiheit)',
+  });
+
 export const abschnitteSchema = z.object({
   _hinweis_fuer_die_redaktion: text.optional(),
   eintraege: z.array(
@@ -183,11 +207,7 @@ export const abschnitteSchema = z.object({
       id: kennung,
       ...basisEintrag,
       titel: text.min(1),
-      text: richtext,
-      bild: pfad,
-      bild_alt: text,
-      /** schmal: gute Lesebreite wie die aufgeklappten Leistungen; breit: volle Inhaltsbreite */
-      breite: z.enum(['schmal', 'breit']).default('schmal'),
+      bereiche: z.array(abschnittsbereich).default([]),
       link_text: text,
       link_ziel: text,
       pdf_text: text,

@@ -1,1 +1,5 @@
-<svg id="Ebene_1" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 55.11 28.36"><defs><style>.cls-1{fill:none;stroke:#6c1a51;stroke-miterlimit:10;}</style></defs><title>arrow down start</title><polyline class="cls-1" points="54.75 0.35 27.55 27.65 0.35 0.45"/></svg>
+<svg id="Ebene_1" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 55.11 28.36"><defs><style>/* `vector-effect` hält die Strichstärke in Bildpunkten fest, egal wie
+     klein die Zeichnung eingesetzt wird. Ohne das wäre der Haken in
+     einem 13 px breiten Kasten nur einen Viertelpixel dick und damit
+     deutlich feiner als die Schrift daneben. */
+.cls-1{fill:none;stroke:#6c1a51;stroke-miterlimit:10;stroke-width:1.5;vector-effect:non-scaling-stroke;}</style></defs><title>arrow down start</title><polyline class="cls-1" points="54.75 0.35 27.55 27.65 0.35 0.45"/></svg>

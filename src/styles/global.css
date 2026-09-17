@@ -2,6 +2,10 @@
   Globale Grundstile.
   Alle Werte kommen aus tokens.css — hier stehen keine festen Farben
   oder Größen.
+
+  Unten stehen außerdem die vier Bausteine, die auf der ganzen Seite
+  wiederkehren und deshalb nicht in eine einzelne Komponente gehören:
+  Kicker, Knopf (.kn), Textlink (.tl) und Gruppenzeile.
 */
 
 *,
@@ -101,13 +105,91 @@ li {
   margin-top: var(--abstand-m);
 }
 
+/*
+  AUFZÄHLUNGEN
+  ------------------------------------------------------------------
+  Keine Einzüge und keine Systempunkte, sondern Zeilen auf Haarlinien —
+  dieselbe Handschrift wie die Sprechzeiten und das Stellen-Akkordeon.
+
+  Nummerierte Listen tragen die Zahl zweistellig und sehr leise („01"),
+  Aufzählungen einen 3-px-Punkt in der Hausfarbe. Die Linie steht immer
+  ÜBER der Zeile; die Liste beginnt dadurch mit einer Linie und endet
+  offen.
+*/
 .redaktionstext :is(ul, ol) {
+  list-style: none;
   margin: 0 0 var(--abstand-m);
-  padding-left: var(--abstand-m);
+  padding: 0;
 }
 
-/* Tabellen nutzen die volle Breite. `auto` statt `fixed`: Spalten
-   richten sich nach ihrem Inhalt, kurze Zahlenspalten bleiben schmal. */
+.redaktionstext :is(ul, ol) > li {
+  display: flex;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.redaktionstext ol {
+  counter-reset: aufzaehlung;
+}
+
+.redaktionstext ol > li {
+  counter-increment: aufzaehlung;
+  align-items: baseline;
+  gap: 18px;
+  padding: 16px 0;
+  border-top: 1px solid var(--farbe-linie);
+}
+
+.redaktionstext ol > li::before {
+  content: counter(aufzaehlung, decimal-leading-zero);
+  flex: none;
+  color: var(--farbe-text-leise);
+  font-family: var(--schrift-titel);
+  font-size: var(--text-kicker);
+  font-weight: var(--gewicht-halbfett);
+  line-height: 1.4;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+
+.redaktionstext ul > li {
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--farbe-linie-leise);
+}
+
+.redaktionstext ul > li::before {
+  content: '';
+  flex: none;
+  width: 3px;
+  height: 3px;
+  /* Sitzt damit auf halber Höhe der ersten Zeile */
+  margin-top: 0.62em;
+  border-radius: var(--radius-rund);
+  background: var(--farbe-primaer);
+}
+
+/* Verschachtelte Listen rücken ein und lassen die Linien weg — sonst
+   entstünde ein Gitter. */
+.redaktionstext li :is(ul, ol) {
+  width: 100%;
+  margin: var(--abstand-2xs) 0 0;
+}
+
+.redaktionstext li :is(ul, ol) > li {
+  padding: 4px 0;
+  border-top: 0;
+}
+
+/*
+  TABELLEN
+  ------------------------------------------------------------------
+  Ebenfalls nur Linien: Kopfzeile als gesperrte Beschriftung, darunter
+  Zeilen auf Haarlinien. `auto` statt `fixed`: Spalten richten sich
+  nach ihrem Inhalt, kurze Zahlenspalten bleiben schmal.
+*/
 .redaktionstext table {
   width: 100%;
   min-width: 28rem;
@@ -118,17 +200,33 @@ li {
 
 .redaktionstext th,
 .redaktionstext td {
-  padding: var(--abstand-2xs) var(--abstand-xs);
-  border-bottom: 1px solid var(--farbe-linie);
+  padding: 14px var(--abstand-m) 14px 0;
+  border-bottom: 1px solid var(--farbe-linie-zeile);
+  font-size: 16px;
+  line-height: 1.55;
   text-align: left;
   vertical-align: top;
   overflow-wrap: normal;
 }
 
-.redaktionstext th {
-  color: var(--farbe-primaer);
+.redaktionstext :is(th, td):last-child { padding-right: 0; }
+
+.redaktionstext thead th {
+  padding-bottom: 12px;
+  border-bottom-color: var(--farbe-linie);
+  color: var(--farbe-text-gedeckt);
   font-family: var(--schrift-titel);
+  font-size: var(--text-kicker);
   font-weight: var(--gewicht-halbfett);
+  line-height: 1;
+  letter-spacing: var(--sperrung-kicker);
+  text-transform: uppercase;
+}
+
+/* Zeilenköpfe (erste Spalte) bleiben Fließtext, nur etwas kräftiger */
+.redaktionstext tbody th {
+  color: var(--farbe-text);
+  font-weight: var(--gewicht-mittel);
 }
 
 /* Bilder, die in der Redaktion in den Text gesetzt wurden: immer über
@@ -183,6 +281,350 @@ img {
 }
 
 /*
+  AUFBAU EINES ABSCHNITTS
+  ==================================================================
+  Jeder Abschnitt der Startseite folgt demselben Muster:
+
+      Kicker            12 px, gesperrt, Versalien
+      H2                leicht (300), mit bewegtem Verlauf
+      Einleitung        eine Lesebreite, gedeckt
+      Inhalt            44–52 px darunter
+
+  Alles linksbündig — nur Startbereich, Willkommen und der Hinweis
+  stehen mittig. Das nimmt die Zentrierung des Logos oben auf und
+  lässt darunter einen ruhigen Lesefluss entstehen.
+*/
+.bereich {
+  padding-inline: var(--abstand-seitenrand);
+  padding-block: var(--abstand-abschnitt);
+}
+
+/* Abschnitte, die unmittelbar aneinander anschließen, teilen sich den
+   Zwischenraum: der obere lässt seinen unteren Rand weg. */
+.bereich--ohne-oben { padding-top: 0; }
+.bereich--ohne-unten { padding-bottom: 0; }
+
+.bereich__inhalt {
+  width: min(100%, var(--breite-inhalt));
+  margin-inline: auto;
+}
+
+.kicker {
+  font-size: var(--text-kicker);
+  font-weight: var(--gewicht-halbfett);
+  line-height: 1;
+  letter-spacing: var(--sperrung-kicker);
+  text-transform: uppercase;
+  color: var(--farbe-text-gedeckt);
+}
+
+.kicker--klein {
+  font-size: var(--text-kicker-klein);
+  letter-spacing: var(--sperrung-kicker-klein);
+}
+
+/* Kicker → H2 → Einleitung: jeweils 20 px */
+.bereich__titel {
+  margin: 20px 0 0;
+}
+
+.bereich__einleitung {
+  margin: 20px 0 0;
+  max-width: var(--breite-absatz);
+  color: var(--farbe-text-gedeckt);
+  font-size: 17px;
+  line-height: var(--zeilenhoehe-lese);
+}
+
+/*
+  GRUPPENZEILE
+  ------------------------------------------------------------------
+  Gesperrte Beschriftung, die eine Haarlinie bis zum rechten Rand
+  hinter sich herzieht — gliedert die Leistungen nach Kategorien und
+  das Team nach Ärzten und Praxisteam.
+*/
+.gruppenzeile {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.gruppenzeile__symbol {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.gruppenzeile__text {
+  font-size: var(--text-kicker);
+  font-weight: var(--gewicht-halbfett);
+  line-height: 1;
+  letter-spacing: var(--sperrung-kicker);
+  text-transform: uppercase;
+  color: var(--farbe-text);
+  white-space: nowrap;
+}
+
+.gruppenzeile__linie {
+  flex: 1;
+  height: 1px;
+  background: var(--farbe-linie);
+}
+
+/*
+  KNOPF (.kn)
+  ==================================================================
+  Eine Pille mit Haarlinie — dieselbe Linienführung wie die Symbole.
+  Beim Zeigen geht von der Stelle, an der der Zeiger den Knopf
+  betreten hat, eine runde Fläche auf und füllt ihn. Sonst nichts:
+  keine Pfeile, keine Punkte, kein Schatten — und der Knopf behält
+  seine Größe. Der Entwurf ließ ihn dabei um 3 px je Seite wachsen;
+  das ist wieder heraus (Florian, 17. September 2026): Nebeneinander
+  stehende Knöpfe schoben sich dadurch gegenseitig an.
+
+  Aufbau im HTML:
+      <a class="kn" href="…"><span class="kn__f" aria-hidden="true"></span>Text</a>
+
+  Der Text steht als Textknoten direkt im Knopf. Deshalb muss der
+  Knopf selbst ein Stapelkontext sein (z-index: 0) und die Füllfläche
+  dahinter liegen (z-index: -1) — sonst überdeckte sie den Text.
+  Die Startstelle (--x / --y) setzt scripts/knopf.ts.
+*/
+.kn {
+  --x: 50%;
+  --y: 50%;
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 15px 30px;
+  border: 1px solid var(--farbe-primaer);
+  border-radius: var(--radius-rund);
+  background: var(--farbe-flaeche);
+  color: var(--farbe-primaer);
+  font-family: var(--schrift-titel);
+  font-size: 15px;
+  font-weight: var(--gewicht-mittel);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 0.45s var(--verlauf-betont);
+}
+
+.kn > * {
+  position: relative;
+  z-index: 1;
+}
+
+.kn__f {
+  position: absolute;
+  z-index: -1;
+  left: var(--x);
+  top: var(--y);
+  width: 230%;
+  aspect-ratio: 1;
+  height: auto;
+  border-radius: 50%;
+  background: var(--verlauf-knopf);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.7s var(--verlauf-betont),
+    opacity 0.5s var(--verlauf-betont);
+}
+
+.kn:hover,
+.kn:focus-visible {
+  color: var(--farbe-text-invers);
+}
+
+.kn:hover > .kn__f,
+.kn:focus-visible > .kn__f {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* Beim Drücken geht die Fläche schneller auf — der Knopf soll
+   antworten, nicht nachdenken. */
+.kn:active > .kn__f { transition-duration: 0.25s, 0.2s; }
+
+.kn--voll {
+  background: var(--farbe-primaer);
+  color: var(--farbe-text-invers);
+}
+
+.kn--voll > .kn__f { background: var(--verlauf-knopf-invers); }
+
+.kn--voll:hover,
+.kn--voll:focus-visible { color: var(--farbe-primaer); }
+
+.kn--klein {
+  padding: 11px 22px;
+  font-size: 14px;
+}
+
+/* Ohne Bewegung springt die Fläche ohne Übergang um. */
+@media (prefers-reduced-motion: reduce) {
+  .kn, .kn__f { transition: none; }
+  .kn:hover > .kn__f, .kn:focus-visible > .kn__f { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/*
+  TEXTLINK (.tl)
+  ==================================================================
+  „Mehr erfahren" in den Kacheln, „Beitrag lesen" bei den Neuigkeiten.
+  Gesperrte Versalien mit einem Pfeil, unter denen beim Zeigen eine
+  Linie von links hereinwächst.
+*/
+.tl {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding-bottom: 6px;
+  color: var(--farbe-primaer);
+  font-family: var(--schrift-titel);
+  font-size: var(--text-kicker);
+  font-weight: var(--gewicht-halbfett);
+  line-height: 1;
+  letter-spacing: var(--sperrung-kicker-klein);
+  text-transform: uppercase;
+  text-decoration: none;
+  background: linear-gradient(to right, var(--farbe-primaer), var(--farbe-primaer))
+    left bottom / 0 1px no-repeat;
+  transition: background-size 0.5s var(--verlauf-betont);
+}
+
+/* Der Pfeil ist die vorhandene `pfeil-runter`-Zeichnung, um 90° gedreht */
+.tl__pfeil {
+  display: block;
+  flex: none;
+  width: 15px;
+  height: 9px;
+  transition: transform 0.5s var(--verlauf-betont);
+}
+
+.tl__pfeil svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Strichstärke in Bildpunkten statt im Koordinatensystem der
+   Zeichnung: Sonst wäre der Haken in einem 15 px breiten Kasten nur
+   einen Viertelpixel dick — viel feiner als die Schrift daneben. */
+.tl__pfeil polyline {
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+:is(a, button):hover .tl,
+:is(a, button):focus-visible .tl,
+.tl:hover,
+.tl:focus-visible { background-size: 100% 1px; }
+
+:is(a, button):hover .tl__pfeil,
+:is(a, button):focus-visible .tl__pfeil,
+.tl:hover .tl__pfeil,
+.tl:focus-visible .tl__pfeil { transform: translateX(5px); }
+
+/*
+  SCHLIESSEN-KREUZ
+  ==================================================================
+  Ein Element für alle Stellen, an denen sich etwas schließen lässt:
+  die Leistungs- und Beitragsseiten und die Einstiegskarte. 48 px groß,
+  das Kreuz in der Mitte, darum ein dünner Kreis. Beim Zeigen dreht es
+  sich um 90° — wie das Kreuz der Hinweis-Blase (Abläufe a-34 / a-35).
+
+  Der Kreis ist als SVG gezeichnet, damit er sich auch *einzeichnen*
+  kann: Auf den Unterseiten läuft er an, sobald das Kreuz beim Scrollen
+  oben klebt. In der Einstiegskarte soll er dagegen von Anfang an dastehen
+  — dafür `.schliessen--fest` (Florian, 17. September 2026).
+
+  Wer das Kreuz einsetzt, kümmert sich selbst um seine Lage; hier steht
+  nur, wie es aussieht.
+*/
+.schliessen {
+  /* Bezug für den Kreis darin. Wer das Kreuz an eine feste Stelle setzt,
+     überschreibt das mit `absolute` — der Kreis sitzt dann weiterhin
+     genau darauf. */
+  position: relative;
+  display: block;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-rund);
+  background: url('/icons/ui/schliessen.svg') center / 24px no-repeat;
+  cursor: pointer;
+  transition:
+    transform 300ms var(--verlauf),
+    background-color 300ms var(--verlauf);
+}
+
+.schliessen:hover,
+.schliessen:focus-visible { transform: rotate(90deg); }
+
+/* Die Strichlänge 139 ist der Umfang des Kreises (2 · π · 22). Ein
+   Versatz von genau dieser Länge zeigt nichts, ein Versatz 0 den
+   ganzen Kreis. */
+.schliessen__kreis {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--farbe-primaer);
+  stroke-width: 1;
+  stroke-dasharray: 139;
+  stroke-dashoffset: 139;
+  transform: rotate(-90deg);
+  transition: stroke-dashoffset 500ms var(--verlauf-betont);
+}
+
+.schliessen--fest .schliessen__kreis { stroke-dashoffset: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .schliessen,
+  .schliessen__kreis { transition: none; }
+  .schliessen:hover,
+  .schliessen:focus-visible { transform: none; }
+}
+
+/*
+  EINBLENDEN BEIM HEREINSCROLLEN
+  ==================================================================
+  Alles mit `data-rein` steht zunächst 18 px tiefer und unsichtbar und
+  fährt an seinen Platz, sobald es ins Bild kommt (scripts/einblenden.ts).
+  Ohne JavaScript bleibt es sichtbar — die Regel greift erst, wenn das
+  Skript `data-rein` auf „warten" gestellt hat.
+*/
+[data-rein='warten'] {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+[data-rein] {
+  transition:
+    opacity 0.8s var(--verlauf-betont),
+    transform 0.8s var(--verlauf-betont);
+}
+
+[data-rein='da'] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rein],
+  [data-rein='warten'] { opacity: 1; transform: none; transition: none; }
+}
+
+/*
   Seitenwechsel-Animation.
   Wer im Betriebssystem reduzierte Bewegung eingestellt hat, bekommt
   einen harten Wechsel ohne Übergang.
@@ -216,27 +658,28 @@ img {
   color: var(--farbe-primaer);
 }
 
-/* Abschnittsüberschriften der Startseite: groß und mittig wie `.heading`
-   der Vorlage (60 px). Der Inhalt darunter bleibt linksbündig. */
+/* Abschnittsüberschriften der Startseite: leicht gesetzt und
+   linksbündig. Die frühere mittige Ausrichtung ist mit dem Handoff
+   vom 17. September 2026 entfallen — nur Willkommen bleibt zentriert
+   (die Komponente setzt das selbst). */
 main.seiteninhalt h2:not(.ohne-verlauf),
-[data-verlauf] > h2,
-[data-verlauf] > .inhalt > h2 {
-  margin-inline: auto;
-  /* Auf schmalen Handys darf die Überschrift nicht an den Rand stoßen —
-     sie bekommt denselben Seitenrand wie der Inhalt. */
-  max-width: calc(100% - 2 * var(--abstand-m));
+[data-verlauf] .bereich__titel {
+  margin-inline: 0;
   font-size: var(--text-titel);
+  font-weight: var(--gewicht-leicht);
   /* Etwas mehr als 1: Der bewegte Verlauf wird nur innerhalb des
      Kastens gezeichnet (`background-clip: text`) — bei genau 1 ragt
      das „g" darunter heraus und bliebe farblos. */
-  line-height: 1.08;
-  text-align: center;
+  line-height: 1.12;
+  letter-spacing: -0.012em;
+  text-align: left;
   text-wrap: balance;
 }
 
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   :is(main, [data-verlauf]) h1:not(.ohne-verlauf),
-  :is(main, [data-verlauf]) h2:not(.ohne-verlauf) {
+  :is(main, [data-verlauf]) h2:not(.ohne-verlauf),
+  .verlauf {
     background: url('/bilder/deko/verlauf.gif') center / cover no-repeat;
     -webkit-background-clip: text;
     background-clip: text;
@@ -244,11 +687,16 @@ main.seiteninhalt h2:not(.ohne-verlauf),
   }
 }
 
+/* Auch außerhalb einer Überschrift: der Titel im Team-Banner und der
+   kleine Formular-Titel tragen `.verlauf` als Klasse. */
+.verlauf { color: var(--farbe-primaer); }
+
 /* Erzwingt das Betriebssystem eigene Farben (Kontrastmodus),
    tritt der Verlauf zurück. */
 @media (forced-colors: active) {
   :is(main, [data-verlauf]) h1,
-  :is(main, [data-verlauf]) h2 {
+  :is(main, [data-verlauf]) h2,
+  .verlauf {
     background: none;
     -webkit-text-fill-color: currentColor;
     color: CanvasText;

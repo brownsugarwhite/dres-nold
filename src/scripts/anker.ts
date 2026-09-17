@@ -5,18 +5,21 @@
  * sondern gleitet — mit Platz für die feste Kopfleiste. Zwei Ziele
  * sind besonders:
  *
- *   #oz_anchor  Die Öffnungszeiten fahren scrollgesteuert herein
- *               (Oeffnungszeiten.astro) — die Blase steht erst nach gut
+ *   #oz_anchor  Die Sprechstunden fahren scrollgesteuert herein
+ *               (Oeffnungszeiten.astro) — die Karte steht erst nach gut
  *               zwei Fensterhöhen still, mit voll ausgefahrenem Zipfel.
  *               Genau dorthin wird gescrollt: knapp vor den Punkt, an
  *               dem er sich wieder einzieht und die Leisten tauschen.
+ *   #praxis     Begrüßung und Bilderband liegen ebenfalls in dieser
+ *   #galerie    Karte — auch sie werden in eine Scrolltiefe umgerechnet
+ *               (siehe `tiefeInKarte`), statt gemessen zu werden.
  *   #start      Ganz nach oben.
  *
  * Astros Router übernimmt Klicks auf Verweise selbst; dieser Zuhörer
  * läuft in der Capture-Phase und ist damit vor ihm dran.
  */
 
-import { ozWeg, OZ_RAST } from './scrollwege';
+import { ozWeg, OZ_RAST, ozStuetzstellen, ozAnteilFuer, ozTiefeAus } from './scrollwege';
 
 /** Höhe der Kopfleiste — so viel Luft bleibt über dem Ziel */
 const KOPFLEISTE = 80;
@@ -25,6 +28,46 @@ const LUFT = 16;
 /** Scrolltiefe, bei der die Blase mit Zipfel steht (in Fensterhöhen) —
     eine Spur vor dem Rastpunkt, damit die Leisten noch nicht tauschen */
 const ozRuhe = () => (OZ_RAST - 0.01) * (ozWeg() + 1) - 1;
+
+function zahl(stil: CSSStyleDeclaration, name: string): number {
+  return parseFloat(stil.getPropertyValue(name));
+}
+
+/**
+ * Sprungmarken INNERHALB der Einstiegskarte (Begrüßung, Bilderband).
+ *
+ * Sie stehen nicht einfach an einer Stelle im Dokument: Die Karte fährt
+ * scrollgesteuert herein, ihre Teile sind also je nach Scrolltiefe
+ * woanders. Gesucht ist deshalb die Scrolltiefe, bei der das Element
+ * gerade unter der Kopfleiste steht.
+ *
+ * Gezeichnet liegt die Oberkante der Karte bei
+ *     Fensterhöhe − Ruhelage − Kartenhöhe + Versatz
+ * — daraus folgt der nötige Versatz, und `ozAnteilFuer` kehrt die
+ * Bewegungskurve um.
+ *
+ * `null`, wenn die Karte nicht scrollgesteuert läuft (reduzierte
+ * Bewegung) — dann steht sie ruhig im Fluss und wird normal gemessen.
+ */
+function tiefeInKarte(element: HTMLElement): number | null {
+  const karte = document.querySelector<HTMLElement>('[data-ozblase]');
+  if (!karte || !karte.contains(element)) return null;
+
+  const stil = getComputedStyle(karte);
+  const start = zahl(stil, '--oz-start');
+  const laenge = zahl(stil, '--zipfel-laenge') || 154;
+  const ruhe = zahl(getComputedStyle(document.documentElement), '--oz-ruhe');
+  if (!Number.isFinite(start) || !Number.isFinite(ruhe)) return null;
+
+  /* Abstand des Elements von der Oberkante der Karte */
+  let oben = 0;
+  for (let e: HTMLElement | null = element; e && e !== karte; e = e.offsetParent as HTMLElement | null) {
+    oben += e.offsetTop;
+  }
+
+  const versatz = KOPFLEISTE + LUFT - (window.innerHeight - ruhe - karte.offsetHeight) - oben;
+  return ozTiefeAus(ozAnteilFuer(versatz, ozStuetzstellen(start, laenge)));
+}
 
 function wenigerBewegung(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -41,7 +84,7 @@ export function zielTiefe(hash: string): number | null {
 
   const element = document.getElementById(id);
   if (!element || element.getClientRects().length === 0) return null;
-  return tiefeVon(element);
+  return tiefeInKarte(element) ?? tiefeVon(element);
 }
 
 function tiefeVon(element: Element): number {

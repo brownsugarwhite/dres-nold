@@ -15,10 +15,20 @@ Website der Zahnarzt- und Kieferorthopädie-Praxis **Dres. Nold**, Rosenstraße 
 >   beim Öffnen ins Vollbild morphen. **Nicht** die Aufklapp-Liste der
 >   alten Seite nachbauen.
 > - **Öffnungszeiten** verwenden auf allen Größen die mobile Lösung
->   (Blase mit Zipfel). **Nicht** die zwei Kästen der Desktop-Vorlage.
+>   (Blase mit Zipfel). **Nicht** die zwei Kästen der Desktop-Vorlage
+>   und **nicht** die drei Kästen des Gestaltungs-Entwurfs.
+> - **Der ganze Einstieg steckt in dieser Blase**: Begrüßung,
+>   Bilderband und Sprechstunden sind EINE Karte, die gemeinsam über
+>   das Logo hereinfährt (`Oeffnungszeiten.astro`, 17. September 2026).
+>   Begrüßung und Band gehören also **nicht** als eigene Abschnitte in
+>   `main`.
 > - **Kein Briefumschlag** im Kontakt.
 > - **Google-Karte erst auf Klick** — Vorschaubild statt Banner, kein
 >   Fremdskript (geändert am 14. September 2026, siehe dort).
+>
+> `design_handoff_startseite/` ist der Gestaltungs-Entwurf vom
+> 17. September 2026. Er ist umgesetzt — mit den Ausnahmen, die in
+> `entscheidungen.md` unter „Gestaltungs-Handoff" stehen.
 >
 > `docs/referenz/` beschreibt, was die alte Seite tut — als Nachschlage-
 > werk, nicht als Vorgabe. Bei Widerspruch gilt `entscheidungen.md`.
@@ -86,16 +96,33 @@ Redaktion ──► dres-nold.de/login
 
 ### Farben
 
+Ein einziger Grauton-Verlauf, abgestimmt auf das Aubergine: dieselbe
+Farbfamilie, nur entsättigt und aufgehellt. Drei unabhängige Grautöne
+nebeneinander wirkten unruhig, und das frühere `#758696` erreichte auf
+Weiß nur 3,75:1 (Vorgabe: 4,5:1).
+
 | Token | Wert | Verwendung |
 |---|---|---|
-| `--farbe-primaer` | `#6c1a51` | Aubergine — Hausfarbe, Überschriften, Akzente, Buttons |
+| `--farbe-primaer` | `#6c1a51` | Aubergine — Hausfarbe, Überschriften, Akzente, Knöpfe |
 | `--farbe-primaer-hell` | `#a3959f` | Abgetönte Variante, Hover-Zustände |
-| `--farbe-text` | `#5c5e61` | Fließtext |
-| `--farbe-text-gedeckt` | `#758696` | Sekundärtext, Bildunterschriften |
-| `--farbe-dunkel` | `#554d53` | Dunkle Flächen |
-| `--farbe-weiss` | `#ffffff` | Hintergrund |
+| `--farbe-text` | `#4d434b` | Fließtext — 9,5:1 auf Weiß |
+| `--farbe-text-gedeckt` | `#766c74` | Zweitrangiges, Labels — 5,0:1 auf Weiß |
+| `--farbe-text-leise` | `#c6bcc2` | Trennpunkte, Zähler — **nie für lesbaren Text** |
+| `--farbe-linie` | `#e4e0e2` | Haarlinien, Kachelrahmen |
+| `--farbe-linie-leise` | `#f0ecee` | Trennlinien in Listen |
+| `--farbe-linie-zeile` | `#e9e4e7` | Zeilenlinien in den Sprechzeiten |
+| `--farbe-formlinie` | `#d6ced2` | Grundlinie der Formularfelder |
+| `--farbe-flaeche` | `#ffffff` | Hintergrund |
+| `--farbe-flaeche-hell` | `#faf8f9` | Kaum getönte Kästen |
+| `--farbe-flaeche-gedeckt` | `#f4f2f3` | Gedeckte Flächen |
+| `--farbe-flaeche-kachel` | `#f1eef0` | Grund der Leistungskacheln beim Scrollen (Ablauf a-8) |
 
 *Vorsicht:* Im Webflow-CSS existieren Beinahe-Duplikate (`#6b1a51`, `#6a2051`). Das sind Ungenauigkeiten der Vorlage — im Neubau gilt durchgängig `#6c1a51`.
+
+**Gewichte:** Überschriften leicht (300), Labels halbfett und gesperrt
+(600, Versalien). Nur diese beiden tragen die Hierarchie; Fließtext 400,
+Namen und Knöpfe 500. Überschriften stehen **linksbündig** — mittig
+stehen nur Startbereich, Begrüßung und Hinweis.
 
 ### Schrift
 
@@ -128,7 +155,7 @@ Alle Inhalte liegen als JSON unter `src/content/`. Jede Datei entspricht einem B
 | `navigation.json` | Menüpunkte und Reihenfolge | Leistungen klappen automatisch auf |
 | `team.json` | Personen mit Foto, Name, Funktion, Tätigkeiten | `gruppe`: `aerzte` oder `team`; `taetigkeiten` ist eine Liste und klappt auf der Seite auf |
 | `galerie.json` | Praxisbilder | Alternativtexte sind **Pflicht** (Barrierefreiheit) |
-| `abschnitte.json` | Frei anlegbare Abschnitte im Praxis-Bereich | Ohne eigenen Menüeintrag; `breite`: `schmal` (46 rem) oder `breit` (volle Inhaltsbreite); Bilder auch direkt im Fließtext |
+| `abschnitte.json` | Frei anlegbare Abschnitte im Praxis-Bereich | Ohne eigenen Menüeintrag; je Abschnitt ein oder mehrere `bereiche` mit Bild **neben** dem Text (`bild_seite`: `links`/`rechts`) |
 | `stellen.json` | Stellenanzeigen | Bereich blendet sich aus, wenn leer |
 | `startseite.json` | Überschriften und Einleitungstexte der Startseiten-Abschnitte | Ein Abschnitt je Bereich: `willkommen`, `sprechstunden`, `galerie`, `leistungen`, `team`, `kontakt`, `formular` |
 | `seite.json` | Seitentitel, Beschreibung, Vorschaubild, Praxisadresse | |
@@ -182,7 +209,9 @@ docs/
 
 **Startseite** (`/`) ist und bleibt ein One-Pager mit Ankern:
 
-`#start` · `#oz_anchor` (Öffnungszeiten; `scripts/anker.ts` scrollt zum Rastpunkt der Blase) · `#galerie` · `#information` (Hinweis) · `#praxis` · `#leistungen` (Kachelübersicht) · `#team` · `#neuigkeiten` · `#contact`
+`#start` · `#praxis` (Begrüßung) · `#galerie` · `#oz_anchor` (Sprechstunden) · `#abschnitte` · `#leistungen` (Kachelübersicht) · `#neuigkeiten` · `#team` · `#stellen` · `#contact` · `#information` (Hinweis)
+
+Die ersten drei Marken liegen alle **in der Einstiegskarte**, die scrollgesteuert hereinfährt. Sie stehen damit nicht an einer festen Stelle im Dokument — `scripts/anker.ts` rechnet sie in eine Scrolltiefe um (`tiefeInKarte`), statt sie zu messen.
 
 **Unterseiten** — von der Startseite aus als Vollbild geöffnet, aber mit eigener Adresse:
 

@@ -2,20 +2,19 @@
 /**
  * Kontakt — „So erreichen Sie uns".
  *
- * Aufbau nach der Vorlage, um das dort nur ausgeblendete Formular
- * ergänzt (Entscheidung von Florian, September 2026):
- *   .contact          60 px oben, 200 px unten Innenabstand
- *   .div-block-27     Adresse zweispaltig, 30 px darüber
- *   .text-block-4/-5  20 px, Gewicht 300, Zeilenhöhe 26 px
- *   .contact-content  46 px darunter: links die Karte (60 %),
- *                     rechts das Formular (40 %); mobil untereinander
- *   .div-block-22     Karte mit weichem Schatten 1px 1px 17px -12px
+ * Aufbau nach dem Handoff vom 17. September 2026:
+ *   Kicker, Überschrift, darunter Adresse und Telefon nebeneinander,
+ *   dann zweispaltig: links die Karte, rechts das Formular.
  *
  * Die Karte kommt von Google Maps und lädt erst, wenn der Besucher das
  * Vorschaubild anklickt (scripts/einwilligung.ts merkt die Entscheidung
  * im Browser). Vorher steht dort ein selbst gehostetes Bild. Weil bis
  * dahin nichts von fremden Servern geladen wird, braucht die Seite kein
- * Einwilligungs-Banner beim Aufruf.
+ * Einwilligungs-Banner beim Aufruf — der Hinweis steht dort, wo er
+ * gebraucht wird: in der Karte selbst.
+ *
+ * Kein Schlagschatten an der Karte und kein grauer Kachelgrund hinter
+ * dem Bereich (Florian, 17. September 2026) — alles steht auf Weiß.
  *
  * Kein Briefumschlag — der gehörte zu einem früheren Provisorium.
  */
@@ -31,99 +30,82 @@ const kartenZiel = 'https://www.google.com/maps/search/?api=1&query=' + encodeUR
 const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(adresse) + '&z=16&hl=de&output=embed';
 ---
 
-<section class="kontakt" id="contact" data-verlauf>
-  <h2 class="kontakt__titel">{texte.titel}</h2>
-  {texte.text && <p class="kontakt__einleitung">{texte.text}</p>}
+<section class="kontakt bereich bereich--ohne-oben" id="contact" data-verlauf>
+  <div class="bereich__inhalt">
+    <div class="kicker" data-rein>Kontakt</div>
+    <h2 class="bereich__titel" data-rein>{texte.titel}</h2>
+    {texte.text && <p class="bereich__einleitung" data-rein>{texte.text}</p>}
 
-  <div class="kontakt__adresse">
-    <address class="kontakt__spalte kontakt__spalte--rechts">
-      <strong>Praxis {praxis.name.split('–')[0].trim()}</strong><br />
-      {praxis.strasse}<br />
-      {praxis.plz} {praxis.ort}
-    </address>
+    <div class="kontakt__adresse" data-rein>
+      <address class="kontakt__spalte">
+        <strong class="kontakt__praxis">Praxis {praxis.name.split('–')[0].trim()}</strong><br />
+        {praxis.strasse}<br />
+        {praxis.plz} {praxis.ort}
+      </address>
 
-    <address class="kontakt__spalte kontakt__spalte--links">
-      Telefon <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a><br />
-      Fax {praxis.fax}<br />
-      <a class="kontakt__mail" href={`mailto:${praxis.email}`}>{praxis.email}</a>
-    </address>
-  </div>
+      <address class="kontakt__spalte">
+        Telefon <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a><br />
+        Fax {praxis.fax}<br />
+        <a class="kontakt__mail" href={`mailto:${praxis.email}`}>{praxis.email}</a>
+      </address>
+    </div>
 
-  <div class="kontakt__inhalt">
-    <div class="landkarte" data-landkarte data-einbettung={karteEinbettung}>
-      <div class="landkarte__vorschau" data-landkarte-vorschau>
-        <img src="/bilder/deko/karte-vorschau.jpg" alt={`Kartenausschnitt: ${adresse}`} width="1600" height="969" loading="lazy" />
-        <div class="landkarte__hinweis">
-          <p class="landkarte__text">
-            Die Karte wird von Google Maps geladen. Dabei erhält Google Ihre IP-Adresse.
-          </p>
-          <div class="landkarte__knoepfe">
-            <button class="landkarte__knopf" type="button" data-landkarte-laden>Karte laden</button>
-            <a class="landkarte__verweis" href={kartenZiel} target="_blank" rel="noopener">In Google Maps öffnen</a>
+    <div class="kontakt__inhalt">
+      <div class="landkarte" data-rein data-landkarte data-einbettung={karteEinbettung}>
+        <div class="landkarte__vorschau" data-landkarte-vorschau>
+          <img src="/bilder/deko/karte-vorschau.jpg" alt={`Kartenausschnitt: ${adresse}`} width="1600" height="969" loading="lazy" />
+          {/* Der Hinweis steht in der Karte, nicht am Seitenanfang:
+              Er gehört genau dorthin, wo die Entscheidung ansteht. */}
+          <div class="landkarte__hinweis">
+            <p class="landkarte__text">
+              Die Karte wird von Google Maps geladen. Dabei erhält Google Ihre IP-Adresse.
+            </p>
+            <div class="landkarte__knoepfe">
+              <button class="kn kn--voll kn--klein" type="button" data-landkarte-laden>
+                <span class="kn__f" aria-hidden="true"></span>Karte laden
+              </button>
+              <a class="tl" href={kartenZiel} target="_blank" rel="noopener">In Maps öffnen</a>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="kontakt__formular">
-      <h3 class="kontakt__formulartitel ohne-verlauf">{formulartexte.titel}</h3>
-      {formulartexte.text && <p class="kontakt__formulartext">{formulartexte.text}</p>}
-      <Kontaktformular />
+      <div class="kontakt__formular" data-rein>
+        <div class="kicker kicker--klein">Nachricht</div>
+        <h3 class="kontakt__formulartitel verlauf">{formulartexte.titel}</h3>
+        {formulartexte.text && <p class="kontakt__formulartext">{formulartexte.text}</p>}
+        <Kontaktformular />
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  /* .contact: 60 px oben, 200 px unten — der graue Symbolgrund scheint
-     wie in der Vorlage hinter dem Bereich durch */
   .kontakt {
     position: relative;
     z-index: 40;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     width: 100%;
-    padding-block: 60px 200px;
-    padding-inline: var(--abstand-m);
+    background: var(--farbe-flaeche);
   }
 
-  .kontakt__titel {
-    margin-bottom: 0;
-    text-align: center;
-  }
-
-  /* .div-block-27: 30 px Abstand darüber */
-  .kontakt__einleitung {
-    max-width: 46rem;
-    margin: var(--abstand-s) 0 0;
-    color: var(--farbe-text);
-    text-align: center;
-  }
-
+  /* Adresse und Telefon nebeneinander, mit viel Luft dazwischen;
+     wird es eng, rutscht der zweite Block unter den ersten. */
   .kontakt__adresse {
     display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-top: 30px;
-  }
-
-  /* .text-block-4 / -5: 20 px, Gewicht 300, Zeilenhöhe 26 px */
-  .kontakt__spalte {
+    flex-wrap: wrap;
+    gap: clamp(28px, 5vw, 80px);
+    margin-top: 36px;
     color: var(--farbe-text);
-    font-size: 20px;
-    font-weight: var(--gewicht-leicht);
+    font-size: 17px;
     font-style: normal;
-    line-height: 26px;
+    line-height: 1.75;
   }
 
-  .kontakt__spalte--rechts {
-    text-align: right;
-    margin-inline: 18px 40px;
-  }
+  .kontakt__spalte { font-style: normal; }
 
-  .kontakt__spalte--links {
-    text-align: left;
-    margin-left: 40px;
+  .kontakt__praxis {
+    font-weight: var(--gewicht-halbfett);
+    color: var(--farbe-primaer);
   }
 
   .kontakt__spalte a {
@@ -134,29 +116,28 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
   .kontakt__spalte a:hover,
   .kontakt__spalte a:focus-visible { text-decoration: underline; }
 
-  .kontakt__mail {
+  .kontakt__spalte a.kontakt__mail {
     font-weight: var(--gewicht-halbfett);
     color: var(--farbe-primaer);
   }
 
-  /* .contact-content: Karte und Formular nebeneinander, 46 px darunter */
+  /* Karte und Formular nebeneinander */
   .kontakt__inhalt {
-    display: flex;
-    gap: 40px;
-    align-items: stretch;
-    width: min(100%, var(--breite-inhalt));
-    margin-top: 46px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: clamp(28px, 3.5vw, 48px);
+    align-items: start;
+    margin-top: clamp(40px, 5vw, 64px);
   }
 
-  /* .div-block-22: 60 % breit, mindestens 40 vh hoch, weicher Schatten */
+  /* Nur Rahmen und Rundung — kein Schatten (Florian, 17. September 2026) */
   .landkarte {
     position: relative;
-    flex: 1 1 0;
-    min-height: max(60vh, 560px);
+    min-height: clamp(300px, 34vw, 470px);
     overflow: hidden;
+    border: 1px solid var(--farbe-linie);
     border-radius: var(--radius-m);
     background: var(--farbe-flaeche-gedeckt);
-    box-shadow: 1px 1px 17px -12px rgb(0 0 0 / 50%);
   }
 
   .landkarte__vorschau {
@@ -169,53 +150,32 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
     height: 100%;
     object-fit: cover;
     /* Zurückhaltend, damit der Hinweis darüber lesbar bleibt */
-    filter: saturate(0.6);
+    filter: saturate(0.55);
   }
 
   .landkarte__hinweis {
     position: absolute;
-    inset: auto var(--abstand-m) var(--abstand-m);
-    padding: var(--abstand-s) var(--abstand-m);
-    background: rgb(255 255 255 / 92%);
+    inset: auto 20px 20px;
+    padding: 20px 24px;
+    background: rgb(255 255 255 / 94%);
     border-radius: var(--radius-m);
-    box-shadow: 0 12px 30px -12px rgb(0 0 0 / 30%);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
   }
 
   .landkarte__text {
-    margin: 0 0 var(--abstand-2xs);
+    margin: 0 0 14px;
     max-width: none;
-    font-size: var(--text-s);
     color: var(--farbe-text);
+    font-size: 15px;
+    line-height: 1.55;
   }
 
   .landkarte__knoepfe {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--abstand-2xs) var(--abstand-s);
+    gap: 12px;
     align-items: center;
-  }
-
-  .landkarte__knopf {
-    padding: var(--abstand-2xs) var(--abstand-s);
-    border: 0;
-    border-radius: var(--radius-rund);
-    background: var(--farbe-primaer);
-    color: var(--farbe-text-invers);
-    font: inherit;
-    font-size: var(--text-s);
-    font-weight: var(--gewicht-halbfett);
-    cursor: pointer;
-    transition: background-color var(--dauer-schnell) var(--verlauf);
-  }
-
-  .landkarte__knopf:hover,
-  .landkarte__knopf:focus-visible { background: var(--farbe-dunkel); }
-
-  .landkarte__verweis {
-    font-size: var(--text-s);
-    color: var(--farbe-primaer);
   }
 
   /* Die geladene Karte füllt den Kasten */
@@ -227,38 +187,32 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
     border: 0;
   }
 
-  /* .div-block-23: 40 % breit */
-  .kontakt__formular {
-    flex: 1 1 0;
-    min-width: 0;
+  .kontakt__formular { min-width: 0; }
+
+  .kontakt__formulartitel {
+    margin: 14px 0 0;
+    font-size: var(--text-titel-klein);
+    font-weight: var(--gewicht-leicht);
+    line-height: 1.22;
+    letter-spacing: -0.011em;
   }
 
   .kontakt__formulartext {
-    max-width: none;
-    margin-bottom: var(--abstand-m);
+    max-width: 30rem;
+    margin: 12px 0 30px;
     color: var(--farbe-text-gedeckt);
-    font-size: var(--text-s);
+    font-size: 15px;
+    line-height: 1.6;
   }
 
-  .kontakt__formulartitel {
-    margin-bottom: var(--abstand-2xs);
-    color: var(--farbe-primaer);
-    font-size: var(--text-l);
-    font-weight: var(--gewicht-normal);
+  @media (max-width: 900px) {
+    .kontakt__inhalt { grid-template-columns: 1fr; }
+    .landkarte { min-height: 360px; }
   }
 
-  @media (max-width: 991px) {
-    .kontakt__inhalt { flex-direction: column; }
-    .landkarte { min-height: 420px; }
-  }
-
-  @media (max-width: 767px) {
-    .kontakt { padding-block: 40px 120px; }
-    .landkarte { min-height: 320px; }
-    .kontakt__adresse { flex-direction: column; align-items: center; gap: var(--abstand-s); }
-    .kontakt__spalte--rechts,
-    .kontakt__spalte--links { text-align: center; margin: 0; }
-    .landkarte__hinweis { inset: auto var(--abstand-s) var(--abstand-s); padding: var(--abstand-xs) var(--abstand-s); }
+  @media (max-width: 560px) {
+    .landkarte { min-height: 300px; }
+    .landkarte__hinweis { inset: auto 12px 12px; padding: 16px 18px; }
   }
 </style>
 

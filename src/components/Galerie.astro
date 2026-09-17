@@ -8,13 +8,20 @@
  * JavaScript für die Bewegung selbst, gleiche Wirkung.
  *
  * Format wie in der Vorlage (`.swiper { height: 450px }`): eine feste
- * Höhe, die Bilder behalten ihr Seitenverhältnis. Vorher waren sie
- * quadratisch beschnitten.
+ * Höhe, die Bilder behalten ihr Seitenverhältnis.
  *
- * Darunter die Punkte-Anzeige im Instagram-Stil: Sie zeigt nur an,
- * welches Bild gerade mittig steht, und lässt sich anklicken, um an
- * diese Stelle im Band zu springen. Das Band läuft dabei weiter — es
- * wird nicht zum schrittweisen Slider (Festlegung von Florian).
+ * Darunter eine Fortschrittsleiste (Handoff, 17. September 2026): eine
+ * Haarlinie, auf der ein Reiter mitläuft, daneben der Zähler „01 / 05".
+ * Sie ersetzt die frühere Punktreihe. Ein Klick auf die Leiste versetzt
+ * das Band an diese Stelle; es läuft von dort ruhig weiter und wird
+ * nicht zum schrittweisen Slider (Festlegung von Florian).
+ *
+ * Band und Leiste lassen sich mit der Maus oder dem Finger ziehen. Beim
+ * bloßen Zeigen hält das Band dagegen NICHT mehr an — es soll ruhig
+ * weiterlaufen (Florian, 17. September 2026). Angehalten wird es nur,
+ * solange jemand zieht, und solange die Leiste sichtbar den Tastatur-
+ * fokus hat; Letzteres ist der Halt, den WCAG 2.2.2 für dauernd
+ * bewegte Inhalte verlangt.
  *
  * Die Bilder werden doppelt ausgegeben, damit der Übergang nahtlos ist.
  */
@@ -23,11 +30,14 @@ import galerie from '../content/galerie.json';
 const bilder = galerie.eintraege
   .filter((e) => e.aktiv)
   .sort((a, b) => a.position - b.position);
+
+/** Zweistellig, damit der Zähler nicht springt */
+const zweistellig = (n: number) => String(n).padStart(2, '0');
 ---
 
 {bilder.length > 0 && (
   <section class="galerie" id="galerie" aria-label="Einblicke in unsere Praxis" data-galerie>
-    <div class="galerie__fenster">
+    <div class="galerie__fenster" data-galeriefenster>
       <div class="galerie__band" data-galerieband>
         {[...bilder, ...bilder].map((b, i) => (
           <figure class="galerie__bild">
@@ -45,19 +55,20 @@ const bilder = galerie.eintraege
     </div>
 
     {bilder.length > 1 && (
-      <div class="galerie__punkte" data-galeriepunkte role="tablist" aria-label="Bild auswählen">
-        {bilder.map((b, i) => (
-          <span class="galeriepunkt" data-punktfach>
-            <button
-              class="galeriepunkt__knopf"
-              type="button"
-              role="tab"
-              aria-selected={i === 0 ? 'true' : 'false'}
-              aria-label={`Bild ${i + 1} von ${bilder.length}`}
-              data-nummer={i}
-            ></button>
-          </span>
-        ))}
+      <div class="galerie__leiste">
+        <button
+          class="fortschritt"
+          type="button"
+          data-galerieleiste
+          aria-label="Bildlauf: ziehen oder mit den Pfeiltasten zum nächsten oder vorigen Bild"
+        >
+          <span class="fortschritt__grund" aria-hidden="true"></span>
+          <span class="fortschritt__balken" data-galeriebalken aria-hidden="true"></span>
+          <span class="fortschritt__reiter" data-galeriereiter aria-hidden="true"></span>
+        </button>
+        <span class="galerie__zaehler" data-galeriezaehler aria-hidden="true">
+          01 / {zweistellig(bilder.length)}
+        </span>
       </div>
     )}
   </section>
@@ -68,17 +79,26 @@ const bilder = galerie.eintraege
     width: 100%;
   }
 
+  /* Das Fenster ist zugleich die Ziehfläche. `pan-y` lässt das
+     senkrechte Scrollen der Seite durch und behält nur die waagerechte
+     Bewegung für das Band. */
   .galerie__fenster {
     overflow: hidden;
     width: 100%;
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
   }
+
+  .galerie[data-zieht] .galerie__fenster,
+  .galerie[data-zieht] .fortschritt { cursor: grabbing; }
 
   .galerie__band {
     display: flex;
     width: max-content;
     /* Ruhig durchlaufend. Die Dauer ist fest — je mehr Bilder, desto
        gemächlicher wandert jedes einzelne vorbei. */
-    animation: galerie-lauf 60s linear infinite;
+    animation: galerie-lauf 70s linear infinite;
   }
 
   /* Feste Höhe wie `.swiper` der Vorlage; die Breite ergibt sich aus
@@ -86,7 +106,7 @@ const bilder = galerie.eintraege
   .galerie__bild {
     flex: none;
     margin: 0;
-    height: clamp(240px, 30vw, 450px);
+    height: clamp(230px, 32vw, 430px);
   }
 
   .galerie__bild img {
@@ -94,6 +114,9 @@ const bilder = galerie.eintraege
     width: auto;
     height: 100%;
     max-width: none;
+    /* Sonst nimmt der Browser das Bild selbst als Ziehgut auf */
+    -webkit-user-drag: none;
+    user-select: none;
   }
 
   /* Das Band ist doppelt bestückt — nach der halben Strecke
@@ -103,158 +126,248 @@ const bilder = galerie.eintraege
     to { transform: translateX(-50%); }
   }
 
-  .galerie:hover .galerie__band,
-  .galerie:focus-within .galerie__band {
+  /* Anhalten nur, solange gezogen wird — und solange die Leiste
+     sichtbar den Tastaturfokus hat. Beim bloßen Zeigen läuft das Band
+     weiter (Florian, 17. September 2026); früher hielt es hier an, was
+     mit dem Ziehen nicht zusammengeht und beim Überfahren der halben
+     Seitenbreite ständig stockte.
+
+     `:focus-visible` statt `:focus-within`: Sonst bliebe das Band nach
+     einem Mausklick auf die Leiste stehen, weil der Knopf den Fokus
+     behält. */
+  .galerie[data-zieht] .galerie__band,
+  .galerie:has(.fortschritt:focus-visible) .galerie__band {
     animation-play-state: paused;
   }
 
-  /* ---------- Punkte-Anzeige ----------
-     Maße wie im Slider von finanzleser: 8 px, aktiv 11 px, 6 px Abstand.
-     Die Randpunkte eines Fensters schrumpfen auf 5 bzw. 3 px, damit die
-     Reihe auch bei vielen Bildern schmal bleibt. */
-  .galerie__punkte {
+  /* ---------- Fortschrittsleiste ---------- */
+
+  .galerie__leiste {
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 6px;
-    margin-top: var(--abstand-m);
+    gap: 20px;
+    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
+    margin: 26px auto 0;
   }
 
-  .galeriepunkt {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: none;
-    width: var(--groesse, 8px);
-    height: 11px;
-    overflow: hidden;
-    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .galeriepunkt__knopf {
-    width: var(--groesse, 8px);
-    height: var(--groesse, 8px);
+  /* Die Leiste ist ein Knopf über die ganze Breite: 22 px hoch, damit
+     sie sich auch mit dem Finger treffen lässt — sichtbar ist davon
+     nur die Haarlinie in der Mitte. */
+  .fortschritt {
+    position: relative;
+    flex: 1;
+    height: 22px;
     padding: 0;
     border: 0;
+    background: none;
+    cursor: pointer;
+    /* Beim Ziehen mit dem Finger soll die Seite nicht mitscrollen */
+    touch-action: none;
+  }
+
+  .fortschritt__grund,
+  .fortschritt__balken {
+    position: absolute;
+    inset: 50% 0 auto;
+    height: 1px;
+    margin-top: -0.5px;
+  }
+
+  .fortschritt__grund { background: var(--farbe-linie); }
+
+  .fortschritt__balken {
+    background: var(--farbe-primaer);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  .fortschritt__reiter {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    margin: -3.5px 0 0 -3.5px;
     border-radius: var(--radius-rund);
     background: var(--farbe-primaer);
-    cursor: pointer;
-    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1),
-                height 300ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Die Punkte sind klein — die Trefferfläche darf es nicht sein. */
-  .galeriepunkt__knopf::before {
-    content: '';
-    position: absolute;
-    width: 28px;
-    height: 28px;
-    margin: -14px 0 0 -14px;
-    inset: 50% auto auto 50%;
+  .galerie__zaehler {
+    flex: none;
+    font-family: var(--schrift-titel);
+    font-size: var(--text-kicker);
+    font-weight: var(--gewicht-mittel);
+    line-height: 1;
+    letter-spacing: var(--sperrung-kicker-klein);
+    color: var(--farbe-text-gedeckt);
+    font-variant-numeric: tabular-nums;
   }
-
-  .galeriepunkt__knopf { position: relative; }
 
   @media (prefers-reduced-motion: reduce) {
     .galerie__band { animation: none; }
     .galerie__fenster { overflow-x: auto; }
-    .galeriepunkt,
-    .galeriepunkt__knopf { transition: none; }
+    /* Ohne laufendes Band hat die Leiste nichts anzuzeigen */
+    .galerie__leiste { display: none; }
   }
 </style>
 
 <script>
   /**
-   * Punkte-Anzeige zum laufenden Band.
+   * Fortschrittsleiste zum laufenden Band.
    *
-   * Der Fortschritt kommt aus der laufenden CSS-Animation selbst
+   * Der Stand kommt aus der laufenden CSS-Animation selbst
    * (`getAnimations()`), nicht aus einer eigenen Zeitrechnung — so
-   * stimmen Band und Punkte auch dann überein, wenn das Band beim
-   * Zeigen pausiert.
+   * stimmen Band und Leiste immer überein. Geschrieben wird direkt ins
+   * DOM, ohne Umweg.
    *
-   * Ein Klick versetzt die Animationszeit, statt sie neu zu starten:
-   * das Band springt an die Stelle und läuft von dort ruhig weiter.
+   * Dasselbe Prinzip trägt das Ziehen: Gezogen wird nicht am Band,
+   * sondern an der **Zeit** der Animation. Das Band bleibt damit die
+   * eine laufende CSS-Animation — es gibt keine zweite Rechnung, die
+   * mit ihr in Streit geraten könnte, und nach dem Loslassen läuft
+   * alles von der neuen Stelle ruhig weiter.
+   *
+   * Angehalten wird ausschließlich über `data-zieht` am Bereich; das
+   * Anhalten selbst steht im CSS oben.
    */
-  /* Größen wie im Slider von finanzleser: Der aktive Punkt ist der
-     größte, seine Nachbarn werden nach außen hin kleiner. Alle haben
-     dieselbe Farbe — die Staffelung allein trägt die Information. */
-  const GROESSEN = [11, 8, 5, 3];
-  const KLEINST = 3;
-
   function galerieAufbauen() {
     const bereich = document.querySelector<HTMLElement>('[data-galerie]');
     const band = document.querySelector<HTMLElement>('[data-galerieband]');
-    const reihe = document.querySelector<HTMLElement>('[data-galeriepunkte]');
-    if (!bereich || !band || !reihe || bereich.dataset.bereit) return;
+    const leiste = document.querySelector<HTMLElement>('[data-galerieleiste]');
+    if (!bereich || !band || !leiste || bereich.dataset.bereit) return;
     bereich.dataset.bereit = 'ja';
 
-    const faecher = [...reihe.querySelectorAll<HTMLElement>('[data-punktfach]')];
-    const anzahl = faecher.length;
-    if (!anzahl) return;
+    const fenster = bereich.querySelector<HTMLElement>('[data-galeriefenster]');
+    const balken = bereich.querySelector<HTMLElement>('[data-galeriebalken]');
+    const reiter = bereich.querySelector<HTMLElement>('[data-galeriereiter]');
+    const zaehler = bereich.querySelector<HTMLElement>('[data-galeriezaehler]');
+
+    /* Das Band enthält jedes Bild zweimal — die Hälfte ist die Runde. */
+    const anzahl = Math.max(1, band.children.length / 2);
+    const zweistellig = (n: number) => String(n).padStart(2, '0');
+    const gesamt = zweistellig(anzahl);
 
     const lauf = () => band.getAnimations()[0] as Animation | undefined;
     const dauer = () => {
       const zeiten = lauf()?.effect?.getComputedTiming();
-      return typeof zeiten?.duration === 'number' ? zeiten.duration : 60000;
+      return typeof zeiten?.duration === 'number' ? zeiten.duration : 70000;
     };
 
-    /** Welches Bild steht gerade mittig? */
-    const aktuell = () => {
+    /** Stand der Runde, 0 … 1 */
+    const anteil = () => {
       const zeit = Number(lauf()?.currentTime ?? 0);
-      const anteil = ((zeit / dauer()) % 1 + 1) % 1;
-      return Math.round(anteil * anzahl) % anzahl;
+      return (((zeit / dauer()) % 1) + 1) % 1;
     };
 
-    /* Höchstens sieben Punkte gleichzeitig; bei mehr Bildern wandert
-       das Fenster mit. */
-    const fenster = Math.min(anzahl, 7);
-
-    /**
-     * Die Größe hängt am Abstand zum aktiven Punkt: 11 – 8 – 5 – 3.
-     * Punkte außerhalb des Fensters fallen auf 0 und geben ihren Platz
-     * ganz ab; die Reihe bleibt dadurch immer gleich breit.
-     */
-    const groesseVon = (i: number, jetzt: number) => {
-      const halb = Math.floor(fenster / 2);
-      let start = jetzt - halb;
-      if (start < 0) start = 0;
-      if (start > anzahl - fenster) start = anzahl - fenster;
-
-      const platz = i - start;
-      if (platz < 0 || platz >= fenster) return 0;
-
-      return GROESSEN[Math.min(Math.abs(i - jetzt), GROESSEN.length - 1)] ?? KLEINST;
-    };
-
-    let zuletzt = -1;
     let laeuft = false;
+    let zuletzt = -1;
 
     const zeichnen = () => {
       if (!laeuft) return;
-      const jetzt = aktuell();
-      if (jetzt !== zuletzt) {
-        zuletzt = jetzt;
-        faecher.forEach((fach, i) => {
-          const groesse = groesseVon(i, jetzt);
-          const knopf = fach.firstElementChild as HTMLElement | null;
-          fach.style.setProperty('--groesse', `${groesse}px`);
-          fach.style.width = groesse ? `${groesse}px` : '0px';
-          knopf?.style.setProperty('--groesse', `${groesse}px`);
-          knopf?.setAttribute('aria-selected', i === jetzt ? 'true' : 'false');
-        });
+      const a = anteil();
+      balken?.style.setProperty('transform', `scaleX(${a.toFixed(4)})`);
+      if (reiter) reiter.style.left = `${(a * 100).toFixed(2)}%`;
+
+      const nummer = (Math.floor(a * anzahl) % anzahl) + 1;
+      if (zaehler && nummer !== zuletzt) {
+        zuletzt = nummer;
+        zaehler.textContent = `${zweistellig(nummer)} / ${gesamt}`;
       }
       requestAnimationFrame(zeichnen);
     };
 
-    reihe.addEventListener('click', (e) => {
-      const knopf = (e.target as Element | null)?.closest<HTMLElement>('[data-nummer]');
+    /** Setzt die Animationszeit; Rundenanfang und -ende sind dieselbe
+        Stelle, der Wert wird deshalb in eine Runde zurückgefaltet. */
+    const zeitSetzen = (zeit: number) => {
       const spiel = lauf();
-      if (!knopf || !spiel) return;
-      const nummer = Number(knopf.dataset.nummer);
-      /* Die Zeit auf den Anfang des gewünschten Bildes setzen — die
-         Animation läuft dadurch weiter, springt aber an die Stelle. */
-      spiel.currentTime = (nummer / anzahl) * dauer();
-      zuletzt = -1;
+      if (!spiel) return;
+      const d = dauer();
+      spiel.currentTime = (((zeit % d) + d) % d);
+    };
+
+    /** Setzt das Band auf einen Stand 0 … 1 der Runde. */
+    const springen = (a: number) => zeitSetzen(a * dauer());
+
+    /* ---------- Ziehen ----------
+       Eine Runde ist die halbe Bandbreite: So weit wandert das Band in
+       einer Animationsdauer. Aus einem Ziehweg in Bildpunkten wird
+       damit eine Zeitspanne. Nach rechts ziehen heißt: zurück in der
+       Zeit. */
+    const runde = () => Math.max(1, band.scrollWidth / 2);
+
+    let anBand = false;
+    let anLeiste = false;
+    let griffX = 0;
+    let griffZeit = 0;
+
+    const anhalten = () => { bereich.dataset.zieht = 'ja'; };
+    const weiterlaufen = () => { delete bereich.dataset.zieht; };
+
+    /** Stand aus einer Stelle auf der Leiste. */
+    const ausPunkt = (x: number) => {
+      const r = leiste.getBoundingClientRect();
+      springen(Math.min(1, Math.max(0, (x - r.left) / r.width)));
+    };
+
+    const loslassen = (e: PointerEvent) => {
+      if (!anBand && !anLeiste) return;
+      const halter = anBand ? fenster : leiste;
+      anBand = false;
+      anLeiste = false;
+      weiterlaufen();
+      if (halter?.hasPointerCapture(e.pointerId)) halter.releasePointerCapture(e.pointerId);
+    };
+
+    /* Das Band: Der Ziehweg verschiebt die Zeit gegenüber dem Stand
+       beim Zupacken. */
+    fenster?.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || !lauf()) return;
+      fenster.setPointerCapture(e.pointerId);
+      anBand = true;
+      griffX = e.clientX;
+      griffZeit = Number(lauf()?.currentTime ?? 0);
+      anhalten();
+    });
+
+    fenster?.addEventListener('pointermove', (e) => {
+      if (!anBand) return;
+      zeitSetzen(griffZeit - ((e.clientX - griffX) / runde()) * dauer());
+    });
+
+    fenster?.addEventListener('pointerup', loslassen);
+    fenster?.addEventListener('pointercancel', loslassen);
+    /* Sonst hebt der Browser beim Ziehen das Bild selbst auf */
+    fenster?.addEventListener('dragstart', (e) => e.preventDefault());
+
+    /* Die Leiste: Das Band folgt unmittelbar der Stelle unter dem
+       Zeiger — auch schon beim Aufsetzen, das ersetzt den früheren
+       Klick. */
+    leiste.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || !lauf()) return;
+      leiste.setPointerCapture(e.pointerId);
+      anLeiste = true;
+      anhalten();
+      ausPunkt(e.clientX);
+    });
+
+    leiste.addEventListener('pointermove', (e) => {
+      if (anLeiste) ausPunkt(e.clientX);
+    });
+
+    leiste.addEventListener('pointerup', loslassen);
+    leiste.addEventListener('pointercancel', loslassen);
+
+    /* Mit der Tastatur bedienbar: Die frühere Punktreihe hatte je Bild
+       einen eigenen Knopf. Hier ist es einer — also müssen die
+       Pfeiltasten ein Bild weiter- und zurückschalten. */
+    leiste.addEventListener('keydown', (e) => {
+      const schritt = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1
+                    : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1
+                    : 0;
+      if (schritt === 0 && e.key !== 'Home' && e.key !== 'End') return;
+      e.preventDefault();
+      if (e.key === 'Home') springen(0);
+      else if (e.key === 'End') springen((anzahl - 1) / anzahl);
+      else springen(Math.round(anteil() * anzahl) / anzahl + schritt / anzahl);
     });
 
     /* Die Schleife läuft nur, solange das Band im Fenster steht. Sonst

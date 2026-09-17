@@ -6,7 +6,10 @@
  *   .landing     Logo, am Bildschirm fixiert, füllt die Höhe
  *   .start_space Weiße Fläche darunter (130vh) — schafft den Scrollweg,
  *                über den das Logo animiert wird
- *   .fixedbg     Grauer Grund mit Symbolmuster dahinter
+ *
+ * Der graue Symbolgrund der Vorlage (`.fixedbg`) entfällt: Das Logo
+ * steht auf Weiß, und auch weiter unten scheint kein Kachelmuster mehr
+ * hinter dem Kontaktbereich durch (Florian, 17. September 2026).
  *
  * Ablauf `a-7` (PAGE_SCROLL): Über die ersten 10 % des Scrollwegs
  * skaliert das Logo auf 1,3, wandert 30 px nach unten, spielt dabei
@@ -18,8 +21,6 @@
 import seite from '../content/seite.json';
 const { praxis } = seite;
 ---
-
-<div class="grund" aria-hidden="true"></div>
 
 <div class="startbereich" data-startbereich>
   <div class="startbereich__mitte">
@@ -55,19 +56,12 @@ const { praxis } = seite;
   In der Vorlage folgt hier `.start_space` mit 130vh — der Scrollweg,
   über den das Logo animiert wird. Bei uns entfällt er: Ablauf a-7
   hängt an PAGE_SCROLL, das Logo rechnet also mit dem gesamten
-  Dokument, und die 350vh der Öffnungszeiten liegen ohnehin davor.
-  Stünde der Raum trotzdem hier, wäre er nach den Öffnungszeiten eine
+  Dokument, und die 350vh der Sprechstunden liegen ohnehin davor.
+  Stünde der Raum trotzdem hier, wäre er nach den Sprechstunden eine
   bildschirmfüllende leere Fläche vor der Begrüßung.
 */}
 
 <style>
-  .grund {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    background: #f3f3f3 url('/bilder/deko/icon-hintergrund.png') center / 600px;
-  }
-
   .startbereich {
     position: fixed;
     inset: 0;
@@ -291,7 +285,7 @@ const { praxis } = seite;
     /* Gedeckelt auf anderthalb Fensterhöhen: Je länger die Seite wird
        (die Praxis legt Beiträge und Abschnitte an), desto länger wären
        sonst die 10 % — auf Handys stünde das Logo dann noch, wenn die
-       Öffnungszeiten schon darüberfahren. */
+       Sprechstunden schon darüberfahren. */
     const fortschritt = () => {
       const weg = document.documentElement.scrollHeight - window.innerHeight;
       const logoWeg = Math.min(0.1 * weg, 1.5 * window.innerHeight);

@@ -309,7 +309,9 @@ function richtextFeld(feld: Feld, wert: Wert): Baustein {
       html += '</tbody></table><p></p>';
       befehl('insertHTML', html)();
     }),
-    knopf('Bild', 'Bild in den Text einfügen', () => bildEinfuegen(inhalt, feld, befehl)),
+    /* Freie Abschnitte haben ihr Bild als eigenes Feld neben dem Text —
+       dort wäre ein zweiter Weg, Bilder einzusetzen, nur verwirrend. */
+    feld.ohneBild ? null : knopf('Bild', 'Bild in den Text einfügen', () => bildEinfuegen(inhalt, feld, befehl)),
     knopf('Format löschen', 'Alle Auszeichnungen entfernen', befehl('removeFormat')),
   ]);
 

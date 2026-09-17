@@ -1,17 +1,35 @@
 ---
 /**
- * Öffnungszeiten — schnalzen beim Scrollen von unten herein.
+ * Der Einstieg der Startseite — eine große weiße Karte, die beim
+ * Scrollen von unten hereinfährt und mit dem Zipfel einrastet.
+ *
+ * SIE ENTHÄLT DEN GANZEN ERSTEN ABSCHNITT (Florian, 17. September 2026):
+ *
+ *   Begrüßung  →  Bilderband  →  Sprechstunden  →  Zipfel
+ *
+ * Vorher waren Begrüßung und Band eigene Abschnitte im Seitenfluss und
+ * nur die Sprechstunden-Blase fuhr herein. Das ließ sich nicht
+ * zusammenbringen: Die Blase lebt davon, über das fest stehende Logo zu
+ * fahren, also musste sie oben stehen — und stand damit vor der
+ * Begrüßung. Jetzt fährt alles gemeinsam herein, und die Reihenfolge
+ * stimmt wieder.
+ *
+ * Weil die Karte höher ist als das Fenster, sieht man beim Hereinfahren
+ * zuerst ihren Kopf (die Begrüßung) und zuletzt ihren Fuß (die Zeiten) —
+ * die Leserichtung stimmt also. In der Ruhelage steht ihr Fuß knapp
+ * über der Symbolleiste; was darüber liegt, ist dann schon vorbei-
+ * gezogen.
  *
  * Aufbau wie in der Vorlage (`.oz` / `.oz-container` / `.div-block-28`):
  *   • Ein 350vh hoher Bereich ganz am Seitenanfang (Handys: 450vh —
  *     dort braucht das große Logo mehr Weg, um sich aufzulösen)
  *   • Darin eine Bühne, die über die volle Strecke stehen bleibt und
- *     ihren Überlauf abschneidet — die Blase ist unsichtbar, solange
+ *     ihren Überlauf abschneidet — die Karte ist unsichtbar, solange
  *     sie noch unterhalb steht
- *   • Die Blase selbst ruht knapp über der Symbolleiste und wird vom
+ *   • Die Karte selbst ruht knapp über der Symbolleiste und wird vom
  *     Scrollweg dorthin gefahren
  *   • Darunter die Abschlusslinie mit dem Zipfel — eine eigene
- *     SVG-Zeichnung, die auf den Öffnungszeiten-Knopf zeigt
+ *     SVG-Zeichnung, die auf den Sprechstunden-Knopf zeigt
  *
  * Alle Zeitwerte stammen aus Ablauf `a-19` („oz test") der Vorlage:
  *
@@ -39,7 +57,7 @@
  * weißes Polygon mit gestrichelter Kontur, bei dem drei Punkte wandern.
  * Hier wird dieselbe Form direkt als SVG gezeichnet. Vorteile:
  *   • die Grundlinie läuft von Fensterrand zu Fensterrand
- *   • die Spitze zeigt exakt auf die Mitte des Öffnungszeiten-Knopfs
+ *   • die Spitze zeigt exakt auf die Mitte des Sprechstunden-Knopfs
  *     in der Symbolleiste — gemessen, nicht geschätzt
  *   • die Länge ist je Bildschirmgröße einstellbar (`--zipfel-laenge`)
  *   • keine 170 KB Lottie-Bibliothek für diesen Bereich
@@ -49,6 +67,8 @@
  * nach links ab) werden proportional zur eingestellten Länge skaliert.
  */
 import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
+import Willkommen from './Willkommen.astro';
+import Galerie from './Galerie.astro';
 import startseite from '../content/startseite.json';
 
 const texte = startseite.sprechstunden;
@@ -58,31 +78,40 @@ const texte = startseite.sprechstunden;
   Zwei Ebenen, weil sie an verschiedenen Stellen im Stapel liegen
   müssen: die weiße Fläche unter dem Logo, die Blase darüber.
 
-    Ebene  1  grauer Symbolgrund (fest im Fenster)
     Ebene  2  diese weiße Fläche — nimmt den Platz im Fluss ein
     Ebene 10  der Logobereich (fest im Fenster)
-    Ebene 30  die Öffnungszeiten-Blase
+    Ebene 30  die Sprechstunden-Blase
 
-  Der graue Grund wird dadurch erst unterhalb sichtbar
-  (docs/entscheidungen.md), das Logo bleibt aber sichtbar, während
-  die Blase darüber hereinfährt.
+  Das Logo bleibt dadurch sichtbar, während die Blase darüber
+  hereinfährt — genau das macht den Auftritt aus.
 */}
 <div class="ozraum" aria-hidden="true"></div>
 
-<section class="ozbereich" id="oz_anchor" aria-labelledby="oz-titel">
+<section class="ozbereich" id="oz_anchor" aria-label="Einstieg">
   <div class="ozbereich__buehne">
     <div class="ozblase" data-ozblase>
       <div class="ozblase__flaeche">
-        {/* Wie in der mobilen Vorlage ein Kreuz oben rechts. Weil die
-            Blase scrollgesteuert ist, „schließt" es sie, indem es sanft
-            an den Praxis-Bereich darunter scrollt. */}
-        <button class="ozschliessen" type="button" data-ozschliessen aria-label="Sprechstunden schließen"></button>
+        <Willkommen />
 
-        <h2 class="ozblase__titel ohne-verlauf" id="oz-titel">{texte.titel}</h2>
-        {texte.text && <p class="ozblase__einleitung">{texte.text}</p>}
+        <div class="ozband">
+          <Galerie />
+        </div>
 
-        <div class="ozblase__spalten">
-          <OeffnungszeitenListen />
+        <div class="ozsprechstunden" aria-labelledby="oz-titel">
+          {/* Wie in der mobilen Vorlage ein Kreuz oben rechts. Weil die
+              Karte scrollgesteuert ist, „schließt" es sie, indem es sanft
+              an den Bereich darunter scrollt. */}
+          <button class="schliessen schliessen--fest ozschliessen" type="button" data-ozschliessen aria-label="Einstieg überspringen">
+            <svg class="schliessen__kreis" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" /></svg>
+          </button>
+
+          <div class="ozblase__kicker kicker">Sprechstunden</div>
+          <h2 class="ozblase__titel ohne-verlauf" id="oz-titel">{texte.titel}</h2>
+          {texte.text && <p class="ozblase__einleitung">{texte.text}</p>}
+
+          <div class="ozblase__spalten">
+            <OeffnungszeitenListen />
+          </div>
         </div>
       </div>
 
@@ -97,12 +126,16 @@ const texte = startseite.sprechstunden;
 
 <style>
   /* Wie lang der Zipfel voll ausgefahren ist. Mobil das Maß der
-     Vorlage; auf dem Desktop kürzer, damit er nicht die halbe
-     Symbolleiste überragt (Wunsch von Florian). Das Skript liest den
-     Wert und richtet Ruhelage und Bewegung danach aus. */
-  .ozblase { --zipfel-laenge: 154px; }
+     Vorlage; auf dem Desktop länger, weil dort mehr Luft zwischen Karte
+     und Symbolleiste steht (Florian: 90 → 130 → 175 px). Das Skript
+     liest den Wert und richtet Ruhelage und Bewegung danach aus.
+
+     Der Wert steht am Raum, nicht an der Karte: Der Raum rechnet ihn in
+     seine Höhe ein (siehe unten), und an die Karte vererbt er sich
+     ohnehin. */
+  .ozraum { --zipfel-laenge: 154px; }
   @media (min-width: 60rem) {
-    .ozblase { --zipfel-laenge: 130px; }
+    .ozraum { --zipfel-laenge: 175px; }
   }
 
   /* Der Scrollweg, über den die Blase hereinfährt — muss zu `ozWeg()`
@@ -128,11 +161,16 @@ const texte = startseite.sprechstunden;
   .ozraum {
     position: relative;
     z-index: 2;
-    /* Der Inhalt beginnt dort, wo im Moment des Freigebens die Spitze
-       des Zipfels steht: an der Oberkante der Symbolleiste (110 px).
-       Fährt die Leiste weg, kommt darunter schon die Begrüßung hervor;
-       zieht sich der Zipfel ein, schließt der Inhalt an die Blase an. */
-    height: calc(var(--oz-ende) - 110px);
+    /* Wie viel Platz der Einstieg im Fluss belegt.
+       Ausgangspunkt: Beim Freigeben steht die Spitze des Zipfels an der
+       Oberkante der Symbolleiste (110 px). Davon geht die Zipfellänge
+       noch ab — die Spitze zieht sich beim Weiterscrollen ein, und der
+       Platz, den sie hatte, stünde sonst als leere Fläche zwischen
+       Karte und nächstem Abschnitt (Florian, 17. September 2026).
+       Während sie sich einzieht, reicht sie kurz in den Innenabstand
+       des nächsten Abschnitts hinein; sie sitzt aber weit rechts, wo
+       dort nichts steht. */
+    height: calc(var(--oz-ende) - 110px - var(--zipfel-laenge));
     background: var(--farbe-flaeche);
   }
 
@@ -171,16 +209,49 @@ const texte = startseite.sprechstunden;
     left: 50%;
     /* `100%` statt `100vw`: `vw` zählt die Rollleiste mit, die Blase
        säße dadurch ein paar Pixel zu weit rechts. */
-    width: min(calc(100% - 2 * var(--abstand-m)), 68rem);
+    width: min(calc(100% - 2 * var(--abstand-seitenrand)), var(--breite-inhalt));
     /* Vom Skript gesetzt */
     transform: translate(-50%, var(--oz-versatz, 700px));
     pointer-events: auto;
   }
 
+  /* Die Karte selbst hat keinen Innenabstand — Begrüßung, Band und
+     Sprechstunden bringen ihren eigenen mit. */
   .ozblase__flaeche {
     position: relative;
-    padding: var(--abstand-m) var(--abstand-l);
     background: var(--farbe-flaeche);
+  }
+
+  /* Abstände wie im Entwurf: eine kleine Fuge zwischen Begrüßung und
+     Band, dann der volle Abschnittsabstand vor den Sprechstunden.
+
+     Das Band bricht aus der Karte aus und läuft über die volle
+     Fensterbreite (Florian, 17. September 2026). `--fensterbreite`
+     setzt das Skript unten aus `clientWidth` — `100vw` ginge nicht,
+     weil es die Rollleiste mitzählt und die Seite dann waagerecht
+     überliefe. Ohne JavaScript bleibt es bei der Kartenbreite; das ist
+     der ruhige Rückfall. */
+  .ozband {
+    width: var(--fensterbreite, 100%);
+    /* Derselbe Abstand wie zwischen Band und Sprechstunden — innerhalb
+       der Karte hat alles denselben Rhythmus (Florian, 17. September
+       2026). */
+    margin-top: var(--abstand-gruppe);
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Seitlich derselbe Rand wie die Fortschrittsleiste des Bands — so
+     stehen Zeiten und Leiste auf einer Fluchtlinie. Unten deutlich mehr
+     Luft: Die Zeiten sollen nicht auf der gestrichelten Grundlinie
+     sitzen (Florian, 17. September 2026). */
+  .ozsprechstunden {
+    position: relative;
+    /* Oben der Gruppenabstand wie über dem Band; unten deutlich mehr,
+       damit die Zeiten nicht auf der gestrichelten Grundlinie sitzen.
+       Vorher stand oben der volle Abschnittsabstand — das riss die
+       Sprechstunden zu weit vom Band weg (Florian). */
+    padding: var(--abstand-gruppe) var(--abstand-seitenrand) var(--abstand-2xl);
   }
 
   /* Die Zeichnung hängt an der Unterkante der Fläche und ist so breit
@@ -212,59 +283,59 @@ const texte = startseite.sprechstunden;
     stroke-linejoin: round;
   }
 
-  /* Überschrift über allen drei Listen — eine vollwertige Abschnitts-
-     überschrift wie „Unsere Leistungen" oder „Wir freuen uns auf Sie",
-     nur eine Spur kleiner, weil sie in der Blase steht. */
+  /* Kicker und Überschrift wie in jedem anderen Abschnitt — nur eine
+     Spur kleiner, weil sie in der Blase stehen. */
+  .ozblase__kicker { padding-right: 48px; }
+
   .ozblase__titel {
-    margin: 0;
+    margin: 20px 0 0;
     padding-right: 48px;
     color: var(--farbe-primaer);
     font-size: clamp(1.75rem, 1.2rem + 1.8vw, 2.75rem);
-    font-weight: var(--gewicht-halbfett);
-    line-height: 1.1;
+    font-weight: var(--gewicht-leicht);
+    line-height: 1.12;
+    letter-spacing: -0.012em;
   }
 
-  /* Schließen-Kreuz wie auf den Leistungsseiten: dreht sich beim
-     Zeigen um 90° (Abläufe a-34 / a-35 der Vorlage). */
+  /* Dasselbe Schließen-Kreuz wie auf den Leistungsseiten (Aussehen in
+     styles/global.css) — nur steht sein Kreis hier von Anfang an da,
+     statt sich einzuzeichnen: Es gibt keinen Moment, in dem er anlaufen
+     könnte, die Karte fährt ja schon herein (Florian, 17. September
+     2026).
+
+     Es sitzt tiefer als früher und bündig mit der rechten Kante des
+     Textes darunter. */
   .ozschliessen {
     position: absolute;
-    top: var(--abstand-xs);
-    right: var(--abstand-xs);
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border: 0;
-    border-radius: var(--radius-rund);
-    background: url('/icons/ui/schliessen.svg') center / 20px no-repeat;
-    cursor: pointer;
-    transition: transform 300ms var(--verlauf), background-color 300ms var(--verlauf);
+    top: var(--abstand-l);
+    right: var(--abstand-seitenrand);
   }
 
   .ozschliessen:hover,
   .ozschliessen:focus-visible {
-    transform: rotate(90deg);
     background-color: var(--farbe-flaeche-gedeckt);
   }
 
+  /* Über die volle Breite der Blase statt auf Lesebreite: In der Blase
+     steht der Satz allein über drei Spalten und soll sie tragen
+     (Florian, 17. September 2026). */
   .ozblase__einleitung {
-    max-width: 46rem;
-    margin: var(--abstand-2xs) 0 var(--abstand-l);
-    color: var(--farbe-text);
-    font-size: var(--text-m);
+    max-width: none;
+    margin: 20px 0 48px;
+    color: var(--farbe-text-gedeckt);
+    font-size: 17px;
+    line-height: var(--zeilenhoehe-lese);
   }
 
   /* Drei Listen nebeneinander — auf kleinen Bildschirmen untereinander */
   .ozblase__spalten {
     display: grid;
-    /* Jede Spalte nimmt die Breite, die ihre Zeiten brauchen; der Rest
-       verteilt sich als Abstand dazwischen. Mit festen Dritteln wurde
-       die breiteste Spalte abgeschnitten. */
-    grid-template-columns: repeat(3, auto);
-    justify-content: space-between;
-    /* Nur ein Mindestabstand — den Rest verteilt `space-between` über
-       den tatsächlich freien Platz. Ein fester Anteil der Fenster-
-       breite (6vw) schob die dritte Spalte aus der Blase hinaus. */
-    gap: var(--abstand-l);
+    /* Drei gleich breite Spalten. Die Zeilen darin laufen über die
+       volle Spaltenbreite — Wochentag links, Zeit rechts, Haarlinie
+       dazwischen. `minmax(0, 1fr)` statt `1fr`, damit lange Zeiten die
+       Spalte nicht auseinanderdrücken. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(40px, 5vw, 88px);
     align-items: start;
   }
 
@@ -276,16 +347,17 @@ const texte = startseite.sprechstunden;
      passten sie schon nicht mehr und liefen seitlich heraus. */
   @media (max-width: 68rem) {
     .ozblase { width: calc(100% - 2 * var(--abstand-s)); }
-    .ozblase__flaeche { padding: var(--abstand-m); }
+    .ozsprechstunden { padding: var(--abstand-gruppe) var(--abstand-m) var(--abstand-xl); }
     .ozblase__spalten { grid-template-columns: 1fr; gap: var(--abstand-m); }
   }
 
-  /* Ohne Bewegung: steht ruhig im Seitenfluss */
+  /* Ohne Bewegung: Der Einstieg steht ruhig im Seitenfluss — Begrüßung,
+     Band und Sprechstunden einfach untereinander. Das Schließen-Kreuz
+     entfällt dabei: Es gibt nichts zu schließen, wenn nichts einfährt. */
   @media (prefers-reduced-motion: reduce) {
-    .ozschliessen { transition: none; }
-    .ozschliessen:hover { transform: none; }
+    .ozschliessen { display: none; }
     .ozraum { display: none; }
-    .ozbereich { position: static; height: auto; padding-block: var(--abstand-2xl); }
+    .ozbereich { position: static; height: auto; padding-bottom: var(--abstand-abschnitt); }
     .ozbereich__buehne { position: static; height: auto; }
     .ozblase { position: static; transform: none; margin-inline: auto; }
     .ozzipfel { display: none; }
@@ -293,26 +365,47 @@ const texte = startseite.sprechstunden;
 </style>
 
 <script>
-  import { ausStuetzstellen, type Stuetzstelle } from '../scripts/easing';
-  import { ozWeg, beimScrollenSichtbar, nachziehen } from '../scripts/scrollwege';
-  import { zuSprungmarke } from '../scripts/anker';
+  import { ausStuetzstellen } from '../scripts/easing';
+  import { ozWeg, beimScrollenSichtbar, nachziehen, ozStuetzstellen } from '../scripts/scrollwege';
 
   /**
-   * Das Kreuz in der Blase: Die Blase hängt am Scrollweg, lässt sich
-   * also nicht „wegklicken". Stattdessen gleitet die Seite an den
-   * Praxis-Bereich darunter — dort ist die Blase vorbei.
+   * Das Kreuz in der Karte: Sie hängt am Scrollweg, lässt sich also
+   * nicht „wegklicken". Stattdessen gleitet die Seite bis ans Ende des
+   * Bereichs — dort ist der Einstieg vorbei und der Inhalt beginnt.
    */
   function ozSchliessenAufbauen() {
     const knopf = document.querySelector<HTMLElement>('[data-ozschliessen]');
-    if (!knopf || knopf.dataset.bereit) return;
+    const raum = document.querySelector<HTMLElement>('.ozraum');
+    if (!knopf || !raum || knopf.dataset.bereit) return;
     knopf.dataset.bereit = 'ja';
     knopf.addEventListener('click', () => {
-      if (!zuSprungmarke('#praxis')) window.scrollTo({ top: window.innerHeight * 4, behavior: 'smooth' });
+      const unten = window.scrollY + raum.getBoundingClientRect().bottom - 96;
+      window.scrollTo({
+        top: Math.max(0, Math.round(unten)),
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? ('instant' as ScrollBehavior)
+          : 'smooth',
+      });
     });
   }
 
   /** Höhe der Symbolleiste unten — `.fussleiste__inhalt` */
   const LEISTE = 110;
+
+  /**
+   * Die Fensterbreite OHNE Rollleiste als CSS-Wert. `100vw` zählt sie
+   * mit; ein Element mit `width: 100vw` wäre also ein paar Pixel zu
+   * breit und ließe die Seite waagerecht überlaufen.
+   */
+  let breiteGemerkt = false;
+  function fensterbreiteMerken() {
+    if (breiteGemerkt) return;
+    breiteGemerkt = true;
+    const setzen = () =>
+      document.documentElement.style.setProperty('--fensterbreite', `${document.documentElement.clientWidth}px`);
+    setzen();
+    window.addEventListener('resize', setzen, { passive: true });
+  }
 
   /* Maße des Zipfels aus der Lottie der Vorlage, bezogen auf die
      Spitze T bei voller Länge 155 px. Links/rechts der Basis als
@@ -327,7 +420,7 @@ const texte = startseite.sprechstunden;
   };
 
   /**
-   * Fährt die Öffnungszeiten am Scrollweg entlang herein — Ablauf a-19 —
+   * Fährt die Sprechstunden am Scrollweg entlang herein — Ablauf a-19 —
    * und zeichnet Grundlinie und Zipfel.
    */
   function ozAufbauen() {
@@ -339,12 +432,17 @@ const texte = startseite.sprechstunden;
     if (!bereich || !blase || !svg || !flaeche || !kontur || blase.dataset.bereit) return;
     blase.dataset.bereit = 'ja';
 
+    /* Das Bilderband in der Karte läuft über die volle Fensterbreite und
+       braucht sie deshalb als Zahl — auch dann, wenn die Karte selbst
+       sich nicht bewegt. */
+    fensterbreiteMerken();
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     /* ---- Geometrie: wird bei Größenänderung neu vermessen ---- */
     let breite = 0;        // Fensterbreite
     let laenge = 154;      // Zipfellänge (--zipfel-laenge)
-    let spitzeX = 0;       // x der Spitze = Mitte des Öffnungszeiten-Knopfs
+    let spitzeX = 0;       // x der Spitze = Mitte des Sprechstunden-Knopfs
     let versatzOben = 0;   // Grundlinie in der Mitte, unter der Blasenkante
     let ruhelage = 264;    // bottom-Wert der Blase in Ruhe
 
@@ -376,9 +474,6 @@ const texte = startseite.sprechstunden;
       svg.setAttribute('height', String(hoehe));
       svg.setAttribute('viewBox', `0 0 ${breite} ${hoehe}`);
 
-      /* Der Hub zwischen 50 % und 71 % entspricht der Zipfellänge —
-         so steht die Spitze still, während die Blase einrastet. */
-      BLASE[2].wert = laenge;
     };
 
     /** Zeichnet Fläche und Kontur für einen Ausfahrgrad 0 … 1 */
@@ -405,27 +500,20 @@ const texte = startseite.sprechstunden;
 
     /* ---- Bewegung ---- */
 
-    /* Schlüsselstellen aus a-19. Die Kurve gehört zum Abschnitt, der an
-       dieser Stelle beginnt. Vor der ersten Stelle hält Webflow den
-       ersten Wert — daher die Stütze bei 0 %. */
-    const BLASE: Stuetzstelle[] = [
-      { bei: 0.00, wert: 700, kurve: 'linear' },
-      { bei: 0.15, wert: 700, kurve: 'easeIn' },
-      { bei: 0.50, wert: 154, kurve: 'outCubic' },
-      { bei: 0.71, wert: 0, kurve: 'linear' },
-      { bei: 1.00, wert: 0 },
-    ];
+    /* Schlüsselstellen aus a-19 — sie stehen in scripts/scrollwege.ts,
+       weil scripts/anker.ts sie ebenfalls braucht (zum Umrechnen einer
+       Sprungmarke INNERHALB der Karte in eine Scrolltiefe). */
+    let BLASE = ozStuetzstellen(700, 154);
 
     /* Der Startwert der Vorlage ist 700 px. Er reicht dort, weil die
-       Blase nur rund 400 px hoch ist. Unsere Listen stehen auf schmalen
-       Schirmen untereinander, die Blase wird dadurch höher — dann muss
-       der Startwert mitwachsen, sonst schaut sie beim Laden schon
-       herein. */
+       Blase nur rund 400 px hoch ist. Unsere Karte trägt den ganzen
+       Einstieg und ist ein Vielfaches davon — der Startwert muss also
+       mitwachsen, sonst stünde sie beim Laden schon im Bild. Er wird
+       zusätzlich als `--oz-start` veröffentlicht. */
     const startBestimmen = () => {
-      const hoch = blase.getBoundingClientRect().height;
-      const start = Math.max(700, ruhelage + hoch + 40);
-      BLASE[0].wert = start;
-      BLASE[1].wert = start;
+      const start = Math.max(700, ruhelage + blase.offsetHeight + 40);
+      BLASE = ozStuetzstellen(start, laenge);
+      blase.style.setProperty('--oz-start', `${Math.round(start)}px`);
     };
 
     /* Der Zipfel fährt aus, während die Blase einrastet, und zieht sich
@@ -438,6 +526,8 @@ const texte = startseite.sprechstunden;
       { bei: 1.00, wert: 0 },
     ];
 
+    /* Erst messen (das setzt Zipfellänge und Ruhelage), dann den
+       Startwert daraus bestimmen. */
     vermessen();
     startBestimmen();
 

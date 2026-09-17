@@ -116,9 +116,9 @@ const naechste = alle[i + 1];
     view-transition-class: karte;
   }
 
-  /* Schließen-Kreuz: klebt beim Scrollen unter der Leiste, dann
-     zeichnet sich ein Kreis darum. Dreht sich beim Zeigen wie das
-     Kreuz der Hinweis-Blase (Abläufe a-34 / a-35). */
+  /* Schließen-Kreuz: Aussehen steht in styles/global.css, hier nur die
+     Lage. Es klebt beim Scrollen unter der Leiste — und erst dann
+     zeichnet sich der Kreis darum ein. */
   .schliessen-wache { display: block; height: 0; }
 
   .schliessen-halter {
@@ -132,28 +132,6 @@ const naechste = alle[i + 1];
     position: absolute;
     top: 0;
     right: 0;
-    display: block;
-    width: 48px;
-    height: 48px;
-    background: url('/icons/ui/schliessen.svg') center / 24px no-repeat;
-    transition: transform 300ms var(--verlauf), background-color 300ms var(--verlauf);
-  }
-
-  .schliessen:hover,
-  .schliessen:focus-visible { transform: rotate(90deg); }
-
-  .schliessen__kreis {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    fill: none;
-    stroke: var(--farbe-primaer);
-    stroke-width: 1;
-    stroke-dasharray: 139;
-    stroke-dashoffset: 139;
-    transform: rotate(-90deg);
-    transition: stroke-dashoffset 500ms var(--verlauf-betont);
   }
 
   .schliessen-halter[data-klebt] .schliessen {
@@ -232,8 +210,4 @@ const naechste = alle[i + 1];
     .nachbar--vor { margin-left: 0; text-align: left; }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .schliessen, .schliessen__kreis { transition: none; }
-    .schliessen:hover { transform: none; }
-  }
 </style>

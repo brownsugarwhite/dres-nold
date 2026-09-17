@@ -5,8 +5,9 @@
   In Komponenten NIEMALS direkte Farbwerte, Schriftgrößen oder
   Abstände schreiben, sondern immer diese Variablen verwenden.
 
-  Die Werte sind aus der Webflow-Vorlage abgeleitet und geben deren
-  Erscheinungsbild 1:1 wieder.
+  Grundlage ist die Webflow-Vorlage; die Feinwerte (Grautöne, Größen,
+  Abstände, Laufweiten) stammen aus dem Gestaltungs-Handoff vom
+  17. September 2026 — siehe design_handoff_startseite/README.md.
 */
 
 :root {
@@ -28,11 +29,32 @@
      damit unter der Vorgabe von 4,5:1 (WCAG 2.1 AA). */
   --farbe-text: #4d434b;          /* Fließtext — 9,5:1 auf Weiß */
   --farbe-text-gedeckt: #766c74;  /* Zweitrangiges — 5,0:1 auf Weiß */
+  /* Nur für Zeichen ohne Textbedeutung: Trennpunkte, Zähler-Nummern
+     („01"). NIE für Text, den man lesen muss — der Kontrast reicht
+     dafür nicht. */
+  --farbe-text-leise: #c6bcc2;
   --farbe-text-invers: #ffffff;
 
   --farbe-flaeche: #ffffff;
+  /* Kaum wahrnehmbar getönt — für Kästen, die sich vom Weiß abheben
+     sollen, ohne grau zu wirken (Erfolgsmeldung im Formular). */
+  --farbe-flaeche-hell: #faf8f9;
   --farbe-flaeche-gedeckt: #f4f2f3;
-  --farbe-linie: #dddddd;
+  /* Der Grund, aus dem die Leistungskacheln beim Scrollen auf Weiß
+     aufhellen (Ablauf a-8). Die Vorlage nimmt dafür das neutrale
+     #f1f1f1; hier steht derselbe Helligkeitsschritt, nur in die
+     Aubergine-Familie gedreht. Die gedeckte Fläche darüber wäre für
+     diese Bewegung zu schwach — man sähe sie nicht. */
+  --farbe-flaeche-kachel: #f1eef0;
+
+  /* Linien in drei Stärken, alle aus der Aubergine-Familie. Das
+     frühere neutrale #dddddd stach daneben als kühler Fremdkörper
+     heraus. */
+  --farbe-linie: #e4e0e2;         /* Haarlinien, Kachelrahmen */
+  --farbe-linie-leise: #f0ecee;   /* Trennlinien innerhalb von Listen */
+  --farbe-linie-zeile: #e9e4e7;   /* Zeilenlinien in Sprechzeiten */
+  --farbe-formlinie: #d6ced2;     /* Grundlinie der Formularfelder */
+
   /* Farbe der Punktlinie in den Leisten — aus punktlinie.png übernommen,
      damit die gezeichnete Blase nahtlos daran anschließt */
   --farbe-punktlinie: #742d5d;
@@ -41,6 +63,11 @@
   --farbe-hinweis: var(--farbe-primaer);
   --farbe-fehler: #a4243b;
   --farbe-erfolg: #2d6a4f;
+
+  /* Die Füllfläche der Knöpfe. Radial, damit sie dort aufgeht, wo der
+     Zeiger den Knopf betritt (scripts/knopf.ts setzt --x / --y). */
+  --verlauf-knopf: radial-gradient(circle at center, #83306a 0%, #6c1a51 52%, #5b1342 100%);
+  --verlauf-knopf-invers: radial-gradient(circle at center, #ffffff 0%, #fdfbfc 55%, #f4eff2 100%);
 
   /* --- Schrift --------------------------------------------------
      Die Vorlage nutzt Myriad Pro über Adobe Typekit. Typekit entfällt
@@ -65,8 +92,25 @@
   --text-l: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
   --text-xl: clamp(1.5rem, 1.3rem + 1vw, 2.25rem);
   --text-xxl: clamp(2rem, 1.6rem + 2vw, 3.5rem);
-  /* Abschnittsüberschriften der Startseite — 60 px wie `.heading` der Vorlage */
-  --text-titel: clamp(2.25rem, 1.5rem + 2.6vw, 3.75rem);
+
+  /* Die vier Grade der Startseite.
+     Grundsatz der Gestaltung: Überschriften leicht (300), Labels
+     halbfett und gesperrt (600, Versalien). Nur diese beiden Gewichte
+     tragen die Hierarchie; Fließtext 400, Namen und Knöpfe 500. */
+  --text-willkommen: clamp(2.6rem, 1.1rem + 5vw, 4.9rem);  /* H1 */
+  --text-titel: clamp(1.9rem, 1.1rem + 2.6vw, 3rem);       /* H2 Abschnitt */
+  --text-titel-klein: clamp(1.5rem, 1.1rem + 1.2vw, 2rem); /* H2 im Formular */
+  --text-banner: clamp(2rem, 1.1rem + 3.4vw, 4.2rem);      /* Titel im Team-Banner */
+
+  /* Lesegrößen */
+  --text-lead: clamp(1.06rem, 0.95rem + 0.5vw, 1.32rem);   /* Einleitung */
+  --text-flies: clamp(1.02rem, 0.95rem + 0.3vw, 1.18rem);  /* Fließtext im Abschnitt */
+
+  /* Label über der Überschrift („Kicker") und Textlinks */
+  --text-kicker: 12px;
+  --text-kicker-klein: 11.5px;
+  --sperrung-kicker: 0.18em;
+  --sperrung-kicker-klein: 0.14em;
 
   --gewicht-leicht: 300;
   --gewicht-normal: 400;
@@ -77,6 +121,8 @@
   --zeilenhoehe-eng: 1.2;
   --zeilenhoehe-mittel: 1.45;
   --zeilenhoehe-normal: 1.6;
+  /* Fließtext läuft locker — das ist der ruhige Grundton der Seite */
+  --zeilenhoehe-lese: 1.68;
 
   /* --- Abstände -------------------------------------------------
      Konsistentes Raster; Basis 8 px. */
@@ -90,11 +136,24 @@
   --abstand-2xl: 6rem;
   --abstand-3xl: 9rem;
 
+  /* Der Rhythmus der Startseite: ein Abschnitt oben und unten,
+     Gruppen darin, und der Seitenrand. */
+  --abstand-abschnitt: clamp(80px, 9vw, 124px);
+  --abstand-gruppe: clamp(48px, 6vw, 72px);
+  --abstand-seitenrand: 24px;
+
   /* --- Layout ---------------------------------------------------- */
-  --breite-inhalt: 1200px;
+  /* 1360 statt 1200: Das Bilderband steckt seit dem 17. September 2026
+     in der Einstiegskarte und ist damit so breit wie der Inhalt — bei
+     1200 px wirkte es eingeengt (Florian). */
+  --breite-inhalt: 1360px;
   --breite-text: 68ch;
+  /* Lesebreite eines Absatzes — so lang, dass das Auge die nächste
+     Zeile noch sicher findet */
+  --breite-absatz: 34rem;
   --radius-s: 4px;
-  --radius-m: 8px;
+  --radius-m: 10px;
+  --radius-l: 14px;
   --radius-rund: 999px;
 
   /* --- Bewegung --------------------------------------------------

@@ -193,3 +193,257 @@ Aus Florians Durchsicht der fertigen Seite:
   Neuigkeiten-Karten haben keinen eigenen Hintergrund mehr, nur ihren
   Rahmen. Die Bereiche darunter bleiben weiß.
 - **Öffnungszeiten** stehen zusätzlich in der Kopfleiste.
+
+## Gestaltungs-Handoff (17. September 2026)
+
+Florian hat die Startseite mit einem Entwurf überarbeitet
+(`design_handoff_startseite/`). Übernommen sind Typografie, Grautöne,
+Abstände, Knöpfe, Kacheln und der Aufbau der Abschnitte. **Diese Punkte
+aus dem Entwurf ausdrücklich NICHT:**
+
+| Im Entwurf | Hier stattdessen |
+|---|---|
+| Logo auf grauem Kachelgrund | **Weiß** — der graue Symbolgrund (`.fixedbg` der Vorlage) entfällt auf der ganzen Seite, auch hinter dem Kontaktbereich |
+| Sprechzeiten in drei Kästen | Die **scrollgesteuerte Blase mit Zipfel** bleibt (siehe oben). Neu ist nur ihre **Stelle**: unter Begrüßung und Bilderband. Der Schnalz und der Leistenwechsel geschehen dadurch später |
+| Kachel-Schatten beim Zeigen | Nur **Rahmen in der Hausfarbe und 3 px Anhebung** wie bisher; die Bewegung *innerhalb* der Kachel (Symbol wächst) ist übernommen |
+| Knopf wird beim Zeigen breiter | **Er behält seine Größe.** Nur die runde Fläche geht auf und die Schrift wechselt die Farbe. Nebeneinander stehende Knöpfe schoben sich sonst gegenseitig an |
+| — | **Morph-Seitenwechsel und das Aufklappmenü mit Blasenlinie bleiben unangetastet** |
+| Kräftiger Verlauf über dem Team-Banner | Ein **sehr leichter** Schleier, nur so viel wie die Lesbarkeit braucht. Die Bewegung des Banners (a-3) bleibt |
+| Ärzte im 3:4-Format über die volle Breite | **Kleiner, in der bisherigen Größenordnung** (280 px hoch) und **alles linksbündig** |
+| Neuigkeiten ohne Bildbewegung | **Bild wächst beim Zeigen** — die angeklickte Karte gibt die Vergrößerung vor der Momentaufnahme wieder ab, damit der Morph sauber startet. Dazu kommt die Skalierung beim Scrollen (a-3, siehe unten) |
+| Formularfelder mit festem Label darüber | Die **bisherigen Felder mit wanderndem Label und gezeichneter Linie** bleiben, alles auf Weiß |
+| Karte mit Schatten | **Ohne Schatten**; der Einwilligungshinweis steht in der Karte, nicht am Seitenanfang |
+| Logo in der Kopfleiste 56 px | **80 px wie bisher** (Florian, 17. September 2026) |
+
+Weitere Festlegungen aus demselben Durchgang:
+
+- **Alles linksbündig** außer Startbereich, Begrüßung und Hinweis.
+- Die **Hinweis-Sprechblase behält ihre Form** (Zipfel, News-Symbol,
+  Einflug von links). Übernommen sind Kicker, die leichte Überschrift
+  und der Knopf.
+- Der **Scrollweg der Sprechstunden** bleibt bei 350vh (mobil 450vh) —
+  siehe weiter unten, „Der Einstieg ist eine Karte".
+- **Ablauf a-8 der Leistungskacheln bleibt vollständig** — mit beiden
+  Teilen: Die Kacheln wachsen beim Hereinscrollen von 0,9 auf 1 **und**
+  ihr Grund hellt dabei von Grau auf Weiß auf; am Ende des Wegs beides
+  wieder zurück. Der Ablauf war kurz durch das Einblenden aus 18 px
+  Tiefe (`data-rein`) ersetzt und das Aufhellen ganz gestrichen — beides
+  war zu wenig (Florian, 17. September 2026). Die übrigen Abschnitte
+  blenden weiterhin ein.
+
+  Der Grauton ist `--farbe-flaeche-kachel` (#f1eef0): derselbe
+  Helligkeitsschritt wie das #f1f1f1 der Vorlage, nur in die
+  Aubergine-Familie gedreht. Die gedeckte Fläche (#f4f2f3) wäre für die
+  Bewegung zu schwach gewesen. In Ruhe steht die Kachel auf Weiß — die
+  Festlegung „Kacheln ohne eigene Fläche" bleibt damit gewahrt.
+- **Die Beitragsbilder der Neuigkeiten skalieren beim Scrollen** wie das
+  Gruppenfoto im Team (Ablauf a-3): über den Scrollweg von 1 auf 1,1,
+  mit demselben weichen Nachlauf (Florian, 17. September 2026). Die
+  Vergrößerung beim Zeigen bleibt daneben bestehen; damit sich beide
+  nicht in denselben `transform` drängen, liegt zwischen Ausschnitt und
+  Bild eine dritte Ebene (`.beitrag__lauf`), die nur die Scrollbewegung
+  trägt.
+- **Offen:** Die beiden Knöpfe der Begrüßung stehen fest im Code.
+
+### Nachjustierung am selben Tag
+
+- **Inhaltsbreite 1360 px** wie im Entwurf. Zwischendurch stand sie auf
+  1200 px; seit das Bilderband in der Einstiegskarte steckt und damit
+  nur noch so breit ist wie der Inhalt, wirkte das eingeengt.
+- **Sprechstunden:** Kicker „Sprechstunden", Überschrift „Wann Sie uns
+  antreffen", Einleitung über die volle Breite der Blase (nicht auf
+  Lesebreite), mehr Luft zur gestrichelten Grundlinie. Im Menü heißt
+  der Punkt jetzt ebenfalls **Sprechstunden**.
+
+  **Die Blase bleibt ganz oben im Dokument, mit ihrem bisherigen
+  Scrollweg (Ablauf a-19).** Zwei Versuche am 17. September 2026,
+  sie unter das Bilderband zu setzen — einmal mit dem alten Ablauf,
+  einmal mit einer neu gerechneten Bewegung im Seitenfluss — sind beide
+  zurückgenommen. Die Blase lebt davon, dass sie über das fest stehende
+  Logo hereinfährt; weiter unten hat sie nichts, worüber sie fahren
+  könnte, und alles wirkt gesucht.
+
+- **Reihenfolge unten:** Neuigkeiten stehen VOR dem Team.
+- **Listen und Tabellen** im Redaktionstext folgen überall dem Handoff:
+  nummerierte Listen als Zeilen auf Haarlinien mit leiser `01`,
+  Aufzählungen mit 3-px-Punkt, Tabellen mit gesperrter Kopfzeile und
+  Zeilenlinien. Kein Einzug, keine Systempunkte.
+- **Team:** Beide Raster füllen die Inhaltsbreite aus und haben
+  Abstände; die Fotos füllen ihre Spalte (`object-fit: cover`, oben
+  verankert) und sind dadurch größer. Der Schattensaum liegt jetzt
+  AUSSERHALB des beschnittenen Rahmens und reicht eine halbe Lücke nach
+  links und rechts über die Karte hinaus — so ergibt er eine
+  durchgehende Linie pro Reihe. An den Reihenenden läuft er 64 px über
+  die Inhaltsbreite hinaus aus.
+- **Neuigkeiten** wieder ganz ohne Rahmen: Bild, Text darunter, sonst
+  nichts. Zusammengehalten wird die Karte allein von der Bewegung.
+- **Fußbereich** ohne Logo und schmal.
+- **Pfeilspitzen** (`pfeil-runter.svg` und die Haken in den Textlinks)
+  tragen `vector-effect: non-scaling-stroke` bei 1,5 px. Vorher war die
+  Strichstärke im Koordinatensystem der Zeichnung definiert und schrumpfte
+  in einem 13 px breiten Kasten auf einen Viertelpixel — deutlich feiner
+  als die Schrift daneben.
+
+## Freie Abschnitte: Bild neben Text (17. September 2026)
+
+Ein freier Abschnitt hat eine Überschrift und darunter einen oder
+mehrere **Bereiche**. Jeder Bereich zeigt ein Bild **neben** seinem
+Text; in der Redaktion ist nur zu wählen, ob es links oder rechts
+steht. Der Text umfließt kein Bild mehr.
+
+Mehrere Bereiche ergeben einen langen Abschnitt mit mehreren Bildern.
+Ab dem zweiten Bereich ist eine Zwischenüberschrift sinnvoll; beim
+ersten steht schon die Überschrift des Abschnitts darüber.
+
+Damit entfallen zwei Dinge von früher:
+
+- **`breite` (schmal / breit)** — der Abschnitt nutzt immer die volle
+  Inhaltsbreite, weil er zwei Spalten trägt.
+- **Bilder im Fließtext** — der Knopf „Bild" ist in diesem Textfeld
+  nicht mehr da. Ein zweiter Weg, Bilder einzusetzen, wäre neben dem
+  eigenen Bildfeld nur verwirrend; für ein weiteres Bild legt man einen
+  weiteren Bereich an.
+
+Die Bildbeschreibung ist Pflicht, sobald ein Bild gewählt ist — das
+prüft `schema.ts` und meldet es beim Speichern.
+
+## Der Einstieg ist eine Karte (17. September 2026)
+
+Begrüßung, Bilderband und Sprechstunden stecken **gemeinsam in der
+Sprechblase** und fahren als eine Karte über das fest stehende Logo
+herein (`src/components/Oeffnungszeiten.astro`).
+
+Der Weg dahin, damit es niemand noch einmal versucht:
+
+1. Erst standen Begrüßung und Band als eigene Abschnitte im Fluss und
+   nur die Blase fuhr herein — sie musste dafür ganz oben stehen und
+   stand damit **vor** der Begrüßung. Falsche Reihenfolge.
+2. Dann wurde die Blase unter das Band gesetzt. Dort hat sie nichts,
+   worüber sie fahren könnte; zwischen Band und Blase klaffte eine
+   leere Fläche.
+3. Dann wurde ihre Bewegung neu gerechnet (Rückstand statt absoluter
+   Position). Technisch sauber, aber die Blase lebt nun einmal vom
+   Logo darunter.
+
+Die Lösung ist Florians: **alles in einen Behälter.** Weil die Karte
+höher ist als das Fenster, sieht man beim Hereinfahren zuerst ihren
+Kopf (die Begrüßung) und zuletzt ihren Fuß (die Zeiten) — die
+Leserichtung stimmt also von selbst. In der Ruhelage steht ihr Fuß
+knapp über der Symbolleiste, der Zipfel zeigt auf den
+Sprechstunden-Knopf, dann schnalzt er zurück und die Karte scrollt mit
+dem Inhalt weiter.
+
+**Folgen, an die man denken muss:**
+
+- Der Startwert der Bewegung wächst mit der Kartenhöhe
+  (`startBestimmen()`), sonst stünde die Karte beim Laden schon im Bild.
+- `#praxis` und `#galerie` liegen IN der Karte. Sie lassen sich nicht
+  messen, sondern werden über die umgekehrte Bewegungskurve in eine
+  Scrolltiefe umgerechnet (`scripts/anker.ts`, `tiefeInKarte`). Die
+  Kurve steht deshalb in `scripts/scrollwege.ts`, nicht mehr in der
+  Komponente.
+- Das Bilderband **bricht aus der Karte aus** und läuft über die volle
+  Fensterbreite (`--fensterbreite`, vom Skript aus `clientWidth`;
+  `100vw` ginge nicht, weil es die Rollleiste mitzählt). Die
+  Inhaltsbreite steht wieder auf 1360 px.
+- Die Abstände in der Karte folgen dem Entwurf: eine kleine Fuge
+  zwischen Begrüßung und Band, davor und danach der volle
+  Abschnittsabstand. Seitlich hat der Sprechstunden-Teil denselben Rand
+  wie die Fortschrittsleiste des Bands — Zeiten und Leiste stehen auf
+  einer Fluchtlinie.
+- Der Zipfel ist auf dem Desktop **175 px** lang (90 → 130 → 175): Die
+  Karte steht dort weiter über der Symbolleiste, die Spitze braucht
+  mehr Weg.
+- Bei reduzierter Bewegung steht alles ruhig untereinander; das
+  Schließen-Kreuz entfällt dann.
+
+## Kopfleiste und Team (17. September 2026, abends)
+
+**Kopfleiste** wie im Entwurf: Logo links, Menüpunkte rechts, ganz außen
+die Telefonnummer als Knopf — alles an der Inhaltsbreite ausgerichtet.
+Vorher saß der ganze Block mittig in 700 px.
+
+**Sprechzeiten:** größerer Abstand zwischen den drei Spalten
+(`clamp(40px, 5vw, 88px)`).
+
+**Team — zurück zu den Maßen der alten Seite:**
+
+| | Rahmen | Foto |
+|---|---|---|
+| Ärztinnen und Ärzte | 300 px hoch, drei Spalten in max. 948 px | in seinem eigenen Format, mittig im Rahmen |
+| Praxisteam | 260 px hoch | ebenso |
+
+Entscheidend ist, dass das Foto den Rahmen **nicht** ausfüllt: Nur so
+schaut die Person ganz aus dem Schattensaum heraus, statt an der Brust
+beschnitten zu werden. Die Höhe steht in Bildpunkten (`--portraet-hoehe`),
+nicht in Prozent — beim Hereinscrollen ist der Ausschnitt nur 80 % hoch
+(Ablauf a/a-2) und soll dann WENIGER zeigen, nicht ein kleineres Bild.
+
+**Abstand zum nächsten Abschnitt:** Der Einstieg belegt im Fluss
+`--oz-ende − 110px − Zipfellänge`. Die Zipfellänge geht ab, weil die
+Spitze sich beim Weiterscrollen einzieht — ihr Platz stünde sonst als
+leere Fläche zwischen Karte und „Aus der Praxis" (Florian). Während sie
+sich einzieht, reicht sie kurz in den Innenabstand des nächsten
+Abschnitts hinein; sie sitzt aber weit rechts, wo dort nichts steht.
+
+Der **Schattensaum** ist 24 px hoch statt 14 und leicht zurückgenommen
+(90 % Deckung): Der Verlauf der Zeichnung streckt sich über mehr Pixel
+und wirkt dadurch weicher.
+
+### Kopfleiste, Schließen-Kreuz, Rhythmus in der Karte (17. September 2026)
+
+- **Praxisname in der Kontaktzeile.** Ganz oben, der Anschrift voran:
+  „Praxis Dres. Nold · Rosenstraße 1 · 76467 Bietigheim · …" — nur auf
+  dem Desktop, darunter wird die Zeile zu lang. Halbfett, damit er sich
+  von den Angaben dahinter absetzt.
+
+  Der Name steht **fest im Code** (`Navigation.astro`): `seite.json`
+  führt nur den vollen Namen „Dres. Nold – Zahnarztpraxis und
+  Kieferorthopädie", der hier über zwei Zeilen liefe.
+
+  Nicht ins Menü: Dort war er kurz versehentlich gelandet (neben dem
+  Logo der Kopfleiste) — gemeint war die Kontaktzeile (Florian).
+
+- **Die Kontaktzeile läuft auf der Inhaltsbreite**, wie die Kopfleiste
+  darunter. Vorher stand sie in 60 % Breite, höchstens 700 px, mittig —
+  mit dem Praxisnamen davor war das zu eng.
+
+- **Ein Schließen-Kreuz für die ganze Seite.** Aussehen und Maße stehen
+  jetzt einmal in `styles/global.css` (`.schliessen`, 48 px, Kreis mit
+  1 px Strich); die drei Stellen, die es einsetzen — Leistungsseite,
+  Beitragsseite, Einstiegskarte —, bestimmen nur noch seine Lage.
+  Vorher war es an jeder Stelle eigens beschrieben, und in der
+  Einstiegskarte war es kleiner und ohne Kreis.
+
+  In der Karte trägt es `.schliessen--fest`: Der Kreis **steht von
+  Anfang an da**, statt sich einzuzeichnen. Auf den Unterseiten zeichnet
+  er sich weiterhin ein, sobald das Kreuz beim Scrollen oben klebt — in
+  der Karte gäbe es dafür keinen Moment, sie fährt ja schon herein
+  (Florian). Es sitzt außerdem tiefer (40 px statt 12) und bündig mit
+  der rechten Textkante.
+
+- **Ein Rhythmus in der Karte.** Begrüßung → Band und Band →
+  Sprechstunden haben denselben Abstand (`--abstand-gruppe`, 48–72 px).
+  Oben stand vorher `clamp(24px, 4vw, 48px)`, unten der volle
+  Abschnittsabstand — auf dem Desktop 48 gegen 124 px. Die
+  Sprechstunden rücken damit spürbar näher ans Band (Florian). Der
+  große Abstand **unter** den Zeiten bleibt: Sie sollen nicht auf der
+  gestrichelten Grundlinie sitzen.
+
+- **Die Galerie hält beim Zeigen nicht mehr an und lässt sich ziehen.**
+  Band und Fortschrittsleiste nehmen beide den Zeiger (oder den Finger)
+  auf; gezogen wird dabei nicht am Band, sondern an der **Zeit** der
+  CSS-Animation. Damit bleibt die eine laufende Animation der einzige
+  Antrieb — es gibt keine zweite Rechnung, die mit ihr in Streit geraten
+  könnte, und nach dem Loslassen läuft das Band von der neuen Stelle
+  ruhig weiter.
+
+  Angehalten wird nur noch, solange jemand zieht (`data-zieht`) und
+  solange die Leiste **sichtbar** den Tastaturfokus hat. Das frühere
+  Anhalten beim bloßen Zeigen ist weg (Florian): Es vertrug sich nicht
+  mit dem Ziehen, und weil das Band über die volle Fensterbreite läuft,
+  stockte es bei fast jeder Mausbewegung. `:focus-visible` statt
+  `:focus-within` — sonst bliebe das Band nach einem Mausklick auf die
+  Leiste stehen, weil der Knopf den Fokus behält. Der Fokus-Halt ist
+  zugleich der Halt, den WCAG 2.2.2 für dauernd bewegte Inhalte
+  verlangt.

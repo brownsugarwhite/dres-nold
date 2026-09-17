@@ -5,6 +5,15 @@
  * Neu gegenüber der Vorlage. Blendet sich samt Menüpunkt aus, wenn kein
  * Beitrag aktiv ist. Jeder Beitrag hat eine eigene Adresse und öffnet
  * sich mit demselben Morph-Übergang wie die Leistungen.
+ *
+ * Beim Zeigen vergrößert sich das Bild innerhalb seines Ausschnitts
+ * (Handoff, 17. September 2026). Damit das den Morph nicht stört, gibt
+ * die angeklickte Karte diese Vergrößerung vor der Momentaufnahme
+ * wieder ab — siehe die Regel zu `data-morph` unten.
+ *
+ * Beim Scrollen wächst das Bild zusätzlich langsam von 1 auf 1,1 —
+ * dieselbe Bewegung wie das Gruppenfoto im Team-Abschnitt (Ablauf a-3,
+ * Skript unten; Florian, 17. September 2026).
  */
 import daten from '../content/neuigkeiten.json';
 
@@ -17,26 +26,47 @@ const alsDatum = (iso: string) =>
 ---
 
 {beitraege.length > 0 && (
-  <section class="neuigkeiten" id="neuigkeiten" data-verlauf>
-    <h2 class="neuigkeiten__titel">{daten.titel}</h2>
-    {daten.einleitung && <p class="neuigkeiten__einleitung">{daten.einleitung}</p>}
+  <section class="neuigkeiten bereich bereich--ohne-oben" id="neuigkeiten" data-verlauf>
+    <div class="bereich__inhalt">
+      <div class="kicker" data-rein>Aktuelles</div>
+      <h2 class="bereich__titel" data-rein>{daten.titel}</h2>
+      {daten.einleitung && <p class="bereich__einleitung" data-rein>{daten.einleitung}</p>}
 
-    <div class="neuigkeiten__liste inhalt">
-      {beitraege.map((b) => (
-        <article class="beitrag">
-          <a class="beitrag__link" data-karte href={`/neuigkeiten/${b.id}/`} transition:name={`beitrag-${b.id}`}>
-            {b.bild && (
-              <img class="beitrag__bild" src={b.bild} alt={b.bild_alt || ''} width="600" height="360" loading="lazy" transition:name={`beitrag-bild-${b.id}`} />
-            )}
-            <div class="beitrag__text">
-              {b.datum && <time class="beitrag__datum" datetime={b.datum}>{alsDatum(b.datum)}</time>}
-              <h3 class="beitrag__titel">{b.titel}</h3>
-              {b.kurz && <p class="beitrag__kurz">{b.kurz}</p>}
-              <span class="beitrag__mehr" aria-hidden="true">Weiterlesen →</span>
-            </div>
-          </a>
-        </article>
-      ))}
+      <div class="neuigkeiten__liste">
+        {beitraege.map((b) => (
+          <article class="beitrag" data-rein>
+            <a class="beitrag__link" data-karte href={`/neuigkeiten/${b.id}/`} transition:name={`beitrag-${b.id}`}>
+              {b.bild && (
+                <span class="beitrag__ausschnitt">
+                  {/* Drei Ebenen, damit sich die Bewegungen nicht ins
+                      Gehege kommen: Der Ausschnitt steht still, der Lauf
+                      trägt die Skalierung beim Scrollen, das Bild die
+                      beim Zeigen. Zwei `transform` auf einem Element
+                      ließen sich nicht getrennt überblenden. */}
+                  <span class="beitrag__lauf" data-beitragsbild>
+                    <img class="beitrag__bild" src={b.bild} alt={b.bild_alt || ''} width="600" height="338" loading="lazy" transition:name={`beitrag-bild-${b.id}`} />
+                  </span>
+                </span>
+              )}
+              <span class="beitrag__text">
+                {b.datum && <time class="beitrag__datum kicker kicker--klein" datetime={b.datum}>{alsDatum(b.datum)}</time>}
+                <h3 class="beitrag__titel">{b.titel}</h3>
+                {b.kurz && <span class="beitrag__kurz">{b.kurz}</span>}
+                <span class="beitrag__mehr">
+                  <span class="tl">
+                    Beitrag lesen
+                    <span class="tl__pfeil" aria-hidden="true">
+                      <svg viewBox="0 0 55 28" focusable="false">
+                        <polyline fill="none" stroke="currentColor" stroke-miterlimit="10" points="0.35 0.45 27.55 27.65 54.75 0.35" transform="rotate(-90 27.5 14)" />
+                      </svg>
+                    </span>
+                  </span>
+                </span>
+              </span>
+            </a>
+          </article>
+        ))}
+      </div>
     </div>
   </section>
 )}
@@ -45,45 +75,64 @@ const alsDatum = (iso: string) =>
   .neuigkeiten {
     position: relative;
     z-index: 40;
-    padding-block: 60px 100px;
-    padding-inline: var(--abstand-m);
     background: var(--farbe-flaeche);
   }
 
-  .neuigkeiten__titel { text-align: center; }
-
-  .neuigkeiten__einleitung {
-    max-width: none;
-    margin-bottom: var(--abstand-l);
-    color: var(--farbe-text);
-    font-size: 20px;
-    font-weight: var(--gewicht-leicht);
-    text-align: center;
-  }
-
   .neuigkeiten__liste {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--abstand-l);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    margin-top: 44px;
   }
 
-  .beitrag {
-    flex: 1 1 20rem;
-    max-width: 30rem;
-    margin: 0;
-  }
+  .beitrag { margin: 0; }
 
+  /* Ohne Rahmen und ohne Kasten: Die Karte ist das Bild mit dem Text
+     darunter, mehr braucht sie nicht (Florian, 17. September 2026).
+     Zusammengehalten wird sie beim Zeigen allein von der Bewegung —
+     das Bild wächst, die Karte hebt sich leicht. */
   .beitrag__link {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: var(--abstand-xs);
-    margin: calc(-1 * var(--abstand-xs));
-    border-radius: var(--radius-m);
-    color: inherit;
+    padding: 0;
+    color: var(--farbe-text);
     text-decoration: none;
-    transition: transform var(--dauer-schnell) var(--verlauf);
+    transition: transform 0.45s var(--verlauf-betont);
+  }
+
+  .beitrag__link:hover,
+  .beitrag__link:focus-visible {
+    transform: translateY(-3px);
+  }
+
+  /* Der Ausschnitt steht still, das Bild darin wächst */
+  .beitrag__ausschnitt {
+    display: block;
+    overflow: hidden;
+  }
+
+  /* Ablauf a-3, wie beim Gruppenfoto des Teams: Über den Scrollweg
+     wächst das Bild von 1 auf 1,1. Den Wert setzt das Skript unten;
+     eine Überblendung steht hier bewusst nicht, der Wert wird in jedem
+     Bild neu gesetzt und läuft im Skript schon weich nach. */
+  .beitrag__lauf {
+    display: block;
+    transform: scale(var(--bild-groesse, 1));
+  }
+
+  .beitrag__bild {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    transition: transform 0.55s var(--verlauf-betont);
+    view-transition-class: bild;
+  }
+
+  .beitrag__link:hover .beitrag__bild,
+  .beitrag__link:focus-visible .beitrag__bild {
+    transform: scale(1.07);
   }
 
   /* Nur der Beitrag, der gerade morpht, bekommt Übergangsebenen — alle
@@ -94,54 +143,140 @@ const alsDatum = (iso: string) =>
     view-transition-class: karte;
   }
 
+  /* Beim Klick liegt der Zeiger auf der Karte — Bild und Karte stünden
+     also vergrößert bzw. angehoben in der Momentaufnahme, und der Morph
+     begänne verzerrt. `data-morph` wird noch vor der Aufnahme gesetzt
+     (scripts/uebergaenge.ts), deshalb greift diese Regel rechtzeitig. */
+  .beitrag__link[data-morph],
+  .beitrag__link[data-morph] .beitrag__lauf,
+  .beitrag__link[data-morph] .beitrag__bild {
+    transform: none;
+    transition: none;
+  }
+
   .beitrag__link:not([data-morph]),
   .beitrag__link:not([data-morph]) .beitrag__bild {
     view-transition-name: none;
   }
 
-  .beitrag__bild {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-    margin-bottom: var(--abstand-s);
-    view-transition-class: bild;
-  }
-
   /* Ohne eigenen Übergangsnamen: Datum, Überschrift und Anriss gehören
      zur Karte, machen deren Bewegung und Skalierung mit und blenden
      dabei aus — siehe styles/uebergaenge.css */
+  /* Kein Innenabstand seitlich mehr — der Text steht bündig unter dem
+     Bild, weil es keinen Kasten gibt, von dem er einrücken müsste. */
   .beitrag__text {
     display: flex;
     flex-direction: column;
     flex: 1;
-    gap: var(--abstand-3xs);
+    gap: 11px;
+    padding: 22px 0 0;
   }
 
-  .beitrag__datum {
-    color: var(--farbe-text-gedeckt);
-    font-size: var(--text-xs);
-  }
+  .beitrag__datum { letter-spacing: 0.16em; }
 
   .beitrag__titel {
     margin: 0;
-    font-size: var(--text-l);
     color: var(--farbe-primaer);
+    font-size: 21px;
+    font-weight: var(--gewicht-halbfett);
+    line-height: 1.3;
+    letter-spacing: -0.014em;
   }
 
   .beitrag__kurz {
-    margin: 0;
-    color: var(--farbe-text);
-    font-size: var(--text-s);
+    color: var(--farbe-text-gedeckt);
+    font-size: 16px;
+    line-height: 1.6;
   }
 
   .beitrag__mehr {
     margin-top: auto;
-    padding-top: var(--abstand-2xs);
-    color: var(--farbe-primaer);
-    font-size: var(--text-s);
-    font-weight: var(--gewicht-halbfett);
+    padding-top: 10px;
   }
 
-  .beitrag__link:hover .beitrag__mehr,
-  .beitrag__link:focus-visible .beitrag__mehr { text-decoration: underline; }
+  @media (prefers-reduced-motion: reduce) {
+    .beitrag__link,
+    .beitrag__bild { transition: none; }
+    .beitrag__lauf { transform: none; }
+    .beitrag__link:hover,
+    .beitrag__link:focus-visible { transform: none; }
+    .beitrag__link:hover .beitrag__bild,
+    .beitrag__link:focus-visible .beitrag__bild { transform: none; }
+  }
 </style>
+
+<script>
+  import { nachziehen } from '../scripts/scrollwege';
+
+  /**
+   * Ablauf a-3 auf den Beitragsbildern — dieselbe Bewegung wie beim
+   * Gruppenfoto im Team-Abschnitt: Über den Scrollweg wächst das Bild
+   * von 1 auf 1,1.
+   *
+   * Der Fortschritt zählt wie Webflows „while scrolling in view": 0 %
+   * wenn die Oberkante unten ins Fenster tritt, 100 % wenn die
+   * Unterkante oben hinausläuft. Der gezeichnete Wert läuft dem
+   * Scrollwert nach (Webflow „smoothing 70"), sonst wirkt die
+   * Vergrößerung hart am Scrollrad festgeschraubt.
+   */
+  function beitragsbilderAufbauen() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const bilder = [...document.querySelectorAll<HTMLElement>('[data-beitragsbild]')];
+    if (!bilder.length || bilder[0].dataset.bereit) return;
+    bilder.forEach((b) => { b.dataset.bereit = 'ja'; });
+
+    /** Anteil, zu dem ein Element den Blickbereich durchlaufen hat (0 … 1). */
+    const anteil = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      const weg = window.innerHeight + r.height;
+      return Math.min(1, Math.max(0, (window.innerHeight - r.top) / weg));
+    };
+
+    const werte = new Map<HTMLElement, number>();
+    bilder.forEach((el) => werte.set(el, anteil(el)));
+
+    const zeichnen = () => {
+      bilder.forEach((el) => {
+        const p = werte.get(el) ?? 0;
+        el.style.setProperty('--bild-groesse', (1 + 0.1 * p).toFixed(4));
+      });
+    };
+
+    let laeuft = false;
+    let zuletzt = 0;
+
+    const schritt = (jetzt: number) => {
+      const dt = zuletzt ? Math.min(100, jetzt - zuletzt) : 16.7;
+      zuletzt = jetzt;
+
+      let fertig = true;
+      bilder.forEach((el) => {
+        const z = anteil(el);
+        let w = nachziehen(werte.get(el) ?? z, z, dt);
+        if (Math.abs(z - w) < 0.0005) w = z;
+        else fertig = false;
+        werte.set(el, w);
+      });
+
+      zeichnen();
+
+      if (!fertig) requestAnimationFrame(schritt);
+      else laeuft = false;
+    };
+
+    const anstossen = () => {
+      if (laeuft) return;
+      laeuft = true;
+      zuletzt = 0;
+      requestAnimationFrame(schritt);
+    };
+
+    window.addEventListener('scroll', anstossen, { passive: true });
+    window.addEventListener('resize', anstossen, { passive: true });
+    zeichnen();
+  }
+
+  beitragsbilderAufbauen();
+  document.addEventListener('astro:page-load', beitragsbilderAufbauen);
+</script>
