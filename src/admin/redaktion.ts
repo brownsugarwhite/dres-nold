@@ -198,10 +198,35 @@ export function eingefuegtesAufbereiten(html: string, text: string): string {
 /* Anfragen an die Schnittstellen                                      */
 /* ------------------------------------------------------------------ */
 
-export const ABGEMELDET =
-  'Die Anmeldung ist abgelaufen. Ihre Eingaben stehen noch hier: Bitte in einem '
-  + 'neuen Tab /login öffnen, anmelden — und dann hier noch einmal auf '
-  + '„Speichern und veröffentlichen" drücken.';
+/**
+ * Sagt, warum eine Anfrage abgewiesen wurde — die drei Fälle sehen für
+ * den Bediener gleich aus, verlangen aber ganz Verschiedenes.
+ *
+ *   Umleitung   Cloudflare Access hat die Anfrage abgefangen: nicht (mehr)
+ *               angemeldet. Hilft: neu anmelden.
+ *   401         Access hat durchgelassen, aber die eigene Prüfung in
+ *               functions/_middleware.ts erkennt das Token nicht an.
+ *               Neu anmelden hilft dann NICHT — meist stimmt ACCESS_AUD
+ *               oder ACCESS_TEAM in den Pages-Einstellungen nicht mehr
+ *               mit der Access-Anwendung überein (docs/betrieb.md).
+ *   403         Angemeldet, aber nicht berechtigt.
+ */
+export function abweisungErklaeren(antwort: Response): string {
+  const weiter = ' Ihre Eingaben stehen noch hier — es geht nichts verloren.';
+  if (antwort.status === 401) {
+    return 'Der Server hat die Anmeldung nicht anerkannt (401). Erneutes Anmelden '
+      + 'hilft hier nicht: In den Einstellungen der Seite stimmt die Kennung der '
+      + 'Anmelde-Anwendung nicht mehr (ACCESS_AUD / ACCESS_TEAM). Bitte an die '
+      + 'Betreuung der Seite wenden.' + weiter;
+  }
+  if (antwort.status === 403) {
+    return 'Dieser Zugang darf die Redaktion nicht ändern (403). Bitte an die '
+      + 'Betreuung der Seite wenden.' + weiter;
+  }
+  return 'Die Anmeldung ist abgelaufen. Bitte in einem neuen Tab /login öffnen, '
+    + 'anmelden — und dann hier noch einmal auf „Speichern und veröffentlichen" '
+    + 'drücken.' + weiter;
+}
 
 /**
  * Anfrage an /api/… — mit `redirect: 'manual'`.
@@ -342,7 +367,7 @@ function dateiFeld(feld: Feld, wert: Wert): Baustein {
     form.append('ordner', feld.ordner ?? 'allgemein');
     try {
       const antwort = await anfrage('/api/hochladen', { method: 'POST', body: form });
-      if (!angemeldet(antwort)) { status.textContent = ABGEMELDET; return; }
+      if (!angemeldet(antwort)) { status.textContent = abweisungErklaeren(antwort); return; }
       const ergebnis = await alsJson<{ ok: boolean; pfad?: string; fehler?: string }>(antwort);
       if (ergebnis.ok && ergebnis.pfad) {
         eingabe.value = ergebnis.pfad;
@@ -398,7 +423,7 @@ function bildEinfuegen(
 
     try {
       const antwort = await anfrage('/api/hochladen', { method: 'POST', body: form });
-      if (!angemeldet(antwort)) { window.alert(ABGEMELDET); return; }
+      if (!angemeldet(antwort)) { window.alert(abweisungErklaeren(antwort)); return; }
       const ergebnis = await alsJson<{ ok: boolean; pfad?: string; fehler?: string }>(antwort);
       if (!ergebnis.ok || !ergebnis.pfad) {
         window.alert(ergebnis.fehler || 'Hochladen fehlgeschlagen.');
@@ -677,7 +702,7 @@ async function start() {
   let sha: string;
   try {
     const antwort = await anfrage(`/api/inhalt?bereich=${bereich}`, { headers: { Accept: 'application/json' } });
-    if (!angemeldet(antwort)) { laden.textContent = 'Bitte zuerst anmelden: /login öffnen und danach diese Seite neu laden.'; return; }
+    if (!angemeldet(antwort)) { laden.textContent = abweisungErklaeren(antwort); return; }
     const ergebnis = await alsJson<{ daten?: Eintrag; sha?: string; fehler?: string }>(antwort);
     if (!ergebnis.daten || !ergebnis.sha) throw new Error(ergebnis.fehler || 'Laden fehlgeschlagen');
     daten = ergebnis.daten;
@@ -710,7 +735,7 @@ async function start() {
       });
       /* Nichts ist verloren: Das Formular steht unverändert da. Nach dem
          Anmelden im zweiten Tab genügt ein erneuter Druck auf den Knopf. */
-      if (!angemeldet(antwort)) { sagen('fehler', ABGEMELDET); return; }
+      if (!angemeldet(antwort)) { sagen('fehler', abweisungErklaeren(antwort)); return; }
 
       const ergebnis = await alsJson<{ ok: boolean; commit?: string; fehler?: string[] }>(antwort);
       if (ergebnis.ok) {
