@@ -39,6 +39,12 @@ export type Feld = {
   standard?: boolean;
   /** für eintraege: welches Feld die Überschrift eines Eintrags liefert */
   titelfeld?: string;
+  /** für eintraege: Einzahl für die Knöpfe — „+ Neuer Abschnitt",
+      „Abschnitt entfernen". Ohne Angabe steht dort „Eintrag". */
+  einzahl?: string;
+  /** für eintraege: grammatisches Geschlecht von `einzahl`; allein
+      dafür, ob es „Neuer", „Neue" oder „Neues" heißt. */
+  geschlecht?: 'm' | 'w' | 's';
   /** für richtext: keinen „Bild"-Knopf zeigen — Bilder kommen woanders her */
   ohneBild?: boolean;
   /** Feld anzeigen, aber nicht ändern lassen */
@@ -62,6 +68,8 @@ const zeitenListe = (name: string, label: string): Feld => ({
       name: 'zeilen',
       label: 'Tage',
       typ: 'eintraege',
+      einzahl: 'Tag',
+      geschlecht: 'm',
       titelfeld: 'tag',
       hilfe: 'Ein Tag ohne Zeiten wird auf der Seite ausgeblendet.',
       felder: [
@@ -122,6 +130,8 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         name: 'eintraege',
         label: 'Leistungen',
         typ: 'eintraege',
+        einzahl: 'Leistung',
+        geschlecht: 'w',
         standard: true,
         titelfeld: 'titel',
         felder: [
@@ -136,6 +146,8 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         name: 'kategorien',
         label: 'Bereiche (Überschriften der Übersicht)',
         typ: 'eintraege',
+        einzahl: 'Überschrift',
+        geschlecht: 'w',
         standard: true,
         titelfeld: 'titel',
         hilfe: 'Leere Bereiche erscheinen nicht.',
@@ -160,6 +172,8 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         name: 'eintraege',
         label: 'Beiträge',
         typ: 'eintraege',
+        einzahl: 'Beitrag',
+        geschlecht: 'm',
         standard: true,
         titelfeld: 'titel',
         felder: [
@@ -173,6 +187,8 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
             name: 'dateien',
             label: 'PDF-Anhänge',
             typ: 'eintraege',
+            einzahl: 'Anhang',
+            geschlecht: 'm',
             titelfeld: 'titel',
             felder: [
               { name: 'titel', label: 'Bezeichnung', typ: 'text' },
@@ -194,6 +210,8 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         name: 'eintraege',
         label: 'Personen',
         typ: 'eintraege',
+        einzahl: 'Person',
+        geschlecht: 'w',
         standard: true,
         titelfeld: 'name',
         felder: [
@@ -217,6 +235,8 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         name: 'eintraege',
         label: 'Bilder',
         typ: 'eintraege',
+        einzahl: 'Bild',
+        geschlecht: 's',
         standard: true,
         titelfeld: 'alt',
         felder: [
@@ -236,6 +256,8 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         name: 'eintraege',
         label: 'Abschnitte',
         typ: 'eintraege',
+        einzahl: 'Abschnitt',
+        geschlecht: 'm',
         standard: true,
         titelfeld: 'titel',
         felder: [
@@ -244,6 +266,8 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
             name: 'bereiche',
             label: 'Bereiche',
             typ: 'eintraege',
+            einzahl: 'Bereich',
+            geschlecht: 'm',
             titelfeld: 'titel',
             hilfe: 'Jeder Bereich zeigt ein Bild neben seinem Text. Für einen langen Abschnitt mit mehreren Bildern legen Sie einfach mehrere Bereiche an — sie stehen dann untereinander.',
             felder: [
@@ -277,6 +301,8 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         name: 'eintraege',
         label: 'Stellen',
         typ: 'eintraege',
+        einzahl: 'Stelle',
+        geschlecht: 'w',
         standard: true,
         titelfeld: 'titel',
         felder: [
@@ -299,6 +325,8 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         name: 'eintraege',
         label: 'Menüpunkte',
         typ: 'eintraege',
+        einzahl: 'Menüpunkt',
+        geschlecht: 'm',
         standard: true,
         titelfeld: 'titel',
         felder: [

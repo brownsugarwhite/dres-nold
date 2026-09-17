@@ -52,6 +52,17 @@ Fett, Kursiv, Listen, Verweis, Tabelle. Alles andere (Farben,
 Schriftarten) ist mit Absicht nicht vorgesehen — die Seite bleibt so
 einheitlich.
 
+**Text aus Word oder von einer Webseite einfügen** geht ganz normal mit
+Strg+V (Mac: Cmd+V). Dabei kommt nur der Aufbau mit: Absätze, Listen,
+Verweise und Tabellen. Fett, Kursiv, Schriftart und Farbe der Quelle
+bleiben draußen — sonst schleppte jeder eingefügte Text die Gestaltung
+von woanders mit herein. Was hervorgehoben sein soll, markieren Sie
+danach und drücken **Fett**.
+
+Steht eine Zeile versehentlich als Zwischentitel da: hineinklicken und
+**Absatz** drücken. **Format löschen** nimmt Hervorhebungen innerhalb
+einer Zeile wieder weg.
+
 ## Der Urlaubshinweis, Schritt für Schritt
 
 1. Bereich **Hinweis** öffnen.

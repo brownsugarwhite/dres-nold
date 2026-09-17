@@ -447,3 +447,50 @@ und wirkt dadurch weicher.
   Leiste stehen, weil der Knopf den Fokus behält. Der Fokus-Halt ist
   zugleich der Halt, den WCAG 2.2.2 für dauernd bewegte Inhalte
   verlangt.
+
+### Der Texteditor der Redaktion (17. September 2026)
+
+Zwei Meldungen von Florian, eine Ursache je:
+
+- **„Eingefügter Text ist immer schon fett."** Eingefügtes lief bisher
+  ungefiltert in das `contenteditable` — mit Words `<b>`, `<span
+  style="font-weight:700">`, Schriftart und Farbe. Gesäubert wurde erst
+  beim Speichern, im Editor stand die fremde Gestaltung also weiterhin.
+
+  Jetzt fängt das Feld das Einfügen ab: Übernommen wird der **Aufbau**
+  (Absätze, Listen, Verweise, Tabellen), **keine Auszeichnung**. Fett,
+  Kursiv und Unterstrichen fallen weg, eingefügte Überschriften werden
+  zu Absätzen. Hervorhebungen setzt man danach bewusst mit der Leiste.
+  Enthält die Zwischenablage nur reinen Text, werden Leerzeilen zu
+  Absätzen und einzelne Umbrüche zu Umbrüchen.
+
+- **„Und ich bekomme es mit ‚Absatz' nicht weg."** Der ganze Text stand
+  in einer Überschrift: `<h3><p>…</p><p>…</p></h3>`. So etwas entsteht,
+  wenn man in einer leeren Zeile „Zwischentitel" wählt und dann einen
+  ganzen Text hineinschreibt oder einfügt. `formatBlock` stellt nur den
+  **innersten** Block um — die Hülle blieb stehen, und die Seite zeigte
+  alles als Überschrift, also groß und fett.
+
+  Eine Überschrift enthält jetzt nur noch Text. Enthält sie Absätze oder
+  Listen, wird die Hülle aufgehoben — beim Laden, beim Speichern und
+  wenn „Absatz" oder „Format löschen" gedrückt wird. Bestehende Texte
+  reparieren sich damit beim nächsten Öffnen und Speichern von selbst.
+
+**Nebenbei am Filter geputzt:** Er baute die Vorlage an Ort und Stelle
+um; der Inhalt einer entfernten Hülle wurde danach nicht mehr geprüft
+(er stand nicht mehr in der Liste, über die gerade gelaufen wurde), und
+Unerlaubtes darin blieb stehen — ein `<script>` in einem `<span>` etwa.
+Jetzt wird eine saubere Fassung neu aufgebaut, `<script>`, `<style>` und
+Kommentare fliegen samt Inhalt raus, und `h1`/`h2`/`h5`/`h6` rutschen auf
+die zwei erlaubten Ebenen `h3`/`h4` (keine Sprünge in der Gliederung).
+
+### Die Knöpfe heißen nach dem, was sie anlegen (17. September 2026)
+
+Verschachtelte Listen trugen beide „+ Neuer Eintrag" — bei Abschnitten
+mit ihren Bereichen war nicht zu erkennen, welcher Knopf wozu gehört
+(Florian). Jede Liste hat jetzt ihr Wort (`einzahl` und `geschlecht` in
+`src/admin/bereiche.ts`): „+ Neuer Abschnitt" gegen „+ Neuer Bereich",
+„Abschnitt entfernen" gegen „Bereich entfernen", ebenso in der
+Sicherheitsabfrage. Einträge ohne eigenen Titel heißen in der Kopfzeile
+„Bereich 1", „Bereich 2" statt „(ohne Titel)" — die Nummer wird beim
+Verschieben und Entfernen nachgezogen.

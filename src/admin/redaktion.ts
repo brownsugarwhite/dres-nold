@@ -49,52 +49,149 @@ export function kennungAus(text: string): string {
 
 /** Nur die erlaubten Auszeichnungen bleiben im Richtext übrig */
 const ERLAUBT: Record<string, string[]> = {
-  p: [], br: [], strong: [], em: [], b: [], i: [], u: [],
+  p: [], br: [], strong: [], em: [], u: [],
   ul: [], ol: [], li: [], h3: [], h4: [],
   a: ['href'], table: [], thead: [], tbody: [], tr: [], th: [], td: [],
   /* Bilder im Text: nur Dateien von dieser Seite, mit Alternativtext */
   img: ['src', 'alt'],
 };
 
-export function htmlBereinigen(html: string): string {
-  const rahmen = document.createElement('div');
-  rahmen.innerHTML = html;
+/** Schreibweisen, die auf die hier erlaubten abgebildet werden */
+const UMBENANNT: Record<string, string> = {
+  /* Browser erzeugen <div> für neue Zeilen */
+  div: 'p',
+  b: 'strong',
+  i: 'em',
+  /* Im Fließtext gibt es nur zwei Ebenen von Zwischenüberschriften: Die
+     Überschrift des Abschnitts ist schon eine h2, alles darunter wäre
+     ein Sprung in der Gliederung (Barrierefreiheit, siehe CLAUDE.md).
+     Eingefügte Überschriften rutschen deshalb auf diese zwei Ebenen. */
+  h1: 'h3',
+  h2: 'h3',
+  h5: 'h4',
+  h6: 'h4',
+};
 
-  const durchlaufen = (knoten: Element) => {
-    for (const kind of [...knoten.children]) {
-      const tag = kind.tagName.toLowerCase();
-      if (tag === 'div') {
-        /* Browser erzeugen <div> für neue Zeilen — daraus Absätze machen */
-        const p = document.createElement('p');
-        p.innerHTML = kind.innerHTML;
-        kind.replaceWith(p);
-        durchlaufen(p);
-        continue;
-      }
-      if (!(tag in ERLAUBT)) {
-        /* Unbekanntes Element: Inhalt behalten, Hülle weg */
-        const ersatz = document.createDocumentFragment();
-        while (kind.firstChild) ersatz.append(kind.firstChild);
-        kind.replaceWith(ersatz);
-        continue;
-      }
-      for (const attr of [...kind.attributes]) {
-        if (!ERLAUBT[tag].includes(attr.name)) kind.removeAttribute(attr.name);
-        else if (attr.name === 'href' && /^\s*javascript:/i.test(attr.value)) kind.removeAttribute('href');
+/** Diese Elemente fliegen samt Inhalt raus — ihr Text ist kein Text. */
+const VERWORFEN = new Set(['script', 'style', 'noscript', 'head', 'title']);
+
+/** Was eine Zeile für sich bildet. Eine Überschrift darf davon nichts
+    enthalten — siehe `blockhuellenAufloesen`. */
+const BLOCK = new Set(['p', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'h3', 'h4']);
+
+const UEBERSCHRIFT = new Set(['h3', 'h4']);
+
+/**
+ * Löst Überschriften auf, in denen ganze Absätze oder Listen stecken.
+ *
+ * So etwas entsteht, wenn in einer leeren Zeile „Zwischentitel" gewählt
+ * und danach ein ganzer Text hineingeschrieben oder eingefügt wird: Der
+ * Browser legt die Absätze INNERHALB der Überschrift ab. Der Text steht
+ * dann komplett in einer Überschrift — er sieht überall fett aus, und
+ * „Absatz" half nicht, weil das nur den innersten Block umstellt und die
+ * Hülle stehen ließ.
+ *
+ * Eine Überschrift enthält nur Text. Alles andere ist ein Versehen und
+ * wird hier aufgehoben: Die Hülle fällt weg, der Inhalt bleibt.
+ */
+export function blockhuellenAufloesen(wurzel: Element): boolean {
+  let geaendert = false;
+  for (const kopf of [...wurzel.querySelectorAll('h3, h4')]) {
+    if (![...kopf.children].some((k) => BLOCK.has(k.tagName.toLowerCase()))) continue;
+    const ersatz = document.createDocumentFragment();
+    while (kopf.firstChild) ersatz.append(kopf.firstChild);
+    kopf.replaceWith(ersatz);
+    geaendert = true;
+  }
+  return geaendert;
+}
+
+export function htmlBereinigen(html: string): string {
+  const quelle = document.createElement('div');
+  quelle.innerHTML = html;
+
+  /* Gebaut wird eine neue, saubere Fassung — statt die alte an Ort und
+     Stelle umzubauen. Beim Umbauen an Ort und Stelle wurde der Inhalt
+     einer entfernten Hülle nicht mehr geprüft (er stand nicht mehr in
+     der Liste, über die gerade gelaufen wurde), und Unerlaubtes darin
+     blieb stehen. */
+  const saeubern = (knoten: Node): DocumentFragment => {
+    const ziel = document.createDocumentFragment();
+
+    for (const kind of [...knoten.childNodes]) {
+      if (kind.nodeType === Node.TEXT_NODE) { ziel.append(kind); continue; }
+      if (kind.nodeType !== Node.ELEMENT_NODE) continue; /* Kommentare weg */
+
+      const element = kind as Element;
+      const roh = element.tagName.toLowerCase();
+      if (VERWORFEN.has(roh)) continue;
+
+      const tag = UMBENANNT[roh] ?? roh;
+      /* Unbekanntes Element: Inhalt behalten, Hülle weg */
+      if (!(tag in ERLAUBT)) { ziel.append(saeubern(element)); continue; }
+
+      const neu = document.createElement(tag);
+      for (const attr of [...element.attributes]) {
+        if (!ERLAUBT[tag].includes(attr.name)) continue;
+        if (attr.name === 'href' && /^\s*javascript:/i.test(attr.value)) continue;
         /* Bilder dürfen nur von dieser Seite kommen — kein fremder
            Server, kein `data:`. Sonst würde die Redaktion versehentlich
            eine externe Ressource einbauen (siehe CLAUDE.md). */
-        else if (attr.name === 'src' && !/^\/[a-z0-9._\-/]+$/i.test(attr.value)) kind.remove();
+        if (attr.name === 'src' && !/^\/[a-z0-9._\-/]+$/i.test(attr.value)) continue;
+        neu.setAttribute(attr.name, attr.value);
       }
-      if (tag === 'b') { const s = document.createElement('strong'); s.innerHTML = kind.innerHTML; kind.replaceWith(s); durchlaufen(s); continue; }
-      if (tag === 'i') { const s = document.createElement('em'); s.innerHTML = kind.innerHTML; kind.replaceWith(s); durchlaufen(s); continue; }
-      durchlaufen(kind);
+      if (tag === 'img' && !neu.getAttribute('src')) continue;
+
+      neu.append(saeubern(element));
+      ziel.append(neu);
     }
+
+    return ziel;
   };
-  durchlaufen(rahmen);
+
+  const rahmen = document.createElement('div');
+  rahmen.append(saeubern(quelle));
+  blockhuellenAufloesen(rahmen);
 
   /* Leere Absätze am Ende weg */
   return rahmen.innerHTML.replace(/(<p>(<br>|\s|&nbsp;)*<\/p>\s*)+$/g, '').trim();
+}
+
+/**
+ * Bereitet eingefügten Text auf: Aufbau bleibt, Auszeichnung fällt weg.
+ *
+ * Wer aus Word oder von einer Webseite einfügt, bringt deren Gestaltung
+ * mit — meist fett und in fremder Schrift. Absätze, Listen, Verweise und
+ * Tabellen sind wertvoll und bleiben; Fett, Kursiv, Unterstrichen und
+ * Überschriften fallen weg. Auszeichnungen setzt man danach bewusst mit
+ * der Leiste (Florian, 17. September 2026).
+ */
+export function eingefuegtesAufbereiten(html: string, text: string): string {
+  if (!html.trim()) {
+    /* Nur reiner Text: Leerzeilen trennen Absätze, einzelne Umbrüche
+       bleiben Umbrüche. */
+    const schuetzen = (t: string) =>
+      t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return text
+      .split(/\n\s*\n/)
+      .map((absatz) => absatz.trim())
+      .filter(Boolean)
+      .map((absatz) => `<p>${schuetzen(absatz).replace(/\n/g, '<br>')}</p>`)
+      .join('');
+  }
+
+  const rahmen = document.createElement('div');
+  rahmen.innerHTML = htmlBereinigen(html);
+
+  for (const kind of [...rahmen.querySelectorAll('strong, em, u, h3, h4')]) {
+    const tag = kind.tagName.toLowerCase();
+    /* Überschriften werden zu Absätzen, Auszeichnungen fallen ganz weg */
+    const ersatz: Node = UEBERSCHRIFT.has(tag) ? document.createElement('p') : document.createDocumentFragment();
+    while (kind.firstChild) ersatz.appendChild(kind.firstChild);
+    kind.replaceWith(ersatz);
+  }
+
+  return rahmen.innerHTML;
 }
 
 /* ------------------------------------------------------------------ */
@@ -288,8 +385,27 @@ function richtextFeld(feld: Feld, wert: Wert): Baustein {
     return b;
   };
 
+  /* „Absatz" muss auch aus einer Überschrift herausführen, in der ganze
+     Absätze stecken. `formatBlock` stellt nur den innersten Block um und
+     ließ die Hülle stehen — deshalb danach das Auflösen. */
+  const alsAbsatz = () => {
+    inhalt.focus();
+    document.execCommand('formatBlock', false, 'p');
+    blockhuellenAufloesen(inhalt);
+  };
+
+  /* Text aus Word oder von einer Webseite kommt mit fremder Gestaltung.
+     Eingefügt wird deshalb nur der Aufbau, nicht die Auszeichnung. */
+  inhalt.addEventListener('paste', (e) => {
+    const ablage = e.clipboardData;
+    if (!ablage) return;
+    e.preventDefault();
+    const sauber = eingefuegtesAufbereiten(ablage.getData('text/html'), ablage.getData('text/plain'));
+    if (sauber) document.execCommand('insertHTML', false, sauber);
+  });
+
   const leiste = el('div', { class: 'richtext__leiste' }, [
-    knopf('Absatz', 'Normaler Absatz', befehl('formatBlock', 'p')),
+    knopf('Absatz', 'Normaler Absatz', alsAbsatz),
     knopf('Zwischentitel', 'Zwischenüberschrift', befehl('formatBlock', 'h3')),
     knopf('Fett', 'Fett', befehl('bold')),
     knopf('Kursiv', 'Kursiv', befehl('italic')),
@@ -312,7 +428,10 @@ function richtextFeld(feld: Feld, wert: Wert): Baustein {
     /* Freie Abschnitte haben ihr Bild als eigenes Feld neben dem Text —
        dort wäre ein zweiter Weg, Bilder einzusetzen, nur verwirrend. */
     feld.ohneBild ? null : knopf('Bild', 'Bild in den Text einfügen', () => bildEinfuegen(inhalt, feld, befehl)),
-    knopf('Format löschen', 'Alle Auszeichnungen entfernen', befehl('removeFormat')),
+    knopf('Format löschen', 'Alle Auszeichnungen entfernen', () => {
+      befehl('removeFormat')();
+      blockhuellenAufloesen(inhalt);
+    }),
   ]);
 
   return {
@@ -337,9 +456,19 @@ function gruppeFeld(feld: Feld, wert: Wert, daten: Eintrag): Baustein {
   };
 }
 
+/** „Neuer Abschnitt", „Neue Person", „Neues Bild" */
+const NEU_ARTIKEL = { m: 'Neuer', w: 'Neue', s: 'Neues' };
+
 function eintraegeFeld(feld: Feld, wert: Wert, daten: Eintrag): Baustein {
+  /* Die Knöpfe heißen nach dem, was sie anlegen. Zwei verschachtelte
+     Listen — Abschnitte und die Bereiche darin — trugen sonst beide
+     „+ Neuer Eintrag" und waren nicht auseinanderzuhalten (Florian,
+     17. September 2026). */
+  const einzahl = feld.einzahl ?? 'Eintrag';
+  const neuText = `+ ${NEU_ARTIKEL[feld.geschlecht ?? 'm']} ${einzahl}`;
+
   const liste = el('div');
-  const karten: { el: HTMLElement; lesen: () => Eintrag; loeschen: () => void }[] = [];
+  const karten: { el: HTMLElement; beschriften: () => void; lesen: () => Eintrag; loeschen: () => void }[] = [];
 
   const kartenBauen = (eintrag: Eintrag, neu: boolean) => {
     const inhalt = el('div', { class: 'eintrag__inhalt' });
@@ -372,7 +501,11 @@ function eintraegeFeld(feld: Feld, wert: Wert, daten: Eintrag): Baustein {
     const karte = el('article', { class: 'eintrag' });
     const aktualisieren = () => {
       const t = titelBaustein ? String(titelBaustein.lesen() || '') : '';
-      titelText.textContent = t || '(ohne Titel)';
+      /* Ohne eigenen Titel die Nummer zeigen — „Bereich 2" sagt mehr als
+         „(ohne Titel)", gerade wenn die Zwischenüberschrift absichtlich
+         leer bleibt. */
+      const nummer = [...liste.children].indexOf(karte) + 1;
+      titelText.textContent = t || (nummer > 0 ? `${einzahl} ${nummer}` : `${einzahl} (neu)`);
       const aktiv = feld.standard ? bausteine.find(([n]) => n === 'aktiv')?.[1].lesen() : true;
       marke.textContent = aktiv ? '' : 'ausgeblendet';
       marke.hidden = !!aktiv;
@@ -381,14 +514,21 @@ function eintraegeFeld(feld: Feld, wert: Wert, daten: Eintrag): Baustein {
 
     const hoch = el('button', { class: 'knopf knopf--leise', type: 'button', text: '▲ nach oben' });
     const runter = el('button', { class: 'knopf knopf--leise', type: 'button', text: '▼ nach unten' });
-    const entfernen = el('button', { class: 'knopf knopf--leise', type: 'button', text: 'Eintrag entfernen' });
-    hoch.addEventListener('click', () => { const v = karte.previousElementSibling; if (v) liste.insertBefore(karte, v); });
-    runter.addEventListener('click', () => { const n = karte.nextElementSibling; if (n) liste.insertBefore(n, karte); });
+    const entfernen = el('button', { class: 'knopf knopf--leise', type: 'button', text: `${einzahl} entfernen` });
+    /* Nach dem Verschieben stimmen die Nummern der Karten ohne Titel
+       nicht mehr — alle neu beschriften. */
+    const umsortiert = () => karten.forEach((k) => k.beschriften());
+    hoch.addEventListener('click', () => { const v = karte.previousElementSibling; if (v) liste.insertBefore(karte, v); umsortiert(); });
+    runter.addEventListener('click', () => { const n = karte.nextElementSibling; if (n) liste.insertBefore(n, karte); umsortiert(); });
     entfernen.addEventListener('click', () => {
       const hinweis = feld.standard
-        ? 'Wirklich entfernen? Meist ist „Auf der Seite zeigen" ausschalten die bessere Wahl — dann bleibt alles erhalten.'
-        : 'Wirklich entfernen?';
-      if (window.confirm(hinweis)) { karte.remove(); karten.splice(karten.findIndex((k) => k.el === karte), 1); }
+        ? `${einzahl} wirklich entfernen? Meist ist „Auf der Seite zeigen" ausschalten die bessere Wahl — dann bleibt alles erhalten.`
+        : `${einzahl} wirklich entfernen?`;
+      if (window.confirm(hinweis)) {
+        karte.remove();
+        karten.splice(karten.findIndex((k) => k.el === karte), 1);
+        umsortiert();
+      }
     });
 
     inhalt.append(...bausteine.map(([, b]) => b.el), el('div', { class: 'eintrag__werkzeuge' }, [hoch, runter, entfernen]));
@@ -399,6 +539,7 @@ function eintraegeFeld(feld: Feld, wert: Wert, daten: Eintrag): Baustein {
 
     const k = {
       el: karte,
+      beschriften: aktualisieren,
       lesen: () => {
         const ergebnis: Eintrag = { ...eintrag };
         for (const [name, b] of bausteine) ergebnis[name] = b.lesen();
@@ -411,8 +552,10 @@ function eintraegeFeld(feld: Feld, wert: Wert, daten: Eintrag): Baustein {
   };
 
   for (const e of Array.isArray(wert) ? (wert as Eintrag[]) : []) liste.append(kartenBauen(e, false));
+  /* Erst jetzt stehen alle Karten in der Liste und kennen ihre Nummer */
+  karten.forEach((k) => k.beschriften());
 
-  const neu = el('button', { class: 'knopf', type: 'button', text: '+ Neuer Eintrag' });
+  const neu = el('button', { class: 'knopf', type: 'button', text: neuText });
   neu.addEventListener('click', () => {
     const leer: Eintrag = {};
     for (const f of feld.felder ?? []) {
@@ -421,6 +564,7 @@ function eintraegeFeld(feld: Feld, wert: Wert, daten: Eintrag): Baustein {
     if (feld.standard) { leer.id = ''; leer.aktiv = true; }
     const karte = kartenBauen(leer, true);
     liste.append(karte);
+    karten.forEach((k) => k.beschriften());
     karte.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
