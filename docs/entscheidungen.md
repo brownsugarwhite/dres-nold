@@ -567,3 +567,24 @@ Seite, wo es nützt.
 gehört so etwas gar nicht hinter einen Verweis; solange es das tut,
 steht `data-astro-prefetch="false"` daran (Kommentar in
 `src/layouts/Redaktion.astro`).
+
+### Neun zahnärztliche Leistungen, zwei Leisten auf einer Breite (18. September 2026)
+
+- **Die Leistungen stehen wie auf der alten Seite.** Die elf Texte sind
+  wortgleich aus dem Webflow-Export übernommen (geprüft, Absatz für
+  Absatz) und stehen in derselben Reihenfolge. Dentale-Volumen-
+  Tomographie, Bleaching und Intraoralscanner lagen zwischenzeitlich
+  unter „Sonstige"; sie gehören in die zahnärztliche Liste — dort sind
+  es damit **neun**, wie auf dres-nold.de (Florian).
+
+  Neu gegenüber der alten Seite sind allein die Kurztexte der Kacheln
+  (dort gab es zugeklappt nur den Titel) und die Erklärtexte über den
+  Kacheln — die alte Seite kannte keine Gruppen.
+
+- **Kontaktzeile und Symbolleiste sind gleich breit** (neues Token
+  `--breite-leiste: 980px`) und tragen dieselbe Schriftgröße (14 px wie
+  die Beschriftung unter den Symbolen). Beide rahmen den Startbereich
+  und sollen als Paar gelesen werden. Die Kontaktzeile lief zuvor auf
+  der vollen Inhaltsbreite und war damit deutlich breiter als die
+  Leiste darunter.
+

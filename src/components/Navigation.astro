@@ -375,23 +375,26 @@ const kategorien = (leistungen.kategorien ?? [])
     transition: height 300ms cubic-bezier(0, 0, 0.58, 1);
   }
 
-  /* Auf der Inhaltsbreite wie die Kopfleiste darunter — die Zeile stand
-     vorher in 60 % / höchstens 700 px in der Mitte und war mit dem
-     Praxisnamen davor zu eng (Florian, 17. September 2026). */
+  /* Genau so breit wie die Symbolleiste unten: Beide rahmen den
+     Startbereich und stehen als Paar. Zwischendurch lief die Zeile auf
+     der vollen Inhaltsbreite und war damit deutlich breiter als die
+     Leiste darunter (Florian, 18. September 2026). */
   .kontaktzeile__inhalt {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
+    width: min(100% - 2 * var(--abstand-m), var(--breite-leiste));
     height: 40px;
   }
 
+  /* 14 px wie die Beschriftung unter den Symbolen der Fußleiste —
+     dieselbe Größe, damit die beiden Leisten zusammengehören. */
   .kontaktzeile__text {
     display: flex;
     align-items: center;
     color: var(--farbe-primaer);
     font-family: var(--schrift-titel);
-    font-size: var(--text-s);
+    font-size: 14px;
     font-weight: var(--gewicht-normal);
     white-space: nowrap;
   }
@@ -874,7 +877,8 @@ const kategorien = (leistungen.kategorien ?? [])
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: min(100% - 2 * var(--abstand-m), 980px);
+    /* Dieselbe Breite wie die Kontaktzeile oben — siehe dort */
+    width: min(100% - 2 * var(--abstand-m), var(--breite-leiste));
     height: 110px;
   }
 

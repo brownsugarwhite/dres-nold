@@ -147,6 +147,10 @@
      in der Einstiegskarte und ist damit so breit wie der Inhalt — bei
      1200 px wirkte es eingeengt (Florian). */
   --breite-inhalt: 1360px;
+  /* Die beiden schmalen Leisten des Einstiegs — Kontaktzeile oben und
+     Symbolleiste unten — sind gleich breit. Sie rahmen den Startbereich
+     und sollen als Paar gelesen werden (Florian, 18. September 2026). */
+  --breite-leiste: 980px;
   --breite-text: 68ch;
   /* Lesebreite eines Absatzes — so lang, dass das Auge die nächste
      Zeile noch sicher findet */
