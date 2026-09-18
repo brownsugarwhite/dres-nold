@@ -793,3 +793,26 @@ Tabulatortaste ist das Kreuz weiterhin das erste Ziel. Dazu rundherum
 gleich viel Innenabstand, ein kleinerer Radius und ruhiger gesetzter
 Text (16,5 px, Zeilenhöhe 1,6, gleichmäßige Absätze).
 
+### Das Aufklappmenü passt jetzt auf den Schirm (18. September 2026)
+
+- **Kleinere Symbole und engere Zeilen:** 44 px statt 60 (in der Liste
+  der Kategorien 32 statt 40), 7 px Innenabstand statt 10. Damit steht
+  die ganze Liste auch auf kurzen Bildschirmen, ohne dass man im Menü
+  rollen muss.
+- **Das Menü ist so hoch wie sein Inhalt**, nicht so hoch wie der
+  Bildschirm: Es klappt über die **Rasterhöhe** auf (`0fr → 1fr`,
+  dieselbe Technik wie das Akkordeon darin) statt über eine feste Höhe.
+  Gemessen bei 375 × 812: 489 px hoch, 283 px über dem unteren
+  Bildschirmrand; mit aufgeklappten Leistungen 654 px. Reicht der Inhalt
+  einmal nicht, rollt er innerhalb des Rahmens (Deckel:
+  `100dvh − 80px − 64px`).
+- **Eine Doppellinie schließt das Menü ab** — unter „Datenschutz ·
+  Impressum" (`border-bottom: 3px double`).
+- **Die Seite steht still, solange das Menü offen ist**
+  (`overflow: hidden` an der Wurzel, beim Schließen zurückgenommen).
+  Sonst scrollte beim Wischen über dem Menü der Inhalt dahinter weg —
+  und mit ihm fuhr die Einstiegskarte, weil sie am Scrollweg hängt.
+- **Die Kontaktzeile hat auf Handys denselben Seitenrand wie alles
+  andere** (24 px statt 5 %): Straße und E-Mail standen dicht an der
+  Kante. Gemessen bei 375 px: links 24, rechts 24.
+

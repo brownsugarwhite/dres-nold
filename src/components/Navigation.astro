@@ -181,6 +181,10 @@ const kategorien = (leistungen.kategorien ?? [])
 </header>
   {/* Ausklappmenü für Handys — fährt unter der Kopfleiste auf (Ablauf a-25) */}
   <div class="mobilmenue" id="mobilmenue" data-mobilmenue>
+    {/* Ein Rahmen um alles: Darüber klappt das Menü über die Rasterhöhe
+        auf (0fr → 1fr) und ist damit genau so hoch wie sein Inhalt —
+        nicht so hoch wie der Bildschirm (Florian, 18. September 2026). */}
+    <div class="mobilmenue__rahmen">
     <div class="mobilmenue__inhalt">
       {punkte.map((e, i) => (
         e.id === 'leistungen' ? (
@@ -225,6 +229,7 @@ const kategorien = (leistungen.kategorien ?? [])
     <div class="mobilmenue__recht" style={`--stufe: ${punkte.length}`}>
       <a href="/datenschutz/">Datenschutz</a>
       <a href="/impressum/">Impressum</a>
+    </div>
     </div>
   </div>
 
@@ -517,19 +522,27 @@ const kategorien = (leistungen.kategorien ?? [])
   /* .mobile-expend: fährt in 700 ms (easeInOut) auf — bis zum unteren
      Fensterrand; die Kopfleiste darüber ist 80 px hoch. Wird der Inhalt
      höher als das Fenster, lässt er sich darin rollen. */
+  /* Klappt über die Rasterhöhe auf: So ist das Menü genau so hoch wie
+     sein Inhalt und endet weit über dem unteren Bildschirmrand, statt
+     an ihm zu kleben (Florian, 18. September 2026). Reicht der Inhalt
+     einmal nicht auf den Schirm — etwa mit aufgeklappten Leistungen —,
+     rollt er innerhalb des Rahmens. */
   .mobilmenue {
     position: relative;
+    display: grid;
+    grid-template-rows: 0fr;
     width: 100%;
-    height: 0;
-    overflow: hidden;
-    transition: height 700ms cubic-bezier(0.42, 0, 0.58, 1);
+    transition: grid-template-rows 700ms cubic-bezier(0.42, 0, 0.58, 1);
   }
 
-  .navigation[data-menue-offen] .mobilmenue {
-    height: calc(100vh - 80px);
-    height: calc(100dvh - 80px);
-    overflow-y: auto;
+  .mobilmenue__rahmen {
+    min-height: 0;
+    max-height: calc(100vh - 80px - var(--abstand-xl));
+    max-height: calc(100dvh - 80px - var(--abstand-xl));
+    overflow: hidden auto;
   }
+
+  .navigation[data-menue-offen] .mobilmenue { grid-template-rows: 1fr; }
 
   /* Dieselbe Breite wie die Kopfleiste darüber — so steht das Logo
      genau über den Symbolen dieser Liste. */
@@ -543,8 +556,8 @@ const kategorien = (leistungen.kategorien ?? [])
   .mobilmenue__punkt {
     display: flex;
     align-items: center;
-    gap: var(--abstand-s);
-    padding: 10px 0;
+    gap: var(--abstand-xs);
+    padding: 7px 0;
     color: var(--farbe-primaer);
     text-decoration: none;
   }
@@ -576,16 +589,18 @@ const kategorien = (leistungen.kategorien ?? [])
     transition-delay: calc(120ms + var(--stufe, 0) * 55ms);
   }
 
-  /* Symbolgröße wie in der unteren Leiste */
+  /* Kleiner als in der unteren Leiste: So passt die ganze Liste auch
+     auf kurze Bildschirme, ohne dass man im Menü scrollen muss
+     (Florian, 18. September 2026). */
   .mobilmenue__symbol {
     flex: none;
-    width: 60px;
-    height: 60px;
+    width: 44px;
+    height: 44px;
     object-fit: contain;
   }
 
   .mobilmenue__text {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 400;
     line-height: 1.2;
   }
@@ -623,7 +638,7 @@ const kategorien = (leistungen.kategorien ?? [])
   .mobilmenue__unter[data-offen] { grid-template-rows: 1fr; }
 
   /* Nur so weit eingerückt, dass die kleinen Symbole auf der Mitte der
-     großen darüber stehen (60 − 40) / 2 = 10 px. Vorher standen sie um
+     großen darüber stehen (44 − 32) / 2 = 6 px. Vorher standen sie um
      die ganze Symbolbreite eingerückt und wirkten abgehängt (Florian,
      18. September 2026). */
   .mobilmenue__unterliste {
@@ -631,12 +646,12 @@ const kategorien = (leistungen.kategorien ?? [])
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
-    padding-left: 10px;
+    padding-left: 6px;
   }
 
   .mobilmenue__unterpunkt {
     gap: var(--abstand-xs);
-    padding: 10px 0;
+    padding: 7px 0;
     border-top: 1px solid var(--farbe-linie-leise);
     opacity: 0;
     transform: translateY(-6px);
@@ -652,7 +667,7 @@ const kategorien = (leistungen.kategorien ?? [])
     transition-delay: calc(120ms + var(--stufe, 0) * 70ms);
   }
 
-  .mobilmenue__symbol--klein { width: 40px; height: 40px; }
+  .mobilmenue__symbol--klein { width: 32px; height: 32px; }
 
   .mobilmenue__untertext { display: flex; flex-direction: column; }
   .mobilmenue__kurz { color: var(--farbe-text-gedeckt); font-size: var(--text-s); font-weight: var(--gewicht-normal); line-height: 1.35; }
@@ -664,15 +679,17 @@ const kategorien = (leistungen.kategorien ?? [])
     .mobilmenue__pfeil { transition: none; }
   }
 
-  /* .div-block-30: Punktlinie oben, 40 px hoch */
+  /* .div-block-30: Punktlinie oben. Darunter eine Doppellinie, die das
+     Menü abschließt (Florian, 18. September 2026). */
   .mobilmenue__recht {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: var(--abstand-l);
-    width: 100%;
-    height: 40px;
-    margin-top: var(--abstand-m);
+    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
+    margin: var(--abstand-s) auto 0;
+    padding-block: var(--abstand-s);
+    border-bottom: 3px double var(--farbe-linie);
     background: url('/bilder/deko/punktlinie.png') 50% 0 repeat-x;
     background-size: auto 1px;
   }
@@ -1064,8 +1081,13 @@ const kategorien = (leistungen.kategorien ?? [])
   /* ---------- Kleine Bildschirme ---------- */
   /* ---------- Kleine Bildschirme (Umbruchpunkt der Vorlage) ---------- */
   @media (max-width: 991px) {
-    .kontaktzeile__inhalt,
     .fussleiste__inhalt { width: 90%; }
+
+    /* Derselbe Seitenrand wie überall sonst — vorher standen Straße und
+       E-Mail dicht an der Kante (Florian, 18. September 2026). */
+    .kontaktzeile__inhalt {
+      width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-leiste));
+    }
 
     /* Dieselbe Breite wie die Liste im Aufklappmenü darunter */
     .kopfleiste__inhalt {
@@ -1092,7 +1114,7 @@ const kategorien = (leistungen.kategorien ?? [])
      `.nav-bottom-button { flex: 1 }`), so stehen die Punkte genau
      zwischen den Symbolen */
   @media (max-width: 479px) {
-    .kontaktzeile__inhalt { width: 94%; gap: var(--abstand-2xs); }
+    .kontaktzeile__inhalt { gap: var(--abstand-2xs); }
     .kontaktzeile__text { font-size: var(--text-xs); }
     .fussleiste__inhalt { width: 94%; }
     .fussleiste__inhalt--klein .fussknopf { flex: 1; }
@@ -1498,18 +1520,31 @@ const kategorien = (leistungen.kategorien ?? [])
         });
       }
 
+      /* Solange das Menü offen ist, steht die Seite still: Sonst scrollt
+         beim Wischen über dem Menü der Inhalt dahinter weg — und mit ihm
+         fährt die Einstiegskarte, weil sie am Scrollweg hängt (Florian,
+         18. September 2026). */
+      const seiteSperren = (sperren: boolean) => {
+        document.documentElement.style.overflow = sperren ? 'hidden' : '';
+      };
+
+      const menueSchliessen = () => {
+        navigation.removeAttribute('data-menue-offen');
+        menueknopf.setAttribute('aria-expanded', 'false');
+        menueknopf.setAttribute('aria-label', 'Menü öffnen');
+        knopfSpieler?.playSegments([knopfSpieler.totalFrames - 1, 0], true);
+        seiteSperren(false);
+      };
+
       menueknopf.addEventListener('click', () => {
-        const offen = navigation.hasAttribute('data-menue-offen');
-        if (offen) {
-          navigation.removeAttribute('data-menue-offen');
-          menueknopf.setAttribute('aria-expanded', 'false');
-          menueknopf.setAttribute('aria-label', 'Menü öffnen');
-          knopfSpieler?.playSegments([knopfSpieler.totalFrames - 1, 0], true);
+        if (navigation.hasAttribute('data-menue-offen')) {
+          menueSchliessen();
         } else {
           navigation.setAttribute('data-menue-offen', 'ja');
           menueknopf.setAttribute('aria-expanded', 'true');
           menueknopf.setAttribute('aria-label', 'Menü schließen');
           knopfSpieler?.playSegments([0, knopfSpieler.totalFrames - 1], true);
+          seiteSperren(true);
         }
       });
 
@@ -1532,10 +1567,7 @@ const kategorien = (leistungen.kategorien ?? [])
       // das Akkordeon klappt dabei zu, sobald das Menü eingefahren ist.
       document.querySelectorAll('a.mobilmenue__punkt').forEach((a) => {
         a.addEventListener('click', () => {
-          navigation.removeAttribute('data-menue-offen');
-          menueknopf.setAttribute('aria-expanded', 'false');
-          menueknopf.setAttribute('aria-label', 'Menü öffnen');
-          knopfSpieler?.playSegments([knopfSpieler.totalFrames - 1, 0], true);
+          menueSchliessen();
           window.setTimeout(() => leistungenAufklappen(false), 700);
         });
       });
