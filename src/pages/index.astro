@@ -112,9 +112,16 @@ const gruppen = (leistungen.kategorien ?? [])
   .gruppe > .gruppenzeile { margin: 0; }
 
   /* Erklärtext zwischen Gruppenzeile und Kacheln — aus der Redaktion
-     (leistungen.json → kategorien → beschreibung) */
+     (leistungen.json → kategorien → beschreibung).
+
+     Breiter als die übliche Absatzbreite (34 rem): Der Text steht hier
+     unter einer Zeile, die über die ganze Inhaltsbreite läuft, und
+     wirkte daneben nach links gestaucht (Florian, 18. September 2026).
+     48 rem sind bei 16 px rund 90 Zeichen je Zeile — das Ende dessen,
+     was sich noch angenehm liest; weiter zu gehen ginge auf Kosten der
+     Lesbarkeit. */
   .gruppe__text {
-    max-width: var(--breite-absatz);
+    max-width: min(48rem, 100%);
     margin-top: 20px;
   }
 

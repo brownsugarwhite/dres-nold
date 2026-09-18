@@ -1268,3 +1268,16 @@ Schenkel unter 45° — die Spitze ist ein spitzer Gehrungsstoß. Nachgemessen
 Der Haken am Menüpunkt selbst steht 3 px näher am Wort (5 px Abstand
 statt 8), und die drei Kategorien im Handy-Menü sind 20 px eingerückt
 statt 6 — so lesen sie sich als Unterpunkte, ohne abgehängt zu wirken.
+
+### Erklärtext der Leistungskategorien breiter (18. September 2026)
+
+Er stand auf der üblichen Absatzbreite (`--breite-absatz`, 34 rem) —
+unter einer Gruppenzeile, die über die ganze Inhaltsbreite läuft, und
+über Kacheln, die dasselbe tun. Dazwischen wirkte er nach links
+gestaucht (Florian).
+
+Jetzt `min(48rem, 100%)`: bei 1440 px sind das 768 statt 544, gemessen
+rund 75 Zeichen je Zeile. Das liegt noch gut im lesbaren Bereich
+(45–90); deutlich weiter zu gehen ginge auf Kosten der Lesbarkeit. Die
+Einleitung des Abschnitts darüber bleibt auf der schmalen Absatzbreite —
+sie gehört zur Überschrift, nicht zu den Kacheln.
