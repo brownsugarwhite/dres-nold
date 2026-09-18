@@ -1185,3 +1185,54 @@ Ecken mehr. Die Beiträge stehen auf breiten Schirmen weiter auseinander
 (24 → bis 72 px). Auf Handys ist der Seitenrand knapper (24 → 18 px),
 die Sprechstunden nehmen ihn jetzt auch, und die Porträts sind dadurch
 und durch einen höheren Rahmen rund 13 % größer.
+
+### Der Fehler hinter dem Fehler: ein Leerzeichen (18. September 2026)
+
+Das Bild kreuzblendete beim Morph — und zwar die ganze Zeit, egal wie
+oft die Regeln dafür umgeschrieben wurden. Der Grund war ein
+Leerzeichen:
+
+```css
+html[data-rueckmorph] ::view-transition-old(.bild)   /* greift NIE */
+html[data-rueckmorph]::view-transition-old(.bild)    /* richtig */
+```
+
+Die Ebenen eines Übergangs hängen am **Wurzelelement selbst**. Ein
+Nachfahren-Kombinator sucht sie unterhalb davon — dort sind sie nicht.
+Die Regel ist gültig, wird ohne Warnung übernommen und trifft nichts;
+es blieb bei den allgemeinen Regeln (`::view-transition-old(*)`), also
+beim Kreuzblenden. Sichtbar wurde das als kurzes helles Aufblitzen in
+der Mitte des Übergangs: Dort sind beide Abbilder halb durchsichtig,
+und die weiße Seite dahinter scheint durch.
+
+Betroffen waren **alle** so geschriebenen Regeln, auch die fürs
+Blättern zwischen zwei Leistungen (`html[data-uebergang] …`). Das
+seitliche Durchschieben war deshalb nie zu sehen — es lief die normale
+Überblendung. Beides ist jetzt in Ordnung.
+
+**Nachweisbar prüfen** lässt sich so etwas während des Übergangs mit
+
+```js
+document.getAnimations()
+  .filter((a) => a.effect?.pseudoElement)
+  .map((a) => [a.effect.pseudoElement, a.animationName])
+```
+
+Steht dort der Name aus der allgemeinen Regel statt des eigenen, greift
+die eigene Regel nicht. Bildschirmfotos allein hätten es nicht gezeigt:
+Am Anfang und am Ende sah der Übergang richtig aus, nur in der Mitte
+nicht.
+
+### Der Pfeil am Menüpunkt „Leistungen" (18. September 2026)
+
+Er steht jetzt **unter** dem Wort statt daneben, auf dessen Mitte — und
+damit auf derselben Senkrechten wie der Pfeil der Blase und die Symbole
+darin. Beim Öffnen sinkt er ab und blendet aus, während der Pfeil der
+Blase ein Stück tiefer aufblendet: Aus dem einen wird der andere. (Vorher
+drehte er sich an Ort und Stelle — das Gegenteil davon.)
+
+Die Blase saß dafür bisher nach einem geschätzten Verhältnis
+(`knopfX − 15 % der Blasenbreite`). Jetzt wird gerechnet: bis zur Mitte
+eines Symbols sind es 36 px Innenabstand plus die halbe Symbolbreite,
+also `knopfX − 54`. Nachgemessen bei 1440 px stehen Knopfmitte, Haken,
+Blasenpfeil und alle drei Symbole auf demselben Wert.

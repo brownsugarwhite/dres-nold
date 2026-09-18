@@ -774,28 +774,42 @@ const kategorien = (leistungen.kategorien ?? [])
   }
 
   /*
-    Der Haken am Menüpunkt „Leistungen": Er steht absolut am rechten
-    Rand des Knopfes, nicht im Textfluss. Der Text darin rollt beim
-    Zeigen um 80 px hoch (`.menuepunkt__rolle`) — stünde der Haken
-    daneben im Fluss, rollte er mit und wäre weg.
+    Der Haken am Menüpunkt „Leistungen": Er steht absolut UNTER dem
+    Wort, auf dessen Mitte — nicht daneben (Florian, 18. September
+    2026). Absolut deshalb, weil der Text beim Zeigen um 80 px hoch
+    rollt (`.menuepunkt__rolle`); im Fluss rollte der Haken mit und
+    wäre weg.
+
+    Er steht damit auf derselben Senkrechten wie der Pfeil der Blase
+    und die Symbole darin — siehe `zeichnen()` im Skript unten.
   */
   .menuepunkt--knopf {
     position: relative;
-    padding-right: 17px;
   }
 
   .menuepunkt__pfeil {
     position: absolute;
-    right: 0;
-    top: 50%;
+    left: 50%;
+    bottom: 14px;
     width: 11px;
     height: 7px;
-    margin-top: -3px;
+    margin-left: -5.5px;
     background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
-    transition: transform 350ms var(--verlauf-betont);
+    transition:
+      opacity 220ms var(--verlauf),
+      transform 220ms var(--verlauf);
   }
 
-  .menuepunkt--knopf[aria-expanded='true'] .menuepunkt__pfeil { transform: rotate(180deg); }
+  /*
+    Beim Öffnen wird aus diesem Haken der Pfeil der Blase: Er sinkt ab
+    und blendet aus, während der andere ein paar Bildpunkte tiefer
+    aufblendet (`blaseZeichnen`). Ein Drehen an Ort und Stelle wäre das
+    Gegenteil davon (Florian, 18. September 2026).
+  */
+  .menuepunkt--knopf[aria-expanded='true'] .menuepunkt__pfeil {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 
   .menuepunkt__rolle {
     display: flex;
@@ -835,6 +849,7 @@ const kategorien = (leistungen.kategorien ?? [])
 
   @media (prefers-reduced-motion: reduce) {
     .menuepunkt:hover .menuepunkt__rolle { animation: none; }
+    .menuepunkt__pfeil { transition: none; }
   }
 
   /* ---------- Aufklappmenü („Blase") ----------
@@ -1317,8 +1332,19 @@ const kategorien = (leistungen.kategorien ?? [])
         const boxBreite = Math.min(400, breite - 32);
         const kr = knopf.getBoundingClientRect();
         const knopfX = kr.left + kr.width / 2;
-        /* Die Blase sitzt so, dass der Menüpunkt im linken Drittel liegt */
-        const links = Math.max(16, Math.min(breite - boxBreite - 16, knopfX - boxBreite * 0.15));
+        /*
+          Die Blase sitzt so, dass die SYMBOLE darin genau unter der
+          Mitte des Menüpunkts stehen — und damit auf derselben
+          Senkrechten wie der Pfeil und der Haken am Knopf darüber
+          (Florian, 18. September 2026).
+
+          Bis zur Mitte eines Symbols sind es vom linken Rand der Blase:
+          36 px Innenabstand (`.aufklapp__inhalt`) plus die halbe
+          Symbolbreite. Vorher stand hier ein geschätztes Verhältnis —
+          es traf beinahe, aber eben nur beinahe.
+        */
+        const bisSymbolmitte = 36 + 18;
+        const links = Math.max(16, Math.min(breite - boxBreite - 16, knopfX - bisSymbolmitte));
         const mitte = links + boxBreite / 2;
 
         /* Sie wächst in Höhe UND Breite — die Linie fließt auf, statt

@@ -109,7 +109,7 @@
    so führt die Karte den Blick, statt mit allem gleichzeitig
    aufzutauchen (Florian, 18. September 2026). Gesetzt wird das
    Kennzeichen in scripts/uebergaenge.ts. */
-html[data-rueckmorph] ::view-transition-new(root) {
+html[data-rueckmorph]::view-transition-new(root) {
   animation-delay: 150ms;
 }
 
@@ -235,11 +235,11 @@ html[data-rueckmorph] ::view-transition-new(root) {
 /* Hinweg: Die Aufnahme der Karte entfällt, die der Beitragsseite
    beginnt im Rahmen der Karte — vergrößert wie dort — und fährt auf
    ihr eigenes Maß, während die Hülle sie an ihren Platz trägt. */
-html:not([data-rueckmorph]) ::view-transition-old(.bild) {
+html:not([data-rueckmorph])::view-transition-old(.bild) {
   display: none;
 }
 
-html:not([data-rueckmorph]) ::view-transition-new(.bild) {
+html:not([data-rueckmorph])::view-transition-new(.bild) {
   animation: uebergang-bild-heran var(--dauer-uebergang) var(--verlauf-betont) both;
   opacity: 1;
 }
@@ -247,11 +247,11 @@ html:not([data-rueckmorph]) ::view-transition-new(.bild) {
 /* Rückweg: spiegelbildlich. Die Aufnahme der Karte entfällt wieder,
    die der Beitragsseite wandert zurück in den Rahmen der Karte und
    nimmt dabei deren Vergrößerung an. */
-html[data-rueckmorph] ::view-transition-new(.bild) {
+html[data-rueckmorph]::view-transition-new(.bild) {
   display: none;
 }
 
-html[data-rueckmorph] ::view-transition-old(.bild) {
+html[data-rueckmorph]::view-transition-old(.bild) {
   animation: uebergang-bild-nach var(--dauer-uebergang) var(--verlauf-betont) both;
   opacity: 1;
 }
@@ -298,6 +298,15 @@ html[data-rueckmorph] ::view-transition-old(.bild) {
 }
 
 /*
+  ACHTUNG, SELEKTOREN OHNE LEERZEICHEN
+  ------------------------------------------------------------------
+  `html[…]::view-transition-old(…)` — direkt angehängt, NICHT
+  `html[…] ::view-transition-old(…)` mit Leerzeichen. Die Ebenen des
+  Übergangs hängen am Wurzelelement selbst; ein Nachfahren-Kombinator
+  trifft sie nicht, und die Regel greift stillschweigend nie. Genau
+  daran hing wochenlang, dass hier nur die allgemeinen Regeln wirkten
+  und das Bild sichtbar kreuzblendete (Florian, 18. September 2026).
+
   BLÄTTERN ZWISCHEN ZWEI LEISTUNGEN / BEITRÄGEN
   ==================================================================
   Ausgelöst über „Vorherige / Nächste" (scripts/uebergaenge.ts setzt
@@ -319,18 +328,18 @@ html[data-rueckmorph] ::view-transition-old(.bild) {
 @keyframes uebergang-rein-rechts { from { transform: translateX(calc(50vw + 50%)); } }
 
 /* Der Rest der Seite bleibt stehen — nichts verschwimmt */
-html[data-uebergang] ::view-transition-old(root),
-html[data-uebergang] ::view-transition-new(root) {
+html[data-uebergang]::view-transition-old(root),
+html[data-uebergang]::view-transition-new(root) {
   animation: none;
 }
 
 /* Die Hüllen wandern nicht — die Abbilder schieben sich durch */
-html[data-uebergang] ::view-transition-group(.karte) {
+html[data-uebergang]::view-transition-group(.karte) {
   animation: none;
 }
 
-html[data-uebergang] ::view-transition-old(.karte),
-html[data-uebergang] ::view-transition-new(.karte) {
+html[data-uebergang]::view-transition-old(.karte),
+html[data-uebergang]::view-transition-new(.karte) {
   animation-duration: var(--dauer-uebergang);
   animation-timing-function: var(--verlauf-betont);
   animation-delay: 0ms;
@@ -343,13 +352,13 @@ html[data-uebergang] ::view-transition-new(.karte) {
   object-fit: none;
 }
 
-html[data-uebergang] ::view-transition-old(.karte) { animation-fill-mode: forwards; }
-html[data-uebergang] ::view-transition-new(.karte) { animation-fill-mode: both; }
+html[data-uebergang]::view-transition-old(.karte) { animation-fill-mode: forwards; }
+html[data-uebergang]::view-transition-new(.karte) { animation-fill-mode: both; }
 
-html[data-uebergang='vor'] ::view-transition-old(.karte) { animation-name: uebergang-raus-links; }
-html[data-uebergang='vor'] ::view-transition-new(.karte) { animation-name: uebergang-rein-rechts; }
-html[data-uebergang='zurueck'] ::view-transition-old(.karte) { animation-name: uebergang-raus-rechts; }
-html[data-uebergang='zurueck'] ::view-transition-new(.karte) { animation-name: uebergang-rein-links; }
+html[data-uebergang='vor']::view-transition-old(.karte) { animation-name: uebergang-raus-links; }
+html[data-uebergang='vor']::view-transition-new(.karte) { animation-name: uebergang-rein-rechts; }
+html[data-uebergang='zurueck']::view-transition-old(.karte) { animation-name: uebergang-raus-rechts; }
+html[data-uebergang='zurueck']::view-transition-new(.karte) { animation-name: uebergang-rein-links; }
 
 /*
   Beim Blättern geben Symbol, Titel und Bild ihre Namen ab: Sie sind
