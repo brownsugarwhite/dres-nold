@@ -449,13 +449,56 @@ function richtextFeld(feld: Feld, wert: Wert): Baustein {
   const befehl = (name: string, arg?: string) => () => {
     inhalt.focus();
     document.execCommand(name, false, arg);
+    zustandZeigen();
   };
-  const knopf = (text: string, titel: string, aktion: () => void) => {
+
+  /* Knöpfe, die anzeigen, wie der ausgewählte Text gesetzt ist */
+  const schalter: [HTMLElement, () => boolean][] = [];
+
+  const knopf = (text: string, titel: string, aktion: () => void, zustand?: () => boolean) => {
     const b = el('button', { type: 'button', text, title: titel });
     b.addEventListener('mousedown', (e) => e.preventDefault());
     b.addEventListener('click', aktion);
+    if (zustand) schalter.push([b, zustand]);
     return b;
   };
+
+  /** Welcher Block umgibt die Auswahl? Liefert 'p', 'h3', 'li' … */
+  const block = () => {
+    const knoten = window.getSelection()?.anchorNode;
+    let el = knoten instanceof Element ? knoten : knoten?.parentElement ?? null;
+    while (el && el !== inhalt) {
+      const tag = el.tagName.toLowerCase();
+      if (['p', 'h3', 'h4', 'li', 'td', 'th'].includes(tag)) return tag;
+      el = el.parentElement;
+    }
+    return '';
+  };
+
+  /** Steckt die Auswahl in einem Verweis? */
+  const imVerweis = () => {
+    const knoten = window.getSelection()?.anchorNode;
+    const start = knoten instanceof Element ? knoten : knoten?.parentElement ?? null;
+    return !!start?.closest('a');
+  };
+
+  /**
+   * Zeigt an den Knöpfen, wie der ausgewählte Text gesetzt ist.
+   *
+   * Der Browser beantwortet das selbst (`queryCommandState`) — für die
+   * Blockform und den Verweis sucht die Auswahl sich ihren Vorfahren
+   * (Florian, 18. September 2026).
+   */
+  function zustandZeigen() {
+    const auswahl = window.getSelection();
+    const knoten = auswahl?.anchorNode ?? null;
+    const drin = !!knoten && inhalt.contains(knoten);
+    for (const [b, pruefen] of schalter) {
+      let an = false;
+      try { an = drin && pruefen(); } catch { /* alter Browser: dann eben nicht */ }
+      b.setAttribute('aria-pressed', String(an));
+    }
+  }
 
   /* „Absatz" muss auch aus einer Überschrift herausführen, in der ganze
      Absätze stecken. `formatBlock` stellt nur den innersten Block um und
@@ -477,16 +520,19 @@ function richtextFeld(feld: Feld, wert: Wert): Baustein {
   });
 
   const leiste = el('div', { class: 'richtext__leiste' }, [
-    knopf('Absatz', 'Normaler Absatz', alsAbsatz),
-    knopf('Zwischentitel', 'Zwischenüberschrift', befehl('formatBlock', 'h3')),
-    knopf('Fett', 'Fett', befehl('bold')),
-    knopf('Kursiv', 'Kursiv', befehl('italic')),
-    knopf('• Liste', 'Aufzählung', befehl('insertUnorderedList')),
-    knopf('1. Liste', 'Nummerierte Liste', befehl('insertOrderedList')),
+    knopf('Absatz', 'Normaler Absatz', alsAbsatz, () => block() === 'p'),
+    knopf('Zwischentitel', 'Zwischenüberschrift', befehl('formatBlock', 'h3'), () => block() === 'h3'),
+    /* In einer Zwischenüberschrift meldet der Browser „fett", weil sie
+       fett gesetzt IST — angeklickt hat das niemand. Dort also nicht
+       anzeigen. */
+    knopf('Fett', 'Fett', befehl('bold'), () => !['h3', 'h4'].includes(block()) && document.queryCommandState('bold')),
+    knopf('Kursiv', 'Kursiv', befehl('italic'), () => document.queryCommandState('italic')),
+    knopf('• Liste', 'Aufzählung', befehl('insertUnorderedList'), () => document.queryCommandState('insertUnorderedList')),
+    knopf('1. Liste', 'Nummerierte Liste', befehl('insertOrderedList'), () => document.queryCommandState('insertOrderedList')),
     knopf('Verweis', 'Verweis einfügen', () => {
       const ziel = window.prompt('Adresse des Verweises (z. B. https://… oder /leistungen/prophylaxe/):');
       if (ziel) befehl('createLink', ziel)();
-    }),
+    }, imVerweis),
     knopf('Tabelle', 'Tabelle einfügen', () => {
       const spalten = Math.min(8, Math.max(1, Number(window.prompt('Wie viele Spalten?', '2')) || 2));
       const zeilen = Math.min(50, Math.max(1, Number(window.prompt('Wie viele Zeilen (ohne Überschrift)?', '3')) || 3));
@@ -505,6 +551,15 @@ function richtextFeld(feld: Feld, wert: Wert): Baustein {
       blockhuellenAufloesen(inhalt);
     }),
   ]);
+
+  /* Die Auswahl ändert sich am Dokument, nicht am Feld — deshalb hier.
+     Läuft für jedes Textfeld einmal; der Test `inhalt.contains` sorgt
+     dafür, dass nur das Feld mit der Auswahl etwas anzeigt. */
+  document.addEventListener('selectionchange', zustandZeigen);
+  inhalt.addEventListener('input', zustandZeigen);
+  inhalt.addEventListener('focus', zustandZeigen);
+  inhalt.addEventListener('blur', zustandZeigen);
+  zustandZeigen();
 
   return {
     el: huelle(feld, el('div', { class: 'richtext' }, [leiste, inhalt]), id),

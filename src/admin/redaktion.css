@@ -159,6 +159,14 @@ body {
 
 .richtext__leiste button:hover { border-color: var(--farbe-linie); background: var(--farbe-flaeche); }
 
+/* Zeigt, wie der ausgewählte Text gesetzt ist */
+.richtext__leiste button[aria-pressed='true'] {
+  border-color: var(--farbe-primaer);
+  background: var(--farbe-flaeche);
+  color: var(--farbe-primaer);
+  font-weight: var(--gewicht-halbfett);
+}
+
 .richtext__inhalt {
   min-height: 10em;
   padding: var(--abstand-xs);

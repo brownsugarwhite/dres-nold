@@ -887,3 +887,24 @@ Kartenzustimmung ist aus Ziffer 4 entfernt.
 Praxis bzw. ihrem Datenschutzbeauftragten zu prüfen — das gilt für diese
 Änderung besonders.
 
+### Die Leiste zeigt, wie der Text gesetzt ist (18. September 2026)
+
+Wer im Texteditor etwas markiert, sieht jetzt oben in der Leiste, wie es
+gesetzt ist: Der zutreffende Knopf steht in der Hausfarbe und trägt
+`aria-pressed="true"` — also auch für Vorleseprogramme erkennbar.
+
+Den Zustand beantwortet der Browser selbst (`queryCommandState`) für
+Fett, Kursiv und die beiden Listen; für „Absatz" und „Zwischentitel"
+sucht die Auswahl ihren umgebenden Block, für „Verweis" ihren
+`<a>`-Vorfahren.
+
+Eine Feinheit: In einer Zwischenüberschrift meldet der Browser „fett",
+weil sie fett gesetzt **ist** — angeklickt hat das niemand. Dort bleibt
+der Knopf deshalb aus.
+
+**Zwei Beispiel-Stellenanzeigen** stehen in `stellen.json` — echte,
+vollständige Anzeigen (ZFA und Prophylaxe/ZMP), damit die Praxis sieht,
+wie der Bereich aussieht. Sie sind aktiv geschaltet und **vor dem
+Livegang zu prüfen**: Umfang, Ansprechperson und die zugesagten
+Leistungen muss die Praxis bestätigen.
+
