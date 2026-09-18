@@ -195,8 +195,26 @@ html[data-rueckmorph] ::view-transition-new(root) {
   display: none;
 }
 
+/*
+  Die gezeigte Aufnahme beginnt bei der Vergrößerung, die das Bild
+  einen Wimpernschlag vorher hatte, und fährt über die Dauer des
+  Übergangs auf ihr eigenes Maß.
+
+  Ohne das sprang das Bild: Auf der Übersicht ist es beim Zeigen und
+  über den Scrollweg vergrößert, auf der Beitragsseite nicht — und
+  gezeigt wird während des Übergangs immer die Aufnahme der ZIELseite.
+  Den Unterschied misst scripts/uebergaenge.ts und reicht ihn als
+  `--morph-zoom` herein (Florian, 18. September 2026). Ist nichts
+  anzugleichen, steht die Eigenschaft nicht und der Anfangswert ist 1 —
+  dann bewegt sich hier nichts.
+*/
+@keyframes uebergang-bild-angleichen {
+  from { transform: scale(var(--morph-zoom, 1)); }
+  to { transform: scale(1); }
+}
+
 ::view-transition-new(.bild) {
-  animation: none;
+  animation: uebergang-bild-angleichen var(--dauer-uebergang) var(--verlauf-betont) both;
   opacity: 1;
   width: 100%;
   height: 100%;

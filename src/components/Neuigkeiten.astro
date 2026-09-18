@@ -85,7 +85,10 @@ const alsDatum = (iso: string) =>
        breiter als der Platz — ohne die Schranke schob die Liste die
        ganze Seite waagerecht auf (320-px-Geräte, 18. September 2026). */
     grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
-    gap: 24px;
+    /* Auf breiten Schirmen deutlich mehr Luft zwischen den Beiträgen —
+       nebeneinander standen sie zu dicht (Florian, 18. September 2026).
+       Untereinander bleibt es beim engeren Maß. */
+    gap: 34px clamp(24px, 4.5vw, 72px);
     margin-top: 44px;
   }
 
@@ -219,7 +222,7 @@ const alsDatum = (iso: string) =>
 </style>
 
 <script>
-  import { nachziehen } from '../scripts/scrollwege';
+  import { nachziehen, durchlauf, A3_ZUWACHS } from '../scripts/scrollwege';
 
   /**
    * Ablauf a-3 auf den Beitragsbildern — dieselbe Bewegung wie beim
@@ -239,12 +242,9 @@ const alsDatum = (iso: string) =>
     if (!bilder.length || bilder[0].dataset.bereit) return;
     bilder.forEach((b) => { b.dataset.bereit = 'ja'; });
 
-    /** Anteil, zu dem ein Element den Blickbereich durchlaufen hat (0 … 1). */
-    const anteil = (el: HTMLElement) => {
-      const r = el.getBoundingClientRect();
-      const weg = window.innerHeight + r.height;
-      return Math.min(1, Math.max(0, (window.innerHeight - r.top) / weg));
-    };
+    /* Die Formel steht in scripts/scrollwege.ts — der Seitenwechsel
+       rechnet mit derselben (siehe dort). */
+    const anteil = durchlauf;
 
     const werte = new Map<HTMLElement, number>();
     bilder.forEach((el) => werte.set(el, anteil(el)));
@@ -252,7 +252,7 @@ const alsDatum = (iso: string) =>
     const zeichnen = () => {
       bilder.forEach((el) => {
         const p = werte.get(el) ?? 0;
-        el.style.setProperty('--bild-groesse', (1 + 0.1 * p).toFixed(4));
+        el.style.setProperty('--bild-groesse', (1 + A3_ZUWACHS * p).toFixed(4));
       });
     };
 

@@ -167,8 +167,8 @@ const texte = startseite.sprechstunden;
     position: relative;
     z-index: 2;
     /* Wie viel Platz der Einstieg im Fluss belegt.
-       Ausgangspunkt: Beim Freigeben steht die Spitze des Zipfels an der
-       Oberkante der Symbolleiste (110 px). Davon geht die Zipfellänge
+       Ausgangspunkt: Beim Freigeben steht die Spitze des Zipfels knapp
+       über der Symbolleiste (110 px). Davon geht die Zipfellänge
        noch ab — die Spitze zieht sich beim Weiterscrollen ein, und der
        Platz, den sie hatte, stünde sonst als leere Fläche zwischen
        Karte und nächstem Abschnitt (Florian, 17. September 2026).
@@ -368,7 +368,9 @@ const texte = startseite.sprechstunden;
      Bilderband und Abschlusslinie statt nach unten versetzt (Florian,
      18. September 2026). */
   @media (max-width: 48rem) {
-    .ozsprechstunden { padding: var(--abstand-l) var(--abstand-m); }
+    /* Derselbe Rand wie überall sonst, statt eines eigenen Maßes —
+       das bringt der Zeitentabelle nebenbei etwas mehr Breite. */
+    .ozsprechstunden { padding: var(--abstand-l) var(--abstand-seitenrand); }
     .ozblase__zeile { margin-top: 14px; }
     .ozblase__einleitung { margin: 14px 0 0; font-size: 16px; }
     .ozblase__spalten { gap: var(--abstand-l); margin-top: var(--abstand-l); }
@@ -417,6 +419,12 @@ const texte = startseite.sprechstunden;
 
   /** Höhe der Symbolleiste unten — `.fussleiste__inhalt` */
   const LEISTE = 110;
+
+  /** Luft zwischen der Spitze des Zipfels und der Oberkante der
+      Symbolleiste. Ohne sie endete die Spitze genau auf deren
+      Punktlinie und verschwand dahinter; sie soll knapp darüber stehen
+      (Florian, 18. September 2026). */
+  const LUFT = 10;
 
   /**
    * Die Fensterbreite OHNE Rollleiste als CSS-Wert. `100vw` zählt sie
@@ -491,8 +499,9 @@ const texte = startseite.sprechstunden;
          Versatz so wählen, dass der höchste Punkt 2 px darunter liegt. */
       versatzOben = Math.max(4, (breite / 2) * VORLAGE.neigung + 2);
 
-      /* Blase so hoch, dass die ausgefahrene Spitze die Leiste berührt */
-      ruhelage = LEISTE + laenge + grundlinie(spitzeX);
+      /* Blase so hoch, dass die ausgefahrene Spitze knapp über der
+         Leiste endet */
+      ruhelage = LEISTE + LUFT + laenge + grundlinie(spitzeX);
       document.documentElement.style.setProperty('--oz-ruhe', `${ruhelage}px`);
 
       const hoehe = versatzOben * 2 + laenge + 4;

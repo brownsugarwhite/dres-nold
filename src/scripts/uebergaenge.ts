@@ -25,6 +25,7 @@
  *    „klebt", zeichnet sich ein Kreis darum.
  */
 import { navigate } from 'astro:transitions/client';
+import { durchlauf, A3_ZUWACHS } from './scrollwege';
 
 const MERKER = 'uebergang-ziel';
 
@@ -57,7 +58,65 @@ type VorTausch = Event & { newDocument: Document; viewTransition?: ViewTransitio
 function kennzeichenAbraeumen() {
   delete document.documentElement.dataset.uebergang;
   delete document.documentElement.dataset.rueckmorph;
+  document.documentElement.style.removeProperty('--morph-zoom');
   for (const k of document.querySelectorAll('[data-morph]')) k.removeAttribute('data-morph');
+}
+
+/**
+ * Wie stark das Bild eines Beitrags GERADE vergrößert ist.
+ *
+ * Auf der Übersicht trägt es zwei Vergrößerungen: eine beim Zeigen
+ * (`.beitrag__bild`) und eine über den Scrollweg (`.beitrag__lauf`).
+ * Auf der Beitragsseite steht es unvergrößert.
+ *
+ * Genau daraus entstand der Sprung, den man beim Morphen sah: Der
+ * Browser zeigt während des Übergangs die Aufnahme der ZIELseite —
+ * und die ist anders vergrößert als das, was einen Wimpernschlag
+ * vorher unter dem Zeiger stand. Der Unterschied wird deshalb gemessen
+ * und als `--morph-zoom` weitergereicht; styles/uebergaenge.css lässt
+ * die Aufnahme damit genau dort beginnen, wo das Bild eben noch stand,
+ * und fährt sie über die Dauer des Übergangs auf ihr eigenes Maß
+ * (Florian, 18. September 2026).
+ */
+function bildZoom(karte: Element | null | undefined): number {
+  const lauf = karte?.querySelector<HTMLElement>('.beitrag__lauf');
+  const bild = karte?.querySelector<HTMLElement>('.beitrag__bild');
+  if (!lauf || !bild) return 1;
+  const faktor = (el: HTMLElement) => {
+    const wert = getComputedStyle(el).transform;
+    if (!wert || wert === 'none') return 1;
+    try { return new DOMMatrixReadOnly(wert).a || 1; } catch { return 1; }
+  };
+  return faktor(lauf) * faktor(bild);
+}
+
+/**
+ * Dieselbe Rechnung für den Rückweg — dort ist das Bild noch gar nicht
+ * vergrößert, wenn wir messen.
+ *
+ * Der Grund ist die Reihenfolge: `astro:after-swap` läuft VOR
+ * `astro:page-load`, und erst dort setzt Neuigkeiten.astro den Wert.
+ * Die neue Momentaufnahme entsteht aber danach — sie zeigt das Bild
+ * also vergrößert. Deshalb wird hier vorweggenommen, was das Skript
+ * gleich setzen wird: derselbe Ablauf a-3 mit derselben Formel
+ * (scripts/scrollwege.ts). Die Karte steht zu diesem Zeitpunkt schon
+ * an ihrem Platz — `after-swap` hat sie mittig gestellt.
+ */
+function bildZoomDanach(karte: Element | null | undefined): number {
+  const lauf = karte?.querySelector<HTMLElement>('.beitrag__lauf');
+  if (!lauf) return 1;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 1;
+  /* Steht der Wert schon, gilt er — dann war Neuigkeiten.astro vorher
+     dran und hat für diese Seite gerechnet. */
+  const gesetzt = parseFloat(lauf.style.getPropertyValue('--bild-groesse'));
+  if (gesetzt > 0) return gesetzt;
+  return 1 + A3_ZUWACHS * durchlauf(lauf);
+}
+
+/** `--morph-zoom` setzen — oder wegräumen, wenn nichts anzugleichen ist. */
+function zoomMerken(wurzel: HTMLElement, zoom: number) {
+  if (Math.abs(zoom - 1) < 0.002) wurzel.style.removeProperty('--morph-zoom');
+  else wurzel.style.setProperty('--morph-zoom', zoom.toFixed(4));
 }
 
 /** Läuft gerade ein echter Übergang? Dann räumt dessen `finished` auf. */
@@ -80,7 +139,12 @@ document.addEventListener('astro:before-preparation', (ereignis) => {
   /* Die angeklickte Karte kennzeichnen: Nur sie gehört zur
      Übergangsgruppe „karte" und liegt damit über ihren Nachbarn
      (styles/uebergaenge.css). */
-  quelle?.closest?.('[data-karte]')?.setAttribute('data-morph', '');
+  const karte = quelle?.closest?.('[data-karte]');
+  karte?.setAttribute('data-morph', '');
+
+  /* Hinweg: Die Aufnahme der Beitragsseite zeigt das Bild unvergrößert
+     — sie beginnt deshalb bei der Vergrößerung der Karte. */
+  zoomMerken(document.documentElement, bildZoom(karte));
 
   /* Rückweg zur Startseite — über das Schließen-Kreuz (dann steht der
      Merker schon) oder über den Zurück-Knopf des Browsers. Dabei blendet
@@ -110,6 +174,11 @@ document.addEventListener('astro:after-swap', () => {
   const r = karte.getBoundingClientRect();
   const oben = window.scrollY + r.top - (window.innerHeight - r.height) / 2;
   window.scrollTo({ top: Math.max(0, oben), behavior: 'instant' as ScrollBehavior });
+
+  /* Ein erster Wert, falls der Wechsel hier schon endet. Der genaue
+     folgt in `astro:page-load` — dann steht das Bild an seinem Platz
+     und die Seite hat sich gesetzt. */
+  zoomMerken(document.documentElement, 1 / (bildZoomDanach(karte) || 1));
 });
 
 /* Astro tauscht beim Wechsel das ganze Dokument aus — die Richtung des
@@ -137,6 +206,14 @@ document.addEventListener('astro:before-swap', (ereignis) => {
 });
 
 document.addEventListener('astro:page-load', () => {
+  /* Letzter Moment vor der neuen Momentaufnahme: Jetzt steht die Seite,
+     und die Vergrößerung des Bildes lässt sich genau bestimmen. Auf
+     dem Rückweg ist das der Wert, der den Sprung verhindert. */
+  if (uebergangLaeuft && document.documentElement.dataset.rueckmorph) {
+    const karte = document.querySelector('[data-karte][data-morph]');
+    if (karte) zoomMerken(document.documentElement, 1 / (bildZoomDanach(karte) || 1));
+  }
+
   /* Ohne echten Übergang (ältere Browser, reduzierte Bewegung) gibt es
      kein `finished` — dann hier aufräumen. */
   if (!uebergangLaeuft) kennzeichenAbraeumen();

@@ -1098,3 +1098,68 @@ darin auf hellerem Grund. Die Gestaltung erkennt die Verschachtelung
 selbst (`.eintrag__inhalt > .eintraege`) — im Skript ist dafür nichts
 zu tun. Dazu trägt jeder Eintrag eine **laufende Nummer** vor dem
 Titel; bei mehreren Bereichen sieht man damit sofort, wo man ist.
+
+### Nachgeschärft (18. September 2026, spätabends)
+
+**Der Zipfel endet jetzt 10 px über der Symbolleiste** (`LUFT` in
+Oeffnungszeiten.astro). Vorher traf seine Spitze genau deren Punktlinie
+und verschwand dahinter; gemessen stand sie bei 789 px, die Leiste
+beginnt bei 790.
+
+**Der Sprung im Morph der Beiträge ist weg — in beide Richtungen.**
+
+Die Ursache lag tiefer als gedacht: Nicht die Lage sprang, sondern der
+INHALT. Auf der Übersicht ist das Bild beim Zeigen und über den
+Scrollweg vergrößert (zusammen bis 1,13), auf der Beitragsseite steht es
+unvergrößert — und gezeigt wird während des Übergangs immer die
+Momentaufnahme der ZIELseite. Beim Öffnen zoomte das Bild deshalb im
+ersten Bild heraus, beim Schließen hinein.
+
+`scripts/uebergaenge.ts` misst den Unterschied und reicht ihn als
+`--morph-zoom` weiter; `styles/uebergaenge.css` lässt die Aufnahme genau
+dort beginnen, wo das Bild eben noch stand, und fährt sie über die Dauer
+des Übergangs auf ihr eigenes Maß. Auf dem Rückweg ist es der Kehrwert.
+
+Der Zeitpunkt der Messung ist dabei entscheidend: Auf dem Rückweg wird
+in `astro:page-load` gemessen, nicht in `astro:after-swap` — vorher
+steht die Karte noch nicht an ihrem Platz und die Vergrößerung ist noch
+nicht gesetzt. Die Formel dafür (`durchlauf`, `A3_ZUWACHS`) steht jetzt
+in `scripts/scrollwege.ts`, damit Beitragsbilder und Seitenwechsel
+dieselbe verwenden.
+
+**Die Ansprechperson springt nicht mehr.** Sie klebt beim Scrollen, und
+`position: sticky` wirkt erst, wenn der beschnittene Vorfahre den
+Überlauf freigibt — also nach der Höhenbewegung. Genau in diesem Moment
+sprang sie an ihre klebende Lage. Jetzt blendet sie erst NACH diesem
+Moment ein (`[data-offen]` statt `:not([data-zu])`): Der Sprung fällt in
+die Zeit, in der sie noch unsichtbar ist. Gemessen bei 1280 × 900: Bis
+620 ms Deckkraft 0, dann der Sprung, dann das Einblenden von 620 bis
+1100 ms. Auf Handys (klebt unten) ebenso.
+
+Dazu wartet das Skript jetzt gezielt auf das Ende der HÖHENbewegung:
+Die Überblendungen des Inhalts melden ihr Ende ebenfalls an die Klappe,
+und eine davon gab vorher zu früh frei.
+
+**Die Karte im Kontakt deckt den Bereich wieder ganz.** Die Ebene liegt
+jetzt auf seinen vier Kanten (`inset: 0`); verschoben wird die Zeichnung
+DARIN (`background-position`), nicht die Ebene. Ihr Maß ist so gewählt,
+dass sie auch bei weit außen stehender Marke bis in alle Ecken reicht.
+Die vorige Lösung — eine übergroße Ebene — ließ oben und unten einen
+Streifen frei, weil das Maß der Zeichnung auf den BEREICH gerechnet war
+und nicht auf die Ebene.
+
+**Die Marke steht mittig zwischen dem, was man sieht.** Gemessen wird
+der Text selbst (Zeile für Zeile), nicht sein Kasten: Die Absätze laufen
+über die ganze Spalte, der Satz darin endet viel früher. Bei 1440 px
+sind das 505 px statt 677 — die Marke rückte damit um 86 px nach links,
+genau in die Mitte der sichtbaren Lücke.
+
+Ist die Lücke zu eng für sie (unter 52 + 2 × 56 px), steht sie **unter
+den beiden Knöpfen** (`data-marke="unterknoepfe"`). Gemessen greift das
+zwischen etwa 950 und 1250 px Fensterbreite.
+
+**Kleinigkeiten:** Das Bild im eigenen Abschnitt hat keine abgerundeten
+Ecken mehr. Die Beiträge stehen auf breiten Schirmen weiter auseinander
+(24 → bis 72 px). Auf Handys ist der Seitenrand knapper (24 → 18 px),
+die Sprechstunden nehmen ihn jetzt auch, und die Porträts sind dadurch
+und durch einen höheren Rahmen rund 13 % größer.

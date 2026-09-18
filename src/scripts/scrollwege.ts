@@ -151,6 +151,27 @@ export function beimScrollenSichtbar(hoehe: number, oben: number): number {
  */
 export const REST = 0.7;
 
+/**
+ * Anteil, zu dem ein Element den Blickbereich durchlaufen hat (0 … 1) —
+ * gezählt wie Webflows „while scrolling in view": 0 %, wenn die
+ * Oberkante unten ins Fenster tritt, 100 %, wenn die Unterkante oben
+ * hinausläuft.
+ *
+ * Steht hier, weil drei Stellen damit rechnen: die Beitragsbilder und
+ * das Gruppenfoto (Ablauf a-3) — und der Seitenwechsel, der wissen
+ * muss, wie weit ein Bild gerade vergrößert IST, bevor er es morpht
+ * (scripts/uebergaenge.ts).
+ */
+export function durchlauf(el: Element): number {
+  const r = el.getBoundingClientRect();
+  const weg = window.innerHeight + r.height;
+  if (weg <= 0) return 0;
+  return Math.min(1, Math.max(0, (window.innerHeight - r.top) / weg));
+}
+
+/** Ablauf a-3: Über den Scrollweg wächst das Bild um diesen Anteil. */
+export const A3_ZUWACHS = 0.1;
+
 /** Rückt `wert` um einen Zeitschritt in Richtung `ziel`. */
 export function nachziehen(wert: number, ziel: number, dt: number): number {
   const schritt = 1 - Math.pow(REST, dt / (1000 / 60));

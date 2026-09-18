@@ -303,16 +303,34 @@ const bewerbung = (titel: string) =>
     transition-delay: 0.14s;
   }
 
-  .stelle__klappe:not([data-zu]) .stelle__seite {
+  /*
+    Die Ansprechperson kommt erst, wenn die Klappe steht.
+
+    Sie klebt beim Scrollen (`position: sticky`) — und das wirkt erst,
+    wenn der Überlauf freigegeben ist, also nach der Bewegung
+    (`data-offen`, siehe Skript). Blendete sie vorher schon ein, spränge
+    sie in genau diesem Moment an ihre klebende Lage. Jetzt fällt der
+    Sprung in die Zeit, in der sie noch unsichtbar ist; sichtbar wird
+    erst das ruhige Einblenden von ihrem endgültigen Platz aus
+    (Florian, 18. September 2026).
+  */
+  .stelle__klappe[data-offen] .stelle__seite {
     opacity: 1;
     transform: none;
-    transition-delay: 0.26s;
+    transition-delay: 0.04s;
   }
 
-  /* Beim Zuklappen soll nichts nachhängen: Der Inhalt geht sofort. */
-  .stelle__klappe[data-zu] .stelle__text,
-  .stelle__klappe[data-zu] .stelle__seite {
+  /* Beim Zuklappen soll nichts nachhängen: Der Inhalt geht sofort.
+     Die Ansprechperson noch eine Spur schneller — mit dem Zuklappen
+     verliert sie ihre klebende Lage und rückt zurück in die Zeile;
+     das soll niemand mehr sehen. */
+  .stelle__klappe[data-zu] .stelle__text {
     transition-duration: 0.2s;
+    transition-delay: 0s;
+  }
+
+  .stelle__klappe[data-zu] .stelle__seite {
+    transition-duration: 0.12s;
     transition-delay: 0s;
   }
 
@@ -436,20 +454,45 @@ const bewerbung = (titel: string) =>
 
     const knoepfe = [...liste.querySelectorAll<HTMLButtonElement>('[data-stellenknopf]')];
 
+    const wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Je Klappe der Zuhörer, der auf das Ende der Höhenbewegung wartet —
+       damit ein schnelles Hin und Her nicht zwei davon stehen lässt. */
+    const warten = new WeakMap<HTMLElement, (e: TransitionEvent) => void>();
+
     const setzen = (knopf: HTMLButtonElement, offen: boolean) => {
       knopf.setAttribute('aria-expanded', String(offen));
       const klappe = document.getElementById(knopf.getAttribute('aria-controls') || '');
       if (!klappe) return;
       delete klappe.dataset.offen;
-      if (offen) {
-        delete klappe.dataset.zu;
-        /* Nach der Bewegung darf der Inhalt überlaufen */
-        klappe.addEventListener('transitionend', () => {
-          if (!klappe.dataset.zu) klappe.dataset.offen = 'ja';
-        }, { once: true });
-      } else {
-        klappe.dataset.zu = 'ja';
-      }
+
+      const alt = warten.get(klappe);
+      if (alt) { klappe.removeEventListener('transitionend', alt); warten.delete(klappe); }
+
+      if (!offen) { klappe.dataset.zu = 'ja'; return; }
+
+      delete klappe.dataset.zu;
+
+      /* Ohne Bewegung gibt es kein Ende, auf das sich warten ließe */
+      if (wenigerBewegung) { klappe.dataset.offen = 'ja'; return; }
+
+      /*
+        Nach der Bewegung darf der Inhalt überlaufen — erst dann klebt
+        die Ansprechperson, und erst dann blendet sie ein (siehe CSS).
+
+        Geprüft wird beides: dass das Ereignis von der Klappe selbst
+        kommt und dass es die Höhe betrifft. Der Inhalt darin hat eigene
+        Überblendungen, deren Ereignisse hier ebenfalls ankommen — ohne
+        die Prüfung gäbe eine davon zu früh frei.
+      */
+      const beiEnde = (e: TransitionEvent) => {
+        if (e.target !== klappe || e.propertyName !== 'grid-template-rows') return;
+        klappe.removeEventListener('transitionend', beiEnde);
+        warten.delete(klappe);
+        if (!klappe.dataset.zu) klappe.dataset.offen = 'ja';
+      };
+      warten.set(klappe, beiEnde);
+      klappe.addEventListener('transitionend', beiEnde);
     };
 
     knoepfe.forEach((knopf) => {

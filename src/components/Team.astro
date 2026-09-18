@@ -573,12 +573,16 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
   }
 
   @media (max-width: 479px) {
+    /* Enger zusammen und höher: Beides macht die Köpfe größer, ohne
+       dass eine dritte Spalte nötig wäre (Florian, 18. September 2026).
+       Die Höhe zählt mit, weil das Foto darin „contain" steht — bei
+       einem flacheren Rahmen begrenzte sie das Bild, nicht die Breite. */
     .aerzte,
-    .mitarbeitende { --luecke: 14px; }
+    .mitarbeitende { --luecke: 12px; }
     .mitarbeitende { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     /* Auf schmalen Handys ist die Spalte schmaler als das Foto — dann
        darf es mitschrumpfen, sonst wird es seitlich beschnitten. */
-    .portraet { height: auto; aspect-ratio: 1 / 1.15; }
+    .portraet { height: auto; aspect-ratio: 1 / 1.25; }
     .portraet__bild { width: 100%; height: 100%; object-fit: contain; object-position: bottom; }
   }
 

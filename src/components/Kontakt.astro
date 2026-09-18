@@ -123,29 +123,30 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
   }
 
   /*
-    Die Zeichnung hängt an der Marke, nicht am Bereich: Ihr Mittelpunkt
-    ist die Praxis, und der soll genau unter der Spitze der Marke
-    liegen — wo immer die gerade sitzt (auf breiten Schirmen in der
-    Lücke zwischen Text und Formular, auf Tablets rechts daneben, auf
-    Handys zwischen Knöpfen und Formular). Das Skript unten misst die
-    Stelle und setzt `--marke-x` / `--marke-y`.
+    Die Ebene der Zeichnung deckt den Bereich genau — sie liegt auf
+    seinen vier Kanten und ist damit immer volle Breite. Verschoben
+    wird nicht die Ebene, sondern die Zeichnung DARIN: Ihr Mittelpunkt
+    ist die Praxis und liegt unter der Spitze der Marke, wo immer die
+    gerade sitzt. Maß und Lage rechnet das Skript unten aus (`--karte-mass`,
+    `--karte-lage`) und wählt das Maß dabei so groß, dass die Zeichnung
+    auch bei weit außen stehender Marke bis in alle Ecken reicht.
 
-    Breite und Höhe sind das Doppelte des jeweils längeren Wegs zum
-    Rand — so deckt die Zeichnung den Bereich, egal wohin die Marke
-    rückt.
+    Ohne JavaScript bleibt es bei `cover` und mittiger Lage — der Punkt
+    sitzt dann in der Mitte, wie die Zeichnung selbst.
   */
   .kontakt__bild {
     position: absolute;
-    left: var(--marke-x, 50%);
-    top: var(--marke-y, 50%);
+    inset: 0;
     display: block;
-    width: calc(2 * max(var(--marke-x, 50%), 100% - var(--marke-x, 50%)));
-    height: calc(2 * max(var(--marke-y, 50%), 100% - var(--marke-y, 50%)));
-    translate: -50% -50%;
-    background: url('/bilder/deko/karte-bietigheim.svg') center / var(--karte-mass, cover) no-repeat;
+    background-image: url('/bilder/deko/karte-bietigheim.svg');
+    background-repeat: no-repeat;
+    background-size: var(--karte-mass, cover);
+    background-position: var(--karte-lage, center);
     /* Fährt beim Hereinscrollen ganz leicht heran — das ist der
-       Anflug der Entwurfsfassung, nur ohne Karten-Bibliothek. Weil der
-       Mittelpunkt die Praxis ist, fliegt sie genau auf die Marke zu. */
+       Anflug der Entwurfsfassung, nur ohne Karten-Bibliothek. Der
+       Bezugspunkt ist die Marke: Die Praxis bleibt beim Anflug stehen,
+       alles andere kommt auf sie zu. */
+    transform-origin: var(--marke-x, 50%) var(--marke-y, 50%);
     scale: 1.1;
     transition: scale 2.2s cubic-bezier(0.22, 0.61, 0.24, 1);
   }
@@ -488,9 +489,45 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
 
     const text = bereich.querySelector<HTMLElement>('.kontakt__text');
     const formular = bereich.querySelector<HTMLElement>('.kontakt__formular');
+    const knoepfe = bereich.querySelector<HTMLElement>('.kontakt__knoepfe');
 
     /** Breite und Höhe der Marke (CSS) — sie darf nirgends anstoßen. */
     const MARKE = { breit: 52, hoch: 72 };
+
+    /** Luft, die links und rechts der Marke frei bleiben soll. */
+    const LUFT = 56;
+
+    /**
+     * Wie weit der Text WIRKLICH nach rechts reicht.
+     *
+     * Die Kästen der Absätze laufen über die ganze Spalte, der Satz
+     * darin endet aber viel früher. Gemessen wird deshalb der Text
+     * selbst (die Zeilenkästen eines Bereichs über den Inhalt), nicht
+     * das Element — sonst säße die Marke zu weit rechts (Florian,
+     * 18. September 2026).
+     */
+    const inhaltRechts = (el: HTMLElement): number => {
+      let rechts = 0;
+      /* Jede Textzeile einzeln: Ein Bereich über das ganze Element
+         lieferte für Absätze deren Kasten zurück, und der läuft über
+         die volle Spalte. */
+      const lauf = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      const stelle = document.createRange();
+      for (let knoten = lauf.nextNode(); knoten; knoten = lauf.nextNode()) {
+        if (!knoten.nodeValue?.trim()) continue;
+        stelle.selectNodeContents(knoten);
+        for (const zeile of stelle.getClientRects()) {
+          if (zeile.width > 0) rechts = Math.max(rechts, zeile.right);
+        }
+      }
+      /* Die Knöpfe sind breiter als ihre Beschriftung — sie zählen mit
+         ihrem Kasten. */
+      for (const knopf of el.querySelectorAll('a, button')) {
+        const k = knopf.getBoundingClientRect();
+        if (k.width > 0) rechts = Math.max(rechts, k.right);
+      }
+      return rechts || el.getBoundingClientRect().right;
+    };
 
     const markeStellen = () => {
       if (!text || !formular) return;
@@ -508,10 +545,19 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
       let y: number;
       let art: string;
 
-      if (nebeneinander) {
+      if (nebeneinander && f.left - inhaltRechts(text) >= MARKE.breit + 2 * LUFT) {
+        /* Genug Lücke: die Marke steht mittig zwischen dem Text links
+           und der Formularkarte rechts. */
         art = 'breit';
-        x = (t.right + f.left) / 2 - b.left;
+        x = (inhaltRechts(text) + f.left) / 2 - b.left;
         y = f.top + f.height * 0.62 - b.top;
+      } else if (nebeneinander) {
+        /* Zu eng dazwischen — dann unter die beiden Knöpfe (Florian,
+           18. September 2026). Dort ist auf jeder Breite Platz. */
+        art = 'unterknoepfe';
+        const kn = (knoepfe ?? text).getBoundingClientRect();
+        x = (kn.left + kn.right) / 2 - b.left;
+        y = t.bottom - b.top + MARKE.hoch + 24;
       } else if (platzRechts > MARKE.breit + 64) {
         art = 'seite';
         x = (f.right + b.right) / 2 - b.left;
@@ -530,13 +576,27 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
       bereich.style.setProperty('--marke-x', `${Math.round(x)}px`);
       bereich.style.setProperty('--marke-y', `${Math.round(y)}px`);
 
-      /* Die Ebene der Zeichnung ist größer als der Bereich, sobald die
-         Marke aus der Mitte rückt (siehe CSS). Ohne Zutun würde die
-         Zeichnung damit auch größer gezogen — sie soll aber immer so
-         groß sein, wie sie den BEREICH gerade deckt. Deshalb steht das
-         Maß hier ausdrücklich, statt es `cover` zu überlassen. */
-      const f2 = Math.max(b.width / 1920, b.height / 1080);
-      bereich.style.setProperty('--karte-mass', `${Math.round(1920 * f2)}px ${Math.round(1080 * f2)}px`);
+      /*
+        Maß und Lage der Zeichnung: Ihr Mittelpunkt — die Praxis —
+        gehört unter die Spitze der Marke. Verschoben wird die
+        Zeichnung, nicht ihre Ebene; die deckt den Bereich ohnehin
+        (siehe CSS).
+
+        Das Maß ist so gewählt, dass sie auch nach dem Verschieben bis
+        in alle vier Ecken reicht: Vom Mittelpunkt bis zur fernsten
+        Kante ist es `max(x, Breite − x)` — das Doppelte davon ist die
+        Mindestbreite, senkrecht entsprechend.
+      */
+      const mass = Math.max(
+        b.width / 1920,
+        b.height / 1080,
+        (2 * Math.max(x, b.width - x)) / 1920,
+        (2 * Math.max(y, b.height - y)) / 1080,
+      );
+      const breit = Math.ceil(1920 * mass);
+      const hoch = Math.ceil(1080 * mass);
+      bereich.style.setProperty('--karte-mass', `${breit}px ${hoch}px`);
+      bereich.style.setProperty('--karte-lage', `${Math.round(x - breit / 2)}px ${Math.round(y - hoch / 2)}px`);
     };
 
     /* Die Reihenlücke hängt ihrerseits von `data-marke` ab — deshalb

@@ -141,9 +141,10 @@ const hoehe = (b: { bild_hoehe?: string }) => (b.bild_hoehe === 'voll' ? 'voll' 
   .block[data-bild='ohne'] { grid-template-columns: minmax(0, 1fr); }
   .block[data-bild='ohne'] .block__text { max-width: 46rem; }
 
+  /* Ohne abgerundete Ecken — das Bild steht als Fläche, nicht als
+     Kachel (Florian, 18. September 2026). */
   .block__bild {
     overflow: hidden;
-    border-radius: var(--radius-m);
   }
 
   .block__bild img {
