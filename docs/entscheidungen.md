@@ -743,3 +743,22 @@ Weichzeichner — sonst stünde er auf der bunten Karte.
   in der Kopfleiste wächst um 5 %. Alles respektiert reduzierte
   Bewegung.
 
+### Nachjustierung am Kartenband und im Kontakt (18. September 2026)
+
+- **Die Karte wirkt jetzt ruhiger statt unscharf.** Das Vorschaubild ist
+  1600 Bildpunkte breit und wird auf großen Schirmen hochgerechnet —
+  kräftig gezeigt sah man das. Deckkraft 38 % statt 50 %, und der
+  Kontrastfilter ist raus (er machte es matschig). Sauber wäre ein
+  größeres Kartenbild; das müsste die Praxis liefern.
+- **Oben eine harte Kante** wie auf dem Handy — die Maske blendet nur
+  noch nach unten aus (Florian).
+- **Der Punkt ist kleiner:** `max(20px, 1.85vw)` statt
+  `max(28px, 2.4vw)`. Er deckt damit den **Kopf** der Google-Marke
+  (29,5 Bildpunkte breit); die feine Spitze darunter bleibt bei 38 %
+  Deckkraft ohnehin unsichtbar. Größer wirkte er wie ein Fleck.
+- **Der Kontaktbereich ist wieder zweispaltig:** links die Anschrift
+  (mit „Telefon", „Fax", „E-Mail" als leiser Marke davor), rechts das
+  Formular. Seit die Karte ausgezogen ist, lief das Formular über die
+  ganze Inhaltsbreite — die Felder waren 745 px breit. Jetzt sind es
+  621 px, auf Handys die volle Spaltenbreite.
+

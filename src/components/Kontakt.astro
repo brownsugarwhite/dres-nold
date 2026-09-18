@@ -2,8 +2,10 @@
 /**
  * Kontakt — „So erreichen Sie uns".
  *
- * Aufbau: Kicker, Überschrift, darunter Adresse und Telefon
- * nebeneinander, dann das Formular.
+ * Aufbau: Kicker, Überschrift, Einleitung — darunter zweispaltig die
+ * Anschrift links und das Formular rechts. Die Anschrift stand vorher
+ * über der ganzen Breite und das Formular darunter; dessen Felder waren
+ * dadurch über einen Meter breit (Florian, 18. September 2026).
  *
  * Die Karte steckt seit dem 18. September 2026 nicht mehr hier, sondern
  * im Band „Anfahrt" am Fuß der Seite (Anfahrt.astro) — dort liegt sie
@@ -28,21 +30,23 @@ const { praxis } = seite;
     <h2 class="bereich__titel" data-rein>{texte.titel}</h2>
     {texte.text && <p class="bereich__einleitung" data-rein>{texte.text}</p>}
 
-    <div class="kontakt__adresse" data-rein>
-      <address class="kontakt__spalte">
-        <strong class="kontakt__praxis">Praxis {praxis.name.split('–')[0].trim()}</strong><br />
-        {praxis.strasse}<br />
-        {praxis.plz} {praxis.ort}
-      </address>
-
-      <address class="kontakt__spalte">
-        Telefon <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a><br />
-        Fax {praxis.fax}<br />
-        <a class="kontakt__mail" href={`mailto:${praxis.email}`}>{praxis.email}</a>
-      </address>
-    </div>
-
     <div class="kontakt__inhalt">
+      <div class="kontakt__adresse" data-rein>
+        <address class="kontakt__spalte">
+          <strong class="kontakt__praxis">Praxis {praxis.name.split('–')[0].trim()}</strong><br />
+          {praxis.strasse}<br />
+          {praxis.plz} {praxis.ort}
+        </address>
+
+        <address class="kontakt__spalte">
+          <span class="kontakt__marke">Telefon</span>
+          <a href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a><br />
+          <span class="kontakt__marke">Fax</span>{praxis.fax}<br />
+          <span class="kontakt__marke">E-Mail</span>
+          <a class="kontakt__mail" href={`mailto:${praxis.email}`}>{praxis.email}</a>
+        </address>
+      </div>
+
       <div class="kontakt__formular" data-rein>
         <div class="kicker kicker--klein">Nachricht</div>
         <h3 class="kontakt__formulartitel verlauf">{formulartexte.titel}</h3>
@@ -61,17 +65,36 @@ const { praxis } = seite;
     background: var(--farbe-flaeche);
   }
 
-  /* Adresse und Telefon nebeneinander, mit viel Luft dazwischen;
-     wird es eng, rutscht der zweite Block unter den ersten. */
+  /* Anschrift links, Formular rechts. Das Formular bekommt die größere
+     Spalte, aber keine, in der die Felder auseinanderlaufen. */
+  .kontakt__inhalt {
+    display: grid;
+    /* Gleich breite Spalten: Das Formular bekommt damit rund 600 px —
+       breit genug für zwei Felder nebeneinander, schmal genug, dass
+       eine Zeile nicht über den halben Schirm läuft. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 96px);
+    align-items: start;
+    margin-top: clamp(40px, 5vw, 64px);
+  }
+
+  /* In der Spalte stehen die beiden Blöcke untereinander */
   .kontakt__adresse {
     display: flex;
-    flex-wrap: wrap;
-    gap: clamp(28px, 5vw, 80px);
-    margin-top: 36px;
+    flex-direction: column;
+    gap: var(--abstand-m);
     color: var(--farbe-text);
     font-size: 17px;
     font-style: normal;
     line-height: 1.75;
+  }
+
+  /* „Telefon", „Fax", „E-Mail" als leise Marke davor — so liest sich
+     der Block als Tabelle, ohne eine zu sein. */
+  .kontakt__marke {
+    display: inline-block;
+    min-width: 4.6rem;
+    color: var(--farbe-text-gedeckt);
   }
 
   .kontakt__spalte { font-style: normal; }
@@ -94,11 +117,13 @@ const { praxis } = seite;
     color: var(--farbe-primaer);
   }
 
-  .kontakt__inhalt {
-    margin-top: clamp(40px, 5vw, 64px);
-  }
-
   .kontakt__formular { min-width: 0; }
+
+  @media (max-width: 900px) {
+    .kontakt__inhalt { grid-template-columns: 1fr; }
+    /* Einspaltig darf das Formular nicht die volle Breite fluten */
+    .kontakt__formular { max-width: 34rem; }
+  }
 
   .kontakt__formulartitel {
     margin: 14px 0 0;

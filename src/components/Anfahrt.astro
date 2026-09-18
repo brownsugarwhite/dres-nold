@@ -91,43 +91,50 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
     damit steht sie bei jeder Fenstergröße genau dort, wo unten der
     eigene Punkt sitzt.
 
-    Entsättigt und aufgehellt, oben und unten ins Weiß auslaufend: Das
-    Band soll den Ort andeuten, nicht ihn zeigen — lesbar bleiben muss
-    der Text darüber.
+    Entsättigt und weit zurückgenommen: Das Band soll den Ort andeuten,
+    nicht ihn zeigen — lesbar bleiben muss der Text darüber. Die
+    Zurückhaltung hat noch einen zweiten Grund: Das Vorschaubild ist
+    1600 Bildpunkte breit und wird auf großen Schirmen hochgerechnet;
+    kräftiger gezeigt wirkte es dort unscharf (Florian, 18. September
+    2026).
+
+    Oben eine harte Kante wie auf dem Handy, nur nach unten läuft es
+    ins Weiß aus.
   */
   .anfahrt__bild {
     position: absolute;
     inset: 0;
     display: block;
     background: url('/bilder/deko/karte-vorschau.jpg') var(--marke-x) var(--marke-y) / cover no-repeat;
-    filter: grayscale(1) contrast(0.82);
-    opacity: 0.5;
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 58%, transparent 96%);
-    mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 58%, transparent 96%);
+    filter: grayscale(1);
+    opacity: 0.38;
+    -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 96%);
+    mask-image: linear-gradient(to bottom, #000 58%, transparent 96%);
   }
 
   /*
     Der Punkt deckt die Google-Marke im Bild zu — dieselbe Stelle,
     dieselbe Größe.
 
-    Die Marke ist im Bild 37,5 Bildpunkte hoch (Kopf 29,5 plus die
-    Spitze darunter). Wie groß sie auf dem Schirm erscheint, hängt vom
-    Maßstab ab, mit dem `cover` das Bild einpasst: Ist das Fenster breit,
-    ist er Fensterbreite / 1600, also 37,5 / 1600 = 2,34 % der
-    Fensterbreite. Ist das Band dagegen hoch und schmal (Handy), zählt
-    die Höhe — dort bleibt die Marke unter 28 px. Beides zusammen:
+    Der Kopf der Marke ist im Bild 29,5 Bildpunkte breit. Wie groß er auf
+    dem Schirm erscheint, hängt vom Maßstab ab, mit dem `cover` das Bild
+    einpasst: Ist das Fenster breit, ist er Fensterbreite / 1600, also
+    1,85 % der Fensterbreite; bei hohem, schmalem Band zählt die Höhe.
+    Der Punkt ist genau so groß — er deckt den Kopf, die feine Spitze
+    darunter bleibt bei 38 % Deckkraft der Karte ohnehin unsichtbar.
+    Größer wirkte er wie ein Fleck (Florian, 18. September 2026).
   */
   .anfahrt__punkt {
     position: absolute;
     left: var(--marke-x);
     top: var(--marke-y);
-    width: max(28px, 2.4vw);
+    width: max(20px, 1.85vw);
     aspect-ratio: 1;
     translate: -50% -50%;
     border-radius: var(--radius-rund);
     background: var(--farbe-primaer);
     /* Weißer Saum: trennt den Punkt von der Karte darunter */
-    box-shadow: 0 0 0 max(3px, 0.22vw) var(--farbe-flaeche);
+    box-shadow: 0 0 0 max(2.5px, 0.17vw) var(--farbe-flaeche);
   }
 
   /* Der Ring geht immer wieder auf und verliert sich dabei */
