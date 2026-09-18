@@ -762,3 +762,34 @@ Weichzeichner — sonst stünde er auf der bunten Karte.
   ganze Inhaltsbreite — die Felder waren 745 px breit. Jetzt sind es
   621 px, auf Handys die volle Spaltenbreite.
 
+### Karte in eigener Größe, Popup aufgeräumt (18. September 2026)
+
+**Die Karte wird nicht mehr hochgerechnet.** `background-size: cover`
+zog die 1600 Bildpunkte des Vorschaubildes auf breiten Schirmen auf 2000
+und mehr — deutlich zu sehen, vor allem an Googles Beschriftung
+(Florian). Jetzt steht `auto`: Das Bild behält seine Größe. Auf schmalen
+Fenstern zeigt es einen Ausschnitt, auf breiten läuft es seitlich ins
+Weiß aus (zweite Maske, waagerecht). Die Ausrichtung stimmt weiterhin:
+`background-position: p%` richtet den p-%-Punkt des Bildes auf den
+p-%-Punkt der Fläche aus, unabhängig davon, welches größer ist.
+
+Weil Bildpunkte und Bildschirmpunkte jetzt dasselbe sind, brauchen
+Punkt und Schleier keine vw-Rechnung mehr: Der Punkt ist 30 px (der Kopf
+der Google-Marke misst 29,5), der Schleier 360 × 135 px.
+
+**Googles Beschriftung liegt unter einem weichen weißen Schleier** —
+eine Ellipse mit 24 px Weichzeichner. Ein Farbverlauf (`closest-side`)
+ließ an den Seiten Reste stehen: Er spannt eine Ellipse auf, die die
+Ecken des Kastens nicht erreicht.
+
+**Ganz sauber wird es erst mit einem anderen Kartenbild** — größer
+(etwa 3200 px) und ohne Beschriftung und Marke. Dann können Schleier und
+Ausrichtung entfallen und die Karte darf kräftiger gezeigt werden.
+
+**Das Popup:** Der dicke Ring um das Kreuz war der Fokusring des
+Browsers — das Skript setzte den Fokus beim Öffnen auf das Kreuz. Er
+geht jetzt auf den Dialog selbst (`tabindex="-1"`); mit der
+Tabulatortaste ist das Kreuz weiterhin das erste Ziel. Dazu rundherum
+gleich viel Innenabstand, ein kleinerer Radius und ruhiger gesetzter
+Text (16,5 px, Zeilenhöhe 1,6, gleichmäßige Absätze).
+

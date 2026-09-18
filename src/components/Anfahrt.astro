@@ -84,57 +84,89 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
   .anfahrt__karte[hidden] { display: none; }
 
   /*
-    Die Karte als Hintergrund statt als <img>: Mit `cover` richtet
-    `background-position` denselben Punkt des Bildes auf denselben Punkt
-    der Fläche aus. Die Google-Marke im Bild sitzt bei 52,77 % / 48,94 %
-    (ausgemessen: Mitte des Kopfes bei 844 / 474 von 1600 × 969) —
-    damit steht sie bei jeder Fenstergröße genau dort, wo unten der
-    eigene Punkt sitzt.
+    Die Karte als Hintergrund statt als <img>: `background-position: p%`
+    richtet den p-%-Punkt des Bildes auf den p-%-Punkt der Fläche aus —
+    unabhängig davon, welches von beiden größer ist. Die Google-Marke im
+    Bild sitzt bei 52,77 % / 48,94 % (ausgemessen: Mitte des Kopfes bei
+    844 / 474 von 1600 × 969), damit steht sie immer genau dort, wo
+    unten der eigene Punkt sitzt.
+
+    `background-size: auto` — das Bild wird NICHT hochgerechnet.
+    Vorher stand hier `cover`; auf breiten Schirmen zog das die 1600
+    Bildpunkte auf 2000 und mehr, und man sah es deutlich, vor allem an
+    Googles Beschriftung (Florian, 18. September 2026). Jetzt steht das
+    Bild in seiner eigenen Größe: Auf schmalen Fenstern zeigt es einen
+    Ausschnitt, auf breiten läuft es seitlich ins Weiß aus — dafür die
+    zweite Maske.
 
     Entsättigt und weit zurückgenommen: Das Band soll den Ort andeuten,
-    nicht ihn zeigen — lesbar bleiben muss der Text darüber. Die
-    Zurückhaltung hat noch einen zweiten Grund: Das Vorschaubild ist
-    1600 Bildpunkte breit und wird auf großen Schirmen hochgerechnet;
-    kräftiger gezeigt wirkte es dort unscharf (Florian, 18. September
-    2026).
-
-    Oben eine harte Kante wie auf dem Handy, nur nach unten läuft es
-    ins Weiß aus.
+    nicht ihn zeigen — lesbar bleiben muss der Text darüber. Oben eine
+    harte Kante wie auf dem Handy.
   */
   .anfahrt__bild {
     position: absolute;
     inset: 0;
     display: block;
-    background: url('/bilder/deko/karte-vorschau.jpg') var(--marke-x) var(--marke-y) / cover no-repeat;
+    background: url('/bilder/deko/karte-vorschau.jpg') var(--marke-x) var(--marke-y) / auto no-repeat;
     filter: grayscale(1);
     opacity: 0.38;
-    -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 96%);
-    mask-image: linear-gradient(to bottom, #000 58%, transparent 96%);
+    -webkit-mask-image:
+      linear-gradient(to bottom, #000 58%, transparent 96%),
+      linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+    mask-image:
+      linear-gradient(to bottom, #000 58%, transparent 96%),
+      linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
   }
 
   /*
-    Der Punkt deckt die Google-Marke im Bild zu — dieselbe Stelle,
-    dieselbe Größe.
+    Googles eigene Beschriftung deckt ein weicher weißer Schleier zu:
+    „Dr.med.dent. Paul Nold / Vor Kurzem angesehen" steht links neben
+    der Marke, „Bietigheim" darunter. Weil das Bild jetzt in seiner
+    eigenen Größe steht, sind Bildpunkte und Bildschirmpunkte dasselbe —
+    die Beschriftung nimmt rund 240 × 85 Punkte ein, der Schleier ist
+    großzügiger geschnitten und läuft nach außen aus.
 
-    Der Kopf der Marke ist im Bild 29,5 Bildpunkte breit. Wie groß er auf
-    dem Schirm erscheint, hängt vom Maßstab ab, mit dem `cover` das Bild
-    einpasst: Ist das Fenster breit, ist er Fensterbreite / 1600, also
-    1,85 % der Fensterbreite; bei hohem, schmalem Band zählt die Höhe.
-    Der Punkt ist genau so groß — er deckt den Kopf, die feine Spitze
-    darunter bleibt bei 38 % Deckkraft der Karte ohnehin unsichtbar.
-    Größer wirkte er wie ein Fleck (Florian, 18. September 2026).
+    Sauberer wäre ein Kartenbild ohne Beschriftung; dann könnte das
+    hier ersatzlos entfallen.
   */
-  .anfahrt__punkt {
+  .anfahrt__karte::after {
+    content: '';
     position: absolute;
     left: var(--marke-x);
     top: var(--marke-y);
-    width: max(20px, 1.85vw);
+    width: 360px;
+    height: 135px;
+    translate: -70% -32%;
+    /* Eine weiße Ellipse mit weich gezeichnetem Rand statt eines
+       Farbverlaufs: Der Verlauf ließ an den Seiten Reste der Schrift
+       stehen, weil `closest-side` eine Ellipse aufspannt, die die Ecken
+       des Kastens nicht erreicht. */
+    border-radius: 50%;
+    background: var(--farbe-flaeche);
+    filter: blur(24px);
+    pointer-events: none;
+  }
+
+  /*
+    Der Punkt deckt den Kopf der Google-Marke zu. Der ist im Bild
+    29,5 Punkte breit — und weil das Bild nicht mehr skaliert wird,
+    sind das auch auf dem Schirm 29,5 Punkte.
+  */
+  .anfahrt__punkt {
+    position: absolute;
+    /* Über dem Schleier, der die fremde Beschriftung zudeckt */
+    z-index: 1;
+    left: var(--marke-x);
+    top: var(--marke-y);
+    width: 30px;
     aspect-ratio: 1;
     translate: -50% -50%;
     border-radius: var(--radius-rund);
     background: var(--farbe-primaer);
     /* Weißer Saum: trennt den Punkt von der Karte darunter */
-    box-shadow: 0 0 0 max(2.5px, 0.17vw) var(--farbe-flaeche);
+    box-shadow: 0 0 0 3px var(--farbe-flaeche);
   }
 
   /* Der Ring geht immer wieder auf und verliert sich dabei */
@@ -210,11 +242,14 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
     margin-block: clamp(24px, 3vw, 40px);
   }
 
+  /* Sobald das Band niedrig wird, käme der Punkt hinter die Anschrift.
+     Ab hier rückt die Kartenebene nach oben (siehe `--karte-hoch`). */
+  @media (max-width: 1100px) {
+    .anfahrt { --karte-hoch: 150px; }
+  }
+
   @media (max-width: 700px) {
-    .anfahrt {
-      min-height: 480px;
-      --karte-hoch: 150px;
-    }
+    .anfahrt { min-height: 480px; }
     .anfahrt__inhalt { align-items: flex-start; }
     .anfahrt__knoepfe { width: 100%; }
     .anfahrt__knoepfe .kn {

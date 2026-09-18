@@ -37,6 +37,7 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
     role="dialog"
     aria-modal="true"
     aria-labelledby="hinweis-titel"
+    tabindex="-1"
     hidden
   >
     <div class="hinweis__blase">
@@ -101,13 +102,18 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
     transform: translateX(-100vw);
     transition: transform 800ms cubic-bezier(0.215, 0.61, 0.355, 1) 400ms;
     background: var(--farbe-flaeche);
-    border-radius: 30px;
-    padding: var(--abstand-l) var(--abstand-l) var(--abstand-m);
+    border-radius: var(--radius-l);
+    /* Rundherum gleich viel Luft, unten eine Spur mehr für den Knopf */
+    padding: clamp(28px, 4vw, 44px);
     width: 100%;
-    max-width: 34rem;
+    max-width: 33rem;
     max-height: 80vh;
     overflow-y: auto;
   }
+
+  /* Kein Fokusring um den Dialog selbst — er bekommt den Fokus nur,
+     damit die Tastatur im Kasten landet. */
+  .hinweis:focus { outline: none; }
 
   .hinweis__schliessen {
     position: absolute;
@@ -116,21 +122,32 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
   }
 
   .hinweis__titel {
-    margin: 16px 0 var(--abstand-s);
+    margin: 10px 0 0;
     /* Platz für das Kreuz daneben */
     padding-right: 64px;
     font-size: 34px;
     font-weight: var(--gewicht-leicht);
-    line-height: 1.16;
-    letter-spacing: -0.011em;
+    line-height: 1.12;
+    letter-spacing: -0.014em;
   }
 
   @media (max-width: 30rem) {
     .hinweis__titel { font-size: 28px; }
   }
 
+  /* Der Text steht ruhiger als der Fließtext der Seite: etwas kleiner,
+     etwas enger geführt, mit gleichmäßigem Abstand zwischen den
+     Absätzen (Florian, 18. September 2026). */
+  .hinweis__text {
+    margin-top: 22px;
+    color: var(--farbe-text);
+    font-size: 16.5px;
+    line-height: 1.6;
+  }
+
   .hinweis__text :global(p) {
-    margin-bottom: var(--abstand-2xs);
+    max-width: none;
+    margin: 0 0 12px;
   }
 
   .hinweis__text :global(p:last-child) {
@@ -142,11 +159,10 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
     flex-wrap: wrap;
     gap: 12px;
     width: 100%;
-    margin-top: 28px;
+    margin-top: 26px;
   }
 
   @media (max-width: 40rem) {
-    .hinweis__blase { padding: var(--abstand-m) var(--abstand-m) var(--abstand-s); }
     .hinweis__titel { padding-right: 56px; }
   }
 </style>
@@ -192,7 +208,12 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
     requestAnimationFrame(() => requestAnimationFrame(() => {
       kasten.setAttribute('data-offen', 'ja');
     }));
-    kasten.querySelector<HTMLButtonElement>('.hinweis__schliessen')?.focus();
+    /* Der Fokus geht auf den Dialog, nicht auf das Kreuz: Sonst zeichnet
+       der Browser seinen Fokusring um das Kreuz, und der sah beim
+       Öffnen aus wie ein zweiter, dicker Ring (Florian, 18. September
+       2026). Mit der Tabulatortaste ist das Kreuz weiterhin das erste,
+       was man erreicht. */
+    kasten.focus({ preventScroll: true });
 
     kasten.querySelector('.hinweis__schliessen')?.addEventListener('click', schliessen);
 
