@@ -23,6 +23,8 @@ Website der Zahnarzt- und Kieferorthopädie-Praxis **Dres. Nold**, Rosenstraße 
 >   Begrüßung und Band gehören also **nicht** als eigene Abschnitte in
 >   `main`.
 > - **Kein Briefumschlag** im Kontakt.
+> - **Die Karte liegt im Band „Anfahrt"** am Seitenfuß, nicht mehr im
+>   Kontaktbereich (`Anfahrt.astro`, 18. September 2026).
 > - **Google-Karte erst auf Klick** — Vorschaubild statt Banner, kein
 >   Fremdskript (geändert am 14. September 2026, siehe dort).
 >
@@ -333,7 +335,7 @@ Wenn Sie diese Seite mit einem KI-Assistenten erweitern wollen, geben Sie ihm di
 
 ## Rechtliches
 
-- **Einwilligung nur für die Google-Karte — und ohne Banner.** Im Kontaktbereich steht ein selbst gehostetes Vorschaubild; erst ein Klick darauf holt die Karte von Google (`src/components/Kontakt.astro`, `src/scripts/einwilligung.ts`). Bis dahin lädt die Seite nichts von fremden Servern, deshalb ist beim Seitenaufruf kein Einwilligungs-Banner nötig. Im Fußbereich lässt sich eine erteilte Zustimmung zurücknehmen. Jede weitere Fremdressource müsste denselben Weg gehen — oder besser: weggelassen werden.
+- **Einwilligung nur für die Google-Karte — und ohne Banner.** Am Fuß der Startseite liegt das Band „Anfahrt" mit einem selbst gehosteten Kartenbild; erst ein Klick auf „Karte anzeigen" holt die Karte von Google (`src/components/Anfahrt.astro`, `src/scripts/einwilligung.ts`). Bis dahin lädt die Seite nichts von fremden Servern, deshalb ist beim Seitenaufruf kein Einwilligungs-Banner nötig. Im Fußbereich lässt sich eine erteilte Zustimmung zurücknehmen. Jede weitere Fremdressource müsste denselben Weg gehen — oder besser: weggelassen werden.
 - **Impressum und Datenschutzerklärung sind getrennte Seiten** (in der Webflow-Version zeigten beide Footer-Links auf `/datenschutz`).
 - **Das Kontaktformular fragt bewusst keine Gesundheitsdaten ab.** Das darf sich nicht ändern — für Gesundheitsangaben wäre eine erheblich aufwendigere Absicherung nötig.
 - Cloudflare-AV-Vertrag ist im Konto der Praxis abzuschließen; Resend-Konto mit EU-Region anlegen.

@@ -9,24 +9,30 @@
  * es nicht — die Karte lädt erst, wenn man das Vorschaubild anklickt
  * (docs/entscheidungen.md, Abschnitt „Kontakt").
  *
- * Punktlinie oben, darunter nur die Verweise — schmal und ruhig. Das
- * Logo aus dem Entwurf ist wieder heraus (Florian, 17. September 2026):
- * Es steht schon in der Kopfleiste und im Startbereich.
+ * Eine Haarlinie oben, darunter links die Zeile mit dem Namen der
+ * Praxis, rechts die Verweise (Entwurf, 18. September 2026). Das Logo
+ * ist heraus (Florian, 17. September 2026): Es steht schon in der
+ * Kopfleiste und im Startbereich.
  *
  * Der große Innenabstand unten hält die Symbolleiste frei, die auf der
  * Startseite dort steht.
  */
+import seite from '../content/seite.json';
+
+const { praxis } = seite;
+const jahr = new Date().getFullYear();
 ---
 <footer class="fuss">
   <div class="fuss__inhalt">
+    <p class="fuss__marke">© {jahr} {praxis.name.replace('–', '·')} · {praxis.ort}</p>
+
     <nav class="fuss__links" aria-label="Rechtliches">
       <a href="/datenschutz/">Datenschutz</a>
-      <span class="punkt" aria-hidden="true"></span>
       <a href="/impressum/">Impressum</a>
       <span class="fuss__widerruf" data-karte-widerrufen-huelle hidden>
-        <span class="punkt" aria-hidden="true"></span>
         <button class="fuss__knopf" type="button" data-karte-widerrufen>Zustimmung zur Karte zurücknehmen</button>
       </span>
+      <button class="fuss__knopf" type="button" data-nach-oben>Nach oben</button>
     </nav>
   </div>
 
@@ -34,24 +40,33 @@
 </footer>
 
 <style>
-  /* Punktlinie oben wie an den Leisten */
   .fuss {
     position: relative;
     z-index: 40;
     width: 100%;
-    background: var(--farbe-flaeche) url('/bilder/deko/punktlinie.png') 0 0 repeat-x;
-    background-size: auto 1px;
+    background: var(--farbe-flaeche);
   }
 
+  /* Name links, Verweise rechts, darüber eine Haarlinie (Entwurf) */
   .fuss__inhalt {
     display: flex;
     flex-wrap: wrap;
-    gap: 14px;
+    gap: 14px clamp(24px, 4vw, 64px);
     align-items: center;
+    justify-content: space-between;
     width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
     margin-inline: auto;
+    border-top: 1px solid var(--farbe-linie);
     /* Unten so viel Luft, dass die Symbolleiste nichts verdeckt */
     padding-block: var(--abstand-m) clamp(120px, 14vw, 150px);
+  }
+
+  .fuss__marke {
+    margin: 0;
+    max-width: none;
+    color: var(--farbe-text-gedeckt);
+    font-size: 14.5px;
+    line-height: 1.4;
   }
 
   .fuss__links {
@@ -84,13 +99,6 @@
     text-underline-offset: 0.22em;
   }
 
-  .punkt {
-    width: 3px;
-    height: 3px;
-    border-radius: var(--radius-rund);
-    background: var(--farbe-text-leise);
-  }
-
   .fuss__widerruf {
     display: flex;
     align-items: center;
@@ -111,6 +119,7 @@
   .fuss__meldung:empty { display: none; }
 
   @media (max-width: 560px) {
+    .fuss__inhalt { justify-content: center; text-align: center; }
     .fuss__links { justify-content: center; width: 100%; row-gap: var(--abstand-2xs); }
   }
 </style>
@@ -140,6 +149,19 @@
     anzeigen();
   }
 
-  widerrufAufbauen();
-  document.addEventListener('astro:page-load', widerrufAufbauen);
+  /** „Nach oben" — sanft, und ohne eine Raute in der Adresse zu hinterlassen. */
+  function nachObenAufbauen() {
+    const knopf = document.querySelector<HTMLButtonElement>('[data-nach-oben]');
+    if (!knopf || knopf.dataset.bereit) return;
+    knopf.dataset.bereit = 'ja';
+    knopf.addEventListener('click', () => {
+      const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: ruhig ? 'auto' : 'smooth' });
+    });
+  }
+
+  const aufbauen = () => { widerrufAufbauen(); nachObenAufbauen(); };
+
+  aufbauen();
+  document.addEventListener('astro:page-load', aufbauen);
 </script>

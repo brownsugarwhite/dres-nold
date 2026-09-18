@@ -669,3 +669,34 @@ am Startbereich). Oben steht nur die 40 px hohe Kontaktzeile, unten die
 nach oben gerutscht. Gemessen bei 375 × 812: Mitte des Blocks jetzt bei
 365 px, die Mitte zwischen den beiden Leisten liegt bei 371 px.
 
+### Das Band „Anfahrt" (18. September 2026)
+
+Die Karte steht nicht mehr als Kasten neben dem Formular, sondern als
+**Band über die volle Breite am Fuß der Startseite** (Entwurf):
+entsättigtes Kartenbild, nach oben und unten ins Weiß auslaufend, darauf
+ein pulsierender Punkt an der Praxis; links unten Anschrift und Hinweis,
+rechts unten „Karte anzeigen" und „Route planen". Darunter der
+Fußbereich mit Haarlinie, links der Praxisname, rechts Datenschutz ·
+Impressum · Nach oben.
+
+**Wie Punkt und Karte zusammenfinden:** Das Bild liegt als
+`background-size: cover`. Bei `cover` richtet `background-position: p%`
+den p-%-Punkt des Bildes auf den p-%-Punkt der Fläche aus. Die Praxis
+liegt bei **52,8 % / 49,2 %** des Bildes — mit genau diesen Werten als
+Position steht sie bei jeder Fenstergröße an derselben Stelle der
+Fläche, und dort sitzt auch der Punkt. Kein Rechnen im Skript.
+
+Auf schmalen Fenstern wäre der Punkt hinter der Anschrift gelandet.
+Dort rückt die ganze Kartenebene 150 px nach oben und wird um dasselbe
+Maß höher — Bild und Punkt liegen in derselben Ebene und bleiben dabei
+aufeinander.
+
+**Der Einwilligungshinweis bleibt vollständig.** Der Entwurf schreibt
+„Die Karte wird erst auf Wunsch von Google geladen"; daraus ist „Die
+Karte lädt erst auf Klick — dabei erhält Google Ihre IP-Adresse"
+geworden. Ohne den zweiten Halbsatz wäre die Einwilligung nicht
+informiert (§ 25 TDDDG).
+
+Ist die Karte geladen, bekommt der Textblock eine weiße Fläche mit
+Weichzeichner — sonst stünde er auf der bunten Karte.
+
