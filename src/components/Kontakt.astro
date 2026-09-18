@@ -35,10 +35,26 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
 <section class="kontakt" id="contact" data-verlauf>
   {/* Der Kartengrund. Rein schmückend — die Anschrift steht daneben im
       Text, deshalb ohne Beschriftung für Vorleseprogramme. */}
-  <div class="kontakt__karte" aria-hidden="true">
+  <div class="kontakt__karte" data-karte aria-hidden="true">
     <span class="kontakt__bild"></span>
-    <span class="kontakt__punkt"><span class="kontakt__welle"></span></span>
+    <span class="kontakt__toenung"></span>
+    <span class="kontakt__schleier"></span>
+    <span class="kontakt__marke">
+      <svg viewBox="0 0 120 120" focusable="false">
+        <circle class="kontakt__ring" cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="1.5" />
+        <circle class="kontakt__ring kontakt__ring--zwei" cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="1.5" />
+        <circle cx="60" cy="60" r="16" fill="#fff" />
+        <circle cx="60" cy="60" r="10" fill="currentColor" />
+      </svg>
+    </span>
   </div>
+
+  {/* Die Zeichnung beruht auf OpenStreetMap-Daten; deren Lizenz (ODbL)
+      verlangt die Namensnennung. Unten rechts an der Karte, wie im
+      Entwurf. */}
+  <p class="kontakt__herkunft">
+    Kartengrundlage: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap-Mitwirkende</a>
+  </p>
 
   <div class="kontakt__inhalt">
     <div class="kontakt__text" data-rein>
@@ -77,10 +93,6 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
 
 <style>
   .kontakt {
-    /* Die Stelle der Praxis im Kartenbild — Bildausrichtung und Punkt
-       benutzen dieselben Werte, deshalb stehen sie hier einmal. */
-    --marke-x: 52.77%;
-    --marke-y: 48.94%;
     position: relative;
     z-index: 40;
     width: 100%;
@@ -89,99 +101,136 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
   }
 
   /*
-    Die Kartenebene. Sie rückt nach oben und zur Seite, damit der Punkt
-    an der Praxis in der freien Fläche links steht und nicht halb hinter
-    der Formularkarte verschwindet. Sie wird dabei um dasselbe Maß
-    größer, damit an den Kanten keine Lücke entsteht — und weil Bild und
-    Punkt in derselben Ebene liegen, bleiben sie dabei aufeinander.
+    Der Kartengrund. Die Zeichnung ist ein eigenes SVG aus
+    OpenStreetMap-Daten (Handoff vom 18. September 2026): Straßen,
+    Gebäude und Grünflächen, keine Beschriftung, keine fremde Marke —
+    und als Vektor auf jedem Schirm scharf. Sie liegt unter
+    `public/bilder/deko/`, es wird nichts nachgeladen.
+
+    Die Praxis liegt in der Mitte der Zeichnung; darauf sitzt die Marke.
   */
   .kontakt__karte {
     position: absolute;
-    /* Links verankert: Die Ebene wird nach rechts breiter und danach
-       nach links geschoben — so reicht sie über beide Kanten hinaus.
-       Rechts verankert blieb rechts ein Streifen ohne Karte. */
-    inset: 0 auto auto 0;
-    width: calc(100% + var(--karte-seit, 0px));
-    height: calc(100% + var(--karte-hoch, 0px));
-    transform: translate(calc(-1 * var(--karte-seit, 0px)), calc(-1 * var(--karte-hoch, 0px)));
+    inset: 0;
   }
 
-  /*
-    `background-position: p%` richtet den p-%-Punkt des Bildes auf den
-    p-%-Punkt der Fläche aus — unabhängig davon, welches größer ist.
-
-    `cover`, damit die Karte über die ganze Breite geht (Florian,
-    18. September 2026). Das Bild ist 1600 Bildpunkte breit und wird
-    dabei auf breiten Schirmen gestreckt — sobald es durch eine eigene
-    Grafik ersetzt ist, fällt das nicht mehr ins Gewicht.
-
-    Der Verlauf liegt nur oben: Die Karte blendet aus dem Weiß des
-    Abschnitts darüber ein und endet unten mit einer harten Kante am
-    Fußbereich.
-  */
   .kontakt__bild {
     position: absolute;
     inset: 0;
     display: block;
-    background: url('/bilder/deko/karte-vorschau.jpg') var(--marke-x) var(--marke-y) / cover no-repeat;
-    filter: grayscale(1);
-    opacity: 0.38;
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%);
-    mask-image: linear-gradient(to bottom, transparent, #000 22%);
+    background: url('/bilder/deko/karte-bietigheim.svg') center / cover no-repeat;
+    /* Fährt beim Hereinscrollen ganz leicht heran — das ist der
+       Anflug der Entwurfsfassung, nur ohne Karten-Bibliothek. */
+    transform: scale(1.1);
+    transform-origin: center;
+    transition: transform 2.2s cubic-bezier(0.22, 0.61, 0.24, 1);
   }
 
-  /*
-    Googles eigene Beschriftung deckt ein weiches weißes Oval zu:
-    „Dr.med.dent. Paul Nold / Vor Kurzem angesehen" steht links neben
-    der Marke, „Bietigheim" darunter. Sobald ein eigenes Kartenbild ohne
-    Beschriftung da ist, kann das hier ersatzlos entfallen.
-  */
-  .kontakt__karte::after {
-    content: '';
+  .kontakt[data-da] .kontakt__bild { transform: scale(1); }
+
+  /* Tönung in der Hausfarbe, 4,5 % (Handoff) */
+  .kontakt__toenung {
     position: absolute;
-    left: var(--marke-x);
-    top: var(--marke-y);
-    /* Mit `cover` wächst die Karte mit dem Fenster — der Schleier
-       ebenso. Die Bandhöhe hält den Maßstab bei etwa 1, deshalb der
-       Mindestwert. */
-    width: max(380px, 23vw);
-    height: max(145px, 8.7vw);
-    translate: -70% -32%;
-    border-radius: 50%;
-    background: var(--farbe-flaeche);
-    filter: blur(24px);
+    inset: 0;
+    background: var(--farbe-primaer);
+    opacity: 0.045;
+    mix-blend-mode: multiply;
     pointer-events: none;
   }
 
-  /* Der Punkt deckt den Kopf der Google-Marke zu (im Bild 29,5 Punkte
-     breit, auf dem Schirm um den Maßstab von `cover` größer). */
-  .kontakt__punkt {
-    position: absolute;
-    z-index: 1;
-    left: var(--marke-x);
-    top: var(--marke-y);
-    width: max(32px, 1.9vw);
-    aspect-ratio: 1;
-    translate: -50% -50%;
-    border-radius: var(--radius-rund);
-    background: var(--farbe-primaer);
-    box-shadow: 0 0 0 3px var(--farbe-flaeche);
-  }
-
-  /* Der Ring geht immer wieder auf und verliert sich dabei */
-  .kontakt__welle {
+  /* Weiß von oben nach unten auslaufend — die Stufen aus dem Handoff.
+     Unten bleibt die Kante hart (Florian, 18. September 2026). */
+  .kontakt__schleier {
     position: absolute;
     inset: 0;
-    border: 1px solid var(--farbe-primaer);
-    border-radius: var(--radius-rund);
-    animation: kontakt-welle 2.8s var(--verlauf) infinite;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      #ffffff 0,
+      rgb(255 255 255 / 97%) 12%,
+      rgb(255 255 255 / 86%) 30%,
+      rgb(255 255 255 / 50%) 55%,
+      rgb(255 255 255 / 12%) 80%,
+      rgb(255 255 255 / 0) 100%
+    );
   }
 
-  @keyframes kontakt-welle {
-    0% { transform: scale(1); opacity: 0.8; }
-    70% { transform: scale(2.8); opacity: 0; }
-    100% { transform: scale(2.8); opacity: 0; }
+  @media (max-width: 1040px) {
+    .kontakt__schleier {
+      background: linear-gradient(
+        to bottom,
+        #ffffff 0,
+        rgb(255 255 255 / 97%) 16%,
+        rgb(255 255 255 / 85%) 36%,
+        rgb(255 255 255 / 40%) 56%,
+        rgb(255 255 255 / 0) 74%
+      );
+    }
   }
+
+  /*
+    Die Marke sitzt auf der Praxis — in der Mitte der Zeichnung. Zwei
+    Ringe gehen versetzt auf und verlieren sich (2,6 s, Versatz 1,3 s),
+    darunter der weiße Kern mit dem Punkt (Handoff).
+  */
+  .kontakt__marke {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(64px, 6vw, 104px);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    color: var(--farbe-primaer);
+    opacity: 0;
+    scale: 0.82;
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 0.61, 0.24, 1) 1.1s,
+      scale 0.7s cubic-bezier(0.22, 0.61, 0.24, 1) 1.1s;
+  }
+
+  .kontakt[data-da] .kontakt__marke { opacity: 1; scale: 1; }
+
+  .kontakt__marke svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 8px 14px rgb(30 8 22 / 22%));
+  }
+
+  .kontakt__ring {
+    transform-origin: 60px 60px;
+    animation: kontakt-ring 2.6s cubic-bezier(0.22, 0.61, 0.24, 1) infinite;
+  }
+
+  .kontakt__ring--zwei { animation-delay: 1.3s; }
+
+  @keyframes kontakt-ring {
+    0% { transform: scale(0.25); opacity: 0.75; }
+    100% { transform: scale(1); opacity: 0; }
+  }
+
+  .kontakt__herkunft {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    max-width: none;
+    margin: 0;
+    padding: 3px 10px;
+    border-radius: var(--radius-s) 0 0 0;
+    background: rgb(255 255 255 / 80%);
+    color: var(--farbe-text-gedeckt);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .kontakt__herkunft a {
+    color: var(--farbe-primaer);
+    text-decoration: none;
+  }
+
+  .kontakt__herkunft a:hover,
+  .kontakt__herkunft a:focus-visible { text-decoration: underline; }
 
   /* ---------- Inhalt ---------- */
 
@@ -307,17 +356,6 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     letter-spacing: -0.011em;
   }
 
-  .kontakt {
-    --karte-hoch: 150px;
-    --karte-seit: 300px;
-  }
-
-  /* Einspaltig steht die Formularkarte unter dem Text — dann muss die
-     Karte nicht zur Seite. */
-  @media (max-width: 900px) {
-    .kontakt { --karte-seit: 0px; }
-  }
-
   @media (max-width: 900px) {
     .kontakt__inhalt {
       grid-template-columns: 1fr;
@@ -331,8 +369,42 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .kontakt__welle { animation: none; opacity: 0.5; }
+    .kontakt__ring { animation: none; opacity: 0.35; transform: scale(0.75); }
+    .kontakt__bild,
+    .kontakt__marke,
     .kontakt__telefon,
     .kontakt__mail { transition: none; }
+    .kontakt__bild { transform: none; }
+    .kontakt__marke { opacity: 1; scale: 1; }
   }
 </style>
+
+<script>
+  /**
+   * Der Anflug: Sobald ein knappes Drittel des Bereichs im Bild ist,
+   * fährt die Karte von 110 % auf ihre Größe herunter und die Marke
+   * blendet auf — dieselbe Choreografie wie der `flyTo` des Entwurfs,
+   * nur ohne Karten-Bibliothek (Handoff, 18. September 2026).
+   */
+  function karteAufbauen() {
+    const bereich = document.querySelector<HTMLElement>('#contact');
+    if (!bereich || bereich.dataset.bereit) return;
+    bereich.dataset.bereit = 'ja';
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      bereich.dataset.da = 'ja';
+      return;
+    }
+
+    const beobachter = new IntersectionObserver((eintraege) => {
+      if (!eintraege.some((e) => e.isIntersecting)) return;
+      bereich.dataset.da = 'ja';
+      beobachter.disconnect();
+    }, { threshold: 0.3 });
+
+    beobachter.observe(bereich);
+  }
+
+  karteAufbauen();
+  document.addEventListener('astro:page-load', karteAufbauen);
+</script>

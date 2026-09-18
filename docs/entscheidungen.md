@@ -946,3 +946,33 @@ wie der Bereich aussieht. Sie sind aktiv geschaltet und **vor dem
 Livegang zu prüfen**: Umfang, Ansprechperson und die zugesagten
 Leistungen muss die Praxis bestätigen.
 
+### Die echte Karte (18. September 2026)
+
+Der zweite Handoff (`design_handoff_startseite 2/`) bringt den
+Kartenbereich fertig: eine **stilisierte Karte aus
+OpenStreetMap-Daten**, eingefärbt, mit weißem Verlauf von oben und einer
+pulsierenden Marke an der Praxis.
+
+Umgesetzt ist die **statische Fassung** — die der Handoff selbst als
+Möglichkeit (c) anbietet und die er unter „Offene Punkte für Florian"
+als Punkt 0 zur Entscheidung stellt:
+
+| | |
+|---|---|
+| Zeichnung | `karte-bietigheim-1920x1080.svg` aus dem Handoff, ohne die C2PA-Signatur (121 → 114 KB), liegt als `public/bilder/deko/karte-bietigheim.svg` |
+| Tönung | `--farbe-primaer` bei 4,5 %, `multiply` |
+| Weißverlauf | von oben, Stufen aus dem Handoff (100 % → 0 % am unteren Rand), unter 1040 px eigene Stufen |
+| Marke | zwei Ringe, 2,6 s, Versatz 1,3 s, darunter weißer Kern und Punkt |
+| Anflug | Die Karte fährt von 110 % auf ihre Größe herunter (2,2 s), die Marke blendet nach 1,1 s auf — ausgelöst, sobald 30 % des Bereichs im Bild sind |
+
+**Was NICHT übernommen ist: die Live-Karte mit Leaflet und
+OSM-Kacheln.** Sie würde bei jedem Seitenaufruf Kacheln von
+`tile.openstreetmap.org` holen. Das verstößt gegen die Grundregel „keine
+externen Ressourcen" (CLAUDE.md) — `scripts/pruefe-externe-ressourcen.mjs`
+würde den Build abbrechen, die Seite käme nicht online. Außerdem wäre
+die Einwilligung wieder fällig, die wir am selben Tag gerade abgeschafft
+haben. Das bleibt Florians Entscheidung; der Handoff sieht das genauso.
+
+Die Namensnennung „© OpenStreetMap-Mitwirkende" steht unten rechts an
+der Karte — die ODbL verlangt sie auch für die statische Zeichnung.
+
