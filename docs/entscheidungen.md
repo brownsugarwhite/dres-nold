@@ -1253,3 +1253,18 @@ kommt man auf jedem Bedienweg an beides.
 
 Ein Klick auf eine **Kategorie in der Blase** schließt sie sofort,
 statt erst beim Wegziehen des Zeigers.
+
+### Die Pfeile (18. September 2026)
+
+Der Pfeil der Leistungs-Blase — oben wie unten — hatte eine eigene
+Form: 1 px stark, runde Enden, Schenkel unter 38°. Neben den übrigen
+Pfeilen der Seite, die alle aus `icons/ui/pfeil-runter.svg` kommen
+(1,5 px, gerade Enden, Schenkel unter 45°), wirkte seine Spitze stumpf.
+
+Jetzt stimmt er in allem damit überein: Strichstärke 1,5, Enden gerade,
+Schenkel unter 45° — die Spitze ist ein spitzer Gehrungsstoß. Nachgemessen
+18 × 9 px, also derselbe 90°-Winkel wie beim kleinen Haken (11 × 5,7).
+
+Der Haken am Menüpunkt selbst steht 3 px näher am Wort (5 px Abstand
+statt 8), und die drei Kategorien im Handy-Menü sind 20 px eingerückt
+statt 6 — so lesen sie sich als Unterpunkte, ohne abgehängt zu wirken.

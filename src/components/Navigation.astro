@@ -656,16 +656,15 @@ const kategorien = (leistungen.kategorien ?? [])
 
   .mobilmenue__unter[data-offen] { grid-template-rows: 1fr; }
 
-  /* Nur so weit eingerückt, dass die kleinen Symbole auf der Mitte der
-     großen darüber stehen (44 − 32) / 2 = 6 px. Vorher standen sie um
-     die ganze Symbolbreite eingerückt und wirkten abgehängt (Florian,
-     18. September 2026). */
+  /* Eingerückt, damit die drei Kategorien als Unterpunkte zu lesen
+     sind — aber nicht um die ganze Symbolbreite, sonst wirken sie
+     abgehängt (Florian, 18. September 2026). */
   .mobilmenue__unterliste {
     display: flex;
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
-    padding-left: 6px;
+    padding-left: 20px;
   }
 
   .mobilmenue__unterpunkt {
@@ -790,7 +789,7 @@ const kategorien = (leistungen.kategorien ?? [])
   .menuepunkt__pfeil {
     position: absolute;
     left: 50%;
-    bottom: 14px;
+    bottom: 17px;
     width: 11px;
     height: 7px;
     margin-left: -5.5px;
@@ -900,11 +899,23 @@ const kategorien = (leistungen.kategorien ?? [])
     stroke-dasharray: 1 2;
   }
 
+  /*
+    Derselbe Haken wie unter „Leistungen" — nur größer.
+
+    Er war vorher dünner (1 statt 1,5), hatte runde Enden und einen
+    flacheren Winkel (104° statt 90°). Neben den übrigen Pfeilen der
+    Seite wirkte seine Spitze dadurch stumpf (Florian, 18. September
+    2026). Jetzt stimmen Strichstärke, Winkel und Enden mit
+    `icons/ui/pfeil-runter.svg` überein; die Spitze ist ein spitzer
+    Gehrungsstoß, kein abgerundeter.
+  */
   :global(.blase__pfeil) {
     fill: none;
     stroke: var(--farbe-punktlinie);
-    stroke-width: 1;
-    stroke-linecap: round;
+    stroke-width: 1.5;
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
+    stroke-miterlimit: 10;
   }
 
   /* Die Oberpunkte blenden nacheinander ein, während die Blase wächst:
@@ -1463,7 +1474,11 @@ const kategorien = (leistungen.kategorien ?? [])
         /* Kleiner Pfeil an der Grundlinie, auf den Menüpunkt zeigend */
         const py = y0 + s * 22;
         const sicht = Math.max(0, (anteil - 0.6) / 0.4);
-        pfeil.setAttribute('d', `M${f(knopfX - 9)} ${f(py + s * -7)} L${f(knopfX)} ${f(py)} L${f(knopfX + 9)} ${f(py + s * -7)}`);
+        /* Schenkel unter 45° — dieselbe Form wie der kleine Haken am
+           Menüpunkt (`icons/ui/pfeil-runter.svg`), nur größer. Vorher
+           standen sie flacher und die Spitze wirkte stumpf. */
+        const arm = 9;
+        pfeil.setAttribute('d', `M${f(knopfX - arm)} ${f(py + s * -arm)} L${f(knopfX)} ${f(py)} L${f(knopfX + arm)} ${f(py + s * -arm)}`);
         pfeil.setAttribute('opacity', f(sicht));
 
         /* Der Inhalt liegt in der voll aufgewölbten Blase */
