@@ -1111,21 +1111,38 @@ beginnt bei 790.
 Die Ursache lag tiefer als gedacht: Nicht die Lage sprang, sondern der
 INHALT. Auf der Übersicht ist das Bild beim Zeigen und über den
 Scrollweg vergrößert (zusammen bis 1,13), auf der Beitragsseite steht es
-unvergrößert — und gezeigt wird während des Übergangs immer die
-Momentaufnahme der ZIELseite. Beim Öffnen zoomte das Bild deshalb im
-ersten Bild heraus, beim Schließen hinein.
+unvergrößert. Und das ALTE Abbild war ausgeblendet (`display: none`),
+das neue stand von Anfang an voll da — das neue ist aber die Aufnahme
+der ZIELseite. Beim Öffnen zoomte das Bild deshalb im ersten Bild
+heraus, beim Schließen hinein.
 
-`scripts/uebergaenge.ts` misst den Unterschied und reicht ihn als
-`--morph-zoom` weiter; `styles/uebergaenge.css` lässt die Aufnahme genau
-dort beginnen, wo das Bild eben noch stand, und fährt sie über die Dauer
-des Übergangs auf ihr eigenes Maß. Auf dem Rückweg ist es der Kehrwert.
+Die Lösung ist einfacher als der erste Versuch: **Das alte Abbild bleibt
+liegen.** Es ist die Aufnahme dessen, was beim Klick auf dem Schirm
+stand — mit genau der Lage und der Vergrößerung dieses Moments. Es
+blendet nicht aus, sondern liegt voll deckend unter dem neuen, das
+darüber einblendet (55 % der Dauer). Das erste Bild des Übergangs ist
+damit pixelgenau das letzte Bild davor; nachgemessen an Bildschirmfotos
+130 ms nach dem Klick, in beide Richtungen nicht vom Zustand davor zu
+unterscheiden.
 
-Der Zeitpunkt der Messung ist dabei entscheidend: Auf dem Rückweg wird
-in `astro:page-load` gemessen, nicht in `astro:after-swap` — vorher
-steht die Karte noch nicht an ihrem Platz und die Vergrößerung ist noch
-nicht gesetzt. Die Formel dafür (`durchlauf`, `A3_ZUWACHS`) steht jetzt
-in `scripts/scrollwege.ts`, damit Beitragsbilder und Seitenwechsel
-dieselbe verwenden.
+Bleibt das Überblenden selbst: Zwei Aufnahmen desselben Fotos liegen
+dabei übereinander, verschieden stark vergrößert. Damit sie sich
+decken, wandert die eine auf die andere zu — um `--morph-zoom`, das
+`scripts/uebergaenge.ts` misst (immer ≥ 1). Auf dem Hinweg beginnt das
+neue Abbild bei der Vergrößerung der Karte, auf dem Rückweg wächst das
+alte dem neuen entgegen. **Vergrößert wird dabei nur, nie verkleinert** —
+sonst träte unter dem Abbild die Hülle hervor.
+
+Zwei Feinheiten, an denen es zunächst scheiterte:
+
+- Der Wert muss den Seitentausch überleben. Astro übernimmt die
+  Attribute des NEUEN `<html>`; ein Stil am alten wäre danach fort. Er
+  wird deshalb in `astro:before-swap` mitgegeben.
+- Auf dem Rückweg wird in `astro:page-load` gemessen, nicht in
+  `astro:after-swap` — vorher steht die Karte noch nicht an ihrem Platz
+  und die Vergrößerung ist noch nicht gesetzt. Die Formel dafür
+  (`durchlauf`, `A3_ZUWACHS`) steht jetzt in `scripts/scrollwege.ts`,
+  damit Beitragsbilder und Seitenwechsel dieselbe verwenden.
 
 **Die Ansprechperson springt nicht mehr.** Sie klebt beim Scrollen, und
 `position: sticky` wirkt erst, wenn der beschnittene Vorfahre den

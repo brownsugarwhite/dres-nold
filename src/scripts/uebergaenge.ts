@@ -69,14 +69,12 @@ function kennzeichenAbraeumen() {
  * (`.beitrag__bild`) und eine über den Scrollweg (`.beitrag__lauf`).
  * Auf der Beitragsseite steht es unvergrößert.
  *
- * Genau daraus entstand der Sprung, den man beim Morphen sah: Der
- * Browser zeigt während des Übergangs die Aufnahme der ZIELseite —
- * und die ist anders vergrößert als das, was einen Wimpernschlag
- * vorher unter dem Zeiger stand. Der Unterschied wird deshalb gemessen
- * und als `--morph-zoom` weitergereicht; styles/uebergaenge.css lässt
- * die Aufnahme damit genau dort beginnen, wo das Bild eben noch stand,
- * und fährt sie über die Dauer des Übergangs auf ihr eigenes Maß
- * (Florian, 18. September 2026).
+ * Während des Übergangs liegen beide Aufnahmen übereinander. Damit sie
+ * sich beim Überblenden decken, wandert die eine auf die andere zu —
+ * um genau diesen Unterschied. Er heißt `--morph-zoom` und ist immer
+ * die größere der beiden Vergrößerungen geteilt durch die kleinere,
+ * also ≥ 1; welche Aufnahme sich bewegt, entscheidet die Richtung
+ * (styles/uebergaenge.css; Florian, 18. September 2026).
  */
 function bildZoom(karte: Element | null | undefined): number {
   const lauf = karte?.querySelector<HTMLElement>('.beitrag__lauf');
@@ -144,7 +142,7 @@ document.addEventListener('astro:before-preparation', (ereignis) => {
 
   /* Hinweg: Die Aufnahme der Beitragsseite zeigt das Bild unvergrößert
      — sie beginnt deshalb bei der Vergrößerung der Karte. */
-  zoomMerken(document.documentElement, bildZoom(karte));
+  zoomMerken(document.documentElement, Math.max(1, bildZoom(karte)));
 
   /* Rückweg zur Startseite — über das Schließen-Kreuz (dann steht der
      Merker schon) oder über den Zurück-Knopf des Browsers. Dabei blendet
@@ -178,7 +176,7 @@ document.addEventListener('astro:after-swap', () => {
   /* Ein erster Wert, falls der Wechsel hier schon endet. Der genaue
      folgt in `astro:page-load` — dann steht das Bild an seinem Platz
      und die Seite hat sich gesetzt. */
-  zoomMerken(document.documentElement, 1 / (bildZoomDanach(karte) || 1));
+  zoomMerken(document.documentElement, Math.max(1, bildZoomDanach(karte)));
 });
 
 /* Astro tauscht beim Wechsel das ganze Dokument aus — die Richtung des
@@ -193,6 +191,12 @@ document.addEventListener('astro:before-swap', (ereignis) => {
   if (document.documentElement.dataset.rueckmorph) {
     e.newDocument.documentElement.dataset.rueckmorph = 'ja';
   }
+
+  /* Astro übernimmt beim Tausch die Attribute des NEUEN <html> — was
+     hier als Stil steht, wäre danach fort. Der gemessene Unterschied
+     muss den Tausch aber überleben: Die Bewegung läuft erst danach. */
+  const zoom = document.documentElement.style.getPropertyValue('--morph-zoom');
+  if (zoom) e.newDocument.documentElement.style.setProperty('--morph-zoom', zoom);
 
   /* Aufräumen erst, wenn die Bewegung vorbei ist — siehe
      `kennzeichenAbraeumen()`. */
@@ -211,7 +215,7 @@ document.addEventListener('astro:page-load', () => {
      dem Rückweg ist das der Wert, der den Sprung verhindert. */
   if (uebergangLaeuft && document.documentElement.dataset.rueckmorph) {
     const karte = document.querySelector('[data-karte][data-morph]');
-    if (karte) zoomMerken(document.documentElement, 1 / (bildZoomDanach(karte) || 1));
+    if (karte) zoomMerken(document.documentElement, Math.max(1, bildZoomDanach(karte)));
   }
 
   /* Ohne echten Übergang (ältere Browser, reduzierte Bewegung) gibt es

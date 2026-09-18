@@ -186,39 +186,81 @@ html[data-rueckmorph] ::view-transition-new(root) {
 }
 
 /* --- Das Bild der Neuigkeiten wandert wirklich ------------------
-   Vorschaukarte und Beitragsseite zeigen dieselbe Datei. Deshalb wird
-   das alte Abbild gar nicht erst eingeblendet, und das neue steht von
-   Anfang an voll da: Was man sieht, ist ein einziges Bild, das an
-   seinen Platz wandert und dabei wächst — kein Überblenden zweier
-   Zuschnitte. */
+   Vorschaukarte und Beitragsseite zeigen dieselbe Datei — was man
+   sieht, soll ein einziges Bild sein, das an seinen Platz wandert und
+   dabei wächst. Wie das erreicht wird, steht gleich darunter. */
+
+/*
+  DAS ALTE ABBILD BLEIBT LIEGEN.
+
+  Es ist die Aufnahme dessen, was beim Klick auf dem Schirm stand —
+  mit genau der Lage und der Vergrößerung, die das Bild in diesem
+  Moment hatte. Deshalb blendet es nicht aus, sondern bleibt voll
+  deckend unter dem neuen liegen, das darüber einblendet. Das erste
+  Bild des Übergangs ist damit pixelgenau das letzte Bild davor
+  (Florian, 18. September 2026).
+
+  Vorher war es umgekehrt: Das alte Abbild war ausgeblendet und das
+  neue stand von Anfang an da. Das neue ist aber die Aufnahme der
+  ZIELseite — und dort ist das Bild anders vergrößert. Genau das war
+  der Sprung: beim Öffnen zoomte es heraus, beim Schließen herein.
+
+  Beide Abbilder füllen die Hülle ganz und machen deren Bewegung und
+  Wachstum mit; die Hülle beschneidet, damit beim Angleichen unten
+  nichts über die Kante tritt.
+*/
+::view-transition-image-pair(.bild) {
+  overflow: hidden;
+}
+
+::view-transition-old(.bild),
+::view-transition-new(.bild) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 ::view-transition-old(.bild) {
-  display: none;
+  animation: none;
+  opacity: 1;
+}
+
+::view-transition-new(.bild) {
+  animation: uebergang-blende-ein calc(var(--dauer-uebergang) * 0.55) var(--verlauf) both;
 }
 
 /*
-  Die gezeigte Aufnahme beginnt bei der Vergrößerung, die das Bild
-  einen Wimpernschlag vorher hatte, und fährt über die Dauer des
-  Übergangs auf ihr eigenes Maß.
+  Der letzte Rest: Während des Überblendens liegen zwei Aufnahmen
+  desselben Fotos übereinander, verschieden stark vergrößert. Damit sie
+  sich dabei decken, wandert die eine auf die andere zu — wie weit,
+  misst scripts/uebergaenge.ts und reicht es als `--morph-zoom` herein
+  (immer ≥ 1).
 
-  Ohne das sprang das Bild: Auf der Übersicht ist es beim Zeigen und
-  über den Scrollweg vergrößert, auf der Beitragsseite nicht — und
-  gezeigt wird während des Übergangs immer die Aufnahme der ZIELseite.
-  Den Unterschied misst scripts/uebergaenge.ts und reicht ihn als
-  `--morph-zoom` herein (Florian, 18. September 2026). Ist nichts
-  anzugleichen, steht die Eigenschaft nicht und der Anfangswert ist 1 —
-  dann bewegt sich hier nichts.
+  Auf dem Hinweg ist das alte Abbild das vergrößerte: Das neue beginnt
+  bei derselben Vergrößerung und fährt auf sein eigenes Maß zurück.
+  Auf dem Rückweg ist es umgekehrt, also wächst das alte dem neuen
+  entgegen. Vergrößert wird dabei nur — verkleinert nie, sonst träte
+  unter dem Abbild die Hülle hervor.
 */
-@keyframes uebergang-bild-angleichen {
+@keyframes uebergang-bild-heran {
   from { transform: scale(var(--morph-zoom, 1)); }
   to { transform: scale(1); }
 }
 
-::view-transition-new(.bild) {
-  animation: uebergang-bild-angleichen var(--dauer-uebergang) var(--verlauf-betont) both;
+@keyframes uebergang-bild-nach {
+  from { transform: scale(1); }
+  to { transform: scale(var(--morph-zoom, 1)); }
+}
+
+html:not([data-rueckmorph]) ::view-transition-new(.bild) {
+  animation:
+    uebergang-blende-ein calc(var(--dauer-uebergang) * 0.55) var(--verlauf) both,
+    uebergang-bild-heran var(--dauer-uebergang) linear both;
+}
+
+html[data-rueckmorph] ::view-transition-old(.bild) {
+  animation: uebergang-bild-nach var(--dauer-uebergang) linear both;
   opacity: 1;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 /* --- Die Leisten bleiben scharf und still ------------------------
