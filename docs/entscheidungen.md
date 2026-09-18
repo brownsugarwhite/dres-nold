@@ -686,6 +686,16 @@ liegt bei **52,8 % / 49,2 %** des Bildes — mit genau diesen Werten als
 Position steht sie bei jeder Fenstergröße an derselben Stelle der
 Fläche, und dort sitzt auch der Punkt. Kein Rechnen im Skript.
 
+**Der Punkt deckt die Google-Marke im Bild zu.** Sie ist dort 37,5
+Bildpunkte hoch (Kopf 29,5 plus Spitze) und sitzt mit ihrer Kopfmitte
+bei 844 / 474 von 1600 × 969 — beides ausgemessen. Wie groß sie auf dem
+Schirm erscheint, hängt vom Maßstab ab, mit dem `cover` das Bild
+einpasst: bei breitem Fenster Fensterbreite / 1600, also 2,34 % der
+Fensterbreite; bei hohem, schmalem Band zählt die Höhe. Der Punkt ist
+deshalb `max(28px, 2.4vw)` groß — gemessen bei 1440 px: Marke 33 px,
+Punkt 35 px; bei 375 px: Marke 24 px, Punkt 28 px. Dazu ein weißer Saum,
+der ihn von der Karte trennt.
+
 Auf schmalen Fenstern wäre der Punkt hinter der Anschrift gelandet.
 Dort rückt die ganze Kartenebene 150 px nach oben und wird um dasselbe
 Maß höher — Bild und Punkt liegen in derselben Ebene und bleiben dabei

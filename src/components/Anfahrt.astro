@@ -54,6 +54,10 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
 
 <style>
   .anfahrt {
+    /* Die Stelle der Praxis im Vorschaubild — Bildausrichtung und Punkt
+       benutzen dieselben Werte, deshalb stehen sie hier einmal. */
+    --marke-x: 52.77%;
+    --marke-y: 48.94%;
     position: relative;
     z-index: 40;
     display: flex;
@@ -82,9 +86,10 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
   /*
     Die Karte als Hintergrund statt als <img>: Mit `cover` richtet
     `background-position` denselben Punkt des Bildes auf denselben Punkt
-    der Fläche aus. Die Praxis liegt bei 52,8 % / 49,2 % des Bildes —
+    der Fläche aus. Die Google-Marke im Bild sitzt bei 52,77 % / 48,94 %
+    (ausgemessen: Mitte des Kopfes bei 844 / 474 von 1600 × 969) —
     damit steht sie bei jeder Fenstergröße genau dort, wo unten der
-    Punkt sitzt.
+    eigene Punkt sitzt.
 
     Entsättigt und aufgehellt, oben und unten ins Weiß auslaufend: Das
     Band soll den Ort andeuten, nicht ihn zeigen — lesbar bleiben muss
@@ -94,38 +99,50 @@ const karteEinbettung = 'https://maps.google.com/maps?q=' + encodeURIComponent(a
     position: absolute;
     inset: 0;
     display: block;
-    background: url('/bilder/deko/karte-vorschau.jpg') 52.8% 49.2% / cover no-repeat;
+    background: url('/bilder/deko/karte-vorschau.jpg') var(--marke-x) var(--marke-y) / cover no-repeat;
     filter: grayscale(1) contrast(0.82);
     opacity: 0.5;
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 58%, transparent 96%);
     mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 58%, transparent 96%);
   }
 
-  /* Sitzt auf der Praxis — dieselben Anteile wie die Bildausrichtung */
+  /*
+    Der Punkt deckt die Google-Marke im Bild zu — dieselbe Stelle,
+    dieselbe Größe.
+
+    Die Marke ist im Bild 37,5 Bildpunkte hoch (Kopf 29,5 plus die
+    Spitze darunter). Wie groß sie auf dem Schirm erscheint, hängt vom
+    Maßstab ab, mit dem `cover` das Bild einpasst: Ist das Fenster breit,
+    ist er Fensterbreite / 1600, also 37,5 / 1600 = 2,34 % der
+    Fensterbreite. Ist das Band dagegen hoch und schmal (Handy), zählt
+    die Höhe — dort bleibt die Marke unter 28 px. Beides zusammen:
+  */
   .anfahrt__punkt {
     position: absolute;
-    left: 52.8%;
-    top: 49.2%;
-    width: 14px;
-    height: 14px;
-    margin: -7px 0 0 -7px;
+    left: var(--marke-x);
+    top: var(--marke-y);
+    width: max(28px, 2.4vw);
+    aspect-ratio: 1;
+    translate: -50% -50%;
     border-radius: var(--radius-rund);
     background: var(--farbe-primaer);
+    /* Weißer Saum: trennt den Punkt von der Karte darunter */
+    box-shadow: 0 0 0 max(3px, 0.22vw) var(--farbe-flaeche);
   }
 
   /* Der Ring geht immer wieder auf und verliert sich dabei */
   .anfahrt__welle {
     position: absolute;
-    inset: -3px;
+    inset: 0;
     border: 1px solid var(--farbe-primaer);
     border-radius: var(--radius-rund);
     animation: anfahrt-welle 2.8s var(--verlauf) infinite;
   }
 
   @keyframes anfahrt-welle {
-    0% { transform: scale(1); opacity: 0.85; }
-    70% { transform: scale(3.6); opacity: 0; }
-    100% { transform: scale(3.6); opacity: 0; }
+    0% { transform: scale(1); opacity: 0.8; }
+    70% { transform: scale(2.8); opacity: 0; }
+    100% { transform: scale(2.8); opacity: 0; }
   }
 
   .anfahrt__inhalt {
