@@ -140,7 +140,11 @@
      Gruppen darin, und der Seitenrand. */
   --abstand-abschnitt: clamp(80px, 9vw, 124px);
   --abstand-gruppe: clamp(48px, 6vw, 72px);
-  --abstand-seitenrand: 24px;
+  /* Wächst mit dem Fenster: Auf Handys bleiben es 24 px (dort ist es
+     richtig so), auf mittleren Fenstern wird der Rand deutlich breiter,
+     damit der Inhalt nicht an den Kanten klebt (Florian, 18. September
+     2026). Ab etwa 1120 px greift ohnehin `--breite-inhalt`. */
+  --abstand-seitenrand: clamp(24px, 5vw, 56px);
 
   /* --- Layout ---------------------------------------------------- */
   /* 1360 statt 1200: Das Bilderband steckt seit dem 17. September 2026

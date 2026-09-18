@@ -141,6 +141,8 @@ const kategorien = (leistungen.kategorien ?? [])
                 <span class="menuepunkt__text">{e.titel}</span>
                 <span class="menuepunkt__text" aria-hidden="true">{e.titel}</span>
               </span>
+              {/* Kleiner Haken: zeigt, dass hier etwas aufgeht */}
+              <span class="menuepunkt__pfeil" aria-hidden="true"></span>
             </button>
 
             <div class="aufklapp__inhalt" id="leistungsmenue" hidden>
@@ -180,9 +182,9 @@ const kategorien = (leistungen.kategorien ?? [])
   {/* Ausklappmenü für Handys — fährt unter der Kopfleiste auf (Ablauf a-25) */}
   <div class="mobilmenue" id="mobilmenue" data-mobilmenue>
     <div class="mobilmenue__inhalt">
-      {punkte.map((e) => (
+      {punkte.map((e, i) => (
         e.id === 'leistungen' ? (
-          <div class="mobilmenue__gruppe">
+          <div class="mobilmenue__gruppe" style={`--stufe: ${i}`}>
             {/* „Leistungen" klappt an Ort und Stelle auf — ein Akkordeon
                 mit den Kategorien, wie die Blase auf dem Desktop */}
             <button
@@ -211,7 +213,7 @@ const kategorien = (leistungen.kategorien ?? [])
             </div>
           </div>
         ) : (
-          <a class="mobilmenue__punkt" href={ziel(e)}>
+          <a class="mobilmenue__punkt" href={ziel(e)} style={`--stufe: ${i}`}>
             <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
             <span class="mobilmenue__text">{e.titel}</span>
           </a>
@@ -220,7 +222,7 @@ const kategorien = (leistungen.kategorien ?? [])
     </div>
 
     {/* .div-block-30: Punktlinie oben, 40 px hoch */}
-    <div class="mobilmenue__recht">
+    <div class="mobilmenue__recht" style={`--stufe: ${punkte.length}`}>
       <a href="/datenschutz/">Datenschutz</a>
       <a href="/impressum/">Impressum</a>
     </div>
@@ -476,10 +478,13 @@ const kategorien = (leistungen.kategorien ?? [])
      zum letzten Menüpunkt als zwischen den Punkten selbst. */
   .kopfleiste__telefon { margin-left: 4px; }
 
-  /* .nav-buttons-mobile / -desktop: beide 80 px hoch */
+  /* .nav-buttons-mobile / -desktop: beide 80 px hoch.
+     Logo ganz links, Menüknopf ganz rechts — und weil die Zeile so breit
+     ist wie die Liste im Aufklappmenü, steht das Logo genau über deren
+     Symbolen (Florian, 18. September 2026). */
   .kopfleiste__mobil {
     display: none;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     width: 100%;
     height: 80px;
@@ -526,21 +531,49 @@ const kategorien = (leistungen.kategorien ?? [])
     overflow-y: auto;
   }
 
-  /* .menu-button-container: 90 % Breite, 20 px Abstand oben */
+  /* Dieselbe Breite wie die Kopfleiste darüber — so steht das Logo
+     genau über den Symbolen dieser Liste. */
   .mobilmenue__inhalt {
     display: flex;
     flex-direction: column;
-    width: 90%;
-    margin: 12px auto 0;
+    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
+    margin: 4px auto 0;
   }
 
   .mobilmenue__punkt {
     display: flex;
     align-items: center;
     gap: var(--abstand-s);
-    padding: var(--abstand-2xs) 0;
+    padding: 10px 0;
     color: var(--farbe-primaer);
     text-decoration: none;
+  }
+
+  /* Haarlinien zwischen den Einträgen — die Liste liest sich dadurch
+     ruhiger als eine Reihe frei stehender Zeilen. */
+  .mobilmenue__inhalt > * + * {
+    border-top: 1px solid var(--farbe-linie-leise);
+  }
+
+  /*
+    Die Einträge fahren beim Öffnen von oben nach unten ein: leicht von
+    oben, dabei aufblendend, jeder eine Spur später als der davor
+    (Florian, 18. September 2026).
+  */
+  .mobilmenue__inhalt > *,
+  .mobilmenue__recht {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition:
+      opacity 420ms var(--verlauf-betont),
+      transform 420ms var(--verlauf-betont);
+  }
+
+  .navigation[data-menue-offen] .mobilmenue__inhalt > *,
+  .navigation[data-menue-offen] .mobilmenue__recht {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(120ms + var(--stufe, 0) * 55ms);
   }
 
   /* Symbolgröße wie in der unteren Leiste */
@@ -589,17 +622,22 @@ const kategorien = (leistungen.kategorien ?? [])
 
   .mobilmenue__unter[data-offen] { grid-template-rows: 1fr; }
 
+  /* Nur so weit eingerückt, dass die kleinen Symbole auf der Mitte der
+     großen darüber stehen (60 − 40) / 2 = 10 px. Vorher standen sie um
+     die ganze Symbolbreite eingerückt und wirkten abgehängt (Florian,
+     18. September 2026). */
   .mobilmenue__unterliste {
     display: flex;
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
-    padding-left: calc(60px + var(--abstand-s));
+    padding-left: 10px;
   }
 
   .mobilmenue__unterpunkt {
     gap: var(--abstand-xs);
-    padding: var(--abstand-2xs) 0;
+    padding: 10px 0;
+    border-top: 1px solid var(--farbe-linie-leise);
     opacity: 0;
     transform: translateY(-6px);
     transition:
@@ -652,6 +690,19 @@ const kategorien = (leistungen.kategorien ?? [])
     width: 80px;
     height: 80px;
     object-fit: contain;
+    transition: transform 0.5s var(--verlauf-betont);
+  }
+
+  .logo:hover img,
+  .logo:focus-visible img { transform: scale(1.05); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .logo img,
+    .fussknopf__symbol,
+    .fussknopf__text { transition: none; }
+    .menuepunkt__pfeil { transition: none; }
+    .logo:hover img,
+    .fussknopf:hover .fussknopf__symbol { transform: none; }
   }
 
   /* ---------- Menüpunkte mit Text-Roll ----------
@@ -676,6 +727,30 @@ const kategorien = (leistungen.kategorien ?? [])
     overflow: hidden;
     cursor: pointer;
   }
+
+  /*
+    Der Haken am Menüpunkt „Leistungen": Er steht absolut am rechten
+    Rand des Knopfes, nicht im Textfluss. Der Text darin rollt beim
+    Zeigen um 80 px hoch (`.menuepunkt__rolle`) — stünde der Haken
+    daneben im Fluss, rollte er mit und wäre weg.
+  */
+  .menuepunkt--knopf {
+    position: relative;
+    padding-right: 17px;
+  }
+
+  .menuepunkt__pfeil {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 11px;
+    height: 7px;
+    margin-top: -3px;
+    background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
+    transition: transform 350ms var(--verlauf-betont);
+  }
+
+  .menuepunkt--knopf[aria-expanded='true'] .menuepunkt__pfeil { transform: rotate(180deg); }
 
   .menuepunkt__rolle {
     display: flex;
@@ -916,6 +991,23 @@ const kategorien = (leistungen.kategorien ?? [])
     text-decoration: none;
   }
 
+  /* Beim Zeigen hebt sich das Symbol eine Spur an */
+  .fussknopf__symbol {
+    transition: transform 0.45s var(--verlauf-betont);
+  }
+
+  .fussknopf:hover .fussknopf__symbol,
+  .fussknopf:focus-visible .fussknopf__symbol {
+    transform: translateY(-4px) scale(1.06);
+  }
+
+  .fussknopf__text {
+    transition: opacity 0.35s var(--verlauf);
+  }
+
+  .fussknopf:hover .fussknopf__text,
+  .fussknopf:focus-visible .fussknopf__text { opacity: 0.65; }
+
   /* .nav-bottom-button-txt: 14 px, Gewicht 400 */
   .fussknopf__text {
     color: var(--farbe-primaer);
@@ -973,8 +1065,12 @@ const kategorien = (leistungen.kategorien ?? [])
   /* ---------- Kleine Bildschirme (Umbruchpunkt der Vorlage) ---------- */
   @media (max-width: 991px) {
     .kontaktzeile__inhalt,
-    .kopfleiste__inhalt,
     .fussleiste__inhalt { width: 90%; }
+
+    /* Dieselbe Breite wie die Liste im Aufklappmenü darunter */
+    .kopfleiste__inhalt {
+      width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
+    }
 
     /* Auf Handys die kurze Leiste statt der langen */
     .fussleiste__inhalt--gross { display: none; }

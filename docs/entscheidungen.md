@@ -710,3 +710,36 @@ informiert (§ 25 TDDDG).
 Ist die Karte geladen, bekommt der Textblock eine weiße Fläche mit
 Weichzeichner — sonst stünde er auf der bunten Karte.
 
+### Ränder, Menü und Hover-Feinschliff (18. September 2026)
+
+- **Der Seitenrand wächst mit dem Fenster:** `--abstand-seitenrand` ist
+  jetzt `clamp(24px, 5vw, 56px)`. Auf Handys bleiben es die bisherigen
+  24 px (dort war es richtig), auf mittleren Fenstern wird der Rand
+  deutlich breiter — vorher klebte der Inhalt dort an den Kanten
+  (Florian). Ab etwa 1470 px Fensterbreite greift ohnehin
+  `--breite-inhalt`.
+
+- **Logo und Menüknopf stehen an den Rändern** (`space-between` statt
+  `space-around`), und die Kopfleiste ist auf Handys so breit wie die
+  Liste im Aufklappmenü darunter. Dadurch steht das Logo **genau über
+  den Symbolen** der Liste — gemessen: beide Kanten bei 24 px.
+
+- **Das Aufklappmenü:** Haarlinien zwischen den Einträgen; die
+  aufgeklappten Leistungen nur noch 10 px eingerückt, sodass ihre
+  kleinen Symbole (40 px) auf der Mitte der großen (60 px) stehen —
+  gemessen: beide Mitten bei 54 px. Auch sie haben Haarlinien.
+
+- **Die Einträge fahren gestaffelt ein**, von oben nach unten: leicht
+  von oben, dabei aufblendend, jeder 55 ms später als der davor.
+  Gemessen nach 300 ms: 0,93 · 0,85 · 0,71 · 0,45 · 0,07 · 0 · 0.
+
+- **Der Menüpunkt „Leistungen" hat auf dem Desktop einen Haken**
+  bekommen — bisher war nicht zu sehen, dass dort etwas aufgeht. Er
+  steht **absolut** am rechten Rand des Knopfes: Der Text darin rollt
+  beim Zeigen um 80 px hoch, im Fluss wäre der Haken mitgerollt.
+
+- **Neue Zeige-Zustände:** Die Symbole der unteren Leiste heben sich um
+  4 px und wachsen leicht, ihre Beschriftung nimmt sich zurück; das Logo
+  in der Kopfleiste wächst um 5 %. Alles respektiert reduzierte
+  Bewegung.
+
