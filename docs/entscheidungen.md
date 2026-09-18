@@ -902,6 +902,25 @@ Eine Feinheit: In einer Zwischenüberschrift meldet der Browser „fett",
 weil sie fett gesetzt **ist** — angeklickt hat das niemand. Dort bleibt
 der Knopf deshalb aus.
 
+**Die Stellenliste, drei Änderungen** (Florian, 18. September 2026):
+
+- **Alle Zeilen sind beim Laden zu.** Vorher stand die erste offen.
+- **Zugeklappt steht ein Anriss** unter der Bezeichnung: der Anfang der
+  Beschreibung, ohne Auszeichnung, auf 110 Zeichen gekürzt. Er
+  verschwindet beim Aufklappen, sonst stünde er über seinem eigenen
+  Text.
+- **Ansprechperson und Bewerbungsknopf kleben oben** (`position:
+  sticky`, 80 px Kopfleiste plus Luft) und laufen bei langen Anzeigen
+  mit. Das ging nur mit einem Kniff: Die Klappe beschneidet ihren Inhalt
+  (`overflow: hidden`), und ein beschnittener Vorfahre wird selbst zum
+  Bezugsrahmen — `sticky` bliebe wirkungslos. Der Überlauf wird deshalb
+  erst freigegeben, wenn die Aufklapp-Bewegung steht (`data-offen`,
+  gesetzt in `transitionend`).
+- **Die Nummer steht außerhalb der Textspalte**, im Seitenrand daneben:
+  So beginnt die Bezeichnung auf derselben Fluchtlinie wie der Text
+  darunter. Einspaltig (unter 800 px) rückt sie zurück in die Zeile —
+  dort reicht der Seitenrand nicht.
+
 **Zwei Beispiel-Stellenanzeigen** stehen in `stellen.json` — echte,
 vollständige Anzeigen (ZFA und Prophylaxe/ZMP), damit die Praxis sieht,
 wie der Bereich aussieht. Sie sind aktiv geschaltet und **vor dem

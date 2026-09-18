@@ -4,9 +4,9 @@
  * Ist keine Stelle aktiv, erscheint der Bereich gar nicht.
  *
  * Gestaltung nach dem Handoff vom 17. September 2026: eine Liste auf
- * Haarlinien, jede Zeile klappt auf. Die erste aktive Stelle steht
- * beim Laden offen — so ist auf den ersten Blick zu sehen, dass hinter
- * den Zeilen etwas steckt.
+ * Haarlinien, jede Zeile klappt auf. **Alle Zeilen sind beim Laden
+ * zugeklappt** (Florian, 18. September 2026); dass etwas dahinter
+ * steckt, zeigt der Anriss unter der Bezeichnung.
  *
  * Ohne JavaScript sind alle Stellen offen (das Skript klappt sie erst
  * zu). Nichts ist dann unerreichbar.
@@ -22,6 +22,22 @@ const stellen = daten.eintraege
 
 /** Zweistellige Nummer vor jeder Zeile */
 const nummer = (i: number) => String(i + 1).padStart(2, '0');
+
+/**
+ * Anriss für die zugeklappte Zeile: der erste Satz der Beschreibung,
+ * ohne Auszeichnung und auf eine Zeile gekürzt.
+ */
+const anriss = (html: string, laenge = 110) => {
+  const text = html.replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (text.length <= laenge) return text;
+  const gekuerzt = text.slice(0, laenge);
+  const luecke = gekuerzt.lastIndexOf(' ');
+  return (luecke > 40 ? gekuerzt.slice(0, luecke) : gekuerzt) + ' …';
+};
 
 /** Bewerbung per E-Mail — mit der Stelle schon im Betreff */
 const bewerbung = (titel: string) =>
@@ -47,7 +63,12 @@ const bewerbung = (titel: string) =>
                 data-stellenknopf
               >
                 <span class="stelle__nummer" aria-hidden="true">{nummer(i)}</span>
-                <span class="stelle__titel">{s.titel}</span>
+                <span class="stelle__titel">
+                  {s.titel}
+                  {/* Nur zu sehen, solange die Zeile zu ist — sonst
+                      stünde der Anriss über seinem eigenen Text. */}
+                  {s.beschreibung && <span class="stelle__anriss">{anriss(s.beschreibung)}</span>}
+                </span>
                 {s.umfang && <span class="stelle__umfang">{s.umfang}</span>}
                 <span class="stelle__kreis" aria-hidden="true">
                   <span class="stelle__pfeil"></span>
@@ -100,6 +121,11 @@ const bewerbung = (titel: string) =>
     background: var(--farbe-flaeche);
   }
 
+  /* Wie weit die Nummer nach links aus der Spalte ragt. Sie braucht
+     rund 22 px plus Luft; mehr als der Seitenrand hergibt, darf es
+     nicht sein — sonst stünde sie außerhalb des Fensters. */
+  .stellen__liste { --nummer-versatz: 40px; }
+
   .stellen__liste {
     margin-top: 44px;
     border-top: 1px solid var(--farbe-linie);
@@ -110,6 +136,7 @@ const bewerbung = (titel: string) =>
   .stelle__kopf { margin: 0; }
 
   .stelle__knopf {
+    position: relative;
     display: flex;
     align-items: center;
     gap: clamp(16px, 2.5vw, 40px);
@@ -121,8 +148,13 @@ const bewerbung = (titel: string) =>
     cursor: pointer;
   }
 
+  /* Die Nummer steht AUSSERHALB der Textspalte, im Seitenrand daneben:
+     So beginnt die Bezeichnung auf derselben Fluchtlinie wie der Text
+     darunter (Florian, 18. September 2026). */
   .stelle__nummer {
-    flex: none;
+    position: absolute;
+    left: calc(-1 * var(--nummer-versatz));
+    top: clamp(28px, 3vw, 38px);
     color: var(--farbe-text-leise);
     font-size: var(--text-kicker);
     font-weight: var(--gewicht-mittel);
@@ -201,12 +233,32 @@ const bewerbung = (titel: string) =>
     min-height: 0;
   }
 
+  /* Steht die Zeile offen und ruht die Bewegung, darf der Überlauf
+     wieder sichtbar sein — sonst könnte die Ansprechperson daneben
+     nicht kleben: Ein beschnittener Vorfahre wird selbst zum
+     Bezugsrahmen, und `sticky` bliebe wirkungslos. */
+  .stelle__klappe[data-offen] .stelle__innen { overflow: visible; }
+
   .stelle__spalten {
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
     gap: clamp(24px, 3vw, 56px);
+    align-items: start;
     padding-bottom: clamp(28px, 3vw, 40px);
   }
+
+  /* Der Anriss zeigt bei zugeklappter Zeile, was dahintersteckt */
+  .stelle__anriss {
+    display: block;
+    max-width: 52ch;
+    margin-top: 6px;
+    color: var(--farbe-text-gedeckt);
+    font-size: 15px;
+    font-weight: var(--gewicht-normal);
+    line-height: 1.5;
+  }
+
+  .stelle__knopf[aria-expanded='true'] .stelle__anriss { display: none; }
 
   .stelle__text :global(p) {
     max-width: var(--breite-absatz);
@@ -220,7 +272,12 @@ const bewerbung = (titel: string) =>
     line-height: 1.55;
   }
 
+  /* Läuft beim Scrollen mit: Bei einer langen Anzeige bleiben
+     Ansprechperson und Bewerbungsknopf im Bild (Florian, 18. September
+     2026). 80 px sind die Kopfleiste, der Rest ist Luft. */
   .stelle__seite {
+    position: sticky;
+    top: calc(80px + var(--abstand-m));
     display: flex;
     flex-direction: column;
     gap: 22px;
@@ -258,6 +315,18 @@ const bewerbung = (titel: string) =>
     .stelle__spalten { grid-template-columns: 1fr; }
   }
 
+  /* Einspaltig gibt es nichts, woran etwas kleben könnte. Und weil der
+     Seitenrand dort nur 24 px misst, rückt die Nummer wieder in die
+     Zeile. */
+  @media (max-width: 800px) {
+    .stelle__seite { position: static; }
+
+    .stelle__nummer {
+      position: static;
+      flex: none;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .stelle__klappe,
     .stelle__pfeil,
@@ -269,9 +338,14 @@ const bewerbung = (titel: string) =>
   /**
    * Stellen auf- und zuklappen — nur eine gleichzeitig offen.
    *
-   * Im HTML stehen alle Zeilen offen. Erst dieses Skript klappt sie zu
-   * und lässt die erste stehen. Damit ist ohne JavaScript alles lesbar,
-   * statt dass die Inhalte verschwinden.
+   * Im HTML stehen alle Zeilen offen. Erst dieses Skript klappt sie zu —
+   * seit dem 18. September 2026 alle, auch die erste (Florian). Damit
+   * ist ohne JavaScript alles lesbar, statt dass die Inhalte
+   * verschwinden.
+   *
+   * `data-offen` kommt erst, wenn die Bewegung steht: Solange sie läuft,
+   * muss der Inhalt beschnitten bleiben, danach darf er überlaufen —
+   * nur so kann die Ansprechperson daneben kleben (siehe CSS).
    */
   function stellenAufbauen() {
     const liste = document.querySelector<HTMLElement>('[data-stellenliste]');
@@ -284,12 +358,20 @@ const bewerbung = (titel: string) =>
       knopf.setAttribute('aria-expanded', String(offen));
       const klappe = document.getElementById(knopf.getAttribute('aria-controls') || '');
       if (!klappe) return;
-      if (offen) delete klappe.dataset.zu;
-      else klappe.dataset.zu = 'ja';
+      delete klappe.dataset.offen;
+      if (offen) {
+        delete klappe.dataset.zu;
+        /* Nach der Bewegung darf der Inhalt überlaufen */
+        klappe.addEventListener('transitionend', () => {
+          if (!klappe.dataset.zu) klappe.dataset.offen = 'ja';
+        }, { once: true });
+      } else {
+        klappe.dataset.zu = 'ja';
+      }
     };
 
-    knoepfe.forEach((knopf, i) => {
-      setzen(knopf, i === 0);
+    knoepfe.forEach((knopf) => {
+      setzen(knopf, false);
       knopf.addEventListener('click', () => {
         const offen = knopf.getAttribute('aria-expanded') === 'true';
         knoepfe.forEach((k) => { if (k !== knopf) setzen(k, false); });
