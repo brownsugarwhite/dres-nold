@@ -1236,3 +1236,20 @@ Die Blase saß dafür bisher nach einem geschätzten Verhältnis
 eines Symbols sind es 36 px Innenabstand plus die halbe Symbolbreite,
 also `knopfX − 54`. Nachgemessen bei 1440 px stehen Knopfmitte, Haken,
 Blasenpfeil und alle drei Symbole auf demselben Wert.
+
+### „Leistungen" im Menü: öffnen und springen (18. September 2026)
+
+Der Menüpunkt tut zweierlei, in dieser Reihenfolge:
+
+1. Klick, solange zu → die Blase geht auf
+2. Klick, während offen → sie schließt, und die Seite springt an den
+   Anfang des Leistungsbereichs (`#leistungen`); von einer Unterseite
+   aus zur Startseite dorthin
+
+Mit der Maus ist Schritt 1 schon durch das Überfahren erledigt — der
+erste Klick springt also gleich. Mit Tastatur oder Finger gibt es kein
+Überfahren; dort öffnet der erste Druck und der zweite springt. So
+kommt man auf jedem Bedienweg an beides.
+
+Ein Klick auf eine **Kategorie in der Blase** schließt sie sofort,
+statt erst beim Wegziehen des Zeigers.

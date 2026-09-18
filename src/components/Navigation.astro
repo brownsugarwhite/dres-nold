@@ -1167,6 +1167,8 @@ const kategorien = (leistungen.kategorien ?? [])
 
 <script>
   import { schnalzWeg } from '../scripts/scrollwege';
+  import { zuSprungmarke } from '../scripts/anker';
+  import { navigate } from 'astro:transitions/client';
   /**
    * Verhalten der Navigation.
    *
@@ -1514,8 +1516,34 @@ const kategorien = (leistungen.kategorien ?? [])
         }
       };
 
+      /*
+        Der Menüpunkt „Leistungen" tut zweierlei — in dieser Reihenfolge:
+
+          1. Klick, solange zu:   die Blase geht auf
+          2. Klick, während offen: sie schließt, und die Seite springt
+             an den Anfang des Leistungsbereichs
+
+        Mit der Maus ist Schritt 1 schon durch das Überfahren erledigt;
+        der erste Klick springt also gleich (Florian, 18. September
+        2026). Mit Tastatur oder Finger gibt es kein Überfahren — dort
+        öffnet der erste Druck, der zweite springt. So kommt man auf
+        jedem Weg an beides.
+      */
       knopf.addEventListener('click', () => {
-        setzen(knopf.getAttribute('aria-expanded') !== 'true');
+        if (knopf.getAttribute('aria-expanded') !== 'true') { setzen(true); return; }
+        setzen(false);
+        /* Auf einer Unterseite gibt es die Marke nicht — dann zur
+           Startseite, den Rest erledigt scripts/anker.ts. */
+        if (!zuSprungmarke('#leistungen')) { navigate('/#leistungen'); return; }
+        /* Adresse mitführen, ohne neuen Verlaufseintrag — wie bei den
+           Sprungmarken in scripts/anker.ts. */
+        try { history.replaceState(history.state, '', '#leistungen'); } catch { /* egal */ }
+      });
+
+      /* Eine Kategorie in der Blase: sofort zu, nicht erst beim
+         Wegziehen des Zeigers (Florian, 18. September 2026). */
+      inhalt.addEventListener('click', (e) => {
+        if ((e.target as Element | null)?.closest?.('a')) setzen(false);
       });
 
       // Auf Zeigegeräten öffnet auch das Überfahren — die Blase gehört dazu
