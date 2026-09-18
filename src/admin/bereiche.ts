@@ -278,6 +278,10 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
                 { wert: 'links', label: 'links, Text rechts daneben' },
                 { wert: 'rechts', label: 'rechts, Text links daneben' },
               ] },
+              { name: 'bild_hoehe', label: 'Bildhöhe', typ: 'auswahl', optionen: [
+                { wert: 'format', label: 'in seinem Format — kann kürzer sein als der Text' },
+                { wert: 'voll', label: 'über die ganze Höhe des Bereichs — wird dafür beschnitten' },
+              ], hilfe: 'Gilt nur nebeneinander. Auf Handys steht das Bild ohnehin über dem Text und behält immer sein Format.' },
               { name: 'text', label: 'Text', typ: 'richtext', ohneBild: true, hilfe: 'Bilder kommen aus dem Feld darüber — ein Bild je Bereich.' },
             ],
           },

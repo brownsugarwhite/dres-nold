@@ -1063,3 +1063,38 @@ sonst stießen Wochentag und Zeit aneinander.
 **Nebenbei behoben:** Die Beitragsliste hatte `minmax(320px, 1fr)` und
 schob auf 320-px-Geräten die ganze Seite um 24 px zur Seite. Jetzt
 `minmax(min(320px, 100%), 1fr)`.
+
+### Redaktion: Kopfleiste, Bildhöhe, Bereiche (18. September 2026)
+
+**Die Kopfleiste der Redaktion klebt oben** (`position: sticky`). Bei
+langen Formularen — die eigenen Abschnitte werden schnell lang — waren
+„Übersicht", „Seite ansehen" und „Abmelden" sonst außer Reichweite. Sie
+greift seitlich um `--abstand-s` über die Spalte hinaus und bringt einen
+deckenden Grund mit, damit der Inhalt sauber darunter durchläuft. Die
+Speichern-Leiste unten klebt schon länger nach demselben Muster.
+
+**Neues Feld `bild_hoehe`** in jedem Bereich eines eigenen Abschnitts:
+
+| Wert | Wirkung |
+|---|---|
+| `format` (Standard) | Das Bild behält sein Seitenverhältnis (4 : 3) — auch wenn es dann kürzer ist als der Text daneben. So war es bisher. |
+| `voll` | Das Bild füllt die ganze Höhe des Bereichs und wird dafür beschnitten. |
+
+Technisch: `align-items: stretch` auf der Zeile plus `height: 100 %` am
+Bild. Die Zeilenhöhe bestimmt weiterhin die höhere der beiden Spalten —
+ist das Bild in seinem Format höher als der Text, bleibt es dabei und
+fällt nicht in sich zusammen (nachgemessen: kurzer Text → Zeile 298 px,
+also die Bildhöhe). Auf Handys steht das Bild ohnehin über dem Text;
+dort gilt immer das Format.
+
+Bestehende Einträge ohne das Feld verhalten sich unverändert: Das Schema
+setzt `format` ein, und in der Redaktion steht diese Möglichkeit an
+erster Stelle der Auswahl.
+
+**Die Bereiche innerhalb eines Abschnitts sind jetzt abgesetzt**: Die
+verschachtelte Liste steht in einem getönten Kasten mit einer Kante in
+der Hausfarbe, ihre Beschriftung als gesperrte Versalien, die Karten
+darin auf hellerem Grund. Die Gestaltung erkennt die Verschachtelung
+selbst (`.eintrag__inhalt > .eintraege`) — im Skript ist dafür nichts
+zu tun. Dazu trägt jeder Eintrag eine **laufende Nummer** vor dem
+Titel; bei mehreren Bereichen sieht man damit sofort, wo man ist.

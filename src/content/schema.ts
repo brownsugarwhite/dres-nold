@@ -194,6 +194,10 @@ const abschnittsbereich = z
     bild: pfad,
     bild_alt: text,
     bild_seite: z.enum(['links', 'rechts']).default('links'),
+    /** `format`: Das Bild behält sein Seitenverhältnis und ist dann
+        womöglich kürzer als der Text daneben. `voll`: Es füllt die
+        ganze Höhe des Bereichs und wird dafür beschnitten. */
+    bild_hoehe: z.enum(['format', 'voll']).default('format'),
   })
   .refine((b) => !b.bild || b.bild_alt.trim() !== '', {
     path: ['bild_alt'],

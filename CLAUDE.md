@@ -159,7 +159,7 @@ Alle Inhalte liegen als JSON unter `src/content/`. Jede Datei entspricht einem B
 | `navigation.json` | Menüpunkte und Reihenfolge | Leistungen klappen automatisch auf |
 | `team.json` | Personen mit Foto, Name, Funktion, Tätigkeiten | `gruppe`: `aerzte` oder `team`; `taetigkeiten` ist eine Liste und klappt auf der Seite auf |
 | `galerie.json` | Praxisbilder | Alternativtexte sind **Pflicht** (Barrierefreiheit) |
-| `abschnitte.json` | Frei anlegbare Abschnitte im Praxis-Bereich | Ohne eigenen Menüeintrag; je Abschnitt ein oder mehrere `bereiche` mit Bild **neben** dem Text (`bild_seite`: `links`/`rechts`) |
+| `abschnitte.json` | Frei anlegbare Abschnitte im Praxis-Bereich | Ohne eigenen Menüeintrag; je Abschnitt ein oder mehrere `bereiche` mit Bild **neben** dem Text (`bild_seite`: `links`/`rechts`, `bild_hoehe`: `format`/`voll`) |
 | `stellen.json` | Stellenanzeigen | Bereich blendet sich aus, wenn leer |
 | `startseite.json` | Überschriften und Einleitungstexte der Startseiten-Abschnitte | Ein Abschnitt je Bereich: `willkommen`, `sprechstunden`, `galerie`, `leistungen`, `team`, `kontakt`, `formular` |
 | `seite.json` | Seitentitel, Beschreibung, Vorschaubild, Praxisadresse | |

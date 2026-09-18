@@ -9,17 +9,32 @@ body {
 .redaktion {
   width: min(100% - 2 * var(--abstand-m), 60rem);
   margin-inline: auto;
-  padding-block: var(--abstand-m) var(--abstand-2xl);
+  padding-block: 0 var(--abstand-2xl);
 }
 
+/*
+  Die Kopfleiste bleibt beim Scrollen oben stehen (Florian,
+  18. September 2026) — bei langen Formularen sind „Übersicht" und
+  „Seite ansehen" sonst außer Reichweite.
+
+  Sie greift dafür seitlich über die Spalte hinaus und bringt ihren
+  eigenen Grund mit: Der Inhalt läuft darunter durch und darf nicht
+  durchscheinen. Die Speichern-Leiste unten klebt nach demselben
+  Muster.
+*/
 .redaktion__kopf {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   flex-wrap: wrap;
   gap: var(--abstand-s) var(--abstand-m);
   align-items: center;
   justify-content: space-between;
+  margin-inline: calc(-1 * var(--abstand-s));
   margin-bottom: var(--abstand-m);
-  padding-bottom: var(--abstand-s);
+  padding: var(--abstand-s);
+  background: var(--farbe-flaeche-gedeckt);
   border-bottom: 1px solid var(--farbe-linie);
 }
 
@@ -202,6 +217,35 @@ body {
 .eintraege { margin-bottom: var(--abstand-m); }
 .eintraege > .feld__label { font-size: var(--text-l); color: var(--farbe-primaer); }
 
+/*
+  Eine Liste INNERHALB eines Eintrags — die Bereiche eines Abschnitts.
+  Sie bekommt einen eigenen, leicht getönten Kasten mit einer Kante in
+  der Hausfarbe: So ist auf einen Blick zu sehen, was zum Abschnitt
+  gehört und was ein Bereich darin ist (Florian, 18. September 2026).
+*/
+.eintrag__inhalt > .eintraege {
+  margin-block: var(--abstand-m);
+  padding: var(--abstand-s);
+  border: 1px solid var(--farbe-linie);
+  border-left: 3px solid var(--farbe-primaer);
+  border-radius: var(--radius-m);
+  background: var(--farbe-flaeche-gedeckt);
+}
+
+.eintrag__inhalt > .eintraege > .feld__label {
+  font-size: var(--text-m);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Die Karten darin heben sich vom getönten Grund ab */
+.eintrag .eintrag {
+  border-color: var(--farbe-formlinie);
+  box-shadow: 0 1px 3px rgb(30 8 22 / 6%);
+}
+
+.eintrag .eintrag__kopf { background: var(--farbe-flaeche-hell); }
+
 .eintrag {
   margin-bottom: var(--abstand-s);
   border: 1px solid var(--farbe-linie);
@@ -229,6 +273,23 @@ body {
 .eintrag__kopf[aria-expanded='false'] { border-radius: var(--radius-m); }
 
 .eintrag__titel { flex: 1; font-weight: var(--gewicht-halbfett); color: var(--farbe-primaer); }
+
+/* Laufende Nummer vor dem Titel — zeigt Reihenfolge und Anzahl */
+.eintrag__nummer {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.55em;
+  height: 1.55em;
+  border-radius: var(--radius-rund);
+  background: var(--farbe-primaer);
+  color: var(--farbe-text-invers);
+  font-size: var(--text-xs);
+  font-weight: var(--gewicht-halbfett);
+  font-variant-numeric: tabular-nums;
+}
+
+.eintrag[data-inaktiv] .eintrag__nummer { background: var(--farbe-text-leise); }
 
 .eintrag__marke {
   padding: 0 var(--abstand-2xs);

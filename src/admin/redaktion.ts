@@ -599,9 +599,14 @@ function eintraegeFeld(feld: Feld, wert: Wert, daten: Eintrag): Baustein {
 
   const kartenBauen = (eintrag: Eintrag, neu: boolean) => {
     const inhalt = el('div', { class: 'eintrag__inhalt' });
+    /* Die laufende Nummer steht vor dem Titel — bei den Bereichen
+       innerhalb eines Abschnitts sieht man damit auf einen Blick,
+       wo man ist, auch wenn jeder eine Zwischenüberschrift trägt
+       (Florian, 18. September 2026). */
+    const nummerChip = el('span', { class: 'eintrag__nummer' });
     const titelText = el('span', { class: 'eintrag__titel' });
     const marke = el('span', { class: 'eintrag__marke' });
-    const kopf = el('button', { class: 'eintrag__kopf', type: 'button' }, [titelText, marke]);
+    const kopf = el('button', { class: 'eintrag__kopf', type: 'button' }, [nummerChip, titelText, marke]);
     kopf.setAttribute('aria-expanded', neu ? 'true' : 'false');
     inhalt.hidden = !neu;
     kopf.addEventListener('click', () => {
@@ -633,6 +638,7 @@ function eintraegeFeld(feld: Feld, wert: Wert, daten: Eintrag): Baustein {
          leer bleibt. */
       const nummer = [...liste.children].indexOf(karte) + 1;
       titelText.textContent = t || (nummer > 0 ? `${einzahl} ${nummer}` : `${einzahl} (neu)`);
+      nummerChip.textContent = nummer > 0 ? String(nummer) : '·';
       const aktiv = feld.standard ? bausteine.find(([n]) => n === 'aktiv')?.[1].lesen() : true;
       marke.textContent = aktiv ? '' : 'ausgeblendet';
       marke.hidden = !!aktiv;
@@ -695,6 +701,10 @@ function eintraegeFeld(feld: Feld, wert: Wert, daten: Eintrag): Baustein {
     karte.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
+  /* Verschachtelte Listen — die Bereiche innerhalb eines Abschnitts —
+     hebt die Gestaltung als eigene Gruppe hervor. Sie erkennt sie an
+     der Verschachtelung selbst (`.eintrag__inhalt > .eintraege` in
+     redaktion.css); hier ist dafür nichts zu tun. */
   return {
     el: el('section', { class: 'eintraege' }, [
       el('span', { class: 'feld__label', text: feld.label }),

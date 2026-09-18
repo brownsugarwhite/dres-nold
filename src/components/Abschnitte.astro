@@ -7,7 +7,8 @@
  * ------------------------------------
  * Ein Abschnitt hat eine Überschrift und darunter einen oder mehrere
  * BEREICHE. Jeder Bereich zeigt ein Bild NEBEN seinem Text — in der
- * Redaktion ist nur zu wählen, ob es links oder rechts steht. Der Text
+ * Redaktion ist zu wählen, ob es links oder rechts steht und ob es
+ * sein Format behält oder die ganze Höhe des Bereichs füllt. Der Text
  * umfließt das Bild nicht mehr.
  *
  * Mehrere Bereiche ergeben einen langen Abschnitt mit mehreren Bildern.
@@ -30,6 +31,11 @@ const abschnitte = daten.eintraege
 /** Ohne Bild steht der Text allein — dann braucht es keine zwei Spalten. */
 const seite = (b: { bild?: string; bild_seite?: string }) =>
   b.bild ? (b.bild_seite === 'rechts' ? 'rechts' : 'links') : 'ohne';
+
+/** `voll`: Das Bild füllt die Höhe des Bereichs und wird beschnitten.
+    `format` (Standard): Es behält sein Seitenverhältnis — auch wenn es
+    dann kürzer ist als der Text daneben (Florian, 18. September 2026). */
+const hoehe = (b: { bild_hoehe?: string }) => (b.bild_hoehe === 'voll' ? 'voll' : 'format');
 ---
 
 {abschnitte.length > 0 && (
@@ -45,7 +51,7 @@ const seite = (b: { bild?: string; bild_seite?: string }) =>
             <h2 class="bereich__titel" data-rein>{a.titel}</h2>
 
             {bereiche.map((b, i) => (
-              <div class="block" data-bild={seite(b)} data-rein>
+              <div class="block" data-bild={seite(b)} data-hoehe={hoehe(b)} data-rein>
                 {b.bild && (
                   <div class="block__bild">
                     <img src={b.bild} alt={b.bild_alt} width="900" height="675" loading="lazy" />
@@ -141,10 +147,24 @@ const seite = (b: { bild?: string; bild_seite?: string }) =>
   }
 
   .block__bild img {
+    display: block;
     width: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
   }
+
+  /*
+    Zweite Möglichkeit: Das Bild füllt die ganze Höhe des Bereichs.
+
+    Die Zeile richtet ihre Kinder dann nicht mehr oben aus, sondern
+    zieht sie auf dieselbe Höhe (`stretch`); das Bild darin nimmt
+    100 % davon. Welche Höhe das ist, bestimmt weiterhin die höhere
+    der beiden Spalten — ist der Text länger, wächst das Bild mit und
+    wird seitlich beschnitten (`object-fit: cover`); ist das Bild in
+    seinem Format höher, bleibt es dabei.
+  */
+  .block[data-hoehe='voll'] { align-items: stretch; }
+  .block[data-hoehe='voll'] .block__bild img { height: 100%; }
 
   .block__text { min-width: 0; }
 
@@ -176,7 +196,9 @@ const seite = (b: { bild?: string; bild_seite?: string }) =>
 
   .abschnitt__knoepfe--allein { margin-top: 44px; }
 
-  /* Schmale Schirme: untereinander, Bild immer zuerst */
+  /* Schmale Schirme: untereinander, Bild immer zuerst. Über dem Text
+     gibt es keine „Höhe des Bereichs", an der sich etwas ausrichten
+     könnte — dort gilt immer das Format des Bildes. */
   @media (max-width: 800px) {
     .block,
     .block[data-bild='rechts'] {
@@ -184,6 +206,9 @@ const seite = (b: { bild?: string; bild_seite?: string }) =>
       gap: var(--abstand-m);
       margin-top: 36px;
     }
+
+    .block[data-hoehe='voll'] { align-items: start; }
+    .block[data-hoehe='voll'] .block__bild img { height: auto; }
 
     .block[data-bild='rechts'] .block__bild,
     .block[data-bild='rechts'] .block__text {
