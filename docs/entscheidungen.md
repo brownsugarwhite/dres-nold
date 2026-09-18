@@ -1111,27 +1111,32 @@ beginnt bei 790.
 Die Ursache lag tiefer als gedacht: Nicht die Lage sprang, sondern der
 INHALT. Auf der Übersicht ist das Bild beim Zeigen und über den
 Scrollweg vergrößert (zusammen bis 1,13), auf der Beitragsseite steht es
-unvergrößert. Und das ALTE Abbild war ausgeblendet (`display: none`),
-das neue stand von Anfang an voll da — das neue ist aber die Aufnahme
-der ZIELseite. Beim Öffnen zoomte das Bild deshalb im ersten Bild
-heraus, beim Schließen hinein.
+unvergrößert. Gezeigt wurde von Anfang an die Aufnahme der ZIELseite —
+beim Öffnen zoomte das Bild deshalb im ersten Bild heraus, beim
+Schließen hinein.
 
-Die Lösung ist einfacher als der erste Versuch: **Das alte Abbild bleibt
-liegen.** Es ist die Aufnahme dessen, was beim Klick auf dem Schirm
-stand — mit genau der Lage und der Vergrößerung dieses Moments. Es
-blendet nicht aus, sondern liegt voll deckend unter dem neuen, das
-darüber einblendet (55 % der Dauer). Das erste Bild des Übergangs ist
-damit pixelgenau das letzte Bild davor; nachgemessen an Bildschirmfotos
-130 ms nach dem Klick, in beide Richtungen nicht vom Zustand davor zu
-unterscheiden.
+**Gelöst als ein Bild, das von einem Rahmen in den anderen wandert** —
+wie ein Flip, kein Überblenden (Florian, 18. September 2026). Ein
+zwischenzeitlicher Versuch mit zwei übereinanderliegenden Aufnahmen war
+zwar an den Enden richtig, aber in der Mitte als Überblendung zu sehen.
 
-Bleibt das Überblenden selbst: Zwei Aufnahmen desselben Fotos liegen
-dabei übereinander, verschieden stark vergrößert. Damit sie sich
-decken, wandert die eine auf die andere zu — um `--morph-zoom`, das
-`scripts/uebergaenge.ts` misst (immer ≥ 1). Auf dem Hinweg beginnt das
-neue Abbild bei der Vergrößerung der Karte, auf dem Rückweg wächst das
-alte dem neuen entgegen. **Vergrößert wird dabei nur, nie verkleinert** —
-sonst träte unter dem Abbild die Hülle hervor.
+Der Kniff: Gezeigt wird immer **dieselbe** Aufnahme, nämlich die der
+Beitragsseite. Auf dem Hinweg ist das die neue, auf dem Rückweg die
+alte; die Aufnahme der Karte entfällt jeweils (`display: none`). Damit
+sie an beiden Enden genau passt, kommen zwei Dinge dazu:
+
+| | |
+|---|---|
+| `overflow: hidden` auf der Hülle | Auf der Karte steckt das Bild in einem Ausschnitt, der es beschneidet — ohne das träte es beim Übergang über dessen Kante |
+| `--morph-zoom` | Im Rahmen der Karte wird die Aufnahme um diesen Wert vergrößert und fährt über den Übergang auf ihr eigenes Maß (rückwärts umgekehrt). Immer ≥ 1 — verkleinert wird nie, sonst träte unter der Aufnahme die Hülle hervor |
+
+Beides mit derselben Dauer und Kurve wie die Hülle, damit Bild und
+Rahmen zusammenbleiben.
+
+Nachgemessen an Bildschirmfotos bei auf 6 Sekunden verlangsamtem
+Übergang: Das erste Bild ist in beiden Richtungen nicht vom Zustand
+davor zu unterscheiden, das letzte nicht vom Zustand danach
+(`--morph-zoom` 1,0603 gegen `--bild-groesse` 1,0602 der Karte).
 
 Zwei Feinheiten, an denen es zunächst scheiterte:
 

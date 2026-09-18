@@ -38,15 +38,14 @@
     leistung-symbol-<id>     ihr Symbol
     leistung-titel-<id>      ihr Titel
     beitrag-<id>             Hülle des Neuigkeiten-Beitrags
-    beitrag-bild-<id>        sein Bild — wandert, ohne zu kreuzblenden.
-                             Auf der Übersicht trägt den Namen der
-                             AUSSCHNITT, nicht das Bild darin: Der
-                             Ausschnitt steht still, während das Bild
-                             beim Zeigen und beim Scrollen skaliert
-                             wird. So beginnt der Morph genau dort, wo
-                             das Bild gerade steht, statt vorher
-                             zurückzuspringen (Florian, 18. September
-                             2026).
+    beitrag-bild-<id>        sein Bild — EIN Bild, das von einem
+                             Rahmen in den anderen wandert, ohne zu
+                             kreuzblenden. Auf der Übersicht trägt den
+                             Namen der AUSSCHNITT, nicht das Bild
+                             darin: Der Ausschnitt steht still,
+                             während das Bild beim Zeigen und beim
+                             Scrollen skaliert wird (Florian,
+                             18. September 2026).
     nav-oben / nav-unten     die Leisten — bleiben unbewegt und scharf
                              (gesetzt per CSS in Navigation.astro)
 
@@ -186,29 +185,32 @@ html[data-rueckmorph] ::view-transition-new(root) {
 }
 
 /* --- Das Bild der Neuigkeiten wandert wirklich ------------------
-   Vorschaukarte und Beitragsseite zeigen dieselbe Datei — was man
-   sieht, soll ein einziges Bild sein, das an seinen Platz wandert und
-   dabei wächst. Wie das erreicht wird, steht gleich darunter. */
 
-/*
-  DAS ALTE ABBILD BLEIBT LIEGEN.
+   EIN Bild, das von einem Rahmen in den anderen wandert — kein
+   Überblenden zweier Aufnahmen (Florian, 18. September 2026).
 
-  Es ist die Aufnahme dessen, was beim Klick auf dem Schirm stand —
-  mit genau der Lage und der Vergrößerung, die das Bild in diesem
-  Moment hatte. Deshalb blendet es nicht aus, sondern bleibt voll
-  deckend unter dem neuen liegen, das darüber einblendet. Das erste
-  Bild des Übergangs ist damit pixelgenau das letzte Bild davor
-  (Florian, 18. September 2026).
+   Möglich wird das dadurch, dass immer dieselbe Aufnahme gezeigt wird:
+   die der BEITRAGSSEITE. Auf dem Hinweg ist das die neue, auf dem
+   Rückweg die alte; die Aufnahme der Karte entfällt jeweils. Was man
+   sieht, ist also durchgehend ein und dasselbe Bild, das sich mit
+   seiner Hülle bewegt und wächst.
 
-  Vorher war es umgekehrt: Das alte Abbild war ausgeblendet und das
-  neue stand von Anfang an da. Das neue ist aber die Aufnahme der
-  ZIELseite — und dort ist das Bild anders vergrößert. Genau das war
-  der Sprung: beim Öffnen zoomte es heraus, beim Schließen herein.
+   Damit es dabei an beiden Enden genau passt, sind zwei Dinge nötig:
 
-  Beide Abbilder füllen die Hülle ganz und machen deren Bewegung und
-  Wachstum mit; die Hülle beschneidet, damit beim Angleichen unten
-  nichts über die Kante tritt.
-*/
+   1. Die Hülle beschneidet (`overflow: hidden`). Auf der Karte steckt
+      das Bild in einem Ausschnitt, der es beschneidet — ohne dieses
+      Beschneiden träte es beim Übergang über dessen Kante.
+
+   2. Die Aufnahme wird um `--morph-zoom` vergrößert, solange sie im
+      Rahmen der Karte steht. Denn dort ist das Bild beim Zeigen und
+      über den Scrollweg vergrößert (bis etwa 1,13), auf der
+      Beitragsseite nicht. Wie weit, misst scripts/uebergaenge.ts;
+      der Wert ist immer ≥ 1, verkleinert wird nie — sonst träte unter
+      der Aufnahme die Hülle hervor.
+
+   Beides zusammen heißt: Das erste Bild des Übergangs ist genau das
+   letzte davor, das letzte genau das erste danach. Dazwischen bewegt
+   sich ein Bild. */
 ::view-transition-image-pair(.bild) {
   overflow: hidden;
 }
@@ -220,28 +222,6 @@ html[data-rueckmorph] ::view-transition-new(root) {
   object-fit: cover;
 }
 
-::view-transition-old(.bild) {
-  animation: none;
-  opacity: 1;
-}
-
-::view-transition-new(.bild) {
-  animation: uebergang-blende-ein calc(var(--dauer-uebergang) * 0.55) var(--verlauf) both;
-}
-
-/*
-  Der letzte Rest: Während des Überblendens liegen zwei Aufnahmen
-  desselben Fotos übereinander, verschieden stark vergrößert. Damit sie
-  sich dabei decken, wandert die eine auf die andere zu — wie weit,
-  misst scripts/uebergaenge.ts und reicht es als `--morph-zoom` herein
-  (immer ≥ 1).
-
-  Auf dem Hinweg ist das alte Abbild das vergrößerte: Das neue beginnt
-  bei derselben Vergrößerung und fährt auf sein eigenes Maß zurück.
-  Auf dem Rückweg ist es umgekehrt, also wächst das alte dem neuen
-  entgegen. Vergrößert wird dabei nur — verkleinert nie, sonst träte
-  unter dem Abbild die Hülle hervor.
-*/
 @keyframes uebergang-bild-heran {
   from { transform: scale(var(--morph-zoom, 1)); }
   to { transform: scale(1); }
@@ -252,14 +232,27 @@ html[data-rueckmorph] ::view-transition-new(root) {
   to { transform: scale(var(--morph-zoom, 1)); }
 }
 
+/* Hinweg: Die Aufnahme der Karte entfällt, die der Beitragsseite
+   beginnt im Rahmen der Karte — vergrößert wie dort — und fährt auf
+   ihr eigenes Maß, während die Hülle sie an ihren Platz trägt. */
+html:not([data-rueckmorph]) ::view-transition-old(.bild) {
+  display: none;
+}
+
 html:not([data-rueckmorph]) ::view-transition-new(.bild) {
-  animation:
-    uebergang-blende-ein calc(var(--dauer-uebergang) * 0.55) var(--verlauf) both,
-    uebergang-bild-heran var(--dauer-uebergang) linear both;
+  animation: uebergang-bild-heran var(--dauer-uebergang) var(--verlauf-betont) both;
+  opacity: 1;
+}
+
+/* Rückweg: spiegelbildlich. Die Aufnahme der Karte entfällt wieder,
+   die der Beitragsseite wandert zurück in den Rahmen der Karte und
+   nimmt dabei deren Vergrößerung an. */
+html[data-rueckmorph] ::view-transition-new(.bild) {
+  display: none;
 }
 
 html[data-rueckmorph] ::view-transition-old(.bild) {
-  animation: uebergang-bild-nach var(--dauer-uebergang) linear both;
+  animation: uebergang-bild-nach var(--dauer-uebergang) var(--verlauf-betont) both;
   opacity: 1;
 }
 
