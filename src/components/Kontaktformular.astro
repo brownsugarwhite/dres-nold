@@ -66,15 +66,17 @@
   </div>
   <input type="hidden" name="zeit" value="" data-zeit />
 
-  <label class="einverstaendnis">
-    <input class="einverstaendnis__kasten" name="datenschutz" type="checkbox" value="ja" required />
-    <span class="einverstaendnis__text">
-      Sie erklären sich damit einverstanden, dass Ihre Daten zur Bearbeitung
-      Ihres Anliegens verwendet werden. Weitere Informationen und
-      Widerrufshinweise finden Sie in der
-      <a href="/datenschutz/">Datenschutzerklärung</a>.
-    </span>
-  </label>
+  {/* Ein Hinweis, kein Häkchen: Die Angaben werden verarbeitet, um die
+      Anfrage zu beantworten — Rechtsgrundlage ist Art. 6 Abs. 1 lit. b
+      bzw. f DSGVO, nicht eine Einwilligung. Art. 13 verlangt hier
+      Information, keine Zustimmung; ein Pflichthäkchen wäre sogar die
+      schlechtere Grundlage, weil es jederzeit widerrufbar wäre
+      (Florian, 18. September 2026). */}
+  <p class="datenschutzhinweis">
+    Wir verarbeiten Ihre Angaben, um Ihre Anfrage zu beantworten. Näheres
+    und Ihre Rechte stehen in der
+    <a href="/datenschutz/">Datenschutzerklärung</a>.
+  </p>
 
   <div class="formular__fuss">
     <p class="formular__meldung" data-meldung role="status" aria-live="polite"></p>
@@ -192,26 +194,14 @@
     overflow: hidden;
   }
 
-  /* ---------- Einverständnis ---------- */
+  /* ---------- Datenschutzhinweis ---------- */
 
-  .einverstaendnis {
-    display: flex;
-    gap: var(--abstand-xs);
-    align-items: flex-start;
+  .datenschutzhinweis {
+    max-width: none;
     margin: var(--abstand-2xs) 0 var(--abstand-m);
-    color: var(--farbe-text);
-    font-family: var(--schrift);
+    color: var(--farbe-text-gedeckt);
     font-size: var(--text-s);
-    line-height: 1.45;
-    cursor: pointer;
-  }
-
-  .einverstaendnis__kasten {
-    flex: none;
-    width: 18px;
-    height: 18px;
-    margin: 2px 0 0;
-    accent-color: var(--farbe-primaer);
+    line-height: 1.5;
   }
 
   /* ---------- Fuß: Meldung und Knopf ---------- */
@@ -329,7 +319,7 @@
     const knopf = formular.querySelector<HTMLButtonElement>('button[type="submit"]')!;
     const gelungen = formular.querySelector<HTMLElement>('[data-gelungen]')!;
     const gelungenText = formular.querySelector<HTMLElement>('[data-gelungen-text]')!;
-    const felder = [...formular.querySelectorAll<HTMLElement>('.feld, .feldpaar, .einverstaendnis, .formular__fuss')];
+    const felder = [...formular.querySelectorAll<HTMLElement>('.feld, .feldpaar, .datenschutzhinweis, .formular__fuss')];
     if (zeit) zeit.value = String(Date.now());
 
     const sagen = (art: 'fehler' | 'erfolg' | '', text: string) => {
@@ -363,8 +353,7 @@
 
       if (!formular.checkValidity()) {
         const erstes = formular.querySelector<HTMLInputElement>(':invalid');
-        if (erstes?.name === 'datenschutz') sagen('fehler', 'Bitte bestätigen Sie den Hinweis zum Datenschutz.');
-        else if (erstes?.type === 'email') sagen('fehler', 'Bitte prüfen Sie Ihre E-Mail-Adresse.');
+        if (erstes?.type === 'email') sagen('fehler', 'Bitte prüfen Sie Ihre E-Mail-Adresse.');
         else sagen('fehler', 'Bitte füllen Sie Name, E-Mail und Nachricht aus.');
         erstes?.focus();
         return;

@@ -64,7 +64,6 @@ export async function onRequestPost({ request, env }: Kontext): Promise<Response
   const email = text(f.email, 200);
   const telefon = text(f.telefon, 40);
   const nachricht = text(f.nachricht, 5000);
-  const datenschutz = f.datenschutz === 'ja' || f.datenschutz === 'on' || f.datenschutz === true;
   const honigtopf = text(f.website, 200);
   const zeit = Number(f.zeit) || 0;
 
@@ -77,10 +76,6 @@ export async function onRequestPost({ request, env }: Kontext): Promise<Response
   if (name.length < 2 || !istEmail(email) || nachricht.length < 10) {
     return antworten(request, false, 'Bitte füllen Sie Name, E-Mail und Nachricht vollständig aus.');
   }
-  if (!datenschutz) {
-    return antworten(request, false, 'Bitte bestätigen Sie den Hinweis zum Datenschutz.');
-  }
-
   if (!env.RESEND_API_KEY || !env.KONTAKT_EMPFAENGER) {
     return antworten(request, false, 'Der Versand ist noch nicht eingerichtet. Bitte rufen Sie uns an oder schreiben Sie eine E-Mail.', 503);
   }

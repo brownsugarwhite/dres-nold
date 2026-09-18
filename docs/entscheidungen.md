@@ -851,3 +851,32 @@ Der Einleitungssatz „Am schnellsten telefonisch. Für alles, was nicht
 eilt, schreiben Sie uns gerne." stammt aus dem Entwurf und steht in
 `startseite.json` — die Praxis kann ihn in der Redaktion ändern.
 
+### Kein Häkchen unter dem Kontaktformular (18. September 2026)
+
+Die Pflicht-Checkbox „Sie erklären sich damit einverstanden …" ist weg.
+An ihrer Stelle steht ein Hinweis mit Verweis auf die
+Datenschutzerklärung.
+
+**Warum:** Die Angaben aus dem Formular werden verarbeitet, um die
+Anfrage zu beantworten — Rechtsgrundlage ist Art. 6 Abs. 1 lit. b
+(Anbahnung) bzw. lit. f DSGVO, **nicht** eine Einwilligung (lit. a).
+Genau so steht es auch schon in Ziffer 5 der Datenschutzerklärung. Art.
+13 verlangt an dieser Stelle Information, keine Zustimmung; ein
+Pflichthäkchen wäre sogar die schlechtere Grundlage, weil eine
+Einwilligung jederzeit widerrufbar ist und die Nachricht dann gelöscht
+werden müsste, obwohl sie zur Bearbeitung noch gebraucht wird. Mehrere
+Aufsichtsbehörden sagen ausdrücklich, dass eine solche Checkbox nicht
+erforderlich ist.
+
+Die Prüfung fällt damit auch in `functions/api/kontakt.ts` weg.
+
+**Ziffer 6 der Datenschutzerklärung ist neu geschrieben:** Es ist keine
+Karte mehr eingebettet, der Kartenausschnitt ist eine eigene Grafik, und
+die beiden Schaltflächen sind Verweise, die Google Maps erst auf Klick
+in einem neuen Fenster öffnen. Der Eintrag zur gespeicherten
+Kartenzustimmung ist aus Ziffer 4 entfernt.
+
+**Die Rechtsseiten bleiben Entwürfe** und sind vor der Freigabe von der
+Praxis bzw. ihrem Datenschutzbeauftragten zu prüfen — das gilt für diese
+Änderung besonders.
+
