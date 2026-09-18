@@ -64,7 +64,7 @@ const { hinweis } = Astro.props;
   </div>
 
   <div class="feld">
-    <textarea class="feld__eingabe feld__eingabe--mehrzeilig" id="kontakt-nachricht" name="nachricht" placeholder=" " required maxlength="5000" rows="5"></textarea>
+    <textarea class="feld__eingabe feld__eingabe--mehrzeilig" id="kontakt-nachricht" name="nachricht" placeholder=" " required maxlength="5000" rows="4"></textarea>
     <label class="feld__label" for="kontakt-nachricht">Ihre Nachricht</label>
     <span class="feld__linie" aria-hidden="true"></span>
   </div>
@@ -146,8 +146,11 @@ const { hinweis } = Astro.props;
     outline: none;
   }
 
+  /* Etwas flacher als zuvor (8 em) — lang genug für ein paar Zeilen,
+     ohne das Formular auseinanderzuziehen (Florian, 18. September
+     2026). Wer mehr schreibt, zieht das Feld an der Ecke auf. */
   .feld__eingabe--mehrzeilig {
-    min-height: 8em;
+    min-height: 5.5em;
     resize: vertical;
   }
 

@@ -284,7 +284,13 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
   */
   .kontakt__formular {
     min-width: 0;
-    padding: clamp(28px, 3vw, 44px);
+    /* Feste Breite statt halber Spalte: So bleiben die Felder in einem
+       ruhigen Maß, egal wie breit das Fenster ist (Florian,
+       18. September 2026). */
+    width: 100%;
+    max-width: 480px;
+    justify-self: end;
+    padding: clamp(24px, 2.4vw, 36px);
     border-radius: var(--radius-l);
     background: var(--farbe-flaeche);
     box-shadow: 0 18px 60px rgb(30 8 22 / 8%);
@@ -314,7 +320,7 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
       grid-template-columns: 1fr;
       align-items: start;
     }
-    .kontakt__formular { max-width: 34rem; }
+    .kontakt__formular { justify-self: start; }
   }
 
   @media (max-width: 560px) {
