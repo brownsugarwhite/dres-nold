@@ -870,6 +870,13 @@ erforderlich ist.
 
 Die Prüfung fällt damit auch in `functions/api/kontakt.ts` weg.
 
+**Es steht nur noch EIN Hinweis unter den Feldern:** erst der Satz der
+Praxis aus `startseite.json` („Wir melden uns zurück … keine Angaben zu
+Ihrer Gesundheit"), dann der Datenschutzhinweis. Der erste kommt als
+`hinweis` in `Kontaktformular.astro` herein und bleibt in der Redaktion
+änderbar; der zweite steht fest im Code, weil er eine Rechtspflicht
+erfüllt (Florian, 18. September 2026).
+
 **Ziffer 6 der Datenschutzerklärung ist neu geschrieben:** Es ist keine
 Karte mehr eingebettet, der Kartenausschnitt ist eine eigene Grafik, und
 die beiden Schaltflächen sind Verweise, die Google Maps erst auf Klick

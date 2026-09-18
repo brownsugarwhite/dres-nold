@@ -1,8 +1,13 @@
 ---
 /**
  * Kontaktformular — bewusst schlicht im Inhalt: Name, E-Mail, Telefon
- * (optional), Nachricht, Einverständnis. Es fragt KEINE Gesundheitsdaten
- * ab und darf das auch künftig nicht (CLAUDE.md, Abschnitt Rechtliches).
+ * (optional), Nachricht. Es fragt KEINE Gesundheitsdaten ab und darf das
+ * auch künftig nicht (CLAUDE.md, Abschnitt Rechtliches).
+ *
+ * Unter den Feldern steht EIN Hinweis: erst der Satz der Praxis aus
+ * `startseite.json` (kommt als `hinweis` herein, in der Redaktion
+ * änderbar), dann der Datenschutzhinweis, der fest im Code steht, weil
+ * er eine Rechtspflicht erfüllt (Florian, 18. September 2026).
  *
  * Ohne JavaScript schickt der Browser das Formular normal an
  * /api/kontakt und landet danach wieder hier (?gesendet=1). Mit
@@ -30,6 +35,11 @@
  * Der Sendeknopf ist der Knopf der ganzen Seite (`.kn`). Nach
  * erfolgreichem Versand zeichnet sich ein Kreis mit Haken.
  */
+interface Props {
+  /** Satz der Praxis über dem Datenschutzhinweis (startseite.json) */
+  hinweis?: string;
+}
+const { hinweis } = Astro.props;
 ---
 
 <form class="formular" method="post" action="/api/kontakt" data-kontaktformular novalidate>
@@ -73,6 +83,7 @@
       schlechtere Grundlage, weil es jederzeit widerrufbar wäre
       (Florian, 18. September 2026). */}
   <p class="datenschutzhinweis">
+    {hinweis && <>{hinweis}{' '}</>}
     Wir verarbeiten Ihre Angaben, um Ihre Anfrage zu beantworten. Näheres
     und Ihre Rechte stehen in der
     <a href="/datenschutz/">Datenschutzerklärung</a>.

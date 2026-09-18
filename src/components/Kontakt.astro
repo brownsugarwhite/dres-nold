@@ -70,8 +70,7 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     <div class="kontakt__formular" data-rein>
       <div class="kicker kicker--klein">Nachricht</div>
       <h3 class="kontakt__formulartitel verlauf">{formulartexte.titel}</h3>
-      <Kontaktformular />
-      {formulartexte.text && <p class="kontakt__formularnotiz">{formulartexte.text}</p>}
+      <Kontaktformular hinweis={formulartexte.text} />
     </div>
   </div>
 </section>
@@ -90,16 +89,18 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
   }
 
   /*
-    Die Kartenebene. Auf schmalen Fenstern rückt sie nach oben, damit
-    der Punkt nicht hinter dem Text landet; sie wird dabei um dasselbe
-    Maß höher, damit unten keine Lücke entsteht — und weil Bild und
+    Die Kartenebene. Sie rückt nach oben und zur Seite, damit der Punkt
+    an der Praxis in der freien Fläche links steht und nicht halb hinter
+    der Formularkarte verschwindet. Sie wird dabei um dasselbe Maß
+    größer, damit an den Kanten keine Lücke entsteht — und weil Bild und
     Punkt in derselben Ebene liegen, bleiben sie dabei aufeinander.
   */
   .kontakt__karte {
     position: absolute;
-    inset: 0 0 auto;
+    inset: 0 0 auto auto;
+    width: calc(100% + var(--karte-seit, 0px));
     height: calc(100% + var(--karte-hoch, 0px));
-    transform: translateY(calc(-1 * var(--karte-hoch, 0px)));
+    transform: translate(calc(-1 * var(--karte-seit, 0px)), calc(-1 * var(--karte-hoch, 0px)));
   }
 
   /*
@@ -297,16 +298,15 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     letter-spacing: -0.011em;
   }
 
-  .kontakt__formularnotiz {
-    max-width: none;
-    margin: 22px 0 0;
-    color: var(--farbe-text-gedeckt);
-    font-size: 14px;
-    line-height: 1.6;
+  .kontakt {
+    --karte-hoch: 150px;
+    --karte-seit: 300px;
   }
 
-  @media (max-width: 1100px) {
-    .kontakt { --karte-hoch: 150px; }
+  /* Einspaltig steht die Formularkarte unter dem Text — dann muss die
+     Karte nicht zur Seite. */
+  @media (max-width: 900px) {
+    .kontakt { --karte-seit: 0px; }
   }
 
   @media (max-width: 900px) {
