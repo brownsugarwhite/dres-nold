@@ -2,7 +2,7 @@
   "_hinweis_fuer_die_redaktion": "Hinweis-Sprechblase, die sich beim Öffnen der Seite meldet — für Urlaub, Vertretung oder Notfälle. Erscheint automatisch zwischen 'von' und 'bis' und verschwindet danach von selbst. Zum sofortigen Ausblenden 'aktiv' auf false setzen. Im Text sind Absätze, Aufzählungen und Hervorhebungen möglich. Der Knopf 'mehr erfahren' erscheint nur, wenn ein Ziel eingetragen ist.",
   "aktiv": true,
   "titel": "Urlaub",
-  "text": "<p>Liebe Patienten,</p><p>unsere Praxis ist vom 17. August bis einschließlich 04. September 2026 geschlossen!</p><p>Über unsere Anrufbeantworteransage können Sie die jeweils zuständige Vertretungspraxis erfahren.</p><p>Wir wünschen Ihnen eine schöne Sommerzeit!</p><p>Ihre Praxis Dres. Nold</p>",
+  "text": "<h3>unsere Praxis ist vom 17. August bis einschließlich 04. September 2026 geschlossen!&nbsp;</h3><p></p><p>Über unsere Anrufbeantworteransage können Sie die jeweils zuständige Vertretungspraxis erfahren.</p><p>Wir wünschen Ihnen eine schöne Sommerzeit!</p><p></p><p>Ihre Praxis Dres. Nold</p>",
   "von": "2026-08-17",
   "bis": "2026-09-20",
   "mehr_erfahren_text": "",
