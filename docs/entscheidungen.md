@@ -222,8 +222,9 @@ Weitere Festlegungen aus demselben Durchgang:
   Einflug von links). Übernommen sind Kicker, die leichte Überschrift
   und der Knopf. — **Überholt am 18. September 2026**, siehe „Der
   Hinweis wird eine Karte" weiter unten.
-- Der **Scrollweg der Sprechstunden** bleibt bei 350vh (mobil 450vh) —
-  siehe weiter unten, „Der Einstieg ist eine Karte".
+- Der **Scrollweg der Sprechstunden** blieb hier bei 350vh (mobil
+  450vh) — **seit dem 18. September 2026 sind es 480vh / 620vh**, siehe
+  „Erst das Logo, dann die Karte" am Ende.
 - **Ablauf a-8 der Leistungskacheln bleibt vollständig** — mit beiden
   Teilen: Die Kacheln wachsen beim Hereinscrollen von 0,9 auf 1 **und**
   ihr Grund hellt dabei von Grau auf Weiß auf; am Ende des Wegs beides
@@ -629,4 +630,42 @@ Das Schließen-Kreuz ist dasselbe wie in der Einstiegskarte —
 Damit ist die Festlegung vom 17. September („die Sprechblase behält
 ihre Form") überholt: Florian wollte am 18. September die Karte des
 Entwurfs. Geblieben ist der Einflug von links (Ablauf a-36).
+
+### Erst das Logo, dann die Karte (18. September 2026)
+
+Die Einstiegskarte schob ihre weiße Fläche über das noch stehende Logo:
+Ihre Oberkante überholte die Unterkante des Logos schon nach etwa einer
+drittel Fensterhöhe, während sich das Logo (Ablauf a-7) über **1,26
+Fensterhöhen** auflöst. Gut eine Fensterhöhe lang lagen beide
+übereinander.
+
+Ablauf a-19 hat deshalb am Anfang eine **Wartezeit** bekommen: Die Karte
+steht still, bis das Logo fertig ist, und fährt erst dann herein. Damit
+Anfahrt, Bremsweg und Schnalzen dabei genau so lange dauern wie vorher,
+ist der Scrollweg um die Wartezeit länger:
+
+| | vorher | jetzt |
+|---|---|---|
+| Scrollweg (`ozWeg`, `--oz-weg`) | 3,5 / mobil 4,5 Fensterhöhen | **4,8 / 6,2** |
+| Karte setzt sich in Bewegung | 15 % | **35 %** |
+| Zipfel voll ausgefahren | 50 % | **61 %** |
+| Schnalzen (`OZ_RAST`, `--oz-ende`) | 71 % | **78 %** |
+
+Nachgemessen, alle achtel Fensterhöhen über den ganzen Einstieg, auf
+1440 × 900 und auf 375 × 812: **keine Überdeckung** mehr, solange das
+Logo sichtbar ist. Es verschwindet bei 1,39 (Desktop) bzw. 1,50
+Fensterhöhen (Handy); die Karte beginnt ihre Fahrt unmittelbar danach.
+
+Die vier Zahlen hängen zusammen — wer eine ändert, muss die anderen
+mitziehen: `ozWeg()` und `OZ_RAST` in `scripts/scrollwege.ts`,
+`--oz-weg` und `--oz-ende` in `Oeffnungszeiten.astro`.
+
+Nebenbei: Die Begrüßung hatte eine **eigene weiße Fläche** zusätzlich zu
+der der Karte. Sie ist weg — das Weiß setzt allein `.ozblase__flaeche`.
+
+**Auf Handys sitzen Logo und Scrollhinweis tiefer** (`padding-top: 12vh`
+am Startbereich). Oben steht nur die 40 px hohe Kontaktzeile, unten die
+110 px hohe Symbolleiste; mittig im Fenster wirkte der Block dadurch
+nach oben gerutscht. Gemessen bei 375 × 812: Mitte des Blocks jetzt bei
+365 px, die Mitte zwischen den beiden Leisten liegt bei 371 px.
 

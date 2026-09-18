@@ -147,19 +147,19 @@ const texte = startseite.sprechstunden;
      in scripts/scrollwege.ts passen. Gezählt wird er wie Webflows
      „while scrolling in view": über Scrollweg PLUS eine Fensterhöhe. */
   .ozraum,
-  .ozbereich { --oz-weg: 350vh; }
+  .ozbereich { --oz-weg: 480vh; }
   @media (max-width: 991px) {
     .ozraum,
-    .ozbereich { --oz-weg: 450vh; }
+    .ozbereich { --oz-weg: 620vh; }
   }
 
-  /* Bei 71 % des Ablaufs steht die Blase mit ausgefahrenem Zipfel, die
+  /* Bei 78 % des Ablaufs steht die Blase mit ausgefahrenem Zipfel, die
      Leisten tauschen (OZ_RAST in scripts/scrollwege.ts). Genau dort
      endet der Bereich: Die Bühne löst sich vom Fenster, und die Blase
      scrollt von da an mit dem Inhalt weiter (Florian, 14. September
      2026), statt bis zum Ende des Scrollwegs stehen zu bleiben. */
   .ozraum,
-  .ozbereich { --oz-ende: calc(0.71 * (var(--oz-weg) + 100vh)); }
+  .ozbereich { --oz-ende: calc(0.78 * (var(--oz-weg) + 100vh)); }
 
   /* Nimmt den Platz im Seitenfluss ein und deckt den grauen Grund ab.
      Höhe von `.trigger-oz-scroll` / `.oz` in der mobilen Vorlage. */

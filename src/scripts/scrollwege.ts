@@ -21,12 +21,13 @@ import { ausStuetzstellen, type Stuetzstelle } from './easing';
  * in Oeffnungszeiten.astro passen.
  */
 export function ozWeg(): number {
-  return window.matchMedia('(max-width: 991px)').matches ? 4.5 : 3.5;
+  return window.matchMedia('(max-width: 991px)').matches ? 6.2 : 4.8;
 }
 
 /** Bei diesem Anteil von Ablauf a-19 steht die Blase mit voll
-    ausgefahrenem Zipfel; unmittelbar danach zieht er sich ein. */
-export const OZ_RAST = 0.71;
+    ausgefahrenem Zipfel; unmittelbar danach zieht er sich ein.
+    Muss zu `--oz-ende` in Oeffnungszeiten.astro passen. */
+export const OZ_RAST = 0.78;
 
 /**
  * Scrolltiefe (in Fensterhöhen), ab der die Leisten tauschen.
@@ -44,9 +45,18 @@ export function schnalzWeg(): number {
  * Die Schlüsselstellen von Ablauf a-19 — wie weit die Blase zu einem
  * Anteil des Ablaufs noch unter ihrer Ruhelage steht.
  *
- *   bei 15 %   y = Startwert    Kurve easeIn   ⟶ holt Schwung
- *   bei 50 %   y = Zipfellänge  Kurve outCubic ⟶ bremst ab
- *   bei 71 %   y = 0            — steht, Zipfel voll ausgefahren
+ *   bei 35 %   y = Startwert    Kurve easeIn   ⟶ holt Schwung
+ *   bei 61 %   y = Zipfellänge  Kurve outCubic ⟶ bremst ab
+ *   bei 78 %   y = 0            — steht, Zipfel voll ausgefahren
+ *
+ * Die ersten 35 % sind eine Wartezeit: In ihr löst sich das Logo des
+ * Startbereichs auf (Ablauf a-7, die ersten 10 % des Dokuments,
+ * gedeckelt auf anderthalb Fensterhöhen). Erst danach setzt sich die
+ * Karte in Bewegung — sonst schöbe sich ihre weiße Fläche über das noch
+ * stehende Logo (Florian, 18. September 2026). Der Scrollweg ist um
+ * genau diese Wartezeit länger als vorher (3,5 → 4,8 Fensterhöhen;
+ * mobil 4,5 → 6,2); Anfahrt, Bremsweg und Schnalzen dauern unverändert
+ * so lange wie zuvor.
  *
  * Die Kurve gehört jeweils zu dem Abschnitt, der an dieser Stelle
  * BEGINNT — so wertet Webflow scrollgebundene Abläufe aus.
@@ -59,9 +69,9 @@ export function schnalzWeg(): number {
 export function ozStuetzstellen(start: number, zipfellaenge: number): Stuetzstelle[] {
   return [
     { bei: 0.00, wert: start, kurve: 'linear' },
-    { bei: 0.15, wert: start, kurve: 'easeIn' },
-    { bei: 0.50, wert: zipfellaenge, kurve: 'outCubic' },
-    { bei: 0.71, wert: 0, kurve: 'linear' },
+    { bei: 0.35, wert: start, kurve: 'easeIn' },
+    { bei: 0.61, wert: zipfellaenge, kurve: 'outCubic' },
+    { bei: 0.78, wert: 0, kurve: 'linear' },
     { bei: 1.00, wert: 0 },
   ];
 }

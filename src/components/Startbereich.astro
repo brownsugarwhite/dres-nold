@@ -84,6 +84,14 @@ const { praxis } = seite;
     height: 100%;
   }
 
+  /* Auf Handys sitzt der Block etwas tiefer: Oben steht nur die schmale
+     Kontaktzeile, unten die 110 px hohe Symbolleiste — mittig wirkte er
+     dadurch nach oben gerutscht (Florian, 18. September 2026). Der
+     Innenabstand verschiebt den mittig gesetzten Block um seine Hälfte. */
+  @media (max-width: 991px) {
+    .startbereich__mitte { padding-top: 12vh; }
+  }
+
   /* Logo — Aufbau und Maße wie in der Vorlage.
 
      Beide Ebenen stehen im Fluss untereinander: erst die Lottie-Grafik,
