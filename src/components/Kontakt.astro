@@ -106,25 +106,24 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     `background-position: p%` richtet den p-%-Punkt des Bildes auf den
     p-%-Punkt der Fläche aus — unabhängig davon, welches größer ist.
 
-    `background-size: auto`: Das Bild wird NICHT hochgerechnet. Mit
-    `cover` zog es auf breiten Schirmen die 1600 Bildpunkte auf 2000 und
-    mehr, und man sah es deutlich (Florian, 18. September 2026).
+    `cover`, damit die Karte über die ganze Breite geht (Florian,
+    18. September 2026). Das Bild ist 1600 Bildpunkte breit und wird
+    dabei auf breiten Schirmen gestreckt — sobald es durch eine eigene
+    Grafik ersetzt ist, fällt das nicht mehr ins Gewicht.
+
+    Der Verlauf liegt nur oben: Die Karte blendet aus dem Weiß des
+    Abschnitts darüber ein und endet unten mit einer harten Kante am
+    Fußbereich.
   */
   .kontakt__bild {
     position: absolute;
     inset: 0;
     display: block;
-    background: url('/bilder/deko/karte-vorschau.jpg') var(--marke-x) var(--marke-y) / auto no-repeat;
+    background: url('/bilder/deko/karte-vorschau.jpg') var(--marke-x) var(--marke-y) / cover no-repeat;
     filter: grayscale(1);
     opacity: 0.38;
-    -webkit-mask-image:
-      linear-gradient(to bottom, #000 62%, transparent 98%),
-      linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
-    mask-image:
-      linear-gradient(to bottom, #000 62%, transparent 98%),
-      linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
-    -webkit-mask-composite: source-in;
-    mask-composite: intersect;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%);
+    mask-image: linear-gradient(to bottom, transparent, #000 22%);
   }
 
   /*
@@ -138,8 +137,11 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     position: absolute;
     left: var(--marke-x);
     top: var(--marke-y);
-    width: 360px;
-    height: 135px;
+    /* Mit `cover` wächst die Karte mit dem Fenster — der Schleier
+       ebenso. Die Bandhöhe hält den Maßstab bei etwa 1, deshalb der
+       Mindestwert. */
+    width: max(380px, 23vw);
+    height: max(145px, 8.7vw);
     translate: -70% -32%;
     border-radius: 50%;
     background: var(--farbe-flaeche);
@@ -147,15 +149,14 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     pointer-events: none;
   }
 
-  /* Der Punkt deckt den Kopf der Google-Marke zu: Der ist im Bild
-     29,5 Punkte breit, und weil das Bild nicht skaliert wird, sind das
-     auch auf dem Schirm 29,5 Punkte. */
+  /* Der Punkt deckt den Kopf der Google-Marke zu (im Bild 29,5 Punkte
+     breit, auf dem Schirm um den Maßstab von `cover` größer). */
   .kontakt__punkt {
     position: absolute;
     z-index: 1;
     left: var(--marke-x);
     top: var(--marke-y);
-    width: 30px;
+    width: max(32px, 1.9vw);
     aspect-ratio: 1;
     translate: -50% -50%;
     border-radius: var(--radius-rund);

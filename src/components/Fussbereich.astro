@@ -47,7 +47,7 @@ const jahr = new Date().getFullYear();
     background: var(--farbe-flaeche);
   }
 
-  /* Name links, Verweise rechts, darüber eine Haarlinie (Entwurf) */
+  /* Name links, Verweise rechts */
   .fuss__inhalt {
     display: flex;
     flex-wrap: wrap;
@@ -56,7 +56,9 @@ const jahr = new Date().getFullYear();
     justify-content: space-between;
     width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
     margin-inline: auto;
-    border-top: 1px solid var(--farbe-linie);
+    /* Keine Linie darüber: Der Kontaktbereich endet mit der harten
+       Kante seiner Karte, das ist Trennung genug (Florian,
+       18. September 2026). */
     /* Unten so viel Luft, dass die Symbolleiste nichts verdeckt */
     padding-block: var(--abstand-m) clamp(120px, 14vw, 150px);
   }

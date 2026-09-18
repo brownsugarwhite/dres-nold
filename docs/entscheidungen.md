@@ -837,6 +837,12 @@ Widerrufsknopf im Fußbereich bleiben vorerst stehen, damit alte
 gespeicherte Zustimmungen zurückgenommen werden können; gesetzt wird
 nichts mehr. Die Datenschutzerklärung ist entsprechend anzupassen.
 
+**Die Karte geht über die ganze Breite** (`background-size: cover`),
+der Verlauf liegt nur oben: Sie blendet aus dem Weiß des Abschnitts
+darüber ein und endet unten mit einer **harten Kante** am Fußbereich.
+Die Haarlinie über dem Fußbereich ist deshalb weg — die Kante trennt
+schon (Florian, 18. September 2026).
+
 **Der einzige Schlagschatten der Seite** sitzt an der Formularkarte: Sie
 liegt auf dem Kartengrund, und nur so bleiben die feinen Linien der
 Felder ablesbar. Überall sonst gilt weiter: keine Schatten.
