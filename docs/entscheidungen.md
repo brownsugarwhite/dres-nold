@@ -909,13 +909,32 @@ der Knopf deshalb aus.
   Beschreibung, ohne Auszeichnung, auf 110 Zeichen gekürzt. Er
   verschwindet beim Aufklappen, sonst stünde er über seinem eigenen
   Text.
-- **Ansprechperson und Bewerbungsknopf kleben oben** (`position:
-  sticky`, 80 px Kopfleiste plus Luft) und laufen bei langen Anzeigen
-  mit. Das ging nur mit einem Kniff: Die Klappe beschneidet ihren Inhalt
+- **Ansprechperson und Bewerbungsknopf kleben** und laufen bei langen
+  Anzeigen mit: auf breiten Fenstern **oben** (80 px Kopfleiste plus
+  Luft), auf schmalen **unten** am Bildschirmrand — oben wäre dort kein
+  Platz, da steht schon die Kopfleiste. Damit unten etwas kleben kann,
+  ist `.stelle__spalten` dort ein gewöhnlicher Block: In einem Raster
+  ist die Zeile nur so hoch wie ihr Inhalt, und ein Element hat darin
+  keinen Weg. Das ging nur mit einem Kniff: Die Klappe beschneidet ihren Inhalt
   (`overflow: hidden`), und ein beschnittener Vorfahre wird selbst zum
   Bezugsrahmen — `sticky` bliebe wirkungslos. Der Überlauf wird deshalb
   erst freigegeben, wenn die Aufklapp-Bewegung steht (`data-offen`,
   gesetzt in `transitionend`).
+- **Das Auf- und Zuklappen ist choreografiert:** Die Höhe läuft in
+  0,62 s, der Anriss zieht sich zusammen und blendet aus (0,45 s bzw.
+  0,26 s) und übergibt damit an den echten Text, der 0,14 s später von
+  16 px unten aufblendet; die Spalte mit der Ansprechperson folgt 0,26 s
+  später. Beim Zuklappen geht der Inhalt sofort (0,2 s, keine
+  Verzögerung), damit nichts nachhängt. Gemessen beim Öffnen — Deckkraft
+  von Anriss / Text / Spalte:
+
+  | nach | Anriss | Text | Spalte |
+  |---|---|---|---|
+  | 140 ms | 0,28 | 0,00 | 0,00 |
+  | 280 ms | 0,00 | 0,63 | 0,00 |
+  | 420 ms | 0,00 | 0,91 | 0,70 |
+  | 700 ms | 0,00 | 1,00 | 1,00 |
+
 - **Die Nummer steht außerhalb der Textspalte**, im Seitenrand daneben:
   So beginnt die Bezeichnung auf derselben Fluchtlinie wie der Text
   darunter. Einspaltig (unter 800 px) rückt sie zurück in die Zeile —

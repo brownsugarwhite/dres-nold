@@ -223,7 +223,7 @@ const bewerbung = (titel: string) =>
      zugeklappt hat — sonst sähe man beim Laden, wie alle Stellen
      zusammenfahren. */
   .stellen__liste[data-bereit] .stelle__klappe {
-    transition: grid-template-rows 0.5s var(--verlauf-betont);
+    transition: grid-template-rows 0.62s var(--verlauf-betont);
   }
 
   .stelle__klappe[data-zu] { grid-template-rows: 0fr; }
@@ -247,10 +247,18 @@ const bewerbung = (titel: string) =>
     padding-bottom: clamp(28px, 3vw, 40px);
   }
 
-  /* Der Anriss zeigt bei zugeklappter Zeile, was dahintersteckt */
+  /*
+    Der Anriss zeigt bei zugeklappter Zeile, was dahintersteckt — und
+    übergibt beim Aufklappen an den echten Text: Er zieht sich zusammen
+    und blendet aus, während derselbe Satz eine Zeile tiefer groß
+    wieder auftaucht (Florian, 18. September 2026). Vorher verschwand
+    er hart.
+  */
   .stelle__anriss {
     display: block;
+    overflow: hidden;
     max-width: 52ch;
+    max-height: 4em;
     margin-top: 6px;
     color: var(--farbe-text-gedeckt);
     font-size: 15px;
@@ -258,7 +266,55 @@ const bewerbung = (titel: string) =>
     line-height: 1.5;
   }
 
-  .stelle__knopf[aria-expanded='true'] .stelle__anriss { display: none; }
+  .stellen__liste[data-bereit] .stelle__anriss {
+    transition:
+      max-height 0.45s var(--verlauf-betont),
+      margin-top 0.45s var(--verlauf-betont),
+      opacity 0.26s var(--verlauf);
+  }
+
+  .stelle__knopf[aria-expanded='true'] .stelle__anriss {
+    max-height: 0;
+    margin-top: 0;
+    opacity: 0;
+  }
+
+  /*
+    Der Inhalt kommt gestaffelt nach: erst der Text, dann die Spalte mit
+    der Ansprechperson — beide leicht von unten und aufblendend, sobald
+    die Klappe Platz gemacht hat.
+  */
+  .stelle__text,
+  .stelle__seite {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  .stellen__liste[data-bereit] .stelle__text,
+  .stellen__liste[data-bereit] .stelle__seite {
+    transition:
+      opacity 0.5s var(--verlauf-betont),
+      transform 0.5s var(--verlauf-betont);
+  }
+
+  .stelle__klappe:not([data-zu]) .stelle__text {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.14s;
+  }
+
+  .stelle__klappe:not([data-zu]) .stelle__seite {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.26s;
+  }
+
+  /* Beim Zuklappen soll nichts nachhängen: Der Inhalt geht sofort. */
+  .stelle__klappe[data-zu] .stelle__text,
+  .stelle__klappe[data-zu] .stelle__seite {
+    transition-duration: 0.2s;
+    transition-delay: 0s;
+  }
 
   .stelle__text :global(p) {
     max-width: var(--breite-absatz);
@@ -312,14 +368,34 @@ const bewerbung = (titel: string) =>
 
   @media (max-width: 700px) {
     .stelle__umfang { display: none; }
-    .stelle__spalten { grid-template-columns: 1fr; }
   }
 
-  /* Einspaltig gibt es nichts, woran etwas kleben könnte. Und weil der
-     Seitenrand dort nur 24 px misst, rückt die Nummer wieder in die
-     Zeile. */
+  /*
+    Schmale Fenster: alles untereinander. Die Ansprechperson klebt dort
+    **unten** am Bildschirmrand, solange man in der offenen Anzeige
+    liest (Florian, 18. September 2026) — oben wäre kein Platz, dort
+    steht schon die Kopfleiste.
+
+    Dafür muss `.stelle__spalten` ein gewöhnlicher Block sein: In einem
+    Raster ist die Zeile nur so hoch wie ihr Inhalt, und ein Element hat
+    darin keinen Weg, an dem es kleben könnte.
+
+    Und weil der Seitenrand hier nur 24 px misst, rückt die Nummer
+    zurück in die Zeile.
+  */
   @media (max-width: 800px) {
-    .stelle__seite { position: static; }
+    .stelle__spalten { display: block; }
+
+    .stelle__seite {
+      position: sticky;
+      top: auto;
+      bottom: 0;
+      z-index: 2;
+      margin-top: var(--abstand-m);
+      padding-block: var(--abstand-s);
+      border-top: 1px solid var(--farbe-linie-leise);
+      background: var(--farbe-flaeche);
+    }
 
     .stelle__nummer {
       position: static;
@@ -330,7 +406,13 @@ const bewerbung = (titel: string) =>
   @media (prefers-reduced-motion: reduce) {
     .stelle__klappe,
     .stelle__pfeil,
-    .stelle__kreis { transition: none; }
+    .stelle__kreis,
+    .stelle__anriss,
+    .stelle__text,
+    .stelle__seite { transition: none; }
+
+    .stelle__text,
+    .stelle__seite { opacity: 1; transform: none; }
   }
 </style>
 
