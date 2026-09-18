@@ -101,12 +101,17 @@ const texte = startseite.sprechstunden;
           {/* Wie in der mobilen Vorlage ein Kreuz oben rechts. Weil die
               Karte scrollgesteuert ist, „schließt" es sie, indem es sanft
               an den Bereich darunter scrollt. */}
-          <button class="schliessen schliessen--fest ozschliessen" type="button" data-ozschliessen aria-label="Einstieg überspringen">
-            <svg class="schliessen__kreis" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" /></svg>
-          </button>
-
           <div class="ozblase__kicker kicker">Sprechstunden</div>
-          <h2 class="ozblase__titel ohne-verlauf" id="oz-titel">{texte.titel}</h2>
+
+          {/* Überschrift und Kreuz stehen in einer Zeile — so sitzt das
+              Kreuz auf der Höhe von „Wann Sie uns antreffen" statt
+              darüber zu schweben (Florian, 18. September 2026). */}
+          <div class="ozblase__zeile">
+            <h2 class="ozblase__titel ohne-verlauf" id="oz-titel">{texte.titel}</h2>
+            <button class="schliessen schliessen--fest ozschliessen" type="button" data-ozschliessen aria-label="Einstieg überspringen">
+              <svg class="schliessen__kreis" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" /></svg>
+            </button>
+          </div>
           {texte.text && <p class="ozblase__einleitung">{texte.text}</p>}
 
           <div class="ozblase__spalten">
@@ -285,11 +290,21 @@ const texte = startseite.sprechstunden;
 
   /* Kicker und Überschrift wie in jedem anderen Abschnitt — nur eine
      Spur kleiner, weil sie in der Blase stehen. */
-  .ozblase__kicker { padding-right: 48px; }
+
+  /* Überschrift links, Schließen-Kreuz rechts, beide auf einer Mitte.
+     Der Abstand zum Kicker steht an der Zeile, nicht an der Überschrift:
+     Läge er an ihr, zählte er zu ihrem Rand und das Kreuz säße um die
+     halbe Höhe des Abstands zu hoch. */
+  .ozblase__zeile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--abstand-m);
+    margin-top: 20px;
+  }
 
   .ozblase__titel {
-    margin: 20px 0 0;
-    padding-right: 48px;
+    margin: 0;
     color: var(--farbe-primaer);
     font-size: clamp(1.75rem, 1.2rem + 1.8vw, 2.75rem);
     font-weight: var(--gewicht-leicht);
@@ -303,13 +318,9 @@ const texte = startseite.sprechstunden;
      könnte, die Karte fährt ja schon herein (Florian, 17. September
      2026).
 
-     Es sitzt tiefer als früher und bündig mit der rechten Kante des
-     Textes darunter. */
-  .ozschliessen {
-    position: absolute;
-    top: var(--abstand-l);
-    right: var(--abstand-seitenrand);
-  }
+     Es steht in der Zeile der Überschrift und darf darin nicht
+     schrumpfen. */
+  .ozschliessen { flex: none; }
 
   .ozschliessen:hover,
   .ozschliessen:focus-visible {

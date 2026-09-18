@@ -2,8 +2,7 @@
 /**
  * Hinweis-Sprechblase für Urlaub, Vertretung oder Notfälle.
  *
- * Nachbau des Info-Popups der Webflow-Seite: weiße Sprechblase mit
- * Zipfel, daneben das News-Symbol, über einem abgedunkelten Hintergrund.
+ * Eine weiße Karte in der Mitte, dahinter die weichgezeichnete Seite.
  *
  * Sichtbar nur, wenn der Hinweis aktiv geschaltet ist UND das heutige
  * Datum im eingetragenen Zeitraum liegt. Ein Urlaubshinweis verschwindet
@@ -11,11 +10,11 @@
  *
  * Maße und Farben stammen aus der Vorlage (siehe docs/referenz/).
  *
- * Der Entwurf vom 17. September 2026 zeigt hier eine schlichte Karte
- * ohne Zipfel. Die Sprechblase bleibt (CLAUDE.md nennt sie die
- * wichtigste Funktion für die Praxis, und sie ist das Erkennungsbild
- * der alten Seite); übernommen sind Kicker, die leichte Überschrift mit
- * bewegtem Verlauf und der Knopf der ganzen Seite.
+ * Zipfel und News-Symbol der alten Seite sind seit dem 18. September
+ * 2026 weg: Florian wollte die schlichte Karte des Entwurfs (siehe
+ * docs/entscheidungen.md). Geblieben sind der Einflug von links
+ * (Ablauf a-36) und das Schließen-Kreuz — dasselbe wie in der
+ * Einstiegskarte, mit fertig gezeichnetem Kreis.
  */
 import daten from '../content/hinweis.json';
 
@@ -40,25 +39,25 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
     aria-labelledby="hinweis-titel"
     hidden
   >
-    <div class="hinweis__blase-umgebung">
-      <img class="hinweis__symbol" src="/icons/navigation/neuigkeiten.svg" alt="" width="80" height="80" />
-      <img class="hinweis__zipfel" src="/icons/ui/sprechblase-zipfel.png" alt="" width="30" height="100" />
+    <div class="hinweis__blase">
+      {/* Dasselbe Kreuz wie in der Einstiegskarte — Aussehen in
+          styles/global.css, Kreis von Anfang an sichtbar. */}
+      <button class="schliessen schliessen--fest hinweis__schliessen" type="button" aria-label="Hinweis schließen">
+        <svg class="schliessen__kreis" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" /></svg>
+      </button>
 
-      <div class="hinweis__blase">
-        <button class="hinweis__schliessen" type="button" aria-label="Hinweis schließen"></button>
-        <div class="kicker kicker--klein">Hinweis</div>
-        <h2 class="hinweis__titel verlauf" id="hinweis-titel">{daten.titel}</h2>
-        <div class="hinweis__text redaktionstext" set:html={daten.text} />
+      <div class="kicker kicker--klein">Hinweis</div>
+      <h2 class="hinweis__titel verlauf" id="hinweis-titel">{daten.titel}</h2>
+      <div class="hinweis__text redaktionstext" set:html={daten.text} />
 
-        {daten.mehr_erfahren_ziel && (
-          <div class="hinweis__mehr">
-            <a class="kn kn--voll" href={daten.mehr_erfahren_ziel}>
-              <span class="kn__f" aria-hidden="true"></span>
-              {daten.mehr_erfahren_text || 'Mehr erfahren'}
-            </a>
-          </div>
-        )}
-      </div>
+      {daten.mehr_erfahren_ziel && (
+        <div class="hinweis__mehr">
+          <a class="kn kn--voll" href={daten.mehr_erfahren_ziel}>
+            <span class="kn__f" aria-hidden="true"></span>
+            {daten.mehr_erfahren_text || 'Mehr erfahren'}
+          </a>
+        </div>
+      )}
     </div>
   </div>
 )}
@@ -71,9 +70,15 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Aubergine, stark abgedunkelt — Wert aus der Vorlage */
-    /* Ablauf a-36: Hintergrund dunkelt in 500 ms nach */
-    background-color: #13000d99;
+    /* Aubergine-Schleier, dazu die weichgezeichnete Seite dahinter: So
+       tritt die Karte heraus, ohne dass die Seite ganz verschwindet
+       (Entwurf; Florian, 18. September 2026). Der Schleier ist leichter
+       als der frühere Wert der Vorlage (#13000d99) — das Weichzeichnen
+       trennt schon genug.
+       Ablauf a-36: der Grund dunkelt in 500 ms nach. */
+    background-color: rgb(19 0 13 / 42%);
+    -webkit-backdrop-filter: blur(7px);
+    backdrop-filter: blur(7px);
     padding: var(--abstand-m);
     transition: background-color 500ms linear;
   }
@@ -82,47 +87,23 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
 
   .hinweis[hidden] { display: none; }
 
-  .hinweis[data-offen] .hinweis__blase-umgebung { transform: translateX(0); }
+  .hinweis[data-offen] .hinweis__blase { transform: translateX(0); }
 
-  .hinweis[data-schliesst] .hinweis__blase-umgebung {
+  .hinweis[data-schliesst] .hinweis__blase {
     transform: translateX(-100vw);
     transition: transform 800ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
   }
 
-  /* Ablauf a-36: fährt von links herein, 800 ms outCubic mit
-     400 ms Verzögerung. a-30 schließt in 800 ms inCubic. */
-  .hinweis__blase-umgebung {
-    transform: translateX(-100vw);
-    transition: transform 800ms cubic-bezier(0.215, 0.61, 0.355, 1) 400ms;
-    display: flex;
-    align-items: flex-start;
-    width: 100%;
-    max-width: var(--breite-inhalt);
-    padding-inline: var(--abstand-l);
-  }
-
-  .hinweis__symbol {
-    flex: none;
-    width: 5rem;
-    height: 5rem;
-    /* Symbol weiß einfärben — wie in der Vorlage */
-    filter: brightness(0) invert(1);
-  }
-
-  .hinweis__zipfel {
-    flex: none;
-    width: 30px;
-    height: 100px;
-    margin-left: 5px;
-    object-fit: contain;
-    object-position: right bottom;
-  }
-
+  /* Ablauf a-36: fährt von links herein, 800 ms outCubic mit 400 ms
+     Verzögerung. a-30 schließt in 800 ms inCubic. */
   .hinweis__blase {
     position: relative;
+    transform: translateX(-100vw);
+    transition: transform 800ms cubic-bezier(0.215, 0.61, 0.355, 1) 400ms;
     background: var(--farbe-flaeche);
     border-radius: 30px;
     padding: var(--abstand-l) var(--abstand-l) var(--abstand-m);
+    width: 100%;
     max-width: 34rem;
     max-height: 80vh;
     overflow-y: auto;
@@ -132,25 +113,12 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
     position: absolute;
     top: var(--abstand-m);
     right: var(--abstand-m);
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    border: 0;
-    background: url('/icons/ui/schliessen.svg') center / contain no-repeat transparent;
-    cursor: pointer;
-    /* Dreht sich beim Zeigen — wie in der Vorlage (a-34 / a-35) */
-    /* Ablauf a-34 / a-35: 300 ms, outQuad */
-    transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-
-  .hinweis__schliessen:hover,
-  .hinweis__schliessen:focus-visible {
-    transform: rotate(90deg);
   }
 
   .hinweis__titel {
     margin: 16px 0 var(--abstand-s);
-    padding-right: var(--abstand-l);
+    /* Platz für das Kreuz daneben */
+    padding-right: 64px;
     font-size: 34px;
     font-weight: var(--gewicht-leicht);
     line-height: 1.16;
@@ -178,12 +146,8 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
   }
 
   @media (max-width: 40rem) {
-    .hinweis__blase-umgebung {
-      flex-direction: column;
-      padding-inline: 0;
-    }
-    .hinweis__zipfel { display: none; }
-    .hinweis__symbol { margin-bottom: var(--abstand-s); }
+    .hinweis__blase { padding: var(--abstand-m) var(--abstand-m) var(--abstand-s); }
+    .hinweis__titel { padding-right: 56px; }
   }
 </style>
 

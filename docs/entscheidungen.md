@@ -220,7 +220,8 @@ Weitere Festlegungen aus demselben Durchgang:
 - **Alles linksbündig** außer Startbereich, Begrüßung und Hinweis.
 - Die **Hinweis-Sprechblase behält ihre Form** (Zipfel, News-Symbol,
   Einflug von links). Übernommen sind Kicker, die leichte Überschrift
-  und der Knopf.
+  und der Knopf. — **Überholt am 18. September 2026**, siehe „Der
+  Hinweis wird eine Karte" weiter unten.
 - Der **Scrollweg der Sprechstunden** bleibt bei 350vh (mobil 450vh) —
   siehe weiter unten, „Der Einstieg ist eine Karte".
 - **Ablauf a-8 der Leistungskacheln bleibt vollständig** — mit beiden
@@ -587,4 +588,45 @@ steht `data-astro-prefetch="false"` daran (Kommentar in
   und sollen als Paar gelesen werden. Die Kontaktzeile lief zuvor auf
   der vollen Inhaltsbreite und war damit deutlich breiter als die
   Leiste darunter.
+
+### Feinschliff und Handy-Durchgang (18. September 2026)
+
+- **Die Trennpunkte oben** tragen die Hausfarbe wie die Punkte zwischen
+  den Symbolen unten. Der leise Ton des Handoffs fiel daneben ab
+  (Florian).
+- **Der Haken unter „Scrollen Sie …"** ist 32 × 16 px statt 40 × 20 —
+  neben der feinen Schrift wirkte er zu groß.
+- **Das Schließen-Kreuz der Sprechstunden** steht jetzt in einer Zeile
+  mit „Wann Sie uns antreffen" statt darüber zu schweben. Der Abstand
+  zum Kicker sitzt an der Zeile, nicht an der Überschrift — läge er an
+  ihr, zählte er zu ihrem Rand und das Kreuz säße um die halbe Höhe des
+  Abstands zu hoch.
+- **Unten auf Handys steht „Leistungen" statt „Kontakt".** Danach wird
+  am Handy am häufigsten gesucht; der Kontakt ist über die
+  Telefonnummer daneben ohnehin einen Griff entfernt (Florian).
+
+**Das waagerechte Scrollen ist weg.** Ursache war der Schattensaum des
+Teams: Er ragt an den Reihenenden 64 px über die Inhaltsbreite hinaus,
+daneben ist aber nur der Seitenrand frei (24 px). Die übrigen 40 px
+schoben die ganze Seite auf. `html { overflow-x: clip }` hat das bisher
+verdeckt — auf Browsern ohne `clip` (iOS 15 und älter) aber nicht.
+
+Jetzt endet der Saum am Fensterrand: `overflow-x: clip` am Abschnitt
+`.team`. Das Auslaufen bleibt sichtbar, der Überstand kann die Seite
+aber nicht mehr verbreitern. Gemessen auf 375 px und auf 1440 px
+Fensterbreite, über die ganze Seitenhöhe: Überstand 0.
+
+### Der Hinweis wird eine Karte (18. September 2026)
+
+Zipfel und News-Symbol sind weg, die Blase ist die schlichte Karte des
+Entwurfs — mittig im Fenster, dahinter die **weichgezeichnete Seite**
+(`backdrop-filter: blur(7px)`) unter einem leichteren Aubergine-Schleier
+(42 % statt der 60 % der Vorlage; das Weichzeichnen trennt schon genug).
+
+Das Schließen-Kreuz ist dasselbe wie in der Einstiegskarte —
+`.schliessen--fest`, 48 px mit fertig gezeichnetem Kreis.
+
+Damit ist die Festlegung vom 17. September („die Sprechblase behält
+ihre Form") überholt: Florian wollte am 18. September die Karte des
+Entwurfs. Geblieben ist der Einflug von links (Ablauf a-36).
 

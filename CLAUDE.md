@@ -274,14 +274,14 @@ Damit funktioniert der Übergang praktisch überall. Ein Zusatz-Fallback ist nic
 
 ## Die Hinweis-Sprechblase
 
-Nachbau des Info-Popups der Webflow-Seite und die wichtigste Funktion für die Praxis: weiße Sprechblase mit Zipfel, daneben das News-Symbol in Weiß, über abgedunkeltem Hintergrund (`#13000d99`).
+Die wichtigste Funktion für die Praxis: eine weiße Karte in der Mitte des Fensters, dahinter die weichgezeichnete Seite unter einem Aubergine-Schleier. Zipfel und News-Symbol der Webflow-Vorlage sind seit dem 18. September 2026 weg — es gilt die schlichte Karte des Entwurfs.
 
 **Verhalten:**
 - Erscheint beim Öffnen der Seite, sofern `aktiv` gesetzt ist **und** das heutige Datum zwischen `von` und `bis` liegt
 - Ein Urlaubshinweis verschwindet dadurch von selbst — niemand muss daran denken
 - Wurde sie weggeklickt, bleibt sie für diesen Besuch fort (nur im Browser des Besuchers vermerkt, nichts wird übertragen)
 - Ändert sich Titel oder Zeitraum, meldet sie sich erneut
-- Schließen per Knopf, Klick auf den Hintergrund oder Escape-Taste; das Schließkreuz dreht sich beim Zeigen (aus `a-34`/`a-35`)
+- Schließen per Knopf, Klick auf den Hintergrund oder Escape-Taste; das Schließkreuz ist dasselbe wie in der Einstiegskarte (`.schliessen--fest`) und dreht sich beim Zeigen (aus `a-34`/`a-35`)
 - Optional ein runder „mehr erfahren"-Knopf, wenn ein Ziel eingetragen ist
 
 **Wichtig:** Die Auswertung geschieht beim Erzeugen der Seite. Damit sie am Stichtag umschaltet, baut der GitHub-Workflow die Seite jede Nacht um 03:00 UTC neu.

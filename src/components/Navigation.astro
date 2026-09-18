@@ -47,7 +47,12 @@ const fussGross = punkte
   .filter((e) => e.id !== 'zeiten')
   .concat(punkte.filter((e) => e.id === 'zeiten'));   // Öffnungszeiten ans Ende
 
-const fussKlein = ['kontakt', 'telefon', 'zeiten']
+/* Reihenfolge fest: Die Telefonnummer gehört in die Mitte, links und
+   rechts je ein Sprungziel. Statt Kontakt stehen dort die Leistungen —
+   danach wird auf dem Handy am häufigsten gesucht (Florian,
+   18. September 2026); der Kontakt ist über die Telefonnummer daneben
+   ohnehin einen Griff entfernt. */
+const fussKlein = ['leistungen', 'telefon', 'zeiten']
   .map((id) => punkte.find((e) => e.id === id))
   .filter(Boolean);
 
@@ -958,7 +963,10 @@ const kategorien = (leistungen.kategorien ?? [])
     width: 3px;
     height: 3px;
     border-radius: 50%;
-    background: var(--farbe-text-leise);
+    /* Dieselbe Hausfarbe wie die Punkte zwischen den Symbolen unten —
+       oben und unten sollen gleich aussehen (Florian, 18. September
+       2026). Zwischendurch stand hier der leiseste Ton der Familie. */
+    background: var(--farbe-primaer);
   }
 
   /* ---------- Kleine Bildschirme ---------- */

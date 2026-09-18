@@ -153,6 +153,13 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     align-items: center;
     width: 100%;
     background: var(--farbe-flaeche);
+    /* Der Schattensaum ragt an den Reihenenden 64 px über die
+       Inhaltsbreite hinaus (siehe unten). Auf schmalen Fenstern ist
+       daneben nur der Seitenrand frei — der Rest schob die ganze Seite
+       waagerecht auf. Hier endet er am Fensterrand, das Auslaufen
+       bleibt. `clip` statt `hidden`: kein Rollbereich, damit nichts
+       anderes im Abschnitt seine Verankerung verliert. */
+    overflow-x: clip;
   }
 
   /* ---------- Gruppenfoto ---------- */
