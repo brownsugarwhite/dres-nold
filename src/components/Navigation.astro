@@ -188,7 +188,7 @@ const kategorien = (leistungen.kategorien ?? [])
     <div class="mobilmenue__inhalt">
       {punkte.map((e, i) => (
         e.id === 'leistungen' ? (
-          <div class="mobilmenue__gruppe" style={`--stufe: ${i}`}>
+          <div class="mobilmenue__gruppe" style={`--stufe: ${i}; --stufe-hoch: ${punkte.length - i}`}>
             {/* „Leistungen" klappt an Ort und Stelle auf — ein Akkordeon
                 mit den Kategorien, wie die Blase auf dem Desktop */}
             <button
@@ -217,7 +217,7 @@ const kategorien = (leistungen.kategorien ?? [])
             </div>
           </div>
         ) : (
-          <a class="mobilmenue__punkt" href={ziel(e)} style={`--stufe: ${i}`}>
+          <a class="mobilmenue__punkt" href={ziel(e)} style={`--stufe: ${i}; --stufe-hoch: ${punkte.length - i}`}>
             <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
             <span class="mobilmenue__text">{e.titel}</span>
           </a>
@@ -226,8 +226,9 @@ const kategorien = (leistungen.kategorien ?? [])
     </div>
 
     {/* .div-block-30: Punktlinie oben, 40 px hoch */}
-    <div class="mobilmenue__recht" style={`--stufe: ${punkte.length}`}>
+    <div class="mobilmenue__recht" style={`--stufe: ${punkte.length}; --stufe-hoch: 0`}>
       <a href="/datenschutz/">Datenschutz</a>
+      <span class="punkt" aria-hidden="true"></span>
       <a href="/impressum/">Impressum</a>
     </div>
     </div>
@@ -540,7 +541,15 @@ const kategorien = (leistungen.kategorien ?? [])
     max-height: calc(100vh - 80px - var(--abstand-xl));
     max-height: calc(100dvh - 80px - var(--abstand-xl));
     overflow: hidden auto;
+    /* Während das Menü aufklappt, ist der Inhalt kurzzeitig höher als
+       der Rahmen — der Rollbalken blitzte dabei am Rand auf (Florian,
+       18. September 2026). Rollen bleibt möglich, der Balken ist nur
+       nicht mehr zu sehen. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+
+  .mobilmenue__rahmen::-webkit-scrollbar { width: 0; height: 0; }
 
   .navigation[data-menue-offen] .mobilmenue { grid-template-rows: 1fr; }
 
@@ -572,20 +581,30 @@ const kategorien = (leistungen.kategorien ?? [])
     Die Einträge fahren beim Öffnen von oben nach unten ein: leicht von
     oben, dabei aufblendend, jeder eine Spur später als der davor
     (Florian, 18. September 2026).
+
+    Beim Schließen läuft dieselbe Staffelung rückwärts: Der zuletzt
+    gekommene geht zuerst (`--stufe-hoch` zählt von unten). Deshalb
+    steht die Schließ-Verzögerung im Grundzustand — er ist der, in den
+    zurückgeblendet wird. Etwas schneller getaktet als beim Öffnen,
+    damit alles fort ist, bevor das Menü zu ist (700 ms).
   */
   .mobilmenue__inhalt > *,
   .mobilmenue__recht {
     opacity: 0;
     transform: translateY(-10px);
     transition:
-      opacity 420ms var(--verlauf-betont),
-      transform 420ms var(--verlauf-betont);
+      opacity 260ms var(--verlauf-betont),
+      transform 260ms var(--verlauf-betont);
+    transition-delay: calc(var(--stufe-hoch, 0) * 45ms);
   }
 
   .navigation[data-menue-offen] .mobilmenue__inhalt > *,
   .navigation[data-menue-offen] .mobilmenue__recht {
     opacity: 1;
     transform: none;
+    transition:
+      opacity 420ms var(--verlauf-betont),
+      transform 420ms var(--verlauf-betont);
     transition-delay: calc(120ms + var(--stufe, 0) * 55ms);
   }
 
@@ -685,26 +704,32 @@ const kategorien = (leistungen.kategorien ?? [])
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--abstand-l);
+    gap: var(--abstand-m);
     width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
     margin: var(--abstand-s) auto 0;
     /* Keine eigene Linie darunter: Die Punktlinie hier oben und die
        gestrichelte Unterkante der Navigation schließen das Menü schon
        ab — eine dritte Linie dazwischen war eine zu viel (Florian,
+       18. September 2026). Oben und unten derselbe Abstand: Die beiden
+       Verweise stehen genau zwischen den zwei Linien (Florian,
        18. September 2026). */
-    padding-block: var(--abstand-s) var(--abstand-m);
+    padding-block: var(--abstand-s);
     background: url('/bilder/deko/punktlinie.png') 50% 0 repeat-x;
     background-size: auto 1px;
   }
 
+  /* In der Hausfarbe wie die Punkte und die Zeile ganz oben — die
+     beiden Verweise gehören zur Navigation, nicht zum Fließtext
+     (Florian, 18. September 2026). */
   .mobilmenue__recht a {
-    color: var(--farbe-text);
+    color: var(--farbe-primaer);
     font-size: 14px;
     text-decoration: none;
+    transition: opacity var(--dauer-schnell) var(--verlauf);
   }
 
   .mobilmenue__recht a:hover,
-  .mobilmenue__recht a:focus-visible { color: var(--farbe-primaer); }
+  .mobilmenue__recht a:focus-visible { opacity: 0.65; }
 
   .logo img {
     width: 80px;

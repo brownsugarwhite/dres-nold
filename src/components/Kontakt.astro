@@ -39,13 +39,21 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     <span class="kontakt__bild"></span>
     <span class="kontakt__toenung"></span>
     <span class="kontakt__schleier"></span>
-    <span class="kontakt__marke">
-      <svg viewBox="0 0 120 120" focusable="false">
-        <circle class="kontakt__ring" cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="1.5" />
-        <circle class="kontakt__ring kontakt__ring--zwei" cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="1.5" />
-        <circle cx="60" cy="60" r="16" fill="#fff" />
-        <circle cx="60" cy="60" r="10" fill="currentColor" />
+
+    {/* Die Marke des Entwurfs: ein Tropfen, der von oben hereinfällt,
+        darunter zwei Ringe, die sich nacheinander ausbreiten. Ihre
+        Spitze sitzt auf der Praxis. */}
+    <span class="kontakt__marke" data-marke>
+      <svg viewBox="0 0 52 72" focusable="false">
+        <path
+          d="M26 1C12.2 1 1 12 1 25.6 1 44.5 26 71 26 71S51 44.5 51 25.6C51 12 39.8 1 26 1Z"
+          fill="currentColor" stroke="#ffffff" stroke-width="2"
+        />
+        <circle cx="26" cy="25.5" r="9.5" fill="#ffffff" />
+        <circle cx="26" cy="25.5" r="4.2" fill="currentColor" />
       </svg>
+      <span class="kontakt__halo"></span>
+      <span class="kontakt__halo kontakt__halo--zwei"></span>
     </span>
   </div>
 
@@ -114,19 +122,35 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     inset: 0;
   }
 
+  /*
+    Die Zeichnung hängt an der Marke, nicht am Bereich: Ihr Mittelpunkt
+    ist die Praxis, und der soll genau unter der Spitze der Marke
+    liegen — wo immer die gerade sitzt (auf breiten Schirmen in der
+    Lücke zwischen Text und Formular, auf Tablets rechts daneben, auf
+    Handys zwischen Knöpfen und Formular). Das Skript unten misst die
+    Stelle und setzt `--marke-x` / `--marke-y`.
+
+    Breite und Höhe sind das Doppelte des jeweils längeren Wegs zum
+    Rand — so deckt die Zeichnung den Bereich, egal wohin die Marke
+    rückt.
+  */
   .kontakt__bild {
     position: absolute;
-    inset: 0;
+    left: var(--marke-x, 50%);
+    top: var(--marke-y, 50%);
     display: block;
-    background: url('/bilder/deko/karte-bietigheim.svg') center / cover no-repeat;
+    width: calc(2 * max(var(--marke-x, 50%), 100% - var(--marke-x, 50%)));
+    height: calc(2 * max(var(--marke-y, 50%), 100% - var(--marke-y, 50%)));
+    translate: -50% -50%;
+    background: url('/bilder/deko/karte-bietigheim.svg') center / var(--karte-mass, cover) no-repeat;
     /* Fährt beim Hereinscrollen ganz leicht heran — das ist der
-       Anflug der Entwurfsfassung, nur ohne Karten-Bibliothek. */
-    transform: scale(1.1);
-    transform-origin: center;
-    transition: transform 2.2s cubic-bezier(0.22, 0.61, 0.24, 1);
+       Anflug der Entwurfsfassung, nur ohne Karten-Bibliothek. Weil der
+       Mittelpunkt die Praxis ist, fliegt sie genau auf die Marke zu. */
+    scale: 1.1;
+    transition: scale 2.2s cubic-bezier(0.22, 0.61, 0.24, 1);
   }
 
-  .kontakt[data-da] .kontakt__bild { transform: scale(1); }
+  .kontakt[data-da] .kontakt__bild { scale: 1; }
 
   /* Tönung in der Hausfarbe, 4,5 % (Handoff) */
   .kontakt__toenung {
@@ -168,45 +192,84 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     }
   }
 
+  /* Handys: Der Schleier zieht sich weiter nach oben zusammen, damit
+     schon oberhalb des Formulars etwas von der Karte zu sehen ist —
+     dort steht die Marke (Florian, 18. September 2026). */
+  @media (max-width: 700px) {
+    .kontakt__schleier {
+      background: linear-gradient(
+        to bottom,
+        #ffffff 0,
+        rgb(255 255 255 / 94%) 7%,
+        rgb(255 255 255 / 76%) 18%,
+        rgb(255 255 255 / 34%) 34%,
+        rgb(255 255 255 / 0) 52%
+      );
+    }
+  }
+
   /*
-    Die Marke sitzt auf der Praxis — in der Mitte der Zeichnung. Zwei
-    Ringe gehen versetzt auf und verlieren sich (2,6 s, Versatz 1,3 s),
-    darunter der weiße Kern mit dem Punkt (Handoff).
+    Die Marke des Entwurfs: 52 × 72, die Spitze unten auf der Praxis.
+    Sie fällt von oben herein, sobald der Anflug der Karte zu Ende ist
+    (2,2 s), und darunter breiten sich zwei Ringe versetzt aus.
   */
   .kontakt__marke {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    width: clamp(64px, 6vw, 104px);
-    aspect-ratio: 1;
-    translate: -50% -50%;
+    left: var(--marke-x, 50%);
+    top: var(--marke-y, 50%);
+    width: 52px;
+    height: 72px;
+    /* Der Bezugspunkt ist die Spitze, nicht die Mitte */
+    translate: -50% -100%;
+    transform-origin: 50% 100%;
     color: var(--farbe-primaer);
-    opacity: 0;
-    scale: 0.82;
-    transition:
-      opacity 0.7s cubic-bezier(0.22, 0.61, 0.24, 1) 1.1s,
-      scale 0.7s cubic-bezier(0.22, 0.61, 0.24, 1) 1.1s;
   }
 
-  .kontakt[data-da] .kontakt__marke { opacity: 1; scale: 1; }
-
   .kontakt__marke svg {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
-    filter: drop-shadow(0 8px 14px rgb(30 8 22 / 22%));
+    opacity: 0;
+    filter: drop-shadow(0 10px 14px rgb(30 8 22 / 35%));
   }
 
-  .kontakt__ring {
-    transform-origin: 60px 60px;
-    animation: kontakt-ring 2.6s cubic-bezier(0.22, 0.61, 0.24, 1) infinite;
+  /* Erst fliegt die Karte an (2,2 s), dann fällt die Marke */
+  .kontakt[data-da] .kontakt__marke svg {
+    animation: kontakt-marke-fallen 0.9s cubic-bezier(0.22, 0.61, 0.24, 1) 2.3s both;
   }
 
-  .kontakt__ring--zwei { animation-delay: 1.3s; }
+  @keyframes kontakt-marke-fallen {
+    0% { opacity: 0; transform: translateY(-70px) scale(0.9); }
+    60% { opacity: 1; transform: translateY(4px) scale(1.02); }
+    80% { transform: translateY(-3px) scale(1); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
 
-  @keyframes kontakt-ring {
-    0% { transform: scale(0.25); opacity: 0.75; }
-    100% { transform: scale(1); opacity: 0; }
+  .kontakt__halo {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 26px;
+    height: 26px;
+    margin-left: -13px;
+    margin-bottom: -13px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  .kontakt[data-da] .kontakt__halo {
+    animation: kontakt-halo 2.6s cubic-bezier(0.22, 0.61, 0.24, 1) 3.2s infinite;
+  }
+
+  .kontakt[data-da] .kontakt__halo--zwei { animation-delay: 4.5s; }
+
+  @keyframes kontakt-halo {
+    0% { opacity: 0.7; transform: scale(0.3); }
+    100% { opacity: 0; transform: scale(4.5); }
   }
 
   .kontakt__herkunft {
@@ -239,13 +302,21 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: clamp(32px, 5vw, 96px);
-    align-items: center;
+    /* Oben bündig statt mittig: Die Anschrift links beginnt auf der
+       Höhe der Formularkarte rechts (Florian, 18. September 2026). */
+    align-items: start;
     width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
     margin-inline: auto;
     padding-block: var(--abstand-abschnitt);
   }
 
-  .kontakt__text { min-width: 0; }
+  /* Derselbe Innenabstand wie in der Formularkarte — damit stehen auch
+     die beiden Kicker („Kontakt" und „Nachricht") auf einer Linie und
+     nicht nur die Kanten der Spalten. */
+  .kontakt__text {
+    min-width: 0;
+    padding-top: clamp(24px, 2.4vw, 36px);
+  }
 
   .kontakt__titel {
     margin: 14px 0 0;
@@ -361,35 +432,121 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
       grid-template-columns: 1fr;
       align-items: start;
     }
+    .kontakt__text { padding-top: 0; }
     .kontakt__formular { justify-self: start; }
   }
+
+  /* Steht die Marke zwischen Knöpfen und Formular (Handys, siehe
+     Skript), braucht sie dort Platz — die Reihenlücke wächst dann auf
+     ihre Höhe plus Luft (Florian, 18. September 2026). */
+  .kontakt[data-marke='unten'] .kontakt__inhalt { row-gap: 128px; }
 
   @media (max-width: 560px) {
     .kontakt__knoepfe .kn { flex: 1; justify-content: center; white-space: nowrap; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .kontakt__ring { animation: none; opacity: 0.35; transform: scale(0.75); }
     .kontakt__bild,
-    .kontakt__marke,
     .kontakt__telefon,
     .kontakt__mail { transition: none; }
-    .kontakt__bild { transform: none; }
-    .kontakt__marke { opacity: 1; scale: 1; }
+    .kontakt__bild { scale: 1; }
+    .kontakt[data-da] .kontakt__marke svg { animation: none; }
+    .kontakt__marke svg { opacity: 1; }
+    .kontakt[data-da] .kontakt__halo { animation: none; opacity: 0.35; transform: scale(2.2); }
   }
 </style>
 
 <script>
   /**
-   * Der Anflug: Sobald ein knappes Drittel des Bereichs im Bild ist,
-   * fährt die Karte von 110 % auf ihre Größe herunter und die Marke
-   * blendet auf — dieselbe Choreografie wie der `flyTo` des Entwurfs,
-   * nur ohne Karten-Bibliothek (Handoff, 18. September 2026).
+   * Zwei Dinge: wo die Marke steht, und wann der Anflug losgeht.
+   *
+   * 1. Die Stelle
+   *    Die Marke soll auf jeder Bildschirmgröße frei stehen — nicht
+   *    hinter der Formularkarte und nicht unter dem Text. Wo das ist,
+   *    hängt vom Umbruch ab und wird deshalb gemessen, nicht geraten
+   *    (so hält es auch der Entwurf, `freiePosition()`):
+   *
+   *      nebeneinander   in der Lücke zwischen Text und Formular
+   *      gestapelt, breit  rechts neben dem Formular (Tablets)
+   *      gestapelt, schmal zwischen den Knöpfen und dem Formular
+   *
+   *    Die Zeichnung hängt an derselben Stelle (siehe CSS): Ihr
+   *    Mittelpunkt ist die Praxis und liegt damit immer genau unter
+   *    der Spitze — auf Handys und Tablets ebenso wie auf dem Desktop
+   *    (Florian, 18. September 2026).
+   *
+   * 2. Der Anflug
+   *    Sobald ein knappes Drittel des Bereichs im Bild ist, fährt die
+   *    Karte von 110 % auf ihre Größe herunter; danach fällt die Marke
+   *    herein — dieselbe Choreografie wie der `flyTo` des Entwurfs,
+   *    nur ohne Karten-Bibliothek (Handoff, 18. September 2026).
    */
   function karteAufbauen() {
     const bereich = document.querySelector<HTMLElement>('#contact');
     if (!bereich || bereich.dataset.bereit) return;
     bereich.dataset.bereit = 'ja';
+
+    const text = bereich.querySelector<HTMLElement>('.kontakt__text');
+    const formular = bereich.querySelector<HTMLElement>('.kontakt__formular');
+
+    /** Breite und Höhe der Marke (CSS) — sie darf nirgends anstoßen. */
+    const MARKE = { breit: 52, hoch: 72 };
+
+    const markeStellen = () => {
+      if (!text || !formular) return;
+      const b = bereich.getBoundingClientRect();
+      const t = text.getBoundingClientRect();
+      const f = formular.getBoundingClientRect();
+      if (!b.width || !f.width) return;
+
+      /* Stehen die beiden Spalten nebeneinander? */
+      const nebeneinander = f.left > t.right + 24;
+      /* Bleibt neben dem Formular genug frei für die Marke? */
+      const platzRechts = b.right - f.right;
+
+      let x: number;
+      let y: number;
+      let art: string;
+
+      if (nebeneinander) {
+        art = 'breit';
+        x = (t.right + f.left) / 2 - b.left;
+        y = f.top + f.height * 0.62 - b.top;
+      } else if (platzRechts > MARKE.breit + 64) {
+        art = 'seite';
+        x = (f.right + b.right) / 2 - b.left;
+        y = f.top + f.height * 0.4 - b.top;
+      } else {
+        art = 'unten';
+        x = b.width * 0.72;
+        y = (t.bottom + f.top) / 2 - b.top + MARKE.hoch / 2;
+      }
+
+      /* Nie über den Rand hinaus */
+      x = Math.max(MARKE.breit, Math.min(b.width - MARKE.breit, x));
+      y = Math.max(MARKE.hoch + 8, Math.min(b.height - 16, y));
+
+      bereich.dataset.marke = art;
+      bereich.style.setProperty('--marke-x', `${Math.round(x)}px`);
+      bereich.style.setProperty('--marke-y', `${Math.round(y)}px`);
+
+      /* Die Ebene der Zeichnung ist größer als der Bereich, sobald die
+         Marke aus der Mitte rückt (siehe CSS). Ohne Zutun würde die
+         Zeichnung damit auch größer gezogen — sie soll aber immer so
+         groß sein, wie sie den BEREICH gerade deckt. Deshalb steht das
+         Maß hier ausdrücklich, statt es `cover` zu überlassen. */
+      const f2 = Math.max(b.width / 1920, b.height / 1080);
+      bereich.style.setProperty('--karte-mass', `${Math.round(1920 * f2)}px ${Math.round(1080 * f2)}px`);
+    };
+
+    /* Die Reihenlücke hängt ihrerseits von `data-marke` ab — deshalb
+       zweimal messen: Der zweite Durchgang sieht die neue Lücke. */
+    const messen = () => { markeStellen(); markeStellen(); };
+
+    messen();
+    requestAnimationFrame(messen);
+    window.addEventListener('resize', messen, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(messen).observe(bereich);
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       bereich.dataset.da = 'ja';

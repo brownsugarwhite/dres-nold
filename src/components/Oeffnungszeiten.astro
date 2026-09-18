@@ -362,6 +362,18 @@ const texte = startseite.sprechstunden;
     .ozblase__spalten { grid-template-columns: 1fr; gap: var(--abstand-m); }
   }
 
+  /* Handys: Die drei Listen stehen untereinander und machen den
+     Abschnitt lang. Er wird deshalb enger getaktet, und oben wie unten
+     steht derselbe Abstand — so sitzt der Block mittig zwischen
+     Bilderband und Abschlusslinie statt nach unten versetzt (Florian,
+     18. September 2026). */
+  @media (max-width: 48rem) {
+    .ozsprechstunden { padding: var(--abstand-l) var(--abstand-m); }
+    .ozblase__zeile { margin-top: 14px; }
+    .ozblase__einleitung { margin: 14px 0 0; font-size: 16px; }
+    .ozblase__spalten { gap: var(--abstand-l); margin-top: var(--abstand-l); }
+  }
+
   /* Ohne Bewegung: Der Einstieg steht ruhig im Seitenfluss — Begrüßung,
      Band und Sprechstunden einfach untereinander. Das Schließen-Kreuz
      entfällt dabei: Es gibt nichts zu schließen, wenn nichts einfährt. */
@@ -376,8 +388,11 @@ const texte = startseite.sprechstunden;
 </style>
 
 <script>
-  import { ausStuetzstellen } from '../scripts/easing';
-  import { ozWeg, beimScrollenSichtbar, nachziehen, ozStuetzstellen } from '../scripts/scrollwege';
+  import { ausStuetzstellen, KURVEN } from '../scripts/easing';
+  import {
+    ozWeg, beimScrollenSichtbar, nachziehen, ozStuetzstellen,
+    schnalzWeg, OZ_ZIPFEL_VOLL, SCHNALZ_DAUER,
+  } from '../scripts/scrollwege';
 
   /**
    * Das Kreuz in der Karte: Sie hängt am Scrollweg, lässt sich also
@@ -487,12 +502,23 @@ const texte = startseite.sprechstunden;
 
     };
 
-    /** Zeichnet Fläche und Kontur für einen Ausfahrgrad 0 … 1 */
-    const zipfelZeichnen = (anteil: number) => {
+    /**
+     * Zeichnet Fläche und Kontur.
+     *
+     * @param aus     Ausfahrgrad am Scrollweg, 0 … 1
+     * @param schnalz 1 = der Zipfel steht, 0 = zurückgeschnalzt
+     *
+     * Die Spitze zeigt bis zum Schnalz EXAKT auf die Mitte des
+     * Sprechstunden-Knopfs — beim Ausfahren wandert nur die Basis
+     * (Florian, 18. September 2026). Erst beim Zurückschnalzen lehnt
+     * sie sich weg; genau das gibt der Bewegung ihren Schwung.
+     */
+    const zipfelZeichnen = (aus: number, schnalz: number) => {
+      const anteil = aus * schnalz;
       const f = laenge / VORLAGE.laenge;
       const zw = (m: { zu: number; auf: number }) => (m.zu + (m.auf - m.zu) * anteil) * f;
       const xL = spitzeX + zw(VORLAGE.basisLinks);
-      const xS = spitzeX + zw(VORLAGE.spitze);
+      const xS = spitzeX + VORLAGE.spitze.zu * (1 - schnalz) * f;
       const xR = spitzeX + zw(VORLAGE.basisRechts);
       const yL = grundlinie(xL);
       const yR = grundlinie(xR);
@@ -527,14 +553,20 @@ const texte = startseite.sprechstunden;
       blase.style.setProperty('--oz-start', `${Math.round(start)}px`);
     };
 
-    /* Der Zipfel fährt aus, während die Blase einrastet, und zieht sich
-       danach wieder ein (99 % wie in der Vorlage). */
+    /* Der Zipfel fährt aus, während die Blase einrastet — und bleibt
+       dann stehen. Das Einziehen hängt NICHT mehr am Scrollweg: Es ist
+       der Schnalz und läuft als eigene, schnelle Bewegung ab (unten).
+
+       Die Stellen sind dieselben wie in der Vorlage, nur auf den um
+       die Wartezeit verlängerten Weg umgerechnet: 50 % → 61 %,
+       71 % → 74 % (OZ_ZIPFEL_VOLL). Vorher standen hier noch die
+       ungerechneten Werte — deshalb passte der Schnalz nicht mehr
+       (Florian, 18. September 2026). */
     const ZIPFEL: Stuetzstelle[] = [
       { bei: 0.00, wert: 0, kurve: 'linear' },
-      { bei: 0.50, wert: 0, kurve: 'outCubic' },
-      { bei: 0.71, wert: 0.99, kurve: 'easeOut' },
-      { bei: 0.80, wert: 0, kurve: 'linear' },
-      { bei: 1.00, wert: 0 },
+      { bei: 0.61, wert: 0, kurve: 'outCubic' },
+      { bei: OZ_ZIPFEL_VOLL, wert: 0.99, kurve: 'linear' },
+      { bei: 1.00, wert: 0.99 },
     ];
 
     /* Erst messen (das setzt Zipfellänge und Ruhelage), dann den
@@ -552,9 +584,38 @@ const texte = startseite.sprechstunden;
       return beimScrollenSichtbar(ozWeg(), bereich!.getBoundingClientRect().top);
     }
 
+    /* ---- Der Schnalz ----
+       Ab derselben Scrolltiefe, bei der die Leisten tauschen
+       (`schnalzWeg()`, Navigation.astro), zieht sich der Zipfel zurück —
+       nicht am Scrollrad, sondern in einer eigenen Bewegung von 300 ms
+       mit easeOut, genau der Dauer und Kurve des Leistenwechsels.
+       Beides zusammen ist der Schnalz (Florian, 18. September 2026).
+       Rückwärts läuft er ebenso: Wer wieder hochscrollt, sieht den
+       Zipfel in derselben Zeit wieder ausfahren. */
+    const schnalzSoll = () => (window.scrollY > schnalzWeg() * window.innerHeight ? 0 : 1);
+
+    let schnalz = schnalzSoll();
+    let schnalzZiel = schnalz;
+    let schnalzVon = schnalz;
+    let schnalzStart = 0;
+
+    /** Rückt den Schnalz einen Zeitschritt weiter; true, solange er läuft. */
+    const schnalzSchritt = (jetzt: number): boolean => {
+      const soll = schnalzSoll();
+      if (soll !== schnalzZiel) {
+        schnalzZiel = soll;
+        schnalzVon = schnalz;
+        schnalzStart = jetzt;
+      }
+      if (schnalz === schnalzZiel) return false;
+      const t = Math.min(1, (jetzt - schnalzStart) / SCHNALZ_DAUER);
+      schnalz = t >= 1 ? schnalzZiel : schnalzVon + (schnalzZiel - schnalzVon) * KURVEN.easeOut(t);
+      return schnalz !== schnalzZiel;
+    };
+
     const zeichnen = () => {
       blase.style.setProperty('--oz-versatz', `${ausStuetzstellen(p, BLASE)}px`);
-      zipfelZeichnen(ausStuetzstellen(p, ZIPFEL));
+      zipfelZeichnen(ausStuetzstellen(p, ZIPFEL), schnalz);
     };
 
     /* Eigene Schleife statt reinem Scroll-Ereignis: Der Nachlauf muss
@@ -568,9 +629,11 @@ const texte = startseite.sprechstunden;
       p = nachziehen(p, z, dt);
       if (Math.abs(z - p) < 0.0002) p = z;
 
+      const schnalzt = schnalzSchritt(jetzt);
+
       zeichnen();
 
-      if (p !== z) requestAnimationFrame(schritt);
+      if (p !== z || schnalzt) requestAnimationFrame(schritt);
       else laeuft = false;
     };
 

@@ -56,6 +56,7 @@ type VorTausch = Event & { newDocument: Document; viewTransition?: ViewTransitio
  */
 function kennzeichenAbraeumen() {
   delete document.documentElement.dataset.uebergang;
+  delete document.documentElement.dataset.rueckmorph;
   for (const k of document.querySelectorAll('[data-morph]')) k.removeAttribute('data-morph');
 }
 
@@ -80,6 +81,17 @@ document.addEventListener('astro:before-preparation', (ereignis) => {
      Übergangsgruppe „karte" und liegt damit über ihren Nachbarn
      (styles/uebergaenge.css). */
   quelle?.closest?.('[data-karte]')?.setAttribute('data-morph', '');
+
+  /* Rückweg zur Startseite — über das Schließen-Kreuz (dann steht der
+     Merker schon) oder über den Zurück-Knopf des Browsers. Dabei blendet
+     der übrige Inhalt eine Spur später ein als die Karte wandert, damit
+     die Karte den Blick führt (Florian, 18. September 2026;
+     styles/uebergaenge.css). */
+  let zurueckZurUebersicht = false;
+  try { zurueckZurUebersicht = !!sessionStorage.getItem(MERKER); } catch { /* egal */ }
+  if (zurueckZurUebersicht || e.direction === 'back') {
+    document.documentElement.dataset.rueckmorph = 'ja';
+  }
 });
 
 /* Nach dem Tausch: die Karte der zuletzt offenen Leistung mittig
@@ -108,6 +120,10 @@ document.addEventListener('astro:before-swap', (ereignis) => {
 
   const richtung = document.documentElement.dataset.uebergang;
   if (richtung) e.newDocument.documentElement.dataset.uebergang = richtung;
+
+  if (document.documentElement.dataset.rueckmorph) {
+    e.newDocument.documentElement.dataset.rueckmorph = 'ja';
+  }
 
   /* Aufräumen erst, wenn die Bewegung vorbei ist — siehe
      `kennzeichenAbraeumen()`. */

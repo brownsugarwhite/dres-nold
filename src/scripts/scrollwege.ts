@@ -25,9 +25,22 @@ export function ozWeg(): number {
 }
 
 /** Bei diesem Anteil von Ablauf a-19 steht die Blase mit voll
-    ausgefahrenem Zipfel; unmittelbar danach zieht er sich ein.
-    Muss zu `--oz-ende` in Oeffnungszeiten.astro passen. */
+    ausgefahrenem Zipfel; genau hier schnalzt er zurück und die Leisten
+    tauschen. Muss zu `--oz-ende` in Oeffnungszeiten.astro passen. */
 export const OZ_RAST = 0.78;
+
+/** Kurz davor hat der Zipfel seine volle Länge erreicht und steht.
+    Das kleine Plateau ist Absicht: Der gezeichnete Wert läuft dem
+    Scrollwert nach (`nachziehen`) — ohne Plateau wäre der Zipfel beim
+    Schnalz je nach Scrolltempo noch ein Stück zu kurz. */
+export const OZ_ZIPFEL_VOLL = 0.74;
+
+/** Wie lange Schnalz und Leistenwechsel dauern. Ein Wert für beides:
+    Der Zipfel zieht sich nicht mehr am Scrollweg ein, sondern schnalzt
+    in genau der Zeit zurück, in der die Leisten tauschen — das ist es,
+    was den Schnalz ausmacht (Florian, 18. September 2026). Der Wert
+    steht auch in Navigation.astro als CSS-Übergang (300 ms easeOut). */
+export const SCHNALZ_DAUER = 300;
 
 /**
  * Scrolltiefe (in Fensterhöhen), ab der die Leisten tauschen.
@@ -45,11 +58,11 @@ export function schnalzWeg(): number {
  * Die Schlüsselstellen von Ablauf a-19 — wie weit die Blase zu einem
  * Anteil des Ablaufs noch unter ihrer Ruhelage steht.
  *
- *   bei 35 %   y = Startwert    Kurve easeIn   ⟶ holt Schwung
+ *   bei 30 %   y = Startwert    Kurve easeIn   ⟶ holt Schwung
  *   bei 61 %   y = Zipfellänge  Kurve outCubic ⟶ bremst ab
  *   bei 78 %   y = 0            — steht, Zipfel voll ausgefahren
  *
- * Die ersten 35 % sind eine Wartezeit: In ihr löst sich das Logo des
+ * Die ersten 30 % sind eine Wartezeit: In ihr löst sich das Logo des
  * Startbereichs auf (Ablauf a-7, die ersten 10 % des Dokuments,
  * gedeckelt auf anderthalb Fensterhöhen). Erst danach setzt sich die
  * Karte in Bewegung — sonst schöbe sich ihre weiße Fläche über das noch
@@ -57,6 +70,11 @@ export function schnalzWeg(): number {
  * genau diese Wartezeit länger als vorher (3,5 → 4,8 Fensterhöhen;
  * mobil 4,5 → 6,2); Anfahrt, Bremsweg und Schnalzen dauern unverändert
  * so lange wie zuvor.
+ *
+ * Die Wartezeit war zuerst 35 % — da war das Logo schon ganz fort,
+ * wenn die Begrüßung kam. Jetzt setzt sich die Karte bei 30 % in
+ * Bewegung: Sie kommt herauf, während sich das Logo auflöst, und
+ * schiebt sich trotzdem nie darüber (Florian, 18. September 2026).
  *
  * Die Kurve gehört jeweils zu dem Abschnitt, der an dieser Stelle
  * BEGINNT — so wertet Webflow scrollgebundene Abläufe aus.
@@ -69,7 +87,7 @@ export function schnalzWeg(): number {
 export function ozStuetzstellen(start: number, zipfellaenge: number): Stuetzstelle[] {
   return [
     { bei: 0.00, wert: start, kurve: 'linear' },
-    { bei: 0.35, wert: start, kurve: 'easeIn' },
+    { bei: 0.30, wert: start, kurve: 'easeIn' },
     { bei: 0.61, wert: zipfellaenge, kurve: 'outCubic' },
     { bei: 0.78, wert: 0, kurve: 'linear' },
     { bei: 1.00, wert: 0 },

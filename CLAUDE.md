@@ -91,7 +91,7 @@ Redaktion ──► dres-nold.de/login
 
 - **jQuery, Swiper, Font Awesome, Adobe Typekit** — die vier Fremd-Abhängigkeiten der Webflow-Seite. Alles wird selbst gehostet bzw. neu gebaut.
 - **Google Analytics** — erfordert bei einer Arztpraxis ein Einwilligungs-Banner (§ 25 TDDDG) und ist datenschutzrechtlich heikel, weil Seitenaufrufe Rückschlüsse auf Gesundheitsthemen zulassen. Nachrüstbar, aber nur auf ausdrücklichen Wunsch der Praxis.
-- **Externe Ressourcen jeder Art.** Die Seite darf nichts von fremden Servern nachladen. `scripts/pruefe-externe-ressourcen.mjs` prüft das nach jedem Build (auch im Workflow). **Einzige Ausnahme:** die Google-Maps-Karte im Kontakt — sie lädt erst, wenn der Besucher das Vorschaubild anklickt, und steht nicht im HTML.
+- **Externe Ressourcen jeder Art.** Die Seite darf nichts von fremden Servern nachladen. `scripts/pruefe-externe-ressourcen.mjs` prüft das nach jedem Build (auch im Workflow). **Ohne Ausnahme** — seit dem 18. September 2026 auch die Karte im Kontakt: Sie ist eine selbst gehostete Zeichnung (`public/bilder/deko/karte-bietigheim.svg`); die Knöpfe „Karte anzeigen“ und „Route planen“ sind schlichte Verweise, die Google Maps erst auf Klick in einem neuen Fenster öffnen.
 - **Eine Datenbank.** Inhalte liegen als Dateien im Repo.
 
 ---

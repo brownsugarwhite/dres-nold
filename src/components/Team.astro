@@ -18,8 +18,11 @@
  *   .text-block-2 / -3       Funktion 16 px, Gewicht 300
  *
  * Bewegungen (docs/referenz/animationen.md):
- *   a-3        Gruppenfoto: y −20 → 120 px, Skalierung 1 → 1,1
- *   a-22/a-23  nur auf Handys: Foto fährt in 5 s von −50 % auf 0 %
+ *   a-3        Gruppenfoto: sinkt ab und wächst (1 → 1,16); der Weg
+ *              ergibt sich aus der Vergrößerung, damit der Rahmen
+ *              gefüllt bleibt
+ *   a-22/a-23  entfallen: Die Sonderbewegung der Handys zeigte immer
+ *              nur einen der drei Ärzte (Florian, 18. September 2026)
  *   a / a-2    Porträts: Ausschnitt 80 % → 100 %, Skalierung 1,2 → 1
  *              über die ersten 90 % des Scrollwegs
  *   Alle drei mit Webflows „smoothing 70" — hier `nachziehen()`.
@@ -172,24 +175,26 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     overflow: hidden;
   }
 
-  /* .team-header: formatfüllend; Ablauf a-3 bewegt und vergrößert es */
+  /* .team-header: formatfüllend; Ablauf a-3 bewegt und vergrößert es.
+
+     Der Bezugspunkt liegt an der UNTERKANTE: Das Bild wächst dadurch
+     nach oben aus dem Rahmen heraus, und der Versatz schiebt es
+     anschließend genau so weit wieder herunter, wie oben Bild
+     vorhanden ist. So bleibt der Rahmen in jeder Phase gefüllt.
+     Vorher war der Versatz ein fester Wert (−20 → 140 px) und der
+     Rahmen zeigte in der Mitte der Bewegung einen weißen Streifen —
+     auf dem flacheren Ausschnitt der Handys wäre das ein Drittel des
+     Bildes gewesen (18. September 2026). */
   .team__bild {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     background: url('/bilder/aerzteteam.webp') center / cover no-repeat;
+    transform-origin: 50% 100%;
     transform:
-      translateX(var(--kopf-fahrt, 0%))
-      translateY(var(--kopf-versatz, -20px))
+      translateY(var(--kopf-versatz, 0px))
       scale(var(--kopf-groesse, 1));
-    transition: --kopf-fahrt 5000ms cubic-bezier(0.42, 0, 0.58, 1);
-  }
-
-  @property --kopf-fahrt {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 0%;
   }
 
   /* Ein sehr leichter Schleier über der unteren Hälfte — er soll die
@@ -547,23 +552,27 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
   }
 
   @media (max-width: 767px) {
-    .team__kopf { height: 460px; }
-    /* Das Foto ist doppelt so breit wie das Fenster und fährt beim
-       Hereinscrollen von −50 % auf 0 % (Abläufe a-22 / a-23) */
-    .team__bild {
-      width: 200%;
-      background-position: 50% 100%;
-      background-size: contain;
-      --kopf-fahrt: -50%;
+    /* Auf Handys galt hier die Sonderlösung der Vorlage (Abläufe
+       a-22 / a-23): ein doppelt so breites Foto, das beim Hereinscrollen
+       seitlich durchfuhr. Man sah dabei immer nur einen der drei Ärzte.
+       Jetzt gilt dieselbe Bewegung wie auf dem Desktop (a-3), und der
+       Ausschnitt ist so hoch gewählt, dass alle drei im Bild stehen
+       (Florian, 18. September 2026).
+
+       Das Seitenverhältnis bestimmt den Ausschnitt: Bei 1,55 : 1 zeigt
+       das 1920 × 615 breite Foto rund 950 seiner Bildpunkte — die drei
+       Personen stehen darin zwischen 560 und 1420, also mit Luft an
+       beiden Seiten. Höhe in Bildpunkten stünde dem entgegen: Je
+       schmaler das Fenster, desto enger der Ausschnitt. */
+    .team__kopf {
+      height: auto;
+      aspect-ratio: 1.55 / 1;
     }
-    .team__kopf[data-sichtbar] .team__bild { --kopf-fahrt: 0%; }
     .aerzte { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
     .mitarbeitende { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
   }
 
   @media (max-width: 479px) {
-    .team__kopf { height: 420px; }
-    .team__bild { background-size: cover; }
     .aerzte,
     .mitarbeitende { --luecke: 14px; }
     .mitarbeitende { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -588,7 +597,7 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
   /**
    * Bewegungen im Team-Abschnitt, Werte aus den Abläufen der Vorlage.
    *
-   *   a-3    Gruppenfoto: −20 px → 120 px, Skalierung 1 → 1,1 (0 … 100 %)
+   *   a-3    Gruppenfoto: Skalierung 1 → 1,16, dabei absinkend (0 … 100 %)
    *   a/a-2  Porträts: Ausschnitt 80 % → 100 %, Skalierung 1,2 → 1
    *          über die ersten 90 % des Scrollwegs
    *
@@ -623,8 +632,15 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
 
     const zeichnen = () => {
       const p = werte.get(kopf) ?? 0;
-      bild?.style.setProperty('--kopf-versatz', `${-20 + 140 * p}px`);
-      bild?.style.setProperty('--kopf-groesse', String(1 + 0.1 * p));
+      /* Ablauf a-3: Das Bild wächst und sinkt dabei ab. Wie weit es
+         sinken darf, gibt seine eigene Vergrößerung vor — mehr Weg
+         gäbe es nicht, ohne dass oben der weiße Grund durchschiene.
+         Der Weg ist damit von selbst zur Rahmenhöhe proportional und
+         stimmt auf jedem Bildschirm (Florian, 18. September 2026). */
+      const groesse = 1 + 0.16 * p;
+      const spiel = (groesse - 1) * kopf.offsetHeight;
+      bild?.style.setProperty('--kopf-versatz', `${(spiel * p * 0.98).toFixed(2)}px`);
+      bild?.style.setProperty('--kopf-groesse', groesse.toFixed(4));
 
       portraets.forEach((el) => {
         const q = Math.min(1, (werte.get(el) ?? 0) / 0.9);
@@ -667,16 +683,6 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     window.addEventListener('resize', anstossen, { passive: true });
     zeichnen();
 
-    /* Abläufe a-22 / a-23 (nur Handys, siehe CSS): Sobald der Kopfbereich
-       ins Bild kommt, fährt das Foto in 5 Sekunden von −50 % auf 0 %.
-       Verlässt er das Bild, springt es zurück. */
-    const beobachter = new IntersectionObserver((eintraege) => {
-      eintraege.forEach((e) => {
-        if (e.isIntersecting) kopf.setAttribute('data-sichtbar', 'ja');
-        else kopf.removeAttribute('data-sichtbar');
-      });
-    }, { threshold: 0.1 });
-    beobachter.observe(kopf);
   }
 
   /** Tätigkeiten auf- und zuklappen — nur eines gleichzeitig offen. */

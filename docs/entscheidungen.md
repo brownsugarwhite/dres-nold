@@ -976,3 +976,90 @@ haben. Das bleibt Florians Entscheidung; der Handoff sieht das genauso.
 Die Namensnennung „© OpenStreetMap-Mitwirkende" steht unten rechts an
 der Karte — die ODbL verlangt sie auch für die statische Zeichnung.
 
+
+### Feinschliff-Runde (18. September 2026, abends)
+
+**Der Schnalz.** Die Stützstellen des Zipfels standen noch auf den
+ungerechneten Werten der Vorlage (50/71/80 %), während der Weg der
+Karte längst um die Wartezeit für das Logo gestreckt war. Deshalb
+passte er nicht mehr. Jetzt:
+
+- Der Zipfel fährt bis 74 % aus und **steht** dann (`OZ_ZIPFEL_VOLL`).
+  Das kleine Plateau bis 78 % fängt den Nachlauf (`nachziehen`) ab —
+  ohne es wäre der Zipfel je nach Scrolltempo beim Schnalz noch zu kurz.
+- Bei 78 % (`OZ_RAST`) schnalzt er zurück: **nicht mehr am Scrollweg**,
+  sondern als eigene Bewegung von 300 ms mit easeOut — genau die Dauer
+  und Kurve, mit der die Leisten tauschen. Beides zusammen ist der
+  Schnalz. Rückwärts läuft es ebenso.
+- Die **Spitze steht bis dahin exakt über dem Sprechstunden-Knopf**;
+  nur die Basis wandert. Erst beim Zurückschnalzen lehnt sie sich weg.
+
+**Die Begrüßung kommt früher** (Wartezeit 35 → 30 % von Ablauf a-19).
+Gemessen bei 1440 × 900: Die Karte setzt sich in Bewegung, wenn das Logo
+zu gut der Hälfte aufgelöst ist, und ihre Oberkante erreicht die
+Unterkante des Logos in dem Moment, in dem es verschwindet — sie
+überschneiden sich nie.
+
+**Rückweg der Morph-Übergänge.** Beim Zurückmorphen zur Startseite
+blendet der übrige Inhalt 150 ms später ein als die Karte wandert
+(`html[data-rueckmorph]`, gesetzt in `scripts/uebergaenge.ts`). So führt
+die Karte den Blick.
+
+**Das Bild der Neuigkeiten sprang** beim Öffnen: Es trägt zwei
+Vergrößerungen (Zeigen und Scrollen), die vor der Momentaufnahme
+zurückgesetzt wurden. Den Übergangsnamen trägt jetzt der **Ausschnitt**
+statt des Bildes — seine Kante ist das, was man sieht, und sie steht
+still. Damit beginnt der Morph genau am sichtbaren Bild; das
+Zurücksetzen ist ersatzlos entfallen.
+
+**Gruppenfoto (Ablauf a-3).** Der Versatz war ein fester Wert
+(−20 → 140 px) bei nur 10 % Vergrößerung — der Rahmen zeigte in der
+Mitte der Bewegung einen weißen Streifen (gemessen: 41 px bei 560 px
+Rahmenhöhe). Jetzt wächst das Bild von seiner Unterkante aus (1 → 1,16)
+und sinkt genau so weit ab, wie oben Bild vorhanden ist. Der Weg ist
+damit von selbst zur Rahmenhöhe proportional.
+
+Auf Handys entfallen die Abläufe **a-22/a-23** (das doppelt breite Foto,
+das seitlich durchfuhr): Man sah immer nur einen der drei Ärzte. Dort
+gilt jetzt dieselbe Bewegung wie auf dem Desktop, und der Ausschnitt ist
+über das Seitenverhältnis (1,55 : 1) so gewählt, dass alle drei im Bild
+stehen — bei jeder Fensterbreite dieselbe Bildausschnittsbreite.
+
+**Die Marke auf der Karte** ist jetzt die des Handoffs: der Tropfen aus
+`praxis-karte.js` (52 × 72), der nach dem Anflug von oben hereinfällt
+(0,9 s), darunter zwei Ringe, die sich ausbreiten. Ihre **Spitze** ist
+der Bezugspunkt.
+
+**Wo sie steht, wird gemessen** (wie `freiePosition()` im Handoff) — und
+die Zeichnung hängt daran, nicht umgekehrt: Ihr Mittelpunkt ist die
+Praxis und liegt immer genau unter der Spitze.
+
+| Umbruch | Marke |
+|---|---|
+| nebeneinander (ab ~1024 px) | in der Lücke zwischen Text und Formular |
+| gestapelt, breit (Tablets) | rechts neben dem Formular |
+| gestapelt, schmal (Handys) | zwischen den Knöpfen und dem Formular; die Reihenlücke wächst dafür auf 128 px |
+
+Auf Handys zieht sich der Weißverlauf weiter nach oben zusammen, damit
+schon oberhalb des Formulars Karte zu sehen ist.
+
+**Die linke Spalte im Kontakt steht oben bündig** zur Formularkarte —
+inklusive desselben Innenabstands, damit auch die beiden Kicker
+(„Kontakt" und „Nachricht") auf einer Linie liegen.
+
+**Mobiles Menü:** Die Staffelung läuft beim Schließen rückwärts
+(`--stufe-hoch`), der Rollbalken des Rahmens ist verborgen (er blitzte
+während des Aufklappens auf), und die beiden rechtlichen Verweise stehen
+in der Hausfarbe, durch einen Punkt getrennt, mit demselben Abstand nach
+oben wie nach unten.
+
+**Sprechstunden auf Handys** sind 160 px kürzer: engere Zeilen, kleinere
+Abstände, oben und unten derselbe Innenabstand. Die Zeitspalte darf
+zwischen Vor- und Nachmittag umbrechen (der Trennpunkt bleibt am Ende
+der ersten Angabe), die Wochentagsspalte nimmt nur ihre eigene Breite
+(`width: 1%`), und unter 480 px steht die Tabelle eine Stufe kleiner —
+sonst stießen Wochentag und Zeit aneinander.
+
+**Nebenbei behoben:** Die Beitragsliste hatte `minmax(320px, 1fr)` und
+schob auf 320-px-Geräten die ganze Seite um 24 px zur Seite. Jetzt
+`minmax(min(320px, 100%), 1fr)`.

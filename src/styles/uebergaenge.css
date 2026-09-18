@@ -38,7 +38,15 @@
     leistung-symbol-<id>     ihr Symbol
     leistung-titel-<id>      ihr Titel
     beitrag-<id>             Hülle des Neuigkeiten-Beitrags
-    beitrag-bild-<id>        sein Bild — wandert, ohne zu kreuzblenden
+    beitrag-bild-<id>        sein Bild — wandert, ohne zu kreuzblenden.
+                             Auf der Übersicht trägt den Namen der
+                             AUSSCHNITT, nicht das Bild darin: Der
+                             Ausschnitt steht still, während das Bild
+                             beim Zeigen und beim Scrollen skaliert
+                             wird. So beginnt der Morph genau dort, wo
+                             das Bild gerade steht, statt vorher
+                             zurückzuspringen (Florian, 18. September
+                             2026).
     nav-oben / nav-unten     die Leisten — bleiben unbewegt und scharf
                              (gesetzt per CSS in Navigation.astro)
 
@@ -95,6 +103,15 @@
 
 ::view-transition-new(root) {
   animation: uebergang-rest-ein var(--dauer-uebergang) var(--verlauf-betont) both;
+}
+
+/* Auf dem Rückweg zur Startseite wartet der übrige Inhalt eine Spur:
+   Erst wandert die Karte los, dann blendet die Seite dahinter auf —
+   so führt die Karte den Blick, statt mit allem gleichzeitig
+   aufzutauchen (Florian, 18. September 2026). Gesetzt wird das
+   Kennzeichen in scripts/uebergaenge.ts. */
+html[data-rueckmorph] ::view-transition-new(root) {
+  animation-delay: 150ms;
 }
 
 /* --- Die Karte selbst: alt und neu weich ineinander -------------
@@ -289,7 +306,8 @@ html[data-uebergang='zurueck'] ::view-transition-new(.karte) { animation-name: u
 */
 html[data-uebergang] .leistung__icon,
 html[data-uebergang] .leistung__titel,
-html[data-uebergang] .beitrag__bild {
+html[data-uebergang] .beitrag__bild,
+html[data-uebergang] .beitrag__ausschnitt {
   view-transition-name: none;
 }
 

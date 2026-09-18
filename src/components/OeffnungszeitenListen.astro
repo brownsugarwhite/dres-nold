@@ -15,9 +15,11 @@ import oz from '../content/oeffnungszeiten.json';
 
 const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 
-/** „08:00–12:00 · 14:00–18:00" — leere Hälften fallen weg. */
-const zeit = (z: { vormittag?: string; nachmittag?: string }) =>
-  [z.vormittag, z.nachmittag].filter(Boolean).join(' · ');
+/** Vor- und Nachmittag, leere Hälften fallen weg. Als zwei Stücke,
+    damit auf schmalen Handys zwischen ihnen umbrochen werden kann —
+    innerhalb einer Zeitangabe aber nie. */
+const zeiten = (z: { vormittag?: string; nachmittag?: string }) =>
+  [z.vormittag, z.nachmittag].filter(Boolean) as string[];
 ---
 
 {listen.map((liste) => (
@@ -30,7 +32,17 @@ const zeit = (z: { vormittag?: string; nachmittag?: string }) =>
           .map((z) => (
             <tr>
               <th scope="row">{z.tag}</th>
-              <td>{zeit(z)}</td>
+              <td>
+                {zeiten(z).map((t, i, alle) => (
+                  <>
+                    {i > 0 && ' '}
+                    {/* Der Trennpunkt hängt am ENDE der ersten Angabe:
+                        Muss umbrochen werden, beginnt die zweite Zeile
+                        mit der Zeit und nicht mit einem Punkt. */}
+                    <span class="ozzeiten__stueck">{t}{i < alle.length - 1 && <span aria-hidden="true"> ·</span>}</span>
+                  </>
+                ))}
+              </td>
             </tr>
           ))}
       </tbody>
@@ -69,8 +81,20 @@ const zeit = (z: { vormittag?: string; nachmittag?: string }) =>
     white-space: nowrap;
   }
 
-  /* Der Wochentag tritt zurück — er ist Beschriftung, nicht Angabe. */
+  /* Die Zeitspalte darf zwischen Vor- und Nachmittag umbrechen — sonst
+     stoßen Wochentag und Zeit auf schmalen Handys aneinander. Innerhalb
+     einer Zeitangabe wird nie umbrochen. */
+  .ozzeiten td { white-space: normal; }
+  .ozzeiten__stueck { white-space: nowrap; }
+
+  /* Der Wochentag tritt zurück — er ist Beschriftung, nicht Angabe.
+
+     `width: 1%` ist der übliche Kniff für „so schmal wie der Inhalt":
+     Die Spalte nimmt nur ihre eigene Breite, alles Übrige gehört der
+     Zeitspalte. Ohne ihn verteilt der Browser die Breite gleichmäßiger
+     — die Zeit bräche dann schon um, wenn daneben noch Platz wäre. */
   .ozzeiten th {
+    width: 1%;
     padding-right: var(--abstand-s);
     color: var(--farbe-text);
     text-align: left;
@@ -88,5 +112,28 @@ const zeit = (z: { vormittag?: string; nachmittag?: string }) =>
     font-size: 15px;
     font-style: italic;
     line-height: 1.5;
+  }
+
+  /* Handys: Untereinander brauchen die drei Listen sonst mehr als eine
+     Bildschirmhöhe. Zeilen und Überschriften rücken deshalb enger
+     zusammen (Florian, 18. September 2026) — die Haarlinien halten die
+     Lesbarkeit, auch wenn es dichter steht. */
+  @media (max-width: 48rem) {
+    .ozliste__titel { margin-bottom: var(--abstand-s); }
+    .ozzeiten { font-size: 15px; }
+    /* `padding-block`, nicht `padding`: Der Abstand zwischen Wochentag
+       und Zeit steckt im rechten Innenabstand der ersten Spalte und
+       darf hier nicht mit zurückgesetzt werden. */
+    .ozzeiten th,
+    .ozzeiten td { padding-block: 8px; }
+    .ozliste__zusatz { margin-top: 10px; }
+  }
+
+  /* Schmale Handys: Wochentag und Zeit passen bei 15 px nicht mehr
+     nebeneinander — die Zeit bräche dann in zwei Zeilen um und der
+     Abschnitt würde länger statt kürzer. Eine Stufe kleiner passt
+     alles in eine Zeile (Florian, 18. September 2026). */
+  @media (max-width: 30rem) {
+    .ozzeiten { font-size: 14px; }
   }
 </style>
