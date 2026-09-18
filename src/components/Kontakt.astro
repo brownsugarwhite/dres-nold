@@ -97,7 +97,10 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
   */
   .kontakt__karte {
     position: absolute;
-    inset: 0 0 auto auto;
+    /* Links verankert: Die Ebene wird nach rechts breiter und danach
+       nach links geschoben — so reicht sie über beide Kanten hinaus.
+       Rechts verankert blieb rechts ein Streifen ohne Karte. */
+    inset: 0 auto auto 0;
     width: calc(100% + var(--karte-seit, 0px));
     height: calc(100% + var(--karte-hoch, 0px));
     transform: translate(calc(-1 * var(--karte-seit, 0px)), calc(-1 * var(--karte-hoch, 0px)));

@@ -59,8 +59,13 @@ const jahr = new Date().getFullYear();
     /* Keine Linie darüber: Der Kontaktbereich endet mit der harten
        Kante seiner Karte, das ist Trennung genug (Florian,
        18. September 2026). */
-    /* Unten so viel Luft, dass die Symbolleiste nichts verdeckt */
-    padding-block: var(--abstand-m) clamp(120px, 14vw, 150px);
+    /* Früher stand hier so viel Luft, dass die Symbolleiste nichts
+       verdecken konnte. Die braucht es nicht: Sie fährt aus dem Bild,
+       sobald der Startbereich verlassen ist (`body[data-gescrollt]`),
+       und auf Unterseiten ist sie von Anfang an unten. Am Seitenende
+       ist sie also nie zu sehen — die 150 px waren leerer Raum
+       (Florian, 18. September 2026). */
+    padding-block: var(--abstand-m) clamp(40px, 5vw, 64px);
   }
 
   .fuss__marke {
