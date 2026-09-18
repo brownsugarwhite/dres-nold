@@ -816,3 +816,32 @@ Text (16,5 px, Zeilenhöhe 1,6, gleichmäßige Absätze).
   andere** (24 px statt 5 %): Straße und E-Mail standen dicht an der
   Kante. Gemessen bei 375 px: links 24, rechts 24.
 
+### Karte und Kontakt sind ein Band (18. September 2026)
+
+Der Entwurf führt beides zusammen, und das gefällt Florian deutlich
+besser: **ein Band über die volle Breite** mit dem Kartenbild als Grund
+— links Kicker, Überschrift, die große Telefonnummer, Anschrift und
+E-Mail, die Zusatzzeile und die beiden Knöpfe; rechts das Formular auf
+einer weißen Karte. Das eigene Band „Anfahrt" ist damit wieder
+aufgelöst (`Anfahrt.astro` gelöscht).
+
+**Die Eingabefelder bleiben, wie sie sind.** Der Entwurf zeigt gefüllte
+graue Kästen mit Beschriftung darüber; es bleibt bei den Feldern mit
+wanderndem Label und gezeichneter Linie (Florian, ausdrücklich).
+
+**Die Google-Karte wird nicht mehr eingebettet.** „Karte anzeigen" und
+„Route planen" sind schlichte Verweise, die Maps in einem neuen Fenster
+öffnen. Damit lädt die Seite **nichts mehr von fremden Servern** — die
+Einwilligung ist gegenstandslos. `einwilligung.ts` und der
+Widerrufsknopf im Fußbereich bleiben vorerst stehen, damit alte
+gespeicherte Zustimmungen zurückgenommen werden können; gesetzt wird
+nichts mehr. Die Datenschutzerklärung ist entsprechend anzupassen.
+
+**Der einzige Schlagschatten der Seite** sitzt an der Formularkarte: Sie
+liegt auf dem Kartengrund, und nur so bleiben die feinen Linien der
+Felder ablesbar. Überall sonst gilt weiter: keine Schatten.
+
+Der Einleitungssatz „Am schnellsten telefonisch. Für alles, was nicht
+eilt, schreiben Sie uns gerne." stammt aus dem Entwurf und steht in
+`startseite.json` — die Praxis kann ihn in der Redaktion ändern.
+

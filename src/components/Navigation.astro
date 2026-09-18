@@ -557,7 +557,7 @@ const kategorien = (leistungen.kategorien ?? [])
     display: flex;
     align-items: center;
     gap: var(--abstand-xs);
-    padding: 7px 0;
+    padding: 11px 0;
     color: var(--farbe-primaer);
     text-decoration: none;
   }
@@ -651,7 +651,7 @@ const kategorien = (leistungen.kategorien ?? [])
 
   .mobilmenue__unterpunkt {
     gap: var(--abstand-xs);
-    padding: 7px 0;
+    padding: 10px 0;
     border-top: 1px solid var(--farbe-linie-leise);
     opacity: 0;
     transform: translateY(-6px);
@@ -688,8 +688,11 @@ const kategorien = (leistungen.kategorien ?? [])
     gap: var(--abstand-l);
     width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
     margin: var(--abstand-s) auto 0;
-    padding-block: var(--abstand-s);
-    border-bottom: 3px double var(--farbe-linie);
+    /* Keine eigene Linie darunter: Die Punktlinie hier oben und die
+       gestrichelte Unterkante der Navigation schließen das Menü schon
+       ab — eine dritte Linie dazwischen war eine zu viel (Florian,
+       18. September 2026). */
+    padding-block: var(--abstand-s) var(--abstand-m);
     background: url('/bilder/deko/punktlinie.png') 50% 0 repeat-x;
     background-size: auto 1px;
   }

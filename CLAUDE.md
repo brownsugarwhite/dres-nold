@@ -23,10 +23,12 @@ Website der Zahnarzt- und Kieferorthopädie-Praxis **Dres. Nold**, Rosenstraße 
 >   Begrüßung und Band gehören also **nicht** als eigene Abschnitte in
 >   `main`.
 > - **Kein Briefumschlag** im Kontakt.
-> - **Die Karte liegt im Band „Anfahrt"** am Seitenfuß, nicht mehr im
->   Kontaktbereich (`Anfahrt.astro`, 18. September 2026).
-> - **Google-Karte erst auf Klick** — Vorschaubild statt Banner, kein
->   Fremdskript (geändert am 14. September 2026, siehe dort).
+
+> - **Gar keine eingebettete Google-Karte mehr.** Der Kontaktbereich
+>   liegt auf einem eigenen Kartenbild; „Karte anzeigen" und „Route
+>   planen" sind Verweise, die Google Maps in einem neuen Fenster
+>   öffnen (18. September 2026). Die Seite lädt damit nichts von
+>   fremden Servern — auch keine Einwilligung mehr.
 >
 > `design_handoff_startseite/` ist der Gestaltungs-Entwurf vom
 > 17. September 2026. Er ist umgesetzt — mit den Ausnahmen, die in
@@ -335,7 +337,7 @@ Wenn Sie diese Seite mit einem KI-Assistenten erweitern wollen, geben Sie ihm di
 
 ## Rechtliches
 
-- **Einwilligung nur für die Google-Karte — und ohne Banner.** Am Fuß der Startseite liegt das Band „Anfahrt" mit einem selbst gehosteten Kartenbild; erst ein Klick auf „Karte anzeigen" holt die Karte von Google (`src/components/Anfahrt.astro`, `src/scripts/einwilligung.ts`). Bis dahin lädt die Seite nichts von fremden Servern, deshalb ist beim Seitenaufruf kein Einwilligungs-Banner nötig. Im Fußbereich lässt sich eine erteilte Zustimmung zurücknehmen. Jede weitere Fremdressource müsste denselben Weg gehen — oder besser: weggelassen werden.
+- **Keine Einwilligung mehr nötig — die Seite lädt nichts Fremdes.** Seit dem 18. September 2026 ist die Google-Karte nicht mehr eingebettet: Der Kontaktbereich liegt auf einem selbst gehosteten Kartenbild, und „Karte anzeigen" / „Route planen" sind Verweise, die Google Maps in einem neuen Fenster öffnen (`src/components/Kontakt.astro`). Damit entfällt der letzte Grund für eine Einwilligung. `src/scripts/einwilligung.ts` und der Widerrufsknopf im Fußbereich bleiben vorerst stehen, damit alte gespeicherte Zustimmungen zurückgenommen werden können; sie werden von nichts mehr gesetzt. **Die Datenschutzerklärung muss entsprechend angepasst werden.** Jede neue Fremdressource müsste erst wieder einen solchen Weg bekommen — oder besser: weggelassen werden.
 - **Impressum und Datenschutzerklärung sind getrennte Seiten** (in der Webflow-Version zeigten beide Footer-Links auf `/datenschutz`).
 - **Das Kontaktformular fragt bewusst keine Gesundheitsdaten ab.** Das darf sich nicht ändern — für Gesundheitsangaben wäre eine erheblich aufwendigere Absicherung nötig.
 - Cloudflare-AV-Vertrag ist im Konto der Praxis abzuschließen; Resend-Konto mit EU-Region anlegen.
