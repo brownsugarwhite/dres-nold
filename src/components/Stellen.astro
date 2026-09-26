@@ -136,10 +136,19 @@ const bewerbung = (titel: string) =>
 
   .stelle__kopf { margin: 0; }
 
+  /* Größe der Bezeichnung und Höhe ihrer ersten Zeile: Daran richten
+     sich Kreis, Umfang und (einspaltig) die Nummer aus. Auf Handys
+     wächst die Bezeichnung beim Aufklappen (siehe unten). */
   .stelle__knopf {
+    --titel-groesse: clamp(1.15rem, 1rem + 0.7vw, 1.6rem);
+    --titel-zeile: calc(1.28 * var(--titel-groesse));
     position: relative;
     display: flex;
-    align-items: center;
+    /* Oben ausgerichtet, nicht mittig: Beim Aufklappen zieht sich der
+       Anriss unter der Bezeichnung zusammen — mittig gesetzt wanderten
+       Kreis und Umfang dabei mit. Jetzt stehen sie fest auf der ersten
+       Zeile (26. September 2026). */
+    align-items: flex-start;
     gap: clamp(16px, 2.5vw, 40px);
     width: 100%;
     padding: clamp(22px, 2.6vw, 32px) 0;
@@ -168,16 +177,20 @@ const bewerbung = (titel: string) =>
     flex: 1;
     min-width: 0;
     color: var(--farbe-primaer);
-    font-size: clamp(1.15rem, 1rem + 0.7vw, 1.6rem);
+    font-size: var(--titel-groesse);
     font-weight: var(--gewicht-mittel);
     line-height: 1.28;
     letter-spacing: -0.012em;
   }
 
   /* Der Umfang ist eine Beigabe — auf schmalen Schirmen entfällt er,
-     damit der Titel die Zeile behält. */
+     damit der Titel die Zeile behält.
+
+     Mittig auf der ersten Zeile der Bezeichnung: 29 px hoch (13 px
+     Zeile + 2 × 7 px Innenabstand + 2 × 1 px Rahmen). */
   .stelle__umfang {
     flex: none;
+    margin-top: calc((var(--titel-zeile) - 29px) / 2);
     padding: 7px 16px;
     border: 1px solid var(--farbe-linie);
     border-radius: var(--radius-rund);
@@ -188,6 +201,9 @@ const bewerbung = (titel: string) =>
     white-space: nowrap;
   }
 
+  /* Der Kreis ebenso: 32 px, mittig auf der ersten Zeile. Ist die Zeile
+     niedriger als er (auf Handys), wird der Abstand negativ und er ragt
+     ein paar Pixel in den Innenabstand hinein — das ist gewollt. */
   .stelle__kreis {
     flex: none;
     display: flex;
@@ -195,9 +211,23 @@ const bewerbung = (titel: string) =>
     justify-content: center;
     width: 32px;
     height: 32px;
+    margin-top: calc((var(--titel-zeile) - 32px) / 2);
     border: 1px solid var(--farbe-linie);
     border-radius: var(--radius-rund);
     transition: border-color 0.4s var(--verlauf-betont);
+  }
+
+  /* Wächst die Bezeichnung (Handys, beim Aufklappen), ziehen Kreis und
+     Umfang auf ihrer Zeile mit — erst, wenn das Skript die Liste
+     zugeklappt hat, sonst rutschten sie beim Laden. */
+  .stellen__liste[data-bereit] .stelle__kreis {
+    transition:
+      border-color 0.4s var(--verlauf-betont),
+      margin-top 0.45s var(--verlauf-betont);
+  }
+
+  .stellen__liste[data-bereit] .stelle__umfang {
+    transition: margin-top 0.45s var(--verlauf-betont);
   }
 
   .stelle__knopf:hover .stelle__kreis,
@@ -215,7 +245,7 @@ const bewerbung = (titel: string) =>
      zugeklappt hat — sonst sähe man beim Laden, wie alle Stellen
      zusammenfahren. */
   .stellen__liste[data-bereit] .stelle__klappe {
-    transition: grid-template-rows 0.62s var(--verlauf-betont);
+    transition: grid-template-rows 0.5s var(--verlauf-betont);
   }
 
   .stelle__klappe[data-zu] { grid-template-rows: 0fr; }
@@ -282,17 +312,22 @@ const bewerbung = (titel: string) =>
     transform: translateY(16px);
   }
 
-  .stellen__liste[data-bereit] .stelle__text,
-  .stellen__liste[data-bereit] .stelle__seite {
+  .stellen__liste[data-bereit] .stelle__text {
     transition:
       opacity 0.5s var(--verlauf-betont),
       transform 0.5s var(--verlauf-betont);
   }
 
+  .stellen__liste[data-bereit] .stelle__seite {
+    transition:
+      opacity 0.4s var(--verlauf-betont),
+      transform 0.4s var(--verlauf-betont);
+  }
+
   .stelle__klappe:not([data-zu]) .stelle__text {
     opacity: 1;
     transform: none;
-    transition-delay: 0.14s;
+    transition-delay: 0.1s;
   }
 
   /*
@@ -304,18 +339,38 @@ const bewerbung = (titel: string) =>
     sie in genau diesem Moment an ihre klebende Lage. Jetzt fällt der
     Sprung in die Zeit, in der sie noch unsichtbar ist; sichtbar wird
     erst das ruhige Einblenden von ihrem endgültigen Platz aus
-    (Florian, 18. September 2026).
+    (Florian, 18. September 2026). Sie kommt ohne Verzögerung — die
+    Klappe hat ja schon gewartet.
   */
   .stelle__klappe[data-offen] .stelle__seite {
     opacity: 1;
     transform: none;
-    transition-delay: 0.04s;
+    transition-delay: 0s;
   }
 
-  /* Beim Zuklappen soll nichts nachhängen: Der Inhalt geht sofort.
-     Die Ansprechperson noch eine Spur schneller — mit dem Zuklappen
-     verliert sie ihre klebende Lage und rückt zurück in die Zeile;
-     das soll niemand mehr sehen. */
+  /*
+    Zuklappen in zwei Schritten (26. September 2026): Erst blenden Text
+    und Ansprechperson aus (`data-schliesst`, 0,2 s) — die Klappe steht
+    dabei noch in voller Höhe, die Ansprechperson klebt noch. Erst dann
+    nimmt das Skript den Überlauf zurück und fährt die Höhe zu. Vorher
+    geschah beides zugleich, und die Ansprechperson sprang sichtbar von
+    ihrer klebenden Lage zurück in die Zeile.
+
+    Die Regeln stehen NACH denen für `[data-offen]` und
+    `:not([data-zu])`: gleiche Spezifität, die spätere gewinnt — und
+    während des Ausblendens sind beide Zustände noch gesetzt.
+  */
+  .stelle__klappe[data-schliesst] .stelle__text,
+  .stelle__klappe[data-schliesst] .stelle__seite {
+    opacity: 0;
+    transform: translateY(16px);
+    transition-duration: 0.2s;
+    transition-delay: 0s;
+  }
+
+  /* Fällt die Klappe zu, ohne dass sie je ganz offen stand (schnelles
+     Hin und Her, oder ohne Bewegung), geht der Inhalt gleich mit —
+     ohne Verzögerung, damit nichts nachhängt. */
   .stelle__klappe[data-zu] .stelle__text {
     transition-duration: 0.2s;
     transition-delay: 0s;
@@ -326,15 +381,17 @@ const bewerbung = (titel: string) =>
     transition-delay: 0s;
   }
 
+  /* Dieselbe Textgröße wie in den freien Abschnitten (26. September
+     2026); vorher 16,5 / 15,5 px fest. */
   .stelle__text :global(p) {
     max-width: var(--breite-absatz);
     margin-bottom: var(--abstand-s);
-    font-size: 16.5px;
+    font-size: var(--text-flies);
     line-height: var(--zeilenhoehe-lese);
   }
 
   .stelle__text :global(li) {
-    font-size: 15.5px;
+    font-size: var(--text-flies);
     line-height: 1.55;
   }
 
@@ -392,10 +449,27 @@ const bewerbung = (titel: string) =>
 
     Und weil der Seitenrand hier nur 24 px misst, rückt die Nummer
     zurück in die Zeile.
+
+    Die aufgeklappte Bezeichnung wächst hier (26. September 2026): Sie
+    wird zur Überschrift dessen, was man gerade liest — einspaltig gibt
+    es sonst nichts, was die offene Zeile von den zugeklappten abhebt.
+    Auf breiten Fenstern bleibt sie gleich groß; dort zeigt schon die
+    zweite Spalte, was offen ist.
   */
   @media (max-width: 800px) {
     .stelle__spalten { display: block; }
 
+    .stelle__knopf[aria-expanded='true'] {
+      --titel-groesse: clamp(1.35rem, 1.15rem + 0.85vw, 1.85rem);
+    }
+
+    .stellen__liste[data-bereit] .stelle__titel {
+      transition: font-size 0.45s var(--verlauf-betont);
+    }
+
+    /* Ruht 28 px tiefer und fährt beim Erscheinen von unten herauf —
+       sie klebt hier am unteren Rand, da kommt sie auch her. Beim
+       Zuklappen geht sie denselben Weg zurück. */
     .stelle__seite {
       position: sticky;
       top: auto;
@@ -405,20 +479,40 @@ const bewerbung = (titel: string) =>
       padding-block: var(--abstand-s);
       border-top: 1px solid var(--farbe-linie-leise);
       background: var(--farbe-flaeche);
+      transform: translateY(28px);
     }
 
+    .stelle__klappe[data-offen] .stelle__seite { transform: translateY(0); }
+
+    .stelle__klappe[data-schliesst] .stelle__seite { transform: translateY(28px); }
+
+    /* Auf der ersten Zeile der Bezeichnung, wie Kreis und Umfang —
+       12 px hoch (`--text-kicker` bei Zeilenhöhe 1). */
     .stelle__nummer {
       position: static;
       flex: none;
+      margin-top: calc((var(--titel-zeile) - var(--text-kicker)) / 2);
+    }
+
+    .stellen__liste[data-bereit] .stelle__nummer {
+      transition: margin-top 0.45s var(--verlauf-betont);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .stelle__klappe,
+    /* Mit dem Vorspann `.stellen__liste[data-bereit]`, weil die
+       Bewegungen oben genau so freigegeben werden: Die Klasse allein
+       hätte die geringere Spezifität, und die Regel bliebe ohne Wirkung
+       (bis zum 26. September 2026 war das so). */
     .stelle__kreis,
-    .stelle__anriss,
-    .stelle__text,
-    .stelle__seite { transition: none; }
+    .stellen__liste[data-bereit] .stelle__klappe,
+    .stellen__liste[data-bereit] .stelle__titel,
+    .stellen__liste[data-bereit] .stelle__kreis,
+    .stellen__liste[data-bereit] .stelle__umfang,
+    .stellen__liste[data-bereit] .stelle__nummer,
+    .stellen__liste[data-bereit] .stelle__anriss,
+    .stellen__liste[data-bereit] .stelle__text,
+    .stellen__liste[data-bereit] .stelle__seite { transition: none; }
 
     .stelle__text,
     .stelle__seite { opacity: 1; transform: none; }
@@ -437,6 +531,12 @@ const bewerbung = (titel: string) =>
    * `data-offen` kommt erst, wenn die Bewegung steht: Solange sie läuft,
    * muss der Inhalt beschnitten bleiben, danach darf er überlaufen —
    * nur so kann die Ansprechperson daneben kleben (siehe CSS).
+   *
+   * Zugeklappt wird in zwei Schritten (26. September 2026): Erst blendet
+   * der Inhalt aus (`data-schliesst`), noch bei voller Höhe und noch
+   * klebend; erst danach fällt `data-offen` und die Höhe fährt zu
+   * (`data-zu`). So sieht niemand, wie die Ansprechperson von ihrer
+   * klebenden Lage zurück in die Zeile springt.
    */
   function stellenAufbauen() {
     const liste = document.querySelector<HTMLElement>('[data-stellenliste]');
@@ -447,22 +547,77 @@ const bewerbung = (titel: string) =>
 
     const wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /* Je Klappe der Zuhörer, der auf das Ende der Höhenbewegung wartet —
-       damit ein schnelles Hin und Her nicht zwei davon stehen lässt. */
-    const warten = new WeakMap<HTMLElement, (e: TransitionEvent) => void>();
+    /* Dauern in Millisekunden — müssen mit den Übergängen im CSS oben
+       übereinstimmen: */
+    const KLAPPEN = 500;     // die Höhe der Klappe (`grid-template-rows`)
+    const AUSBLENDEN = 200;  // Text und Ansprechperson beim Zuklappen
+
+    /* Kopfleiste (80 px) plus Luft — dieselben Werte wie in
+       scripts/anker.ts. So tief unter den oberen Rand kommt die
+       Bezeichnung einer aufgeklappten Stelle zu stehen. */
+    const KOPF = 96;
+
+    /*
+      Was je Klappe gerade aussteht: die Zuhörer auf das Ende der
+      Höhenbewegung und der Zeitgeber, der ihr Ende notfalls ersetzt (beim
+      Öffnen) bzw. den zweiten Schritt des Zuklappens auslöst. Ein
+      schnelles Hin und Her räumt damit immer erst auf, statt zweierlei
+      stehen zu lassen.
+    */
+    type Laufend = {
+      zuhoerer?: (e: TransitionEvent) => void;
+      abbruch?: (e: TransitionEvent) => void;
+      timer?: number;
+    };
+    const laufend = new WeakMap<HTMLElement, Laufend>();
+
+    const aufraeumen = (klappe: HTMLElement) => {
+      const l = laufend.get(klappe);
+      if (!l) return;
+      if (l.zuhoerer) klappe.removeEventListener('transitionend', l.zuhoerer);
+      if (l.abbruch) klappe.removeEventListener('transitioncancel', l.abbruch);
+      if (l.timer) window.clearTimeout(l.timer);
+      laufend.delete(klappe);
+    };
+
+    /** Läuft auf der Klappe gerade eine Höhenbewegung? */
+    const hoeheLaeuft = (klappe: HTMLElement) =>
+      klappe.getAnimations().some((a) =>
+        (a as CSSTransition).transitionProperty === 'grid-template-rows'
+        && a.playState === 'running');
 
     const setzen = (knopf: HTMLButtonElement, offen: boolean) => {
       knopf.setAttribute('aria-expanded', String(offen));
       const klappe = document.getElementById(knopf.getAttribute('aria-controls') || '');
       if (!klappe) return;
-      delete klappe.dataset.offen;
+      aufraeumen(klappe);
 
-      const alt = warten.get(klappe);
-      if (alt) { klappe.removeEventListener('transitionend', alt); warten.delete(klappe); }
+      if (!offen) {
+        /* Stand die Klappe nie ganz offen (der Inhalt ist dann noch
+           unsichtbar und klebt nicht), oder läuft keine Bewegung: gleich
+           zu, ohne den ersten Schritt. */
+        if (wenigerBewegung || !klappe.dataset.offen) {
+          delete klappe.dataset.offen;
+          delete klappe.dataset.schliesst;
+          klappe.dataset.zu = 'ja';
+          return;
+        }
 
-      if (!offen) { klappe.dataset.zu = 'ja'; return; }
+        /* Erster Schritt: ausblenden. Zweiter Schritt nach `AUSBLENDEN`:
+           Überlauf zurücknehmen und die Höhe zufahren. */
+        klappe.dataset.schliesst = 'ja';
+        const timer = window.setTimeout(() => {
+          laufend.delete(klappe);
+          delete klappe.dataset.offen;
+          delete klappe.dataset.schliesst;
+          klappe.dataset.zu = 'ja';
+        }, AUSBLENDEN);
+        laufend.set(klappe, { timer });
+        return;
+      }
 
       delete klappe.dataset.zu;
+      delete klappe.dataset.schliesst;
 
       /* Ohne Bewegung gibt es kein Ende, auf das sich warten ließe */
       if (wenigerBewegung) { klappe.dataset.offen = 'ja'; return; }
@@ -475,23 +630,73 @@ const bewerbung = (titel: string) =>
         kommt und dass es die Höhe betrifft. Der Inhalt darin hat eigene
         Überblendungen, deren Ereignisse hier ebenfalls ankommen — ohne
         die Prüfung gäbe eine davon zu früh frei.
+
+        Kommt kein Ende (etwa weil die Bewegung abgebrochen wurde), gibt
+        der Zeitgeber kurz nach der vorgesehenen Dauer frei.
       */
-      const beiEnde = (e: TransitionEvent) => {
-        if (e.target !== klappe || e.propertyName !== 'grid-template-rows') return;
-        klappe.removeEventListener('transitionend', beiEnde);
-        warten.delete(klappe);
+      const fertig = () => {
+        aufraeumen(klappe);
         if (!klappe.dataset.zu) klappe.dataset.offen = 'ja';
       };
-      warten.set(klappe, beiEnde);
+      const beiEnde = (e: TransitionEvent) => {
+        if (e.target !== klappe || e.propertyName !== 'grid-template-rows') return;
+        fertig();
+      };
+      /* Wird eine Klappe wieder geöffnet, während sie noch zufährt, bricht
+         der Browser die alte Bewegung ab und beginnt sofort die neue —
+         dann läuft das Warten weiter. Nur wenn danach nichts mehr läuft,
+         gibt es nichts mehr abzuwarten. */
+      const beiAbbruch = (e: TransitionEvent) => {
+        if (e.target !== klappe || e.propertyName !== 'grid-template-rows') return;
+        if (!hoeheLaeuft(klappe)) fertig();
+      };
+      const timer = window.setTimeout(fertig, KLAPPEN + 80);
+      laufend.set(klappe, { zuhoerer: beiEnde, abbruch: beiAbbruch, timer });
       klappe.addEventListener('transitionend', beiEnde);
+      klappe.addEventListener('transitioncancel', beiAbbruch);
+    };
+
+    /*
+      Die Bezeichnung der eben geöffneten Stelle soll zu sehen sein —
+      unter der Kopfleiste, nicht darüber. Gemessen wird ihre Zeile; war
+      weiter oben eine andere Stelle offen, wird vorweggenommen, was
+      deren Zuklappen an Höhe ändert: Die Klappe verschwindet, und der
+      Anriss unter der Bezeichnung kommt wieder zum Vorschein. Steht die
+      Zeile ohnehin tief genug, passiert nichts.
+    */
+    const ANRISS_ABSTAND = 6;  // `margin-top` des Anrisses im CSS oben
+
+    const titelInsBild = (knopf: HTMLButtonElement, vorher?: HTMLButtonElement) => {
+      const zeile = knopf.closest<HTMLElement>('.stelle__kopf') ?? knopf;
+      let oben = zeile.getBoundingClientRect().top;
+
+      if (vorher) {
+        const klappeVorher = document.getElementById(vorher.getAttribute('aria-controls') || '');
+        const liegtDarueber = vorher.compareDocumentPosition(knopf) & Node.DOCUMENT_POSITION_FOLLOWING;
+        if (klappeVorher && liegtDarueber) {
+          oben -= klappeVorher.offsetHeight;
+          /* Der Anriss ist zusammengezogen (`max-height: 0`), sein Inhalt
+             aber gesetzt — `scrollHeight` misst ihn. */
+          const anriss = vorher.querySelector<HTMLElement>('.stelle__anriss');
+          if (anriss) oben += anriss.scrollHeight + ANRISS_ABSTAND;
+        }
+      }
+
+      if (oben >= KOPF) return;
+      window.scrollTo({
+        top: window.scrollY + oben - KOPF,
+        behavior: wenigerBewegung ? 'instant' as ScrollBehavior : 'smooth',
+      });
     };
 
     knoepfe.forEach((knopf) => {
       setzen(knopf, false);
       knopf.addEventListener('click', () => {
         const offen = knopf.getAttribute('aria-expanded') === 'true';
+        const vorher = knoepfe.find((k) => k !== knopf && k.getAttribute('aria-expanded') === 'true');
         knoepfe.forEach((k) => { if (k !== knopf) setzen(k, false); });
         setzen(knopf, !offen);
+        if (!offen) titelInsBild(knopf, vorher);
       });
     });
 

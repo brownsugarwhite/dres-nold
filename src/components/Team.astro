@@ -32,10 +32,12 @@
  *
  * Handoff, 17. September 2026: Kicker und Titel stehen links unten im
  * Banner statt mittig; darunter gliedern Gruppenzeilen mit Haarlinie.
- * Alles linksbündig. Über dem Banner liegt ein SEHR leichter Verlauf —
- * gerade so viel, dass die weiße Schrift sicher lesbar bleibt (der
- * Entwurf hatte ihn deutlich kräftiger, Florian wollte ihn zurück).
- * Die Bewegung des Banners (Ablauf a-3) bleibt unverändert.
+ * Alles linksbündig — auf Handys (bis 767 px) dagegen mittig, siehe
+ * den Umbruch unten (26. September 2026). Über dem Banner liegt ein
+ * SEHR leichter Verlauf — gerade so viel, dass die weiße Schrift sicher
+ * lesbar bleibt (der Entwurf hatte ihn deutlich kräftiger, Florian
+ * wollte ihn zurück). Die Bewegung des Banners (Ablauf a-3) bleibt
+ * unverändert.
  */
 import Haken from './Haken.astro';
 import team from '../content/team.json';
@@ -241,7 +243,8 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
 
   /* ---------- Porträts ---------- */
 
-  /* Alles linksbündig auf der Inhaltsbreite (Handoff) */
+  /* Alles linksbündig auf der Inhaltsbreite (Handoff); auf Handys
+     mittig, siehe den Umbruch bei 767 px */
   .team__inhalt {
     display: flex;
     flex-direction: column;
@@ -467,12 +470,6 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     cursor: pointer;
   }
 
-  .taetigkeitenknopf:focus-visible {
-    outline: 2px solid var(--farbe-primaer);
-    outline-offset: 3px;
-    border-radius: var(--radius-s);
-  }
-
   /* Namen tragen Gewicht 500 — kräftiger als der Fließtext, aber
      leichter als die gesperrten Beschriftungen (Handoff). */
   .person__name {
@@ -560,8 +557,43 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
       height: auto;
       aspect-ratio: 1.55 / 1;
     }
-    .aerzte { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
-    .mitarbeitende { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+
+    /* Auf Handys steht alles mittig (Florian, 26. September 2026):
+       Überschrift, Namen, Funktion, der Tätigkeiten-Knopf und die
+       Liste darunter — die zweispaltigen Reihen wirken linksbündig
+       ausgefranst, weil die Karte breiter ist als ihr Text. Auf
+       breiten Fenstern bleibt es beim Handoff: alles links. */
+    .team__kicker,
+    .team__titel { text-align: center; }
+
+    .arzt,
+    .mitglied,
+    .person { align-items: center; }
+
+    .person,
+    .taetigkeiten__liste { text-align: center; }
+
+    /* Feste zwei Spalten statt `auto-fill` über 180 px: Das gab zwischen
+       rund 655 und 767 px drei Spalten (3 × 180 + 2 × 24 = 588 px Inhalt
+       bei 5 % Seitenrand) — und dann konnte CSS nicht wissen, welche
+       Karte allein in ihrer Reihe steht. */
+    .aerzte,
+    .mitarbeitende {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-width: none;
+    }
+
+    /* Bleibt die letzte Karte allein in ihrer Reihe (drei Ärzte,
+       dreizehn im Praxisteam), steht sie mittig — in Spaltenbreite, über
+       beide Spalten gelegt. Nicht `justify-items: center` fürs ganze
+       Raster: Damit schrumpften alle Karten auf ihren Inhalt, und
+       das Porträt bezieht seine Größe aus der Kartenbreite. */
+    .aerzte > .arzt:last-child:nth-child(odd),
+    .mitarbeitende > .mitglied:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: calc(50% - var(--luecke) / 2);
+    }
   }
 
   @media (max-width: 479px) {
@@ -571,7 +603,6 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
        einem flacheren Rahmen begrenzte sie das Bild, nicht die Breite. */
     .aerzte,
     .mitarbeitende { --luecke: 12px; }
-    .mitarbeitende { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     /* Auf schmalen Handys ist die Spalte schmaler als das Foto — dann
        darf es mitschrumpfen, sonst wird es seitlich beschnitten. */
     .portraet { height: auto; aspect-ratio: 1 / 1.25; }
