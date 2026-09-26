@@ -5,10 +5,13 @@
  *   POST /api/hochladen   (multipart/form-data: datei, ordner)
  *   → { ok: true, pfad: "/bilder/team/name.jpg" }
  *
- * Erlaubt sind JPG, PNG, WebP (bis 8 MB) und PDF (bis 15 MB). Der
- * Dateiname wird bereinigt (Kleinbuchstaben, keine Umlaute, keine
- * Leerzeichen), damit er in Adressen funktioniert. Existiert der Name
- * schon, wird die Datei ersetzt.
+ * Erlaubt sind JPG, PNG, WebP (bis 8 MB) und PDF (bis 15 MB), für
+ * Symbole zusätzlich SVG (bis 512 KB). Der Dateiname wird bereinigt
+ * (Kleinbuchstaben, keine Umlaute, keine Leerzeichen), damit er in
+ * Adressen funktioniert. Existiert der Name schon, wird die Datei ersetzt.
+ *
+ * Hochgeladene Symbole landen in einem eigenen Ordner (icons/eigene),
+ * damit ein „logo.svg" nicht das Logo der Seite überschreibt.
  */
 import { dateiLesen, dateiSchreiben, type GithubUmgebung } from '../../src/server/github';
 
@@ -20,6 +23,7 @@ const ORDNER: Record<string, string> = {
   neuigkeiten: 'bilder/neuigkeiten',
   abschnitte: 'bilder/abschnitte',
   allgemein: 'bilder',
+  symbole: 'icons/eigene',
   dokumente: 'dokumente',
 };
 
@@ -28,7 +32,27 @@ const TYPEN: Record<string, { endung: string; max: number }> = {
   'image/png': { endung: 'png', max: 8 * 1024 * 1024 },
   'image/webp': { endung: 'webp', max: 8 * 1024 * 1024 },
   'application/pdf': { endung: 'pdf', max: 15 * 1024 * 1024 },
+  'image/svg+xml': { endung: 'svg', max: 512 * 1024 },
 };
+
+/**
+ * Eine SVG ist Text und kann Skripte oder Verweise auf fremde Server
+ * enthalten. Solche Dateien werden abgelehnt statt bereinigt — ein
+ * Symbol braucht nichts davon. Gibt den Grund zurück oder null.
+ */
+export function svgPruefen(text: string): string | null {
+  if (!/<svg[\s>]/i.test(text)) return 'Die Datei ist keine SVG-Grafik';
+  if (/<script[\s>]/i.test(text)) return 'Die SVG enthält ein Skript';
+  if (/<foreignObject[\s>]/i.test(text)) return 'Die SVG enthält eingebettetes HTML';
+  if (/\son[a-z]+\s*=/i.test(text)) return 'Die SVG enthält Skript-Anweisungen (on…)';
+  if (/javascript:/i.test(text)) return 'Die SVG enthält Skript-Verweise';
+  /* href, xlink:href, src, url(…) und @import dürfen nur auf die Datei
+     selbst (#…) oder auf eingebettete Daten zeigen — nie nach draußen.
+     xmlns="http://www.w3.org/…" ist nur ein Namensraum und bleibt erlaubt. */
+  if (/(?:href|src)\s*=\s*["']\s*(?:https?:)?\/\//i.test(text)) return 'Die SVG lädt etwas von einem fremden Server';
+  if (/url\(\s*["']?\s*(?:https?:)?\/\//i.test(text) || /@import/i.test(text)) return 'Die SVG lädt etwas von einem fremden Server';
+  return null;
+}
 
 const json = (daten: unknown, status = 200) =>
   new Response(JSON.stringify(daten), {
@@ -56,15 +80,29 @@ export async function onRequestPost({ request, env, data }: Kontext): Promise<Re
   if (!(datei instanceof File)) return json({ ok: false, fehler: 'Keine Datei erhalten' }, 400);
   if (!ORDNER[ordner]) return json({ ok: false, fehler: 'Unbekannter Ordner' }, 400);
 
-  const typ = TYPEN[datei.type];
-  if (!typ) return json({ ok: false, fehler: 'Erlaubt sind JPG, PNG, WebP und PDF' }, 415);
+  /* Manche Systeme kennen .svg nicht und schicken keinen oder einen
+     allgemeinen Dateityp mit — dann entscheidet die Endung. */
+  const unbestimmt = !datei.type || datei.type === 'application/octet-stream';
+  const mime = unbestimmt && /\.svg$/i.test(datei.name) ? 'image/svg+xml' : datei.type;
+  const istSvg = mime === 'image/svg+xml';
+  const typ = TYPEN[mime];
+  if (!typ || (istSvg && ordner !== 'symbole')) {
+    const erlaubt = ordner === 'symbole' ? 'SVG, JPG, PNG, WebP und PDF' : 'JPG, PNG, WebP und PDF';
+    return json({ ok: false, fehler: `Erlaubt sind ${erlaubt}` }, 415);
+  }
   if (datei.size > typ.max) {
-    return json({ ok: false, fehler: `Datei zu groß (höchstens ${Math.round(typ.max / 1024 / 1024)} MB)` }, 413);
+    const grenze = typ.max < 1024 * 1024 ? `${typ.max / 1024} KB` : `${Math.round(typ.max / 1024 / 1024)} MB`;
+    return json({ ok: false, fehler: `Datei zu groß (höchstens ${grenze})` }, 413);
   }
 
   const name = `${nameBereinigen(datei.name)}.${typ.endung}`;
   const pfadImRepo = `public/${ORDNER[ordner]}/${name}`;
   const bytes = new Uint8Array(await datei.arrayBuffer());
+
+  if (istSvg) {
+    const grund = svgPruefen(new TextDecoder().decode(bytes));
+    if (grund) return json({ ok: false, fehler: `${grund} und kann nicht verwendet werden.` }, 415);
+  }
 
   try {
     const vorhanden = await dateiLesen(env, pfadImRepo);

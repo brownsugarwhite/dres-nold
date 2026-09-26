@@ -348,13 +348,15 @@ function kennungFeld(feld: Feld, wert: Wert, neu: boolean, titelEingabe?: () => 
 
 function dateiFeld(feld: Feld, wert: Wert): Baustein {
   const id = neueId();
-  const eingabe = el('input', { class: 'feld__eingabe', id, type: 'text', value: wert == null ? '' : String(wert), placeholder: feld.typ === 'bild' ? '/bilder/…' : '/dokumente/…' });
+  const symbol = feld.ordner === 'symbole';
+  const eingabe = el('input', { class: 'feld__eingabe', id, type: 'text', value: wert == null ? '' : String(wert), placeholder: symbol ? '/icons/…' : feld.typ === 'bild' ? '/bilder/…' : '/dokumente/…' });
   const vorschau = feld.typ === 'bild' ? el('img', { class: 'datei__vorschau', alt: '' }) : null;
   const zeigen = () => { if (vorschau) { vorschau.src = eingabe.value || ''; vorschau.hidden = !eingabe.value; } };
   zeigen();
   eingabe.addEventListener('change', zeigen);
 
-  const datei = el('input', { type: 'file', accept: feld.typ === 'bild' ? 'image/jpeg,image/png,image/webp' : 'application/pdf' });
+  const bildTypen = symbol ? 'image/svg+xml,.svg,image/jpeg,image/png,image/webp' : 'image/jpeg,image/png,image/webp';
+  const datei = el('input', { type: 'file', accept: feld.typ === 'bild' ? bildTypen : 'application/pdf' });
   const knopf = el('span', { class: 'knopf knopf--leise datei__hochladen', text: 'Hochladen …' }, [datei]);
   const status = el('span', { class: 'feld__hilfe' });
 

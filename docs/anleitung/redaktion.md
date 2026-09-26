@@ -42,6 +42,12 @@ geht etwas online, etwa eine Minute später.
 (bis 15 MB). Danach **Speichern** nicht vergessen. Bilder werden beim
 Bauen der Seite automatisch verkleinert und optimiert.
 
+**Symbole** (bei Leistungen, Bereichen und Menüpunkten) dürfen zusätzlich
+SVG sein (bis 512 KB) — das ist sogar die beste Wahl, weil sie in jeder
+Größe scharf bleiben. Eine SVG mit Skripten oder Verweisen auf fremde
+Server wird abgelehnt; ein normaler Export aus Illustrator oder Figma
+enthält so etwas nicht.
+
 Bitte jedes Bild kurz beschreiben („Bildbeschreibung") — das lesen
 blinde Besucher vor, und Google versteht die Seite besser.
 
