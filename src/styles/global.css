@@ -705,25 +705,43 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
   Eine Animation statt einer Transition: Symbolleiste und Kontaktzeile
   tragen eigene Transitions für den Leistenwechsel, die nicht
   überschrieben werden dürfen. Und nur ein `from`: So endet jedes
-  Element in seinem natürlichen Wert — der Scrollhinweis etwa in der
-  Deckkraft, die das Skript ihm gerade gibt.
+  Element in seinem natürlichen Wert.
+
+  DER SCROLLHINWEIS BEKOMMT KEINEN WEICHZEICHNER UND KEINE DECKKRAFT —
+  nur seine Farbe blendet auf. Er liegt in derselben festen Ebene wie
+  das Logo (Startbereich.astro), und jede Compositor-Animation dort
+  (`opacity`, `filter`, `transform`) lässt den Browser den Verlauf
+  hinter dem Logo neu rastern: mit weichem Rand, der um die weiße
+  Fläche herum als Saum sichtbar wird — derselbe Saum, den früher
+  `transform: scale` und `will-change` am Logo erzeugten. Gemessen am
+  26. September 2026: `opacity` auf dem Scrollhinweis → Saum; `color`
+  (läuft im Hauptthread) → sauber; Weichzeichner auf Kontaktzeile und
+  Symbolleiste (eigene feste Ebenen) → sauber. Das statische Logo wird
+  aus demselben Grund nur über `visibility` verborgen.
 */
 @media (prefers-reduced-motion: no-preference) {
-  html[data-laden='wartet'] body:not([data-gescrollt]) :is(.logo__bild, .kontaktzeile, .fussleiste-huelle, .scrollhinweis) {
+  html[data-laden='wartet'] body:not([data-gescrollt]) :is(.kontaktzeile, .fussleiste-huelle) {
     opacity: 0;
     filter: blur(10px);
   }
+
+  html[data-laden='wartet'] body:not([data-gescrollt]) .scrollhinweis { color: transparent; }
+  html[data-laden='wartet'] body:not([data-gescrollt]) .logo__bild { visibility: hidden; }
 
   @keyframes laden-ein {
     from { opacity: 0; filter: blur(10px); }
   }
 
-  html[data-laden='da'] :is(.logo__bild, .kontaktzeile, .fussleiste-huelle, .scrollhinweis) {
+  @keyframes laden-farbe {
+    from { color: transparent; }
+  }
+
+  html[data-laden='da'] :is(.kontaktzeile, .fussleiste-huelle) {
     animation: laden-ein 800ms var(--verlauf-betont) backwards;
   }
 
   html[data-laden='da'] .fussleiste-huelle { animation-delay: 120ms; }
-  html[data-laden='da'] .scrollhinweis { animation-delay: 240ms; }
+  html[data-laden='da'] .scrollhinweis { animation: laden-farbe 800ms var(--verlauf-betont) 240ms backwards; }
 }
 
 /*

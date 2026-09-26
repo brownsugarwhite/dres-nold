@@ -47,7 +47,14 @@ const { praxis } = seite;
       <p class="scrollhinweis__text">
         Scrollen Sie, um mehr von unserer Praxis zu entdecken
       </p>
-      <span class="scrollhinweis__pfeil"></span>
+      {/* Als Inline-SVG in `currentColor`, nicht als Hintergrundbild: So
+          blendet der Haken beim ersten Aufbau über die Farbe mit ein —
+          die einzige Animation, die hier keinen Saum um das Logo
+          erzeugt (styles/global.css, „Erster Seitenaufbau"). Dieselbe
+          Zeichnung wie icons/ui/pfeil-runter.svg. */}
+      <svg class="scrollhinweis__pfeil" viewBox="0 0 62 38" aria-hidden="true" focusable="false">
+        <polyline fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" vector-effect="non-scaling-stroke" points="3.5 3.5 31 31 58.5 3.5" />
+      </svg>
     </div>
   </div>
 </div>
@@ -228,16 +235,6 @@ const { praxis } = seite;
     display: none;
   }
 
-  /* Spätfall des ersten Aufbaus: Das Sicherheitsnetz (public/laden.js)
-     hat die Seite schon mit dem statischen Logo gezeigt, und die
-     Animation kommt erst danach. Dann blendet das Bild weich aus,
-     statt hart zu verschwinden — sonst blitzte es. */
-  .logo__kontur[data-lottie-spaet] .logo__bild {
-    display: block;
-    opacity: 0;
-    transition: opacity 300ms var(--verlauf);
-  }
-
 
 
   /* Scroll-Hinweis darunter */
@@ -247,6 +244,9 @@ const { praxis } = seite;
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* Die Farbe steht am Hinweis selbst: Text und Haken erben sie, und
+       beim ersten Aufbau blendet sie auf (styles/global.css). */
+    color: var(--farbe-primaer);
     /* In der Vorlage folgt `.scroll2action` ohne Abstand direkt auf das
        Logo (live-webflow.css `.logo` / `.scroll2action`). Der Abstand
        entsteht dort allein aus der Logohöhe. */
@@ -261,7 +261,6 @@ const { praxis } = seite;
   .scrollhinweis__text {
     max-width: 250px;
     margin: 0 0 10px;
-    color: var(--farbe-primaer);
     font-family: var(--schrift-titel);
     font-size: 1rem;
     font-weight: var(--gewicht-normal);
@@ -274,9 +273,10 @@ const { praxis } = seite;
      2026). Der Kasten ist größer, weil die Zeichnung ringsum Rand für
      die Spitze trägt (siehe pfeil-runter.svg). */
   .scrollhinweis__pfeil {
+    display: block;
     width: 44px;
     height: 22px;
-    background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
+    overflow: visible;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -372,10 +372,11 @@ const { praxis } = seite;
       /* Spätfall: Das Sicherheitsnetz hat die Seite schon gezeigt, das
          statische Logo steht. Dann nicht bei leerem Bild beginnen —
          das Logo stünde fertig da, verschwände und zeichnete sich neu.
-         Stattdessen fertig gezeichnet übernehmen; das statische Bild
-         blendet weich aus (`data-lottie-spaet`). */
+         Stattdessen fertig gezeichnet übernehmen: Die Animation zeigt
+         bei Bild 0 dasselbe Logo, der Tausch ist nicht zu sehen. Kein
+         weicher Übergang am statischen Bild — eine Deckkraft-Animation
+         im Logo erzeugte den Saum um den Verlauf (siehe CSS oben). */
       if (wurzel.dataset.laden === 'da') {
-        logo.dataset.lottieSpaet = 'ja';
         spieler.goToAndStop(0, true);
         anScrollKoppeln(spieler, () => fortschritt() / 0.1, ENDE);
         return;

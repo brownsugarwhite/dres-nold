@@ -1416,7 +1416,7 @@ weil die CSP (`public/_headers`) keine eingebetteten Skripte erlaubt**.
 Startbereich.astro setzt `da`, sobald die Zeichnung halb steht; ein
 Sicherheitsnetz tut es nach 2,5 s auf jeden Fall (dann mit dem
 statischen Logo, und die Lottie übernimmt später fertig gezeichnet,
-statt sich noch einmal einzuzeichnen — `data-lottie-spaet`). Ohne das
+statt sich noch einmal einzuzeichnen). Ohne das
 Attribut ist alles sichtbar: Unterseiten, Seitenwechsel per Router
 (Astro tauscht die Attribute von `<html>`), Aufruf mit Sprungmarke,
 reduzierte Bewegung, ohne JavaScript. Ein Neuladen mit gemerkter
@@ -1425,6 +1425,25 @@ Lottie-Datei wird vorgeladen (`as="fetch" crossorigin` — lottie-web
 holt sie per XHR im CORS-Modus). Eine Animation statt einer Transition,
 weil Symbolleiste und Kontaktzeile eigene Transitions für den
 Leistenwechsel tragen.
+
+**Der Saum um den Verlauf, zum dritten Mal.** Die erste Fassung ließ
+auch den Scrollhinweis und das statische Logo über `opacity` und
+`filter: blur()` einblenden — und um die weiße Lottie-Fläche stand
+wieder der bekannte Saum aus dem Verlaufsbild (Florian). Gemessen mit
+einzeln angestoßenen Animationen: `opacity` auf der Kontaktzeile →
+sauber; auf der Symbolleiste → sauber; `opacity` auf dem
+**Scrollhinweis** → Saum; `will-change` dort statisch → sauber;
+`color` dort → sauber; Weichzeichner auf beiden Leisten → sauber. Der
+Scrollhinweis liegt in derselben festen Ebene wie das Logo
+(`.startbereich`); läuft dort eine Compositor-Animation, rastert der
+Browser den 30-fach vergrößerten Verlauf neu und weich — dasselbe, was
+`transform: scale` und `will-change` am Logo schon einmal auslösten.
+Deshalb blendet der Scrollhinweis jetzt allein über seine **Farbe** auf
+(läuft im Hauptthread), der Haken ist dafür ein Inline-SVG in
+`currentColor` statt eines Hintergrundbilds, und das statische Logo
+wird nur über `visibility` verborgen. Die Leisten behalten ihren
+Weichzeichner. Regel: **Im Startbereich nichts über `opacity`,
+`filter` oder `transform` animieren, solange der Verlauf steht.**
 
 Nebenbei: Die Einstiegskarte stand vor dem Skript mit 700 px Versatz
 über dem Logo; die Vorgabe stellt sie jetzt ganz unter die Bühne
