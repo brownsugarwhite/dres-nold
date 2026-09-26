@@ -13,7 +13,8 @@
  *   kennung      Teil der Adresse; bei bestehenden Einträgen gesperrt
  *   auswahl      eine von mehreren Möglichkeiten (`optionen` oder `quelle`)
  *   liste        mehrere kurze Texte, je Zeile einer
- *   bild / pdf   Pfad unter public/ mit Hochladen-Knopf (`ordner`)
+ *   bild / pdf   Pfad unter public/ mit Hochladen-Knopf (`ordner`);
+ *                mit `ordner: 'symbole'` nimmt das Feld auch SVG an
  *   gruppe       Untergruppe von Feldern (`felder`)
  *   eintraege    Liste gleichartiger Einträge (`felder`); mit `standard`
  *                bekommen sie Kennung, aktiv und Reihenfolge automatisch
@@ -32,7 +33,7 @@ export type Feld = {
   /** für auswahl: Liste aus den Daten des Bereichs, z. B. "kategorien" */
   quelle?: string;
   /** für bild/pdf: Zielordner beim Hochladen */
-  ordner?: 'team' | 'galerie' | 'neuigkeiten' | 'abschnitte' | 'allgemein' | 'dokumente';
+  ordner?: 'team' | 'galerie' | 'neuigkeiten' | 'abschnitte' | 'allgemein' | 'symbole' | 'dokumente';
   /** für gruppe/eintraege */
   felder?: Feld[];
   /** für eintraege: Kennung/aktiv/Reihenfolge automatisch verwalten */
@@ -50,6 +51,8 @@ export type Feld = {
   /** Feld anzeigen, aber nicht ändern lassen */
   gesperrt?: boolean;
 };
+
+const SYMBOL_HILFE = 'Am besten als SVG in der Hausfarbe, wie die vorhandenen Symbole.';
 
 export type BereichDefinition = {
   titel: string;
@@ -138,7 +141,7 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
           { name: 'titel', label: 'Titel', typ: 'text' },
           { name: 'kategorie', label: 'Bereich', typ: 'auswahl', quelle: 'kategorien' },
           { name: 'kurz', label: 'Kurztext auf der Kachel', typ: 'mehrzeilig', hilfe: 'Ein bis zwei Sätze.' },
-          { name: 'icon', label: 'Symbol', typ: 'bild', ordner: 'allgemein' },
+          { name: 'icon', label: 'Symbol', typ: 'bild', ordner: 'symbole', hilfe: SYMBOL_HILFE },
           { name: 'inhalt', label: 'Text der Seite', typ: 'richtext', ordner: 'allgemein', hilfe: 'Mit dem Knopf „Bild" lassen sich Bilder direkt in den Text setzen.' },
         ],
       },
@@ -155,7 +158,7 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
           { name: 'titel', label: 'Titel', typ: 'text' },
           { name: 'kurz', label: 'Untertitel', typ: 'text', hilfe: 'Eine Zeile — erscheint im Aufklappmenü.' },
           { name: 'beschreibung', label: 'Erklärtext über den Kacheln', typ: 'richtext', ordner: 'allgemein', hilfe: 'Steht auf der Startseite zwischen der Überschrift des Bereichs und den Kacheln.' },
-          { name: 'icon', label: 'Symbol', typ: 'bild', ordner: 'allgemein' },
+          { name: 'icon', label: 'Symbol', typ: 'bild', ordner: 'symbole', hilfe: SYMBOL_HILFE },
         ],
       },
     ],
@@ -336,7 +339,7 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
         felder: [
           { name: 'titel', label: 'Beschriftung', typ: 'text' },
           { name: 'ziel', label: 'Ziel', typ: 'text', gesperrt: true },
-          { name: 'icon', label: 'Symbol', typ: 'bild', ordner: 'allgemein' },
+          { name: 'icon', label: 'Symbol', typ: 'bild', ordner: 'symbole', hilfe: SYMBOL_HILFE },
           { name: 'in_kopfleiste', label: 'In der Leiste oben', typ: 'schalter' },
           { name: 'in_fussleiste', label: 'In der Symbolleiste unten', typ: 'schalter' },
           { name: 'position_fussleiste', label: 'Reihenfolge unten', typ: 'zahl' },

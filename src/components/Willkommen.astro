@@ -44,16 +44,30 @@ const zeilen = texte.titel.split('\n').filter((z) => z.trim() !== '');
 
 <style>
   .willkommen {
+    --oben: clamp(72px, 9vw, 124px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-block: clamp(72px, 9vw, 124px) clamp(56px, 7vw, 96px);
+    padding-block: var(--oben) clamp(56px, 7vw, 96px);
     padding-inline: var(--abstand-seitenrand);
     /* Keine eigene Fläche: Die Begrüßung steht auf der weißen Karte des
        Einstiegs (`.ozblase__flaeche`). Die doppelte Fläche brachte
        nichts und machte nur schwerer nachvollziehbar, wer das Weiß
        setzt (Florian, 18. September 2026). */
     text-align: center;
+  }
+
+  /* Handys: Die Begrüßung steht NACH der Einstiegskarte
+     (Oeffnungszeiten.astro verschiebt sie, `vorspannAnordnen`). Oben so
+     viel Luft, dass der Zipfel in Ruhelage über leerem Weiß steht und die
+     Überschrift noch unter der Symbolleiste liegt — die fährt beim
+     Schnalz weg und gibt sie frei. Als Außenabstand, damit die
+     Sprungmarke „Praxis" den Titel wie überall unter die Kopfleiste
+     setzt. Nach dem Schnalz bleibt dadurch etwas mehr Weiß zwischen
+     Karte und Begrüßung als sonst zwischen zwei Abschnitten — auf Handys
+     unvermeidlich (Florian, 26. September 2026). */
+  .willkommen[data-nach-karte] {
+    margin-top: calc(var(--zipfel-laenge, 154px) + var(--abstand-s) - var(--oben));
   }
 
   /* Eine Stufe größer als `--text-titel` (die übrigen Überschriften),

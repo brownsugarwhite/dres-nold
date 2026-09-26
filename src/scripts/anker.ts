@@ -10,9 +10,11 @@
  *               zwei Fensterhöhen still, mit voll ausgefahrenem Zipfel.
  *               Genau dorthin wird gescrollt: knapp vor den Punkt, an
  *               dem er sich wieder einzieht und die Leisten tauschen.
- *   #praxis     Begrüßung und Bilderband liegen ebenfalls in dieser
- *   #galerie    Karte — auch sie werden in eine Scrolltiefe umgerechnet
- *               (siehe `tiefeInKarte`), statt gemessen zu werden.
+ *   #praxis     Begrüßung und Bilderband liegen auf dem Desktop ebenfalls
+ *   #galerie    in dieser Karte — dort werden sie in eine Scrolltiefe
+ *               umgerechnet (siehe `tiefeInKarte`), statt gemessen zu
+ *               werden. Auf Handys stehen sie im Fluss hinter der Karte
+ *               und werden normal gemessen.
  *   #start      Ganz nach oben.
  *
  * Astros Router übernimmt Klicks auf Verweise selbst; dieser Zuhörer

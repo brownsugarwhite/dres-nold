@@ -119,14 +119,16 @@ const zeiten = (z: { vormittag?: string; nachmittag?: string }) =>
      zusammen (Florian, 18. September 2026) — die Haarlinien halten die
      Lesbarkeit, auch wenn es dichter steht. */
   @media (max-width: 48rem) {
-    .ozliste__titel { margin-bottom: var(--abstand-s); }
+    .ozliste__titel { margin-bottom: var(--abstand-xs); }
     .ozzeiten { font-size: 15px; }
     /* `padding-block`, nicht `padding`: Der Abstand zwischen Wochentag
        und Zeit steckt im rechten Innenabstand der ersten Spalte und
-       darf hier nicht mit zurückgesetzt werden. */
+       darf hier nicht mit zurückgesetzt werden. 6 px statt 8 seit dem
+       26. September 2026 — die Karte soll auf Handys ganz ins Fenster
+       passen (Florian). */
     .ozzeiten th,
-    .ozzeiten td { padding-block: 8px; }
-    .ozliste__zusatz { margin-top: 10px; }
+    .ozzeiten td { padding-block: 6px; }
+    .ozliste__zusatz { margin-top: var(--abstand-2xs); }
   }
 
   /* Schmale Handys: Wochentag und Zeit passen bei 15 px nicht mehr
