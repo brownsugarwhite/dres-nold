@@ -37,6 +37,7 @@
  * Entwurf hatte ihn deutlich kräftiger, Florian wollte ihn zurück).
  * Die Bewegung des Banners (Ablauf a-3) bleibt unverändert.
  */
+import Haken from './Haken.astro';
 import team from '../content/team.json';
 import startseite from '../content/startseite.json';
 
@@ -131,7 +132,7 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
                   data-aufklapper
                 >
                   Tätigkeiten
-                  <span class="person__pfeil" aria-hidden="true"></span>
+                  <Haken />
                 </button>
                 <div class="taetigkeiten" id={`taetigkeiten-${m.id}`} data-taetigkeiten>
                   <ul class="taetigkeiten__liste" role="list">
@@ -231,9 +232,9 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     margin: 16px 0 0;
     color: var(--farbe-text-invers);
     font-size: var(--text-banner);
-    font-weight: var(--gewicht-leicht);
+    font-weight: var(--gewicht-titel);
     line-height: 1.02;
-    letter-spacing: -0.013em;
+    letter-spacing: -0.010em;
     text-align: left;
     text-shadow: 0 0 20px rgb(0 0 0 / 55%);
   }
@@ -510,15 +511,6 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     line-height: 1.5;
   }
 
-  .person__pfeil {
-    display: block;
-    width: 13px;
-    height: 8px;
-    background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
-    transition: transform 400ms var(--verlauf-betont);
-  }
-
-  .taetigkeitenknopf[aria-expanded='true'] .person__pfeil { transform: rotate(180deg); }
 
   /* Tätigkeiten: klappen über die Zeilenhöhe des Rasters auf */
   .taetigkeiten {
@@ -591,7 +583,7 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     .portraet__ausschnitt { height: 100%; transform: none; }
     .portraet__bild { transition: none; }
     .portraetfeld:hover .portraet__bild { transform: none; }
-    .taetigkeiten, .person__pfeil { transition: none; }
+    .taetigkeiten { transition: none; }
   }
 </style>
 

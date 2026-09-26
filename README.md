@@ -34,4 +34,4 @@ Die Anleitung liegt unter [docs/anleitung/redaktion.md](docs/anleitung/redaktion
 | Kontaktformular | Resend (E-Mail-Versand) |
 | Laufende Kosten | Hosting 0 €, nur die Domain |
 
-Die Seite lädt **keine externen Ressourcen** — einzige Ausnahme ist die Google-Maps-Karte im Kontakt, die erst nach Einwilligung geladen wird. Bitte bei jeder Erweiterung beibehalten.
+Die Seite lädt **keine externen Ressourcen** — ohne Ausnahme. Google Maps öffnet im Kontakt erst auf Klick in einem neuen Fenster. Bitte bei jeder Erweiterung beibehalten.

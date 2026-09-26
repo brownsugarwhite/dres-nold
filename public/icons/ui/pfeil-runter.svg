@@ -1,5 +1,11 @@
-<svg id="Ebene_1" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 55.11 28.36"><defs><style>/* `vector-effect` hält die Strichstärke in Bildpunkten fest, egal wie
-     klein die Zeichnung eingesetzt wird. Ohne das wäre der Haken in
-     einem 13 px breiten Kasten nur einen Viertelpixel dick und damit
-     deutlich feiner als die Schrift daneben. */
-.cls-1{fill:none;stroke:#6c1a51;stroke-miterlimit:10;stroke-width:1.5;vector-effect:non-scaling-stroke;}</style></defs><title>arrow down start</title><polyline class="cls-1" points="54.75 0.35 27.55 27.65 0.35 0.45"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 62 38"><title>Pfeil nach unten</title>
+  <!-- Der Haken selbst ist 55 × 27,5 Einheiten groß (Schenkel unter 45°),
+       ringsum liegt Rand: seitlich und oben 3,5, unten 7 Einheiten. Den
+       braucht die Spitze: `vector-effect` hält den Strich bei 1,5 px, und
+       der Gehrungsstachel eines 90°-Winkels ragt damit gut 1 px über den
+       Scheitel hinaus — ohne Rand schnitt ihn jeder Kasten ab, in dem die
+       Zeichnung als Hintergrundbild steht (Florian, 26. September 2026).
+       Ohne `vector-effect` wäre der Haken in einem 13 px breiten Kasten
+       nur einen Viertelpixel dick und damit feiner als die Schrift. -->
+  <polyline fill="none" stroke="#6c1a51" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" vector-effect="non-scaling-stroke" points="3.5 3.5 31 31 58.5 3.5"/>
+</svg>

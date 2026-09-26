@@ -1,8 +1,8 @@
 /**
  * Prüft das gebaute HTML: Es darf nichts von fremden Servern nachladen.
  * Das ist die Grundlage dafür, dass kein Cookie-Banner nötig ist —
- * einzige Ausnahme ist die Google-Karte, und die lädt erst nach
- * Einwilligung per Skript (steht also nicht als src/href im HTML).
+ * ohne Ausnahme (Google Maps öffnet im Kontakt erst auf Klick in einem
+ * neuen Fenster, als schlichter Verweis).
  *
  * Aufruf: node scripts/pruefe-externe-ressourcen.mjs   (nach npm run build)
  */

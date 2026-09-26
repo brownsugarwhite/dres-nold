@@ -37,7 +37,7 @@ h1, h2, h3, h4 {
   color: var(--farbe-primaer);
   font-family: var(--schrift-titel);
   line-height: var(--zeilenhoehe-eng);
-  font-weight: var(--gewicht-halbfett);
+  font-weight: var(--gewicht-titel);
   text-wrap: balance;
 }
 
@@ -256,6 +256,12 @@ img {
   border-radius: var(--radius-s);
 }
 
+/* Kein grauer Blitz beim Tippen auf iOS — Knöpfe und Verweise zeigen
+   ihre Reaktion selbst (Füllfläche, Aufziehen, Zeige-Zustände). Der
+   Fokusring für die Tastatur oben bleibt davon unberührt (Florian,
+   26. September 2026). */
+a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transparent; }
+
 /* Sprungmarke für Tastatur- und Screenreader-Nutzung.
    Sichtbar, sobald sie den Fokus erhält. */
 .sprungmarke {
@@ -286,7 +292,7 @@ img {
   Jeder Abschnitt der Startseite folgt demselben Muster:
 
       Kicker            12 px, gesperrt, Versalien
-      H2                leicht (300), mit bewegtem Verlauf
+      H2                kräftig (--gewicht-titel), mit bewegtem Verlauf
       Einleitung        eine Lesebreite, gedeckt
       Inhalt            44–52 px darunter
 
@@ -499,12 +505,16 @@ img {
   transition: background-size 0.5s var(--verlauf-betont);
 }
 
-/* Der Pfeil ist die vorhandene `pfeil-runter`-Zeichnung, um 90° gedreht */
+/* Der Pfeil ist ein eigener Rechtshaken, 1:1 gezeichnet (viewBox 9 × 14,
+   Schenkel unter 45°, ringsum 2 Einheiten Rand für die Spitze). Vorher
+   war es die um 90° gedrehte `pfeil-runter`-Zeichnung — deren Schenkel
+   reichten nach der Drehung über den Zeichenkasten hinaus und wurden
+   oben und unten flach abgeschnitten (Florian, 26. September 2026). */
 .tl__pfeil {
   display: block;
   flex: none;
-  width: 15px;
-  height: 9px;
+  width: 9px;
+  height: 14px;
   transition: transform 0.5s var(--verlauf-betont);
 }
 
@@ -512,14 +522,53 @@ img {
   display: block;
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
 
 /* Strichstärke in Bildpunkten statt im Koordinatensystem der
-   Zeichnung: Sonst wäre der Haken in einem 15 px breiten Kasten nur
-   einen Viertelpixel dick — viel feiner als die Schrift daneben. */
+   Zeichnung — so dick wie bei allen anderen Pfeilen der Seite. */
 .tl__pfeil polyline {
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
+}
+
+/*
+  DER HAKEN AN AUFKLAPPERN (components/Haken.astro)
+  ------------------------------------------------------------------
+  Zwei Schenkel, die um die Spitze schwenken: Geht etwas auf, legen sie
+  sich erst flach zu einer waagerechten Linie und klappen dann nach
+  oben heraus — kein Drehen um 180° (Florian, 26. September 2026).
+  Weil die Spitze fest in der Kastenmitte sitzt, läge der Haken zu
+  einmal in der oberen, einmal in der unteren Hälfte; der Kasten fährt
+  deshalb um die halbe Hakenhöhe mit, und die Zeichnung bleibt optisch
+  an Ort und Stelle. Der Zustand kommt vom Aufklapper (`aria-expanded`).
+*/
+.haken {
+  display: block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  overflow: visible;
+  color: var(--farbe-primaer);
+  transform: translateY(2.75px);
+  transition: transform 0.4s var(--verlauf-betont);
+}
+
+.haken line {
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: square;
+  vector-effect: non-scaling-stroke;
+  transform-origin: 8px 8px;
+  transition: transform 0.4s var(--verlauf-betont);
+}
+
+[aria-expanded='true'] .haken { transform: translateY(-2.75px); }
+[aria-expanded='true'] .haken__links { transform: rotate(-90deg); }
+[aria-expanded='true'] .haken__rechts { transform: rotate(90deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .haken, .haken line { transition: none; }
 }
 
 :is(a, button):hover .tl,
@@ -658,7 +707,7 @@ img {
   color: var(--farbe-primaer);
 }
 
-/* Abschnittsüberschriften der Startseite: leicht gesetzt und
+/* Abschnittsüberschriften der Startseite: kräftig gesetzt und
    linksbündig. Die frühere mittige Ausrichtung ist mit dem Handoff
    vom 17. September 2026 entfallen — nur Willkommen bleibt zentriert
    (die Komponente setzt das selbst). */
@@ -666,12 +715,14 @@ main.seiteninhalt h2:not(.ohne-verlauf),
 [data-verlauf] .bereich__titel {
   margin-inline: 0;
   font-size: var(--text-titel);
-  font-weight: var(--gewicht-leicht);
+  font-weight: var(--gewicht-titel);
   /* Etwas mehr als 1: Der bewegte Verlauf wird nur innerhalb des
      Kastens gezeichnet (`background-clip: text`) — bei genau 1 ragt
      das „g" darunter heraus und bliebe farblos. */
   line-height: 1.12;
-  letter-spacing: -0.012em;
+  /* Die Sperrungen waren für den leichten Schnitt gesetzt; mit 580
+     sind die Stämme breiter, große Grade liefen sonst zu dicht. */
+  letter-spacing: -0.010em;
   text-align: left;
   text-wrap: balance;
 }

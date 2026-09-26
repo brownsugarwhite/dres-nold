@@ -46,6 +46,14 @@
      Aubergine-Familie gedreht. Die gedeckte Fläche darüber wäre für
      diese Bewegung zu schwach — man sähe sie nicht. */
   --farbe-flaeche-kachel: #f1eef0;
+  /* Grund der Kartenzeichnung im Kontakt — muss zum `<rect>` in
+     public/bilder/deko/karte-bietigheim.svg passen (dort #f5f3f4). Auf
+     Handys ist die Zeichnung kleiner als der Bereich; ihr Rand läuft
+     in diesen Grund aus. `--farbe-flaeche-gedeckt` liegt eine Stufe
+     daneben und ergäbe eine sichtbare Kante. */
+  --farbe-karte-grund: #f5f3f4;
+  /* Der weiße Schleier hinter dem offenen Handy-Menü */
+  --farbe-schleier-hell: rgb(255 255 255 / 60%);
 
   /* Linien in drei Stärken, alle aus der Aubergine-Familie. Das
      frühere neutrale #dddddd stach daneben als kühler Fremdkörper
@@ -94,9 +102,9 @@
   --text-xxl: clamp(2rem, 1.6rem + 2vw, 3.5rem);
 
   /* Die vier Grade der Startseite.
-     Grundsatz der Gestaltung: Überschriften leicht (300), Labels
-     halbfett und gesperrt (600, Versalien). Nur diese beiden Gewichte
-     tragen die Hierarchie; Fließtext 400, Namen und Knöpfe 500. */
+     Grundsatz der Gestaltung: Überschriften kräftig (`--gewicht-titel`,
+     580), Labels halbfett und gesperrt (600, Versalien). Fließtext 400,
+     Namen und Knöpfe 500. */
   --text-willkommen: clamp(2.6rem, 1.1rem + 5vw, 4.9rem);  /* H1 */
   --text-titel: clamp(1.9rem, 1.1rem + 2.6vw, 3rem);       /* H2 Abschnitt */
   --text-titel-klein: clamp(1.5rem, 1.1rem + 1.2vw, 2rem); /* H2 im Formular */
@@ -112,7 +120,17 @@
   --sperrung-kicker: 0.18em;
   --sperrung-kicker-klein: 0.14em;
 
+  /* Nur noch die große Telefonnummer im Kontakt ist leicht gesetzt */
   --gewicht-leicht: 300;
+  /* Gewicht ALLER Überschriften an einer Stelle. Die Praxis wollte die
+     kräftigen Überschriften zurück (Florian, 26. September 2026): Die
+     alte Webflow-Seite setzte sie in 600 und 700, hier eine Spur
+     leichter — und unter den Labels (600), damit Kicker und
+     Überschrift nicht dasselbe Gewicht tragen. Source Sans 3 ist eine
+     variable Schrift, jeder Zwischenwert ist ein echter Schnitt.
+     Der leichte Schnitt (300) des Handoffs vom 17. September ist
+     damit zurückgenommen. */
+  --gewicht-titel: 580;
   --gewicht-normal: 400;
   --gewicht-mittel: 500;
   --gewicht-halbfett: 600;
@@ -186,6 +204,9 @@
      Seitenwechsel. 12 px ließen den Morph auf schwächeren Geräten
      ruckeln. */
   --weichzeichner-uebergang: 6px;
+  /* Weichzeichner des Schleiers hinter dem offenen Handy-Menü — derselbe
+     Radius wie hinter der Hinweis-Karte. */
+  --weichzeichner-schleier: 7px;
 
   /* --- Ebenen ---------------------------------------------------- */
   --ebene-inhalt: 1;

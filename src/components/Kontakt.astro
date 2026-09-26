@@ -44,7 +44,9 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
         darunter zwei Ringe, die sich nacheinander ausbreiten. Ihre
         Spitze sitzt auf der Praxis. */}
     <span class="kontakt__marke" data-marke>
-      <svg viewBox="0 0 52 72" focusable="false">
+      {/* `overflow="visible"`: Der weiße Saum an der Spitze ragt ein paar
+          Zehntel über den Zeichenkasten hinaus und wurde sonst abgeschnitten. */}
+      <svg viewBox="0 0 52 72" overflow="visible" focusable="false">
         <path
           d="M26 1C12.2 1 1 12 1 25.6 1 44.5 26 71 26 71S51 44.5 51 25.6C51 12 39.8 1 26 1Z"
           fill="currentColor" stroke="#ffffff" stroke-width="2"
@@ -323,9 +325,9 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     margin: 14px 0 0;
     color: var(--farbe-primaer);
     font-size: var(--text-titel);
-    font-weight: var(--gewicht-leicht);
+    font-weight: var(--gewicht-titel);
     line-height: 1.08;
-    letter-spacing: -0.014em;
+    letter-spacing: -0.011em;
   }
 
   .kontakt__einleitung {
@@ -423,9 +425,9 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
   .kontakt__formulartitel {
     margin: 12px 0 26px;
     font-size: var(--text-titel-klein);
-    font-weight: var(--gewicht-leicht);
+    font-weight: var(--gewicht-titel);
     line-height: 1.22;
-    letter-spacing: -0.011em;
+    letter-spacing: -0.009em;
   }
 
   @media (max-width: 900px) {

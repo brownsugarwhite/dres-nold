@@ -636,8 +636,10 @@ const kategorien = (leistungen.kategorien ?? [])
   /* Pfeil rechts: dreht sich, wenn die Kategorien aufgeklappt sind */
   .mobilmenue__pfeil {
     flex: none;
-    width: 14px;
-    height: 8px;
+    /* 15 × 9: Der Kasten trägt den Rand der Zeichnung mit, der sichtbare
+       Haken bleibt 13 px breit (siehe pfeil-runter.svg). */
+    width: 15px;
+    height: 9px;
     margin-left: auto;
     margin-right: var(--abstand-2xs);
     background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
@@ -790,9 +792,10 @@ const kategorien = (leistungen.kategorien ?? [])
     position: absolute;
     left: 50%;
     bottom: 17px;
-    width: 11px;
+    /* 12 × 7 samt Rand der Zeichnung — sichtbar ist der Haken 10 px breit */
+    width: 12px;
     height: 7px;
-    margin-left: -5.5px;
+    margin-left: -6px;
     background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
     transition:
       opacity 220ms var(--verlauf),

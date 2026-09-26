@@ -11,6 +11,7 @@
  * Ohne JavaScript sind alle Stellen offen (das Skript klappt sie erst
  * zu). Nichts ist dann unerreichbar.
  */
+import Haken from './Haken.astro';
 import daten from '../content/stellen.json';
 import seite from '../content/seite.json';
 
@@ -71,7 +72,7 @@ const bewerbung = (titel: string) =>
                 </span>
                 {s.umfang && <span class="stelle__umfang">{s.umfang}</span>}
                 <span class="stelle__kreis" aria-hidden="true">
-                  <span class="stelle__pfeil"></span>
+                  <Haken />
                 </span>
               </button>
             </h3>
@@ -202,15 +203,6 @@ const bewerbung = (titel: string) =>
   .stelle__knopf:hover .stelle__kreis,
   .stelle__knopf:focus-visible .stelle__kreis { border-color: var(--farbe-primaer); }
 
-  .stelle__pfeil {
-    display: block;
-    width: 13px;
-    height: 8px;
-    background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
-    transition: transform 0.45s var(--verlauf-betont);
-  }
-
-  .stelle__knopf[aria-expanded='true'] .stelle__pfeil { transform: rotate(180deg); }
 
   /* Aufklappen über die Zeilenhöhe des Rasters: Das Ziel ist der
      natürliche Inhalt, keine geratene Höhe. */
@@ -423,7 +415,6 @@ const bewerbung = (titel: string) =>
 
   @media (prefers-reduced-motion: reduce) {
     .stelle__klappe,
-    .stelle__pfeil,
     .stelle__kreis,
     .stelle__anriss,
     .stelle__text,

@@ -4,11 +4,6 @@
  * In der Vorlage ein einzelner Verweis „Datenschutz & Impressum";
  * hier getrennt, weil beides eigene Seiten sind.
  *
- * Dazu der Knopf, der eine einmal erteilte Zustimmung zur Google-Karte
- * wieder zurücknimmt. Ein Einwilligungs-Banner beim Seitenaufruf gibt
- * es nicht — die Karte lädt erst, wenn man das Vorschaubild anklickt
- * (docs/entscheidungen.md, Abschnitt „Kontakt").
- *
  * Eine Haarlinie oben, darunter links die Zeile mit dem Namen der
  * Praxis, rechts die Verweise (Entwurf, 18. September 2026). Das Logo
  * ist heraus (Florian, 17. September 2026): Es steht schon in der
@@ -29,14 +24,9 @@ const jahr = new Date().getFullYear();
     <nav class="fuss__links" aria-label="Rechtliches">
       <a href="/datenschutz/">Datenschutz</a>
       <a href="/impressum/">Impressum</a>
-      <span class="fuss__widerruf" data-karte-widerrufen-huelle hidden>
-        <button class="fuss__knopf" type="button" data-karte-widerrufen>Zustimmung zur Karte zurücknehmen</button>
-      </span>
       <button class="fuss__knopf" type="button" data-nach-oben>Nach oben</button>
     </nav>
   </div>
-
-  <p class="fuss__meldung" role="status" aria-live="polite"></p>
 </footer>
 
 <style>
@@ -106,25 +96,6 @@ const jahr = new Date().getFullYear();
     text-underline-offset: 0.22em;
   }
 
-  .fuss__widerruf {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .fuss__widerruf[hidden] { display: none; }
-
-  .fuss__meldung {
-    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
-    margin: -1rem auto 0;
-    max-width: none;
-    padding-bottom: var(--abstand-m);
-    color: var(--farbe-text-gedeckt);
-    font-size: var(--text-xs);
-  }
-
-  .fuss__meldung:empty { display: none; }
-
   @media (max-width: 560px) {
     .fuss__inhalt { justify-content: center; text-align: center; }
     .fuss__links { justify-content: center; width: 100%; row-gap: var(--abstand-2xs); }
@@ -132,30 +103,6 @@ const jahr = new Date().getFullYear();
 </style>
 
 <script>
-  /**
-   * Der Knopf erscheint nur, wenn überhaupt eine Zustimmung zur
-   * Google-Karte gespeichert ist — sonst gäbe es nichts zurückzunehmen.
-   */
-  import { lesen, zuruecksetzen, EREIGNIS } from '../scripts/einwilligung';
-
-  function widerrufAufbauen() {
-    const knopf = document.querySelector<HTMLButtonElement>('[data-karte-widerrufen]');
-    const huelle = document.querySelector<HTMLElement>('[data-karte-widerrufen-huelle]');
-    const meldung = document.querySelector<HTMLElement>('.fuss__meldung');
-    if (!knopf || !huelle || knopf.dataset.bereit) return;
-    knopf.dataset.bereit = 'ja';
-
-    const anzeigen = () => { huelle.hidden = lesen()?.karte !== true; };
-
-    knopf.addEventListener('click', () => {
-      zuruecksetzen();
-      if (meldung) meldung.textContent = 'Die Karte lädt jetzt wieder erst auf Klick.';
-    });
-
-    document.addEventListener(EREIGNIS, anzeigen);
-    anzeigen();
-  }
-
   /** „Nach oben" — sanft, und ohne eine Raute in der Adresse zu hinterlassen. */
   function nachObenAufbauen() {
     const knopf = document.querySelector<HTMLButtonElement>('[data-nach-oben]');
@@ -167,8 +114,6 @@ const jahr = new Date().getFullYear();
     });
   }
 
-  const aufbauen = () => { widerrufAufbauen(); nachObenAufbauen(); };
-
-  aufbauen();
-  document.addEventListener('astro:page-load', aufbauen);
+  nachObenAufbauen();
+  document.addEventListener('astro:page-load', nachObenAufbauen);
 </script>

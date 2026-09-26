@@ -56,16 +56,16 @@ const zeilen = texte.titel.split('\n').filter((z) => z.trim() !== '');
     text-align: center;
   }
 
-  /* Eine Stufe größer als `--text-titel` (die übrigen Überschriften).
-     Leicht gesetzt (300) und eng gesperrt — der Grundsatz der ganzen
-     Seite: Größe trägt die Hierarchie, nicht Fettung. */
+  /* Eine Stufe größer als `--text-titel` (die übrigen Überschriften),
+     im Gewicht aller Überschriften (`--gewicht-titel`) und eng
+     gesperrt. */
   .willkommen__titel {
     max-width: 19ch;
     margin: 0;
     font-size: var(--text-willkommen);
-    font-weight: var(--gewicht-leicht);
+    font-weight: var(--gewicht-titel);
     line-height: 1.07;
-    letter-spacing: -0.013em;
+    letter-spacing: -0.010em;
     text-wrap: balance;
   }
 

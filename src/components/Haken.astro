@@ -1,0 +1,21 @@
+---
+/**
+ * Der Haken an Aufklappern (Stellen, Tätigkeiten im Team, „Leistungen"
+ * im Handy-Menü) — ein Pfeil nach unten aus zwei Schenkeln.
+ *
+ * Er dreht sich NICHT um 180°, wenn etwas aufgeht (Florian, 26. September
+ * 2026): Beide Schenkel schwenken um die Spitze — erst liegen sie flach
+ * zu einer waagerechten Linie, dann klappen sie zur anderen Seite
+ * heraus. Deshalb zwei Linien statt einer Zeichnung; die Bewegung
+ * steht in styles/global.css (`.haken`).
+ *
+ * Maße: Spitze in der Mitte des 16er-Kastens, Schenkel unter 45°,
+ * sichtbar ≈ 13 × 6,5 px wie die übrigen kleinen Pfeile der Seite. Die
+ * eckigen Enden (`square`) treffen sich an der Spitze wie ein
+ * Gehrungsstoß — derselbe spitze Scheitel wie bei `pfeil-runter.svg`.
+ */
+---
+<svg class="haken" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <line class="haken__links" x1="8" y1="8" x2="2.5" y2="2.5" />
+  <line class="haken__rechts" x1="8" y1="8" x2="13.5" y2="2.5" />
+</svg>

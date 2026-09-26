@@ -123,10 +123,13 @@ Weiß nur 3,75:1 (Vorgabe: 4,5:1).
 
 *Vorsicht:* Im Webflow-CSS existieren Beinahe-Duplikate (`#6b1a51`, `#6a2051`). Das sind Ungenauigkeiten der Vorlage — im Neubau gilt durchgängig `#6c1a51`.
 
-**Gewichte:** Überschriften leicht (300), Labels halbfett und gesperrt
-(600, Versalien). Nur diese beiden tragen die Hierarchie; Fließtext 400,
-Namen und Knöpfe 500. Überschriften stehen **linksbündig** — mittig
-stehen nur Startbereich, Begrüßung und Hinweis.
+**Gewichte:** Überschriften kräftig — `--gewicht-titel: 580`, eine Spur
+leichter als die 600/700 der alten Webflow-Seite und leichter als die
+Labels (Florian, 26. September 2026; der leichte Schnitt 300 des
+Handoffs ist zurückgenommen). Labels halbfett und gesperrt (600,
+Versalien), Fließtext 400, Namen und Knöpfe 500, die große
+Telefonnummer im Kontakt 300. Überschriften stehen **linksbündig** —
+mittig stehen nur Startbereich, Begrüßung und Hinweis.
 
 ### Schrift
 
@@ -186,7 +189,7 @@ src/
   admin/        Feldbeschreibungen und Skript der Redaktion
   server/       Gemeinsamer Code der Functions (GitHub-API, Access-Prüfung)
   styles/       tokens.css (Gestaltungswerte) + globale Stile + Übergänge
-  scripts/      Animationen, Übergänge, sanftes Scrollen, Einwilligung — ohne Bibliotheken
+  scripts/      Animationen, Übergänge, sanftes Scrollen — ohne Bibliotheken
 public/
   bilder/       Fotos (werden beim Build automatisch optimiert)
   dokumente/    PDFs zum Download
@@ -337,7 +340,7 @@ Wenn Sie diese Seite mit einem KI-Assistenten erweitern wollen, geben Sie ihm di
 
 ## Rechtliches
 
-- **Keine Einwilligung mehr nötig — die Seite lädt nichts Fremdes.** Seit dem 18. September 2026 ist die Google-Karte nicht mehr eingebettet: Der Kontaktbereich liegt auf einer selbst gehosteten, stilisierten Karte aus OpenStreetMap-Daten (`public/bilder/deko/karte-bietigheim.svg`; die ODbL verlangt den Vermerk „© OpenStreetMap-Mitwirkende", er steht unten rechts an der Karte), und „Karte anzeigen" / „Route planen" sind Verweise, die Google Maps in einem neuen Fenster öffnen (`src/components/Kontakt.astro`). Damit entfällt der letzte Grund für eine Einwilligung. `src/scripts/einwilligung.ts` und der Widerrufsknopf im Fußbereich bleiben vorerst stehen, damit alte gespeicherte Zustimmungen zurückgenommen werden können; sie werden von nichts mehr gesetzt. **Die Datenschutzerklärung muss entsprechend angepasst werden.** Jede neue Fremdressource müsste erst wieder einen solchen Weg bekommen — oder besser: weggelassen werden.
+- **Keine Einwilligung mehr nötig — die Seite lädt nichts Fremdes.** Seit dem 18. September 2026 ist die Google-Karte nicht mehr eingebettet: Der Kontaktbereich liegt auf einer selbst gehosteten, stilisierten Karte aus OpenStreetMap-Daten (`public/bilder/deko/karte-bietigheim.svg`; die ODbL verlangt den Vermerk „© OpenStreetMap-Mitwirkende", er steht unten rechts an der Karte), und „Karte anzeigen" / „Route planen" sind Verweise, die Google Maps in einem neuen Fenster öffnen (`src/components/Kontakt.astro`). Damit entfällt der letzte Grund für eine Einwilligung. `src/scripts/einwilligung.ts` und der Widerrufsknopf im Fußbereich sind am 26. September 2026 entfernt worden (siehe `docs/entscheidungen.md`). **Die Datenschutzerklärung muss entsprechend angepasst werden.** Jede neue Fremdressource müsste erst wieder einen solchen Weg bekommen — oder besser: weggelassen werden.
 - **Impressum und Datenschutzerklärung sind getrennte Seiten** (in der Webflow-Version zeigten beide Footer-Links auf `/datenschutz`).
 - **Das Kontaktformular fragt bewusst keine Gesundheitsdaten ab.** Das darf sich nicht ändern — für Gesundheitsangaben wäre eine erheblich aufwendigere Absicherung nötig.
 - **Kein Pflicht-Häkchen unter dem Formular.** Die Angaben werden verarbeitet, um die Anfrage zu beantworten; Rechtsgrundlage ist Art. 6 Abs. 1 lit. b bzw. f DSGVO, nicht eine Einwilligung. Art. 13 verlangt an dieser Stelle **Information**, keine Zustimmung — deshalb steht dort ein Hinweis mit Verweis auf die Datenschutzerklärung (18. September 2026). Eine Einwilligung wäre sogar die schlechtere Grundlage, weil sie jederzeit widerrufbar ist.
