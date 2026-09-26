@@ -136,13 +136,14 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
   /*
     Die Ebene der Zeichnung deckt den Bereich genau — sie liegt auf
     seinen vier Kanten und ist damit immer volle Breite. Verschoben
-    wird nicht die Ebene, sondern die Zeichnung DARIN: Ihr Mittelpunkt
-    ist die Praxis und liegt unter der Spitze der Marke, wo immer die
-    gerade sitzt. Maß und Lage rechnet das Skript unten aus (`--karte-mass`,
-    `--karte-lage`). Nebeneinander wählt es das Maß so groß, dass die
-    Zeichnung auch bei weit außen stehender Marke bis in alle Ecken
-    reicht; gestapelt (bis 900 px) steht sie in festem Maß und läuft
-    über eine Maske (siehe dort) weich in den Grund aus.
+    wird nicht die Ebene, sondern die Zeichnung DARIN: Die Praxis liegt
+    unter der Spitze der Marke, wo immer die gerade sitzt. Maß und Lage
+    rechnet das Skript unten aus (`--karte-mass`, `--karte-lage`).
+    Nebeneinander wählt es das Maß so groß, dass die Zeichnung auch bei
+    weit außen stehender Marke bis in alle Ecken reicht; gestapelt (bis
+    900 px) steht eine HOCHKANTE Zeichnung (siehe unten im Umbruch),
+    die bis zum unteren Rand reicht und über eine Maske weich in den
+    Grund ausläuft.
 
     Ohne JavaScript bleibt es bei `cover` und mittiger Lage — der Punkt
     sitzt dann in der Mitte, wie die Zeichnung selbst.
@@ -487,6 +488,12 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
        liegt auf dem Bereich selbst. Die `-webkit-`-Fassung braucht
        Safari bis 15 (Florian, 26. September 2026). */
     .kontakt__bild {
+      /* Die hochkante Zeichnung (scripts/karte-zeichnen.mjs): dieselbe
+         Karte, aber 1080 × 1646 mit der Praxis im oberen Drittel — sie
+         reicht unter der Marke gut 1100 Bildpunkte weit nach unten.
+         Mit dem 16:9-Bild blieb unter dem Formular nur der leere Grund
+         (Florian, 26. September 2026). */
+      background-image: url('/bilder/deko/karte-bietigheim-hoch.svg');
       -webkit-mask-image: radial-gradient(ellipse farthest-side at center, #000 50%, transparent 100%);
       -webkit-mask-size: var(--karte-mass, cover);
       -webkit-mask-position: var(--karte-lage, center);
@@ -581,8 +588,19 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     const LUFT = 56;
 
     /** Maß der Zeichnung, wenn Text und Formular gestapelt stehen —
-        als Anteil ihrer vollen Größe (1920 × 1080 → 1402 × 789). */
+        als Anteil ihrer vollen Größe (hochkant: 1080 × 1646 → 788 × 1202).
+        Ist der Bereich höher, wächst das Maß, bis die Zeichnung unten
+        ankommt. */
     const MASS_SCHMAL = 0.73;
+
+    /* Die beiden Zeichnungen: nebeneinander das 16:9-Bild des Handoffs,
+       gestapelt das hochkante aus scripts/karte-zeichnen.mjs (die CSS-
+       Regel im Umbruch tauscht das Bild). `praxis` ist der Punkt, der
+       unter die Spitze der Marke gehört. */
+    const ZEICHNUNG = {
+      breit: { breite: 1920, hoehe: 1080, praxis: { x: 960, y: 540 } },
+      hoch: { breite: 1080, hoehe: 1646, praxis: { x: 540, y: 548.6 } },
+    };
 
     /**
      * Wie weit der Text WIRKLICH nach rechts reicht.
@@ -677,23 +695,37 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
         Gestapelt (der Umbruch bei 900 px, hier gemessen statt geraten)
         ist der Bereich viel höher als breit, und dieselbe Rechnung
         bliese die Zeichnung auf gut das Doppelte auf — vom Ort blieb
-        nur noch die nächste Straße. Dort steht sie deshalb in festem
-        Maß (`MASS_SCHMAL`) und muss nur noch waagerecht bis in beide
-        Ecken reichen; was sie senkrecht nicht deckt, läuft über die
-        Maske (CSS) weich in den Grund aus (Florian, 26. September 2026).
+        nur noch die nächste Straße. Dort steht deshalb die hochkante
+        Zeichnung in festem Maß (`MASS_SCHMAL`), waagerecht bis in beide
+        Ecken — und senkrecht so groß, dass sie unter der Marke bis zum
+        unteren Rand des Bereichs reicht (Florian, 26. September 2026):
+        Von der Praxis bis zur Unterkante der Zeichnung sind es
+        `hoehe − praxis.y` Bildpunkte, gebraucht werden `Höhe − y` plus
+        ein Stück Überstand (`UEBERSTAND`): Die Maske (CSS) lässt die
+        Zeichnung zum Rand hin auslaufen — ragt sie unter den Bereich
+        hinaus, fällt dieser Verlauf hinter die Unterkante, und die Karte
+        bleibt bis unten satt. Was oben über den Rand hinausragt, deckt
+        ohnehin der weiße Schleier.
       */
+      const UEBERSTAND = 200;
+      const z = nebeneinander ? ZEICHNUNG.breit : ZEICHNUNG.hoch;
       const mass = nebeneinander
         ? Math.max(
-            b.width / 1920,
-            b.height / 1080,
-            (2 * Math.max(x, b.width - x)) / 1920,
-            (2 * Math.max(y, b.height - y)) / 1080,
+            b.width / z.breite,
+            b.height / z.hoehe,
+            (2 * Math.max(x, b.width - x)) / z.breite,
+            (2 * Math.max(y, b.height - y)) / z.hoehe,
           )
-        : Math.max(MASS_SCHMAL, (2 * Math.max(x, b.width - x)) / 1920);
-      const breit = Math.ceil(1920 * mass);
-      const hoch = Math.ceil(1080 * mass);
+        : Math.max(
+            MASS_SCHMAL,
+            (2 * Math.max(x, b.width - x)) / z.breite,
+            (b.height + UEBERSTAND - y) / (z.hoehe - z.praxis.y),
+          );
+      const breit = Math.ceil(z.breite * mass);
+      const hoch = Math.ceil(z.hoehe * mass);
       bereich.style.setProperty('--karte-mass', `${breit}px ${hoch}px`);
-      bereich.style.setProperty('--karte-lage', `${Math.round(x - breit / 2)}px ${Math.round(y - hoch / 2)}px`);
+      /* Die Praxis der Zeichnung unter die Spitze der Marke */
+      bereich.style.setProperty('--karte-lage', `${Math.round(x - z.praxis.x * mass)}px ${Math.round(y - z.praxis.y * mass)}px`);
     };
 
     /* ---------- 2. Der Anflug ---------- */

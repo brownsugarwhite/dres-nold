@@ -11,6 +11,7 @@ unabhängig davon, wie lange das Webflow-Abo noch läuft.
 | `live-webflow.css` | Vollständiges Stylesheet (Quelle der Design-Tokens) |
 | `assets/` | 37 Dateien: 20 Fotos, 11 Icons, 3 Lottie-Animationen, 3 PNG |
 | `animationen-sichern.js` | Holt die Animationsdefinitionen aus der laufenden Seite |
+| `assets/karte-daten.json` | OpenStreetMap-Rohdaten der Kartenzeichnung aus dem Gestaltungs-Handoff (© OpenStreetMap-Mitwirkende, ODbL) — Quelle für `scripts/karte-zeichnen.mjs` |
 
 ## Warum kein Webflow-Export nötig ist
 

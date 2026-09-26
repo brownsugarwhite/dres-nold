@@ -1762,6 +1762,32 @@ Der Tätigkeiten-Knopf hatte einen eigenen, dünneren Fokusring
 (2 px, Versatz 3 px). Der ist weg — es gilt der allgemeine 3-px-Ring
 der Seite wie überall.
 
+### Die Karte reicht auf Handys bis unten (26. September 2026)
+
+Mit dem 16:9-Bild des Handoffs blieb unter dem Formular nur der leere
+Grund — „grau-pflaume" (Florian). Die Rohdaten des Handoffs
+(`docs/referenz/assets/karte-daten.json`, jetzt im Repo) reichen nach
+oben und unten aber fast doppelt so weit wie das Bild. Daraus zeichnet
+`scripts/karte-zeichnen.mjs` ein **hochkantes** Bild,
+`public/bilder/deko/karte-bietigheim-hoch.svg`: 1080 × 1646, dieselbe
+Abbildung wie der Handoff (Praxis = Datenpunkt 0/0, ein Datenmaß =
+1920/1400 Bildpunkte, gleiche Farben und Strichstärken), die Praxis im
+oberen Drittel (540 / 548,6). Unter der Praxis liegen damit gut 1 100
+Bildpunkte Karte statt 540.
+
+Gestapelt (bis 900 px) tauscht das CSS das Bild, und das Skript wählt
+das Maß so, dass die Zeichnung unter der Marke bis zur Unterkante des
+Bereichs reicht — plus 200 px Überstand, damit der Randverlauf der
+Maske hinter die Unterkante fällt: `mass = max(0,73, waagerechte
+Deckung, (Höhe + 200 − y) / (1646 − 548,6))`. Bei 375 × 812 und einem
+1 512 px hohen Bereich sind das rund 0,98 → 1 060 px breit; sichtbar
+bleibt gut ein Drittel der Zeichnung, der Ort ist weiter als Stadtplan
+zu erkennen. Was oben
+über den Rand ragt, deckt der weiße Schleier. `--karte-lage` legt seit-
+dem nicht mehr die Bildmitte, sondern den Praxispunkt der jeweiligen
+Zeichnung unter die Spitze der Marke. Das Querformat bleibt die Datei
+des Handoffs; das Skript zeichnet nur das Hochformat.
+
 ### Kleinigkeiten aus demselben Durchgang
 
 - Knopfgruppen überall 12 px Abstand (Begrüßung und Abschnitte hatten
