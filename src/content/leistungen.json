@@ -27,6 +27,15 @@
       "kurz": "Digitale Diagnostik und Ästhetik",
       "beschreibung": "<p>Moderne Technik, die Diagnose und Behandlung genauer und angenehmer macht — vom dreidimensionalen Röntgen bis zur Abformung ohne Abformlöffel.</p>",
       "icon": "/icons/kategorien/sonstige.svg"
+    },
+    {
+      "id": "test",
+      "titel": "Test",
+      "position": 4,
+      "aktiv": true,
+      "kurz": "test test",
+      "beschreibung": "bla bla",
+      "icon": ""
     }
   ],
   "eintraege": [
