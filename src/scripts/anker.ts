@@ -22,6 +22,7 @@
  */
 
 import { ozWeg, OZ_RAST, ozStuetzstellen, ozAnteilFuer, ozTiefeAus } from './scrollwege';
+import { KURVEN } from './easing';
 
 /** Höhe der Kopfleiste — so viel Luft bleibt über dem Ziel */
 const KOPFLEISTE = 80;
@@ -75,6 +76,39 @@ function wenigerBewegung(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+/**
+ * Sanft an eine Scrolltiefe gleiten — mit eigener Bewegung statt
+ * `behavior: 'smooth'`: Das Gleiten des Browsers ist kurz und auf iOS
+ * kaum zu sehen; die alte Seite scrollte langsamer und weicher (Florian,
+ * 26. September 2026). Die Dauer wächst mit dem Weg (500 ms plus 0,35 ms
+ * je Bildpunkt, höchstens 1,8 s), die Kurve ist ein weiches Ein- und
+ * Ausschwingen. Wer währenddessen selbst scrollt, tippt oder eine Taste
+ * drückt, übernimmt — die Bewegung bricht ab.
+ */
+let laufend = 0;
+export function sanftScrollen(ziel: number): void {
+  const start = window.scrollY;
+  const weg = ziel - start;
+  if (wenigerBewegung() || Math.abs(weg) < 2) { window.scrollTo(0, ziel); return; }
+
+  const dauer = Math.min(1800, 500 + Math.abs(weg) * 0.35);
+  const kennung = ++laufend;
+  const beginn = performance.now();
+  const ereignisse = ['wheel', 'touchstart', 'keydown', 'mousedown'];
+  const abbrechen = () => { laufend++; };
+  ereignisse.forEach((e) => window.addEventListener(e, abbrechen, { passive: true }));
+  const aufraeumen = () => ereignisse.forEach((e) => window.removeEventListener(e, abbrechen));
+
+  const schritt = (jetzt: number) => {
+    if (kennung !== laufend) { aufraeumen(); return; }
+    const t = Math.min(1, (jetzt - beginn) / dauer);
+    window.scrollTo(0, start + weg * KURVEN.inOutCubic(t));
+    if (t < 1) requestAnimationFrame(schritt);
+    else aufraeumen();
+  };
+  requestAnimationFrame(schritt);
+}
+
 /** Scrolltiefe für eine Sprungmarke — oder null, wenn es sie nicht gibt */
 export function zielTiefe(hash: string): number | null {
   const id = decodeURIComponent(hash.replace(/^#/, ''));
@@ -97,7 +131,8 @@ function tiefeVon(element: Element): number {
 export function zuSprungmarke(hash: string, sofort = false): boolean {
   const tiefe = zielTiefe(hash);
   if (tiefe === null) return false;
-  window.scrollTo({ top: tiefe, behavior: sofort || wenigerBewegung() ? 'instant' as ScrollBehavior : 'smooth' });
+  if (sofort) window.scrollTo(0, tiefe);
+  else sanftScrollen(tiefe);
   return true;
 }
 

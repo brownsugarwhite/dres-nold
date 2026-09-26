@@ -1888,3 +1888,100 @@ Größenänderung und nach dem Laden der Schrift.
 - Die Karte setzt sich bei **30 %** von Ablauf a-19 in Bewegung (der
   Eintrag vom 18. September nennt noch 35 % — der Wert wurde am selben
   Abend gesenkt, siehe „Die Begrüßung kommt früher").
+
+### Sprechstunden wie früher, sanfteres Scrollen, ruhige Klappen (26. September 2026, spät)
+
+Florians Durchsicht am Handy; sieben Punkte.
+
+**Die Sprechstunden-Zeilen sind wieder die der alten Seite**
+(`OeffnungszeitenListen.astro`). Die Haarlinien und der graue
+Wochentag aus dem Handoff sind zurückgenommen — „der Schriftverlauf war
+schöner". Jetzt: alles in der Hausfarbe, der Wochentag rechtsbündig im
+leichten Schnitt (300) in einer Spalte, die so schmal ist wie ihr
+längster Tag plus 15 px, daneben Vor- und Nachmittag im normalen
+Schnitt als zwei Angaben nebeneinander (14 px Lücke; auf ganz schmalen
+Fenstern rückt der Nachmittag darunter), Zeilen 2 px Luft, keine Linien.
+„…und nach Vereinbarung" steht als letzte Zeile in der Zeitspalte, 8 px
+tiefer. 16 px, auf Handys 15 — bei 375 px stehen Donnerstag und beide
+Zeiten damit in einer Zeile (rund 280 von 305 px). Die Spaltentitel
+bleiben, wie sie sind: gesperrte Versalien in der Hausfarbe (Florian:
+„die Überschriften in Versalien sind gut"). Und „Wann Sie uns
+antreffen" bricht auf Handys nicht mehr um: bis 48 rem
+`white-space: nowrap` bei `min(1.5rem, 5.8vw)` — bei 375 px 21,8 px,
+209 px breit neben dem 48-px-Kreuz.
+
+**Das klebende Kreuz löst sich sichtbar wieder.** Bisher verschwand der
+Zwilling in dem Moment, in dem er sich löste — der Kreis zeichnete sich
+noch aus, aber ohne ihn. Jetzt laufen Grund und Kreis gemeinsam 500 ms
+rückwärts (`background-color` am `.schliessen` 300 → 500 ms mit
+`--verlauf-betont`, dieselbe Dauer wie `stroke-dashoffset`), und erst
+danach wird der Zwilling unsichtbar (`visibility 0s linear 500ms`);
+das Kreuz in der Zeile kommt mit derselben Verzögerung zurück. Beim
+Kleben wechseln beide sofort (`transition-delay: 0s` unter
+`data-kreuz="klebt"`).
+
+**Eigenes sanftes Scrollen** (`sanftScrollen` in `scripts/anker.ts`).
+`behavior: 'smooth'` ist kurz und auf iOS kaum zu sehen; die alte
+Seite glitt langsamer und weicher. Die Dauer wächst mit dem Weg —
+500 ms plus 0,35 ms je Bildpunkt, höchstens 1,8 s (ein Sprung über
+2 000 px dauert also 1,2 s) — mit `inOutCubic` aus easing.ts. Wer
+währenddessen wischt, scrollt, tippt oder eine Taste drückt, übernimmt:
+Die Bewegung bricht ab. Bei reduzierter Bewegung ein Sprung. Benutzt
+von allen Sprungmarken (`zuSprungmarke`), vom Kreuz der Einstiegskarte
+und vom „Nach oben" im Fußbereich. Das kurze Nachrücken des Titels in
+der Stellenliste bleibt beim Browser-Gleiten — es sind wenige Pixel.
+
+**Der Logo-Blitzer beim Laden** (`Startbereich.astro`): lottie-web
+zeichnet beim Laden zuerst Bild 0 — das fertige Logo mit dem grauen
+Zahn — und meldet `DOMLoaded` erst einen Takt später (per
+`setTimeout`); erst dann setzt das Skript das Startbild „leer".
+Dazwischen kann der Browser malen. Jetzt bleibt die Zeichnung
+unsichtbar, bis `data-lottie-bereit` steht — das Attribut und das
+Startbild werden im selben Takt gesetzt (`lottie.ts`, dann das
+`.then` in Startbereich.astro), also ohne Bild dazwischen.
+
+**Klappen gehen direkt auf die neue Höhe** (Florian: „nicht erst
+zurückanimieren und dann auf die neue Höhe").
+
+- *Handy-Menü:* Die Blase folgt der Summe der Zeilenhöhen. Die
+  Kategorien-Zeilen wuchsen bisher gestaffelt ab 140 ms, die anderen
+  schrumpften ab 0 — die Summe sank erst und wuchs dann. Jetzt läuft
+  die Rasterhöhe (`grid-template-rows`) in JEDER Zeile und JEDEM
+  Zustand gleich: 320 ms, `--verlauf-betont`, ohne Verzögerung. Die
+  Summe zweier gleich getakteter Bewegungen geht in einer Bewegung von
+  der alten zur neuen Höhe — ohne Skript. Gestaffelt ist nur noch der
+  Inhalt der Zellen (Deckkraft und `scaleY`, ab 80 ms je 50 ms später;
+  vorher 140/60). Beim Zurück ebenso: Zeilen im Gleichtakt, der Inhalt
+  der Kategorien blendet sofort aus.
+- *Team:* Zwei Karten in derselben Reihe — die Reihe ist so hoch wie
+  die höhere. Fiel die eine Klappe zu, während die andere aufging,
+  sank die Reihe erst und wuchs dann wieder. Jetzt fährt die alte
+  Klappe beim Wechsel nicht auf Null, sondern in derselben Zeit und
+  Kurve auf die Höhe der neuen (`element.animate` auf `height`, 400 ms,
+  Kurve aus dem Token `--verlauf-betont` gelesen); ihr Text blendet in
+  200 ms aus (`data-schliesst`). Die Reihe läuft damit in einer
+  Bewegung von der einen zur anderen Höhe. Am Ende, wenn die neue
+  Klappe die Reihe trägt, fällt die alte ohne Übergang auf Null — nicht
+  zu sehen. Ob beide in einer Reihe stehen, sagt `offsetTop` (wie bei
+  den Reihenenden). In verschiedenen Reihen ist nichts zu tun: gleiche
+  Dauer, gleiche Kurve, die Summe der Höhen geht von selbst in einer
+  Bewegung. Ein Tipp mitten in die Bewegung löst sie sauber ab
+  (`WeakMap` der laufenden Animationen).
+
+**Kontakt auf Handys: mehr Karte um die Marke.** Die Lücke zwischen
+den Knöpfen und dem Formular, in der die Marke steht, ist 220 statt
+128 px hoch (`row-gap` unter `data-marke="unten"`); die Marke sitzt
+weiter in ihrer Mitte — sie klebte am Formular.
+
+**Ein Hörer statt der Nummer in der Handy-Kopfleiste.** Rechts steht
+jetzt der Hörer aus dem Symbol der Telefon-Kategorie
+(`icons/navigation/telefon.svg`, ohne den Kreis darum; 30 px in einer
+44-px-Tippfläche, als Inline-SVG in `currentColor`). Ein Tipp holt
+daneben die Nummer als `tel:`-Verweis hervor: Sie liegt mit Breite 0
+hinter dem Hörer und bekommt ihre gemessene Breite (`--nummer-breite`,
+bei 375 px 69 px) in 400 ms — und weil die Gruppe am rechten Rand
+hängt, rückt der Hörer dabei nach links. Ein zweiter Tipp nimmt sie
+weg, ein Tipp auf den Menüknopf auch. Florian schrieb „darunter";
+umgesetzt ist „daneben" — die Nummer erscheint dort, wo der Hörer
+war. Wenn sie wirklich UNTER dem Hörer stehen soll: eine Rückfrage
+wert, die Kopfleiste ist 80 px hoch, Platz wäre da.

@@ -524,7 +524,12 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     overflow: hidden;
     min-height: 0;
     text-align: left;
+    transition: opacity 200ms var(--verlauf);
   }
+
+  /* Beim Wechsel zu einer Nachbarin in derselben Reihe blendet der Text
+     aus, während die Klappe noch die Reihenhöhe hält (siehe Skript) */
+  .taetigkeiten[data-schliesst] .taetigkeiten__liste { opacity: 0; }
 
   .taetigkeiten__liste li {
     width: auto;
@@ -620,7 +625,8 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     .portraet__ausschnitt { height: 100%; transform: none; }
     .portraet__bild { transition: none; }
     .portraetfeld:hover .portraet__bild { transform: none; }
-    .taetigkeiten { transition: none; }
+    .taetigkeiten,
+    .taetigkeiten__liste { transition: none; }
   }
 </style>
 
@@ -745,20 +751,92 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
   /** Tätigkeiten auf- und zuklappen — nur eines gleichzeitig offen. */
   function accordionAufbauen() {
     const knoepfe = [...document.querySelectorAll<HTMLButtonElement>('[data-aufklapper]')];
+    const wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    /* Dauer der Klappe — muss mit `.taetigkeiten` im CSS übereinstimmen;
+       die Kurve kommt aus dem Token selbst */
+    const DAUER = 400;
+    const kurve = getComputedStyle(document.documentElement).getPropertyValue('--verlauf-betont').trim() || 'ease';
+
+    const klappe = (knopf: HTMLButtonElement) =>
+      document.getElementById(knopf.getAttribute('aria-controls') || '');
+    const karte = (knopf: HTMLButtonElement) => knopf.closest<HTMLElement>('[data-mitglied]');
 
     const setzen = (knopf: HTMLButtonElement, offen: boolean) => {
       knopf.setAttribute('aria-expanded', String(offen));
-      const ziel = document.getElementById(knopf.getAttribute('aria-controls') || '');
+      const ziel = klappe(knopf);
       if (!ziel) return;
       if (offen) ziel.dataset.offen = 'ja';
       else delete ziel.dataset.offen;
     };
 
+    /* Laufende Wechsel-Bewegungen je Klappe, damit ein Tipp mitten in
+       die Bewegung sie sauber ablösen kann */
+    const laeufe = new WeakMap<HTMLElement, Animation>();
+    const loesen = (k: HTMLElement) => {
+      laeufe.get(k)?.cancel();
+      laeufe.delete(k);
+      delete k.dataset.schliesst;
+    };
+
+    /**
+     * Von einer Person zur nächsten wechseln.
+     *
+     * Stehen beide in derselben Reihe, hängt die Reihenhöhe an der
+     * höheren Karte. Fiele die eine Klappe zu, während die andere
+     * aufgeht, sänke die Reihe erst und wüchse dann wieder — ein Ruck
+     * für alles darunter (Florian, 26. September 2026). Deshalb fährt
+     * die alte Klappe hier nicht auf Null, sondern in derselben Zeit und
+     * Kurve auf die Höhe der neuen: Die Reihe läuft damit in EINER
+     * Bewegung von der einen zur anderen Höhe. Erst am Ende, wenn die
+     * neue Klappe die Reihe trägt, fällt die alte — unsichtbar — auf
+     * Null; ihr Text ist bis dahin längst ausgeblendet.
+     *
+     * In verschiedenen Reihen ist nichts zu tun: Beide Klappen laufen
+     * gleich lang mit derselben Kurve, und die Summe ihrer Höhen geht
+     * damit von selbst in einer Bewegung von der alten zur neuen.
+     */
+    const wechseln = (von: HTMLButtonElement, zu: HTMLButtonElement) => {
+      const alt = klappe(von);
+      const neu = klappe(zu);
+      const kAlt = karte(von);
+      const kNeu = karte(zu);
+      setzen(zu, true);
+      if (!alt || !neu || !kAlt || !kNeu || wenigerBewegung || kAlt.offsetTop !== kNeu.offsetTop) {
+        setzen(von, false);
+        return;
+      }
+      const vonHoehe = alt.getBoundingClientRect().height;
+      // Die neue Klappe ist noch zu — ihr Inhalt kennt seine Höhe trotzdem
+      const nachHoehe = neu.querySelector<HTMLElement>('.taetigkeiten__liste')?.scrollHeight ?? 0;
+      von.setAttribute('aria-expanded', 'false');
+      alt.dataset.schliesst = 'ja';
+      const lauf = alt.animate(
+        [{ height: `${vonHoehe}px` }, { height: `${nachHoehe}px` }],
+        { duration: DAUER, easing: kurve, fill: 'forwards' },
+      );
+      laeufe.set(alt, lauf);
+      lauf.onfinish = () => {
+        laeufe.delete(alt);
+        // Der Sprung auf Null geschieht ohne Übergang — hinter der neuen
+        // Klappe ist er nicht zu sehen
+        alt.style.transition = 'none';
+        delete alt.dataset.offen;
+        delete alt.dataset.schliesst;
+        lauf.cancel();
+        void alt.offsetHeight;
+        alt.style.transition = '';
+      };
+    };
+
     knoepfe.forEach((knopf) => {
       knopf.addEventListener('click', () => {
+        const eigene = klappe(knopf);
+        if (eigene) loesen(eigene);
         const offen = knopf.getAttribute('aria-expanded') === 'true';
-        knoepfe.forEach((k) => { if (k !== knopf) setzen(k, false); });
-        setzen(knopf, !offen);
+        const andere = knoepfe.find((k) => k !== knopf && k.getAttribute('aria-expanded') === 'true');
+        if (offen) setzen(knopf, false);
+        else if (andere) wechseln(andere, knopf);
+        else setzen(knopf, true);
       });
     });
   }

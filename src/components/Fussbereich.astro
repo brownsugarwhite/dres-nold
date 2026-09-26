@@ -103,15 +103,15 @@ const jahr = new Date().getFullYear();
 </style>
 
 <script>
-  /** „Nach oben" — sanft, und ohne eine Raute in der Adresse zu hinterlassen. */
+  import { sanftScrollen } from '../scripts/anker';
+
+  /** „Nach oben" — sanft (dieselbe Bewegung wie die Sprungmarken), und
+      ohne eine Raute in der Adresse zu hinterlassen. */
   function nachObenAufbauen() {
     const knopf = document.querySelector<HTMLButtonElement>('[data-nach-oben]');
     if (!knopf || knopf.dataset.bereit) return;
     knopf.dataset.bereit = 'ja';
-    knopf.addEventListener('click', () => {
-      const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      window.scrollTo({ top: 0, behavior: ruhig ? 'auto' : 'smooth' });
-    });
+    knopf.addEventListener('click', () => sanftScrollen(0));
   }
 
   nachObenAufbauen();

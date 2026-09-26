@@ -659,9 +659,13 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
   border-radius: var(--radius-rund);
   background: url('/icons/ui/schliessen.svg') center / 24px no-repeat;
   cursor: pointer;
+  /* Der milchige Grund kommt und geht in derselben Zeit, in der sich
+     der Kreis ein- und wieder auszeichnet (500 ms) — beim Lösen des
+     Kreuzes laufen beide gemeinsam rückwärts (Florian, 26. September
+     2026). */
   transition:
     transform 300ms var(--verlauf),
-    background-color 300ms var(--verlauf);
+    background-color 500ms var(--verlauf-betont);
 }
 
 .schliessen:hover,

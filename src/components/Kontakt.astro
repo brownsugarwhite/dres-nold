@@ -508,7 +508,11 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
   /* Steht die Marke zwischen Knöpfen und Formular (Handys, siehe
      Skript), braucht sie dort Platz — die Reihenlücke wächst dann auf
      ihre Höhe plus Luft (Florian, 18. September 2026). */
-  .kontakt[data-marke='unten'] .kontakt__inhalt { row-gap: 128px; }
+  /* Die Marke steht in der Lücke zwischen Knöpfen und Formular — die
+     Lücke ist so hoch, dass rundherum Karte zu sehen ist und die Marke
+     nicht am Formular klebt (220 px; vorher 128, Florian, 26. September
+     2026). */
+  .kontakt[data-marke='unten'] .kontakt__inhalt { row-gap: 220px; }
 
   /* … und die Formularkarte nimmt dann die ganze Breite: Sie steht
      unter der Marke, nicht neben ihr — das feste Maß von 480 px ließe

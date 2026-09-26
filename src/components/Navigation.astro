@@ -129,11 +129,31 @@ const kategorien = (leistungen.kategorien ?? [])
       <a class="logo" href="/" aria-label={`${praxis.name} — zur Startseite`}>
         <img src="/icons/logo.svg" alt="" width="80" height="80" />
       </a>
-      {/* Rechts die Telefonnummer als schlichter Text, mit einem Punkt
-          vom Menüknopf getrennt — wie die Punkte zwischen den Menüpunkten
-          auf dem Desktop; keine Pille (Florian, 26. September 2026). */}
+      {/* Rechts ein Hörer: Ein Tipp schiebt ihn nach links und holt
+          daneben die Nummer als Verweis hervor, ein zweiter Tipp nimmt
+          sie wieder weg (Florian, 26. September 2026). Ein Punkt trennt
+          zum Menüknopf — wie die Punkte zwischen den Menüpunkten auf dem
+          Desktop. Die Zeichnung ist der Hörer aus dem Symbol der
+          Telefon-Kategorie (icons/navigation/telefon.svg), ohne den
+          Kreis darum. */}
       <div class="kopfleiste__handyrechts">
-        <a class="kopfleiste__nummer" href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
+        <div class="kopftelefon" data-kopftelefon>
+          <button
+            class="kopftelefon__knopf"
+            type="button"
+            aria-expanded="false"
+            aria-controls="kopftelefon-nummer"
+            aria-label="Telefonnummer anzeigen"
+            data-kopftelefonknopf
+          >
+            <svg class="kopftelefon__symbol" viewBox="10 8 43 43" aria-hidden="true" focusable="false">
+              <path fill="currentColor" d="M45.84,48.45a14.43,14.43,0,0,1-9.77.86C24.19,45.51,16,37,12.17,25.12a10.23,10.23,0,0,1,1.12-8.57,6.19,6.19,0,0,1,5.46-3.12,2.15,2.15,0,0,1,1.59.9,39.18,39.18,0,0,1,3.11,6.42A2,2,0,0,1,23,23.33c-1,.85-1.94,1.71-2.94,2.57-.81.68-1.56,2.1-1.1,3.07,2.77,6,7.86,11.41,13.79,13.52.86.3,2.25-.65,2.72-1a32,32,0,0,0,2.7-3.36,1.91,1.91,0,0,1,2.58-.36c2.69,1.3,4.38,2,6.42,3a2.38,2.38,0,0,1,1.08,1.81C48.45,43.73,48.22,47.44,45.84,48.45Z"/>
+              <path class="kopftelefon__welle" d="M28.51,16.85a17.23,17.23,0,0,1,10.38,4.89,20.36,20.36,0,0,1,5.82,10.61"/>
+              <path class="kopftelefon__welle" d="M28.86,10.18s8.65.85,14.79,6.51a24.92,24.92,0,0,1,7.46,14.74"/>
+            </svg>
+          </button>
+          <a class="kopftelefon__nummer" id="kopftelefon-nummer" href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
+        </div>
         <span class="punkt" aria-hidden="true"></span>
         <button
           class="menueknopf"
@@ -518,20 +538,78 @@ const kategorien = (leistungen.kategorien ?? [])
      zum letzten Menüpunkt als zwischen den Punkten selbst. */
   .kopfleiste__telefon { margin-left: 4px; white-space: nowrap; }
 
-  /* Handys: rechts die Nummer als Text, ein Punkt, der Menüknopf */
+  /* Handys: rechts der Hörer, ein Punkt, der Menüknopf */
   .kopfleiste__handyrechts {
     display: flex;
     align-items: center;
     gap: var(--abstand-s);
   }
 
-  .kopfleiste__nummer {
+  .kopftelefon {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Der Hörer: 30 px Zeichnung in einer 44-px-Tippfläche */
+  .kopftelefon__knopf {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--farbe-primaer);
+    cursor: pointer;
+  }
+
+  .kopftelefon__symbol {
+    width: 30px;
+    height: 30px;
+    overflow: visible;
+  }
+
+  .kopftelefon__welle {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* Die Nummer liegt zusammengeschoben hinter dem Hörer (Breite 0). Beim
+     Aufklappen bekommt sie ihre gemessene Breite (`--nummer-breite`,
+     setzt das Skript) — und weil die ganze Gruppe am rechten Rand hängt,
+     rückt der Hörer dabei nach links. `visibility` nimmt den Verweis
+     aus der Tab-Reihenfolge, solange er nicht zu sehen ist. */
+  .kopftelefon__nummer {
+    display: block;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
     color: var(--farbe-primaer);
     font-family: var(--schrift-titel);
     font-size: var(--text-s);
     font-weight: var(--gewicht-mittel);
     text-decoration: none;
     white-space: nowrap;
+    transition:
+      max-width 400ms var(--verlauf-betont),
+      margin-left 400ms var(--verlauf-betont),
+      opacity 240ms var(--verlauf),
+      visibility 0s linear 400ms;
+  }
+
+  .kopftelefon[data-offen] .kopftelefon__nummer {
+    max-width: var(--nummer-breite, 140px);
+    margin-left: 2px;
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s, 0s, 120ms, 0s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kopftelefon__nummer { transition: none; }
   }
 
   /* .nav-buttons-mobile / -desktop: beide 80 px hoch.
@@ -624,17 +702,20 @@ const kategorien = (leistungen.kategorien ?? [])
     transition-property: grid-template-rows, opacity, transform;
     transition-duration: 320ms, 260ms, 260ms;
     transition-timing-function: var(--verlauf-betont);
-    /* Die 120 ms an der Rasterhöhe: Beim Zurück aus der Ebene
-       „Leistungen" wachsen die Zeilen erst, wenn die Kategorien schon
-       schrumpfen (siehe unten). */
-    transition-delay: 120ms, calc(var(--stufe-hoch, 0) * 45ms), calc(var(--stufe-hoch, 0) * 45ms);
+    /* Die Rasterhöhe läuft in JEDER Zeile und JEDEM Zustand gleich:
+       320 ms, ohne Verzögerung. Nur dann geht die Summe aller Zeilen —
+       und mit ihr die Blase — beim Ebenenwechsel in einer Bewegung von
+       der alten zur neuen Höhe, statt erst zu sinken und dann zu wachsen
+       (Florian, 26. September 2026). Gestaffelt ist allein der Inhalt
+       der Zellen. */
+    transition-delay: 0ms, calc(var(--stufe-hoch, 0) * 45ms), calc(var(--stufe-hoch, 0) * 45ms);
   }
 
   .navigation[data-menue-offen] .mobilmenue__zeile {
     opacity: 1;
     transform: none;
     transition-duration: 320ms, 420ms, 420ms;
-    transition-delay: 120ms, calc(60ms + var(--stufe, 0) * 45ms), calc(60ms + var(--stufe, 0) * 45ms);
+    transition-delay: 0ms, calc(60ms + var(--stufe, 0) * 45ms), calc(60ms + var(--stufe, 0) * 45ms);
   }
 
   /* Die Zelle trägt Inhalt und Haarlinie — beides verschwindet mit der
@@ -657,16 +738,18 @@ const kategorien = (leistungen.kategorien ?? [])
   }
 
   /* ---- Ebene „Leistungen" ----
-     Ein Tipp auf „Leistungen" schließt alle anderen Zeilen (320 ms,
-     ohne Verzögerung); die Leistungen-Zeile rückt allein durch das
-     Nachrücken des Rasters an den Kopf — in derselben Kurve und Dauer —
-     und bleibt dort als Zurück-Knopf stehen. Die Kategorien wachsen
-     währenddessen gestaffelt von Null (ab 140 ms, je 60 ms später).
-     Zurück: Kategorien sofort zu (260 ms), die Hauptliste wächst ab
-     120 ms nach. (Florian, 26. September 2026) */
+     Ein Tipp auf „Leistungen" schließt alle anderen Zeilen; die
+     Leistungen-Zeile rückt allein durch das Nachrücken des Rasters an
+     den Kopf — in derselben Kurve und Dauer — und bleibt dort als
+     Zurück-Knopf stehen. Die Kategorien-Zeilen wachsen im selben Takt
+     von Null (Summe der Höhen: eine Bewegung, siehe oben); ihr Inhalt
+     kommt gestaffelt nach (ab 80 ms, je 50 ms später). Zurück
+     spiegelbildlich: Der Inhalt der Kategorien blendet sofort aus, die
+     Zeilen tauschen ihre Höhen im Gleichtakt. (Florian, 26. September
+     2026) */
   .mobilmenue__zeile--unter {
     grid-template-rows: 0fr;
-    transition-duration: 260ms, 260ms, 260ms;
+    transition-duration: 320ms, 260ms, 260ms;
     transition-delay: 0ms;
   }
 
@@ -693,7 +776,7 @@ const kategorien = (leistungen.kategorien ?? [])
   .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile--unter {
     grid-template-rows: 1fr;
     transition-duration: 320ms, 320ms, 320ms;
-    transition-delay: calc(140ms + var(--stufe, 0) * 60ms);
+    transition-delay: 0ms;
   }
 
   .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile--unter .mobilmenue__zelle {
@@ -701,7 +784,7 @@ const kategorien = (leistungen.kategorien ?? [])
     transform: none;
     visibility: visible;
     transition-duration: 320ms, 320ms, 0s, 320ms;
-    transition-delay: calc(140ms + var(--stufe, 0) * 60ms), calc(140ms + var(--stufe, 0) * 60ms), 0s, 0s;
+    transition-delay: calc(80ms + var(--stufe, 0) * 50ms), calc(80ms + var(--stufe, 0) * 50ms), 0s, 0s;
   }
 
   /* Ganz oben braucht die Leistungen-Zeile keine Haarlinie mehr */
@@ -2020,6 +2103,36 @@ const kategorien = (leistungen.kategorien ?? [])
     });
   }
 
+  /**
+   * Der Hörer in der Handy-Kopfleiste: Ein Tipp holt die Nummer hervor,
+   * ein zweiter nimmt sie weg. Ein Tipp auf den Menüknopf nimmt sie
+   * ebenfalls weg — Menü und Nummer sollen sich nicht ins Gehege kommen.
+   */
+  function kopftelefonAufbauen() {
+    const gruppe = document.querySelector<HTMLElement>('[data-kopftelefon]');
+    const knopf = gruppe?.querySelector<HTMLButtonElement>('[data-kopftelefonknopf]');
+    const nummer = gruppe?.querySelector<HTMLElement>('.kopftelefon__nummer');
+    if (!gruppe || !knopf || !nummer || knopf.dataset.bereit) return;
+    knopf.dataset.bereit = 'ja';
+
+    const setzen = (offen: boolean) => {
+      knopf.setAttribute('aria-expanded', String(offen));
+      knopf.setAttribute('aria-label', offen ? 'Telefonnummer verbergen' : 'Telefonnummer anzeigen');
+      if (offen) {
+        // Die Breite des Texts, jetzt gemessen — die Schrift könnte beim
+        // Laden noch gewechselt haben
+        gruppe.style.setProperty('--nummer-breite', `${nummer.scrollWidth}px`);
+        gruppe.dataset.offen = 'ja';
+      } else {
+        delete gruppe.dataset.offen;
+      }
+    };
+
+    knopf.addEventListener('click', () => setzen(!gruppe.dataset.offen));
+    document.querySelector('[data-menueknopf]')?.addEventListener('click', () => setzen(false));
+  }
+
   navigationAufbauen();
-  document.addEventListener('astro:page-load', navigationAufbauen);
+  kopftelefonAufbauen();
+  document.addEventListener('astro:page-load', () => { navigationAufbauen(); kopftelefonAufbauen(); });
 </script>

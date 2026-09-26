@@ -5,11 +5,13 @@
  * (docs/entscheidungen.md); auf dem Desktop stehen die Listen
  * nebeneinander, auf Handys untereinander.
  *
- * Gestaltung nach dem Handoff vom 17. September 2026: Spaltentitel als
- * gesperrte Versalien in der Hausfarbe, darunter Zeilen auf Haarlinien —
- * Wochentag links, Zeit rechts. Vor- und Nachmittag stehen in einer
- * Angabe, getrennt durch einen Mittelpunkt. Der Kasten des Entwurfs
- * entfällt: Hier ist die Blase selbst der Kasten.
+ * Gestaltung: Die Spaltentitel als gesperrte Versalien in der Hausfarbe
+ * (Handoff vom 17. September 2026); die Zeilen darunter wie auf der
+ * alten Seite (Florian, 26. September 2026) — der Wochentag rechtsbündig
+ * in leichtem Schnitt, daneben Vor- und Nachmittag als zwei Angaben
+ * nebeneinander, alles in der Hausfarbe, ohne Linien. „…und nach
+ * Vereinbarung" steht in der Zeitspalte. Die Haarlinien und der graue
+ * Wochentag des Handoffs sind zurückgenommen.
  */
 import oz from '../content/oeffnungszeiten.json';
 
@@ -33,21 +35,22 @@ const zeiten = (z: { vormittag?: string; nachmittag?: string }) =>
             <tr>
               <th scope="row">{z.tag}</th>
               <td>
-                {zeiten(z).map((t, i, alle) => (
-                  <>
-                    {i > 0 && ' '}
-                    {/* Der Trennpunkt hängt am ENDE der ersten Angabe:
-                        Muss umbrochen werden, beginnt die zweite Zeile
-                        mit der Zeit und nicht mit einem Punkt. */}
-                    <span class="ozzeiten__stueck">{t}{i < alle.length - 1 && <span aria-hidden="true"> ·</span>}</span>
-                  </>
-                ))}
+                {/* Zwei Angaben nebeneinander; auf schmalen Handys rückt
+                    der Nachmittag unter den Vormittag */}
+                <span class="ozzeiten__angaben">
+                  {zeiten(z).map((t) => <span class="ozzeiten__stueck">{t}</span>)}
+                </span>
               </td>
             </tr>
           ))}
+        {liste.zusatz && (
+          <tr>
+            <td></td>
+            <td class="ozzeiten__zusatz">{liste.zusatz}</td>
+          </tr>
+        )}
       </tbody>
     </table>
-    {liste.zusatz && <p class="ozliste__zusatz">{liste.zusatz}</p>}
   </section>
 ))}
 
@@ -66,76 +69,45 @@ const zeiten = (z: { vormittag?: string; nachmittag?: string }) =>
   }
 
   .ozzeiten {
-    width: 100%;
     border-collapse: collapse;
+    color: var(--farbe-primaer);
     font-size: 16px;
   }
 
+  /* Wie die alte Seite: keine Linien, alles in der Hausfarbe, enge
+     Zeilen. Wochentag rechtsbündig und leicht — er ist Beschriftung,
+     nicht Angabe —, die Zeiten daneben in normalem Schnitt. */
   .ozzeiten th,
   .ozzeiten td {
-    padding: 11px 0;
-    border-bottom: 1px solid var(--farbe-linie-zeile);
+    padding: 2px 0;
     font-weight: var(--gewicht-normal);
     line-height: 1.4;
     vertical-align: baseline;
+  }
+
+  /* `width: 1%`: die Spalte so schmal wie ihr längster Wochentag */
+  .ozzeiten th {
+    width: 1%;
+    padding-right: 15px;
+    font-weight: var(--gewicht-leicht);
+    text-align: right;
     white-space: nowrap;
   }
 
-  /* Die Zeitspalte darf zwischen Vor- und Nachmittag umbrechen — sonst
-     stoßen Wochentag und Zeit auf schmalen Handys aneinander. Innerhalb
-     einer Zeitangabe wird nie umbrochen. */
-  .ozzeiten td { white-space: normal; }
+  .ozzeiten__angaben {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 14px;
+  }
+
   .ozzeiten__stueck { white-space: nowrap; }
 
-  /* Der Wochentag tritt zurück — er ist Beschriftung, nicht Angabe.
+  .ozzeiten__zusatz { padding-top: 8px; }
 
-     `width: 1%` ist der übliche Kniff für „so schmal wie der Inhalt":
-     Die Spalte nimmt nur ihre eigene Breite, alles Übrige gehört der
-     Zeitspalte. Ohne ihn verteilt der Browser die Breite gleichmäßiger
-     — die Zeit bräche dann schon um, wenn daneben noch Platz wäre. */
-  .ozzeiten th {
-    width: 1%;
-    padding-right: var(--abstand-s);
-    color: var(--farbe-text);
-    text-align: left;
-  }
-
-  .ozzeiten td {
-    color: var(--farbe-text-gedeckt);
-    text-align: right;
-  }
-
-  .ozliste__zusatz {
-    max-width: none;
-    margin: var(--abstand-s) 0 0;
-    color: var(--farbe-text-gedeckt);
-    font-size: 15px;
-    font-style: italic;
-    line-height: 1.5;
-  }
-
-  /* Handys: Untereinander brauchen die drei Listen sonst mehr als eine
-     Bildschirmhöhe. Zeilen und Überschriften rücken deshalb enger
-     zusammen (Florian, 18. September 2026) — die Haarlinien halten die
-     Lesbarkeit, auch wenn es dichter steht. */
+  /* Handys: eine Stufe kleiner, damit Wochentag, Vor- und Nachmittag
+     nebeneinander stehen (bei 375 px reichen die 339 px dafür) */
   @media (max-width: 48rem) {
     .ozliste__titel { margin-bottom: var(--abstand-xs); }
     .ozzeiten { font-size: 15px; }
-    /* `padding-block`, nicht `padding`: Der Abstand zwischen Wochentag
-       und Zeit steckt im rechten Innenabstand der ersten Spalte und
-       darf hier nicht mit zurückgesetzt werden. 6 px statt 8 seit dem
-       26. September 2026 — die Karte soll auf Handys ganz ins Fenster
-       passen (Florian). */
-    .ozzeiten th,
-    .ozzeiten td { padding-block: 6px; }
-    .ozliste__zusatz { margin-top: var(--abstand-2xs); }
-  }
-
-  /* Schmale Handys: Wochentag und Zeit passen bei 15 px nicht mehr
-     nebeneinander — die Zeit bräche dann in zwei Zeilen um und der
-     Abschnitt würde länger statt kürzer. Eine Stufe kleiner passt
-     alles in eine Zeile (Florian, 18. September 2026). */
-  @media (max-width: 30rem) {
-    .ozzeiten { font-size: 14px; }
   }
 </style>

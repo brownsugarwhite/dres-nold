@@ -372,8 +372,29 @@ const texte = startseite.sprechstunden;
     z-index: 1;
   }
 
-  .ozschliessen-klebend:not([data-klebt]) { visibility: hidden; }
-  .ozbereich[data-kreuz='klebt'] .ozschliessen { visibility: hidden; }
+  /* Löst sich das Kreuz wieder, laufen Grund und Kreis 500 ms rückwärts
+     — der Zwilling verschwindet erst danach, und das Kreuz in der Zeile
+     kommt erst dann zurück (Florian, 26. September 2026). Beim Kleben
+     wechseln beide sofort. */
+  .ozschliessen-klebend:not([data-klebt]) {
+    visibility: hidden;
+    transition:
+      transform 300ms var(--verlauf),
+      background-color 500ms var(--verlauf-betont),
+      visibility 0s linear 500ms;
+  }
+
+  .ozschliessen {
+    transition:
+      transform 300ms var(--verlauf),
+      background-color 500ms var(--verlauf-betont),
+      visibility 0s linear 500ms;
+  }
+
+  .ozbereich[data-kreuz='klebt'] .ozschliessen {
+    visibility: hidden;
+    transition-delay: 0s;
+  }
 
   @media (max-width: 991px) {
     /* Erst das nackte Kreuz — der Kreis kommt mit dem Kleben */
@@ -433,7 +454,9 @@ const texte = startseite.sprechstunden;
        möglichst ganz ins Fenster passen. */
     .ozsprechstunden { padding: var(--abstand-m) var(--abstand-seitenrand) var(--abstand-l); }
     .ozblase__zeile { margin-top: var(--abstand-2xs); }
-    .ozblase__titel { font-size: clamp(1.5rem, 1.2rem + 1.8vw, 2.75rem); }
+    /* In einer Zeile neben dem Kreuz (Florian, 26. September 2026): so
+       groß, wie die Fensterbreite es zulässt — bei 375 px 21,8 px. */
+    .ozblase__titel { font-size: min(1.5rem, 5.8vw); white-space: nowrap; }
     .ozblase__einleitung { margin: 10px 0 0; font-size: 15px; line-height: var(--zeilenhoehe-mittel); }
     .ozblase__spalten { gap: calc(var(--abstand-m) + var(--abstand-2xs)); margin-top: var(--abstand-m); }
   }
@@ -471,7 +494,7 @@ const texte = startseite.sprechstunden;
     ozWeg, beimScrollenSichtbar, nachziehen, ozStuetzstellen,
     schnalzWeg, OZ_ZIPFEL_VOLL, SCHNALZ_DAUER,
   } from '../scripts/scrollwege';
-  import { zuSprungmarke } from '../scripts/anker';
+  import { zuSprungmarke, sanftScrollen } from '../scripts/anker';
 
   /** Der Umbruch der Navigation — dort beginnt „Handy" */
   const HANDY = '(max-width: 991px)';
@@ -519,12 +542,7 @@ const texte = startseite.sprechstunden;
       knopf.addEventListener('click', () => {
         if (window.matchMedia(HANDY).matches && zuSprungmarke('#praxis')) return;
         const unten = window.scrollY + raum.getBoundingClientRect().bottom - 96;
-        window.scrollTo({
-          top: Math.max(0, Math.round(unten)),
-          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-            ? ('instant' as ScrollBehavior)
-            : 'smooth',
-        });
+        sanftScrollen(Math.max(0, Math.round(unten)));
       });
     });
   }

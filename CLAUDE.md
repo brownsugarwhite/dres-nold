@@ -237,7 +237,7 @@ Die ersten drei Marken liegen auf dem Desktop alle **in der Einstiegskarte**, di
 Die Leistungs-Adressen stehen fest und dürfen nicht mehr geändert werden:
 `prophylaxe` · `zahnerhaltung` · `wurzelkanalbehandlung` · `parodontitis` · `zahnersatz` · `implantate` · `3d-roentgen` · `bleaching` · `intraoralscanner` · `kieferorthopaedie-kinder` · `kieferorthopaedie-erwachsene`
 
-**Navigation:** Praxis · Leistungen ▾ · Team · Neuigkeiten · Kontakt · Sprechstunden · Telefon 07245 7171 (als Pille)
+**Navigation:** Praxis · Leistungen ▾ · Team · Neuigkeiten · Kontakt · Sprechstunden · Telefon 07245 7171 (als Pille; auf Handys ein Hörer-Symbol, das die Nummer auf Tipp daneben ausklappt)
 
 Der Punkt *Leistungen* klappt als Blase aus der Punktlinie auf und listet die Kategorien aus `leistungen.json`. Auf Handys öffnet das ganze Menü als dieselbe Blase — zum rechten Rand hin offen, mit Schleier über der Seite —, und *Leistungen* wechselt darin die Ebene: Die anderen Zeilen schließen sich, die Kategorien wachsen darunter (`Navigation.astro`, 26. September 2026). Die Telefonnummer steht als Pille in der Kopfleiste, nicht im Menü; Datenschutz und Impressum nur im Fußbereich.
 

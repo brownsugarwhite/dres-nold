@@ -235,6 +235,17 @@ const { praxis } = seite;
     display: none;
   }
 
+  /* Die Zeichnung bleibt unsichtbar, bis sie an ihrer Stelle steht:
+     lottie-web zeichnet beim Laden zuerst Bild 0 — das fertige Logo
+     samt grauem Zahn — und meldet sich erst einen Takt später bereit.
+     Dazwischen kann der Browser malen: ein Blitzer des fertigen Logos,
+     bevor die Zeichnung bei „leer" beginnt (Florian, 26. September
+     2026). `data-lottie-bereit` und das Setzen des Startbilds liegen im
+     selben Takt. */
+  .logo__kontur:not([data-lottie-bereit]) :global(svg) {
+    visibility: hidden;
+  }
+
 
 
   /* Scroll-Hinweis darunter */
