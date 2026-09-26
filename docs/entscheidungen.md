@@ -1817,6 +1817,22 @@ des Handoffs; das Skript zeichnet nur das Hochformat.
   5vw, 6rem)` — bei 375 px 44,8 statt 32 px, bei 1440 px 91 statt 67 px.
   Der Kicker „Unser Team" rückt näher heran (8 statt 16 px).
 
+### Blocksatz, linksbündig (26. September 2026)
+
+Die Kundin ist ein großer Fan von linksbündigem Blocksatz (Florian).
+Er gilt jetzt für die Lesetexte: Redaktionstexte (Leistungsseiten,
+Beiträge, eigene Abschnitte, Stellen, Hinweis-Karte), die Einleitungen
+der Abschnitte, die Erklärtexte der Leistungskategorien, die Einleitung
+im Kontakt und die Rechtsseiten (`global.css`, „Blocksatz"). Immer mit
+Silbentrennung (`hyphens: auto`, deutsch über `lang="de"`) — ohne sie
+reißt Blocksatz die Zeilen auf; `hyphenate-limit-chars: 6 3 3`, damit
+auch auf Handys mit rund 45 Zeichen je Zeile genug Trennstellen da sind.
+Die letzte Zeile bleibt linksbündig. **Nicht** im Blocksatz:
+Überschriften, Kicker, Knöpfe, Menüs, Kurztexte auf Kacheln und Karten,
+Listen, Tabellen, Formularhinweise und alles Zentrierte (Begrüßung) —
+zu kurze oder zu wenige Zeilen. Geprüft bei 375 und 1440 px auf der
+Prophylaxe-Seite.
+
 ### Kleinigkeiten aus demselben Durchgang
 
 - Knopfgruppen überall 12 px Abstand (Begrüßung und Abschnitte hatten

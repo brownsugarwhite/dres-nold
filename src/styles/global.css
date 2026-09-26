@@ -78,6 +78,35 @@ p {
   text-wrap: pretty;
 }
 
+/*
+  BLOCKSATZ, LINKSBÜNDIG
+  ==================================================================
+  Die Praxis wünscht sich Blocksatz (Florian, 26. September 2026). Er
+  gilt für die Lesetexte — Redaktionstexte, Einleitungen, Erklärtexte,
+  Rechtsseiten — und nur zusammen mit Silbentrennung (`hyphens: auto`,
+  braucht `lang="de"` am <html>): Ohne sie reißt Blocksatz die Zeilen
+  zu Löchern auf. Die letzte Zeile bleibt linksbündig (Standard von
+  `text-align-last`). `hyphenate-limit-chars`: ab sechs Buchstaben,
+  mindestens drei auf jeder Seite — eng genug, dass auf Handys
+  (rund 45 Zeichen je Zeile) die Wortabstände ruhig bleiben.
+
+  NICHT im Blocksatz: Überschriften, Kicker, Knöpfe, Menüs, Kurztexte
+  auf Kacheln und Karten, Listen, Tabellen, Formularhinweise und alles
+  Zentrierte — dort sind die Zeilen zu kurz oder zu wenige, als dass er
+  gut aussähe.
+*/
+.blocksatz,
+.redaktionstext p,
+.bereich__einleitung,
+.gruppe__text p,
+.kontakt__einleitung,
+.textseite__inhalt p {
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
+}
+
 /* Aufzählungen laufen wie Fließtext */
 li {
   margin-bottom: var(--abstand-3xs);

@@ -131,7 +131,10 @@ Labels (Florian, 26. September 2026; der leichte Schnitt 300 des
 Handoffs ist zurückgenommen). Labels halbfett und gesperrt (600,
 Versalien), Fließtext 400, Namen und Knöpfe 500, die große
 Telefonnummer im Kontakt 300. Überschriften stehen **linksbündig** —
-mittig stehen nur Startbereich, Begrüßung und Hinweis.
+mittig stehen nur Startbereich, Begrüßung und Hinweis. **Lesetexte im
+linksbündigen Blocksatz mit Silbentrennung** (`global.css`, „Blocksatz";
+Kundenwunsch, 26. September 2026) — Kurztexte, Listen, Tabellen und
+Bedienelemente nicht.
 
 ### Schrift
 
