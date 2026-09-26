@@ -15,8 +15,11 @@
  * Werte aus den Abläufen `schnalz in` (a-26) und `schnalz out` (a-16):
  * 300 ms, easeOut.
  *
- * Neu gegenüber der Vorlage: Der Punkt „Leistungen" klappt zweispaltig
- * auf und listet die Einträge aus leistungen.json.
+ * Neu gegenüber der Vorlage: Der Punkt „Leistungen" klappt als Blase
+ * auf und listet die Kategorien aus leistungen.json. Das Handy-Menü
+ * öffnet als dieselbe Blase, nur zum rechten Rand hin offen; die
+ * Kategorien erscheinen darin als eigene Ebene (Florian, 26. September
+ * 2026).
  */
 import navi from '../content/navigation.json';
 import leistungen from '../content/leistungen.json';
@@ -35,13 +38,19 @@ const punkte = navi.eintraege
 const ziel = (e: { ziel: string }) => (e.ziel.startsWith('#') ? `/${e.ziel}` : e.ziel);
 
 const kopf = punkte.filter((e) => e.in_kopfleiste);
+
+/* Das Handy-Menü führt alle Punkte außer der Telefonnummer — die steht
+   dort als Pille in der Kopfleiste zwischen Logo und Menüknopf und in
+   der Symbolleiste unten (Florian, 26. September 2026). */
+const menue = punkte.filter((e) => e.id !== 'telefon');
 /* Die Symbolleiste unten hat in der Vorlage eine eigene Reihenfolge —
    und auf Handys eine andere als auf dem Desktop. Statt die Reihenfolge
    per CSS zu verschieben (fehleranfällig bei den Trennpunkten) werden
    beide Listen erzeugt und per Umbruchpunkt umgeschaltet. */
 const fussGross = punkte
-  /* Die Telefonnummer erscheint nur auf Handys — auf dem Desktop
-     steht sie in der Kontaktzeile oben. */
+  /* Die Telefonnummer steht auf dem Desktop als Pille in der
+     Kopfleiste und in der Kontaktzeile oben — in der Symbolleiste nur
+     auf Handys. */
   .filter((e) => e.in_fussleiste && e.id !== 'telefon')
   .sort((a, b) => (a.position_fussleiste ?? 99) - (b.position_fussleiste ?? 99))
   .filter((e) => e.id !== 'zeiten')
@@ -80,6 +89,14 @@ const kategorien = (leistungen.kategorien ?? [])
   doppelt auf. Über die Klasse bleibt der Name auf jeder Seite gleich
   (styles/uebergaenge.css hält die Leisten still).
 */}
+{/*
+  Der Schleier hinter dem offenen Handy-Menü: weiß und weichgezeichnet
+  über der ganzen Seite. Er steht AUSSERHALB der Navigation, weil deren
+  Maske (`clip-path`, siehe CSS) ihn sonst mit beschnitte — und ist
+  damit nicht persistiert: Das Skript fragt ihn bei Bedarf frisch ab.
+*/}
+<div class="menue-schleier" data-menue-schleier hidden></div>
+
 <div class="navigation" transition:persist="navigation">
 {/* Kontaktzeile — oben auf der Seite sichtbar */}
 <div class="kontaktzeile" data-leiste="kontakt">
@@ -111,6 +128,13 @@ const kategorien = (leistungen.kategorien ?? [])
     <div class="kopfleiste__mobil">
       <a class="logo" href="/" aria-label={`${praxis.name} — zur Startseite`}>
         <img src="/icons/logo.svg" alt="" width="80" height="80" />
+      </a>
+      {/* Die Telefonnummer als Pille zwischen Logo und Menüknopf — dieselbe
+          wie rechts außen auf dem Desktop (Florian, 26. September 2026).
+          Es ist nie beides zu sehen: `.kopfleiste__rechts` ist auf Handys
+          ausgeblendet, diese Zeile auf dem Desktop. */}
+      <a class="kn kn--klein kopfleiste__telefon kopfleiste__telefon--handy" href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>
+        <span class="kn__f" aria-hidden="true"></span>{praxis.telefon}
       </a>
       <button
         class="menueknopf"
@@ -177,63 +201,74 @@ const kategorien = (leistungen.kategorien ?? [])
       <span class="kn__f" aria-hidden="true"></span>{praxis.telefon}
     </a>
     </div>
-  </nav>
-</header>
-  {/* Ausklappmenü für Handys — fährt unter der Kopfleiste auf (Ablauf a-25) */}
-  <div class="mobilmenue" id="mobilmenue" data-mobilmenue>
-    {/* Ein Rahmen um alles: Darüber klappt das Menü über die Rasterhöhe
-        auf (0fr → 1fr) und ist damit genau so hoch wie sein Inhalt —
-        nicht so hoch wie der Bildschirm (Florian, 18. September 2026). */}
-    <div class="mobilmenue__rahmen">
-    <div class="mobilmenue__inhalt">
-      {punkte.map((e, i) => (
+
+    {/*
+      Das Handy-Menü — klappt als Blase aus der Punktlinie der Kopfleiste
+      auf (Skript: `mobilmenueAufbauen`, Zeichnung wie beim Aufklappmenü
+      „Leistungen" auf dem Desktop). Es steht IN der Kopfleiste, damit
+      es dieselbe Bezugsfläche hat wie deren Blase (`top: 100%`).
+
+      Jede Zeile ist ein kleines Raster (`.mobilmenue__zeile`), das sich
+      über die Rasterhöhe auf Null schließen lässt. So funktioniert der
+      Ebenenwechsel: Ein Tipp auf „Leistungen" schließt alle anderen
+      Zeilen, die Leistungen-Zeile rückt dadurch an den Kopf und wird zum
+      Zurück-Knopf, und die Kategorien darunter wachsen von Null auf ihre
+      Größe (Florian, 26. September 2026). Kein Akkordeon, kein
+      Rollkasten: Die Liste ist kompakt genug für jedes Handy.
+    */}
+    <div class="mobilmenue" id="mobilmenue" data-mobilmenue hidden>
+      {menue.map((e, i) => (
         e.id === 'leistungen' ? (
-          <div class="mobilmenue__gruppe" style={`--stufe: ${i}; --stufe-hoch: ${punkte.length - i}`}>
-            {/* „Leistungen" klappt an Ort und Stelle auf — ein Akkordeon
-                mit den Kategorien, wie die Blase auf dem Desktop */}
-            <button
-              class="mobilmenue__punkt mobilmenue__punkt--knopf"
-              type="button"
-              data-mobilleistungen
-              aria-expanded="false"
-              aria-controls="mobil-leistungen"
-            >
-              <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
-              <span class="mobilmenue__text">{e.titel}</span>
-              <span class="mobilmenue__pfeil" aria-hidden="true"></span>
-            </button>
-            <div class="mobilmenue__unter" id="mobil-leistungen" data-mobilunter>
-              <div class="mobilmenue__unterliste">
-                {kategorien.map((k, i) => (
-                  <a class="mobilmenue__punkt mobilmenue__unterpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}`}>
-                    {k.icon && <img class="mobilmenue__symbol mobilmenue__symbol--klein" src={k.icon} alt="" width="40" height="40" />}
-                    <span class="mobilmenue__untertext">
-                      <span class="mobilmenue__text">{k.titel}</span>
-                      {k.kurz && <span class="mobilmenue__kurz">{k.kurz}</span>}
-                    </span>
-                  </a>
-                ))}
+          <>
+            <div class="mobilmenue__zeile mobilmenue__zeile--leistungen" style={`--stufe: ${i}; --stufe-hoch: ${menue.length - 1 - i}`}>
+              <div class="mobilmenue__zelle">
+                <button
+                  class="mobilmenue__punkt mobilmenue__punkt--knopf"
+                  type="button"
+                  data-mobilleistungen
+                  aria-expanded="false"
+                  aria-controls="mobil-leistungen"
+                >
+                  <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
+                  <span class="mobilmenue__text">{e.titel}</span>
+                  <span class="mobilmenue__pfeil" aria-hidden="true"></span>
+                  <span class="mobilmenue__zurueck" aria-hidden="true">Zurück</span>
+                </button>
               </div>
             </div>
-          </div>
+            {/* Die Kategorien: eigene Zeilen, in Ruhe auf Null geschlossen.
+                `display: contents` — der Rahmen ist nur das Ziel von
+                `aria-controls`, die Zeilen bleiben Kinder des Menüs. */}
+            <div class="mobilmenue__ebene" id="mobil-leistungen" role="group" aria-label="Leistungen">
+              {kategorien.map((k, j) => (
+                <div class="mobilmenue__zeile mobilmenue__zeile--unter" style={`--stufe: ${j}`}>
+                  <div class="mobilmenue__zelle">
+                    <a class="mobilmenue__punkt mobilmenue__unterpunkt" href={`/#leistungen-${k.id}`}>
+                      {k.icon && <img class="mobilmenue__symbol mobilmenue__symbol--klein" src={k.icon} alt="" width="40" height="40" />}
+                      <span class="mobilmenue__untertext">
+                        <span class="mobilmenue__text">{k.titel}</span>
+                        {k.kurz && <span class="mobilmenue__kurz">{k.kurz}</span>}
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
-          <a class="mobilmenue__punkt" href={ziel(e)} style={`--stufe: ${i}; --stufe-hoch: ${punkte.length - i}`}>
-            <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
-            <span class="mobilmenue__text">{e.titel}</span>
-          </a>
+          <div class="mobilmenue__zeile" style={`--stufe: ${i}; --stufe-hoch: ${menue.length - 1 - i}`}>
+            <div class="mobilmenue__zelle">
+              <a class="mobilmenue__punkt" href={ziel(e)}>
+                <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
+                <span class="mobilmenue__text">{e.titel}</span>
+              </a>
+            </div>
+          </div>
         )
       ))}
     </div>
-
-    {/* .div-block-30: Punktlinie oben, 40 px hoch */}
-    <div class="mobilmenue__recht" style={`--stufe: ${punkte.length}; --stufe-hoch: 0`}>
-      <a href="/datenschutz/">Datenschutz</a>
-      <span class="punkt" aria-hidden="true"></span>
-      <a href="/impressum/">Impressum</a>
-    </div>
-    </div>
-  </div>
-
+  </nav>
+</header>
 </div>
 
 {/* Symbolleiste am unteren Rand — oben auf der Seite sichtbar */}
@@ -302,7 +337,7 @@ const kategorien = (leistungen.kategorien ?? [])
   .navigation {
     position: fixed;
     inset: 0 0 auto;
-    z-index: 100;
+    z-index: var(--ebene-navigation);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -366,7 +401,7 @@ const kategorien = (leistungen.kategorien ?? [])
   }
 
   /* Alle Beschriftungen der Navigation stehen in der Überschriftenschrift
-     (Poppins) — sie werden überflogen und angeklickt, nicht gelesen. */
+     (`--schrift-titel`, derzeit dieselbe wie der Fließtext). */
   .menuepunkt__text,
   .mobilmenue__text,
   .mobilmenue__kurz,
@@ -454,10 +489,9 @@ const kategorien = (leistungen.kategorien ?? [])
     transition: height 300ms cubic-bezier(0, 0, 0.58, 1);
   }
 
-  /* Das Aufklappmenü ragt aus der Leiste heraus — solange es offen ist,
-     darf sie den Überlauf nicht beschneiden. */
-  .navigation:has(.aufklapp[data-aktiv]) .kopfleiste,
-  .navigation:has(.aufklapp[data-aktiv]) { overflow: visible; }
+  /* Aufklappmenü und Handy-Menü ragen aus der Leiste heraus — solange
+     eines offen ist, darf sie den Überlauf nicht beschneiden. */
+  .navigation:is([data-menue-aktiv], :has(.aufklapp[data-aktiv])) .kopfleiste { overflow: visible; }
 
   .fussleiste-huelle:has(.aufklapp[data-aktiv]),
   .fussleiste:has(.aufklapp[data-aktiv]) { overflow: visible; }
@@ -482,7 +516,12 @@ const kategorien = (leistungen.kategorien ?? [])
 
   /* Die Telefonnummer steht als Knopf ganz außen — mit etwas mehr Luft
      zum letzten Menüpunkt als zwischen den Punkten selbst. */
-  .kopfleiste__telefon { margin-left: 4px; }
+  .kopfleiste__telefon { margin-left: 4px; white-space: nowrap; }
+
+  /* Auf Handys zwischen Logo und Menüknopf: `space-between` der Zeile
+     stellt sie von selbst in die Mitte. ≈116 px breit — bei 320 px
+     Fensterbreite bleiben links und rechts noch je 21 px Luft. */
+  .kopfleiste__telefon--handy { margin-left: 0; }
 
   /* .nav-buttons-mobile / -desktop: beide 80 px hoch.
      Logo ganz links, Menüknopf ganz rechts — und weil die Zeile so breit
@@ -520,111 +559,173 @@ const kategorien = (leistungen.kategorien ?? [])
 
   .menueknopf__lottie[data-lottie-bereit] { background: none; }
 
-  /* .mobile-expend: fährt in 700 ms (easeInOut) auf — bis zum unteren
-     Fensterrand; die Kopfleiste darüber ist 80 px hoch. Wird der Inhalt
-     höher als das Fenster, lässt er sich darin rollen. */
-  /* Klappt über die Rasterhöhe auf: So ist das Menü genau so hoch wie
-     sein Inhalt und endet weit über dem unteren Bildschirmrand, statt
-     an ihm zu kleben (Florian, 18. September 2026). Reicht der Inhalt
-     einmal nicht auf den Schirm — etwa mit aufgeklappten Leistungen —,
-     rollt er innerhalb des Rahmens. */
+  /* ---------- Handy-Menü ----------
+     Klappt als Blase aus der Punktlinie der Kopfleiste auf — dieselbe
+     Zeichnung wie das Aufklappmenü „Leistungen" auf dem Desktop
+     (`blaseAnlegen` im Skript), nur mit anderer Form: Der Teil der Linie
+     unter dem Logo bleibt oben, rechts davon schwingt sie in einem
+     großen Bogen nach unten, und die Blase ist zum rechten Rand hin
+     offen (Florians Entwurf, 26. September 2026). Das Menü selbst ist
+     nur der Inhalt darin; die Maske am Umschlag (`clip-path`) gibt ihn
+     frei, während die Blase wächst.
+
+     Vorher klappte es über die Rasterhöhe auf (0fr → 1fr) und rollte
+     bei Platzmangel in einem Rahmen. Beides ist weg: Die Blase bringt
+     die Bewegung mit, und die Liste ist kompakt genug für jedes Handy —
+     die Hauptliste braucht 452 px samt Kopfleiste, die Ebene
+     „Leistungen" noch weniger. */
   .mobilmenue {
-    position: relative;
-    display: grid;
-    grid-template-rows: 0fr;
-    width: 100%;
-    transition: grid-template-rows 700ms cubic-bezier(0.42, 0, 0.58, 1);
-  }
-
-  .mobilmenue__rahmen {
-    min-height: 0;
-    max-height: calc(100vh - 80px - var(--abstand-xl));
-    max-height: calc(100dvh - 80px - var(--abstand-xl));
-    overflow: hidden auto;
-    /* Während das Menü aufklappt, ist der Inhalt kurzzeitig höher als
-       der Rahmen — der Rollbalken blitzte dabei am Rand auf (Florian,
-       18. September 2026). Rollen bleibt möglich, der Balken ist nur
-       nicht mehr zu sehen. */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .mobilmenue__rahmen::-webkit-scrollbar { width: 0; height: 0; }
-
-  .navigation[data-menue-offen] .mobilmenue { grid-template-rows: 1fr; }
-
-  /* Dieselbe Breite wie die Kopfleiste darüber — so steht das Logo
-     genau über den Symbolen dieser Liste. */
-  .mobilmenue__inhalt {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: var(--ebene-menue);
     display: flex;
     flex-direction: column;
-    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
-    margin: 4px auto 0;
+    /* Links an der Wand der Blase (`--menue-wand`, vom Skript gemessen:
+       rechte Logokante plus Luft), rechts der Seitenrand */
+    padding: var(--abstand-2xs) var(--abstand-seitenrand) var(--abstand-s)
+             calc(var(--menue-wand, var(--abstand-seitenrand)) + var(--abstand-m));
+  }
+
+  .mobilmenue[hidden] { display: none; }
+
+  /* Der Rahmen um die Kategorien ist nur das Ziel von `aria-controls` */
+  .mobilmenue__ebene { display: contents; }
+
+  /*
+    Jede Zeile ein Raster, das sich über die Rasterhöhe schließen lässt
+    (1fr → 0fr) — so braucht der Ebenenwechsel unten keine festen Höhen.
+    Die Zeile trägt außerdem das Einfahren beim Öffnen des Menüs: leicht
+    von oben, dabei aufblendend, jede eine Spur später als die davor;
+    beim Schließen rückwärts (`--stufe-hoch` zählt von unten), deshalb
+    steht die Schließ-Verzögerung im Grundzustand.
+
+    Die Zellen folgen der leicht geneigten Wand der Blase: Das Skript
+    setzt je Zeile `--versatz` aus ihrer Höhe im Menü.
+  */
+  .mobilmenue__zeile {
+    display: grid;
+    grid-template-rows: 1fr;
+    margin-left: var(--versatz, 0px);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition-property: grid-template-rows, opacity, transform;
+    transition-duration: 320ms, 260ms, 260ms;
+    transition-timing-function: var(--verlauf-betont);
+    /* Die 120 ms an der Rasterhöhe: Beim Zurück aus der Ebene
+       „Leistungen" wachsen die Zeilen erst, wenn die Kategorien schon
+       schrumpfen (siehe unten). */
+    transition-delay: 120ms, calc(var(--stufe-hoch, 0) * 45ms), calc(var(--stufe-hoch, 0) * 45ms);
+  }
+
+  .navigation[data-menue-offen] .mobilmenue__zeile {
+    opacity: 1;
+    transform: none;
+    transition-duration: 320ms, 420ms, 420ms;
+    transition-delay: 120ms, calc(60ms + var(--stufe, 0) * 45ms), calc(60ms + var(--stufe, 0) * 45ms);
+  }
+
+  /* Die Zelle trägt Inhalt und Haarlinie — beides verschwindet mit der
+     Zeile, statt dass die Linie als Doppelstrich stehen bliebe. Beim
+     Schrumpfen zieht sie sich zusätzlich von oben her zusammen (scaleY)
+     und blendet aus; `visibility` nimmt die Verweise dabei aus der
+     Tab-Reihenfolge, sobald sie unsichtbar sind. */
+  .mobilmenue__zelle {
+    min-height: 0;
+    overflow: hidden;
+    transform-origin: 50% 0;
+    transition-property: opacity, transform, visibility, border-color;
+    transition-duration: 320ms, 320ms, 0s, 320ms;
+    transition-timing-function: var(--verlauf-betont), var(--verlauf-betont), linear, var(--verlauf-betont);
+    transition-delay: 120ms, 120ms, 0s, 0s;
+  }
+
+  .mobilmenue__zeile + .mobilmenue__zeile .mobilmenue__zelle {
+    border-top: 1px solid var(--farbe-linie-leise);
+  }
+
+  /* ---- Ebene „Leistungen" ----
+     Ein Tipp auf „Leistungen" schließt alle anderen Zeilen (320 ms,
+     ohne Verzögerung); die Leistungen-Zeile rückt allein durch das
+     Nachrücken des Rasters an den Kopf — in derselben Kurve und Dauer —
+     und bleibt dort als Zurück-Knopf stehen. Die Kategorien wachsen
+     währenddessen gestaffelt von Null (ab 140 ms, je 60 ms später).
+     Zurück: Kategorien sofort zu (260 ms), die Hauptliste wächst ab
+     120 ms nach. (Florian, 26. September 2026) */
+  .mobilmenue__zeile--unter {
+    grid-template-rows: 0fr;
+    transition-duration: 260ms, 260ms, 260ms;
+    transition-delay: 0ms;
+  }
+
+  .mobilmenue__zeile--unter .mobilmenue__zelle {
+    opacity: 0;
+    transform: scaleY(0);
+    visibility: hidden;
+    transition-duration: 260ms, 260ms, 0s, 260ms;
+    transition-delay: 0ms, 0ms, 260ms, 0ms;
+  }
+
+  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile:not(.mobilmenue__zeile--leistungen):not(.mobilmenue__zeile--unter) {
+    grid-template-rows: 0fr;
+    transition-delay: 0ms;
+  }
+
+  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile:not(.mobilmenue__zeile--leistungen):not(.mobilmenue__zeile--unter) .mobilmenue__zelle {
+    opacity: 0;
+    transform: scaleY(0);
+    visibility: hidden;
+    transition-delay: 0ms, 0ms, 320ms, 0ms;
+  }
+
+  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile--unter {
+    grid-template-rows: 1fr;
+    transition-duration: 320ms, 320ms, 320ms;
+    transition-delay: calc(140ms + var(--stufe, 0) * 60ms);
+  }
+
+  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile--unter .mobilmenue__zelle {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+    transition-duration: 320ms, 320ms, 0s, 320ms;
+    transition-delay: calc(140ms + var(--stufe, 0) * 60ms), calc(140ms + var(--stufe, 0) * 60ms), 0s, 0s;
+  }
+
+  /* Ganz oben braucht die Leistungen-Zeile keine Haarlinie mehr */
+  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile--leistungen .mobilmenue__zelle {
+    border-top-color: transparent;
   }
 
   .mobilmenue__punkt {
     display: flex;
     align-items: center;
     gap: var(--abstand-xs);
-    padding: 11px 0;
+    padding: 9px 0;
     color: var(--farbe-primaer);
     text-decoration: none;
   }
 
-  /* Haarlinien zwischen den Einträgen — die Liste liest sich dadurch
-     ruhiger als eine Reihe frei stehender Zeilen. */
-  .mobilmenue__inhalt > * + * {
-    border-top: 1px solid var(--farbe-linie-leise);
-  }
-
-  /*
-    Die Einträge fahren beim Öffnen von oben nach unten ein: leicht von
-    oben, dabei aufblendend, jeder eine Spur später als der davor
-    (Florian, 18. September 2026).
-
-    Beim Schließen läuft dieselbe Staffelung rückwärts: Der zuletzt
-    gekommene geht zuerst (`--stufe-hoch` zählt von unten). Deshalb
-    steht die Schließ-Verzögerung im Grundzustand — er ist der, in den
-    zurückgeblendet wird. Etwas schneller getaktet als beim Öffnen,
-    damit alles fort ist, bevor das Menü zu ist (700 ms).
-  */
-  .mobilmenue__inhalt > *,
-  .mobilmenue__recht {
-    opacity: 0;
-    transform: translateY(-10px);
-    transition:
-      opacity 260ms var(--verlauf-betont),
-      transform 260ms var(--verlauf-betont);
-    transition-delay: calc(var(--stufe-hoch, 0) * 45ms);
-  }
-
-  .navigation[data-menue-offen] .mobilmenue__inhalt > *,
-  .navigation[data-menue-offen] .mobilmenue__recht {
-    opacity: 1;
-    transform: none;
-    transition:
-      opacity 420ms var(--verlauf-betont),
-      transform 420ms var(--verlauf-betont);
-    transition-delay: calc(120ms + var(--stufe, 0) * 55ms);
-  }
-
-  /* Kleiner als in der unteren Leiste: So passt die ganze Liste auch
-     auf kurze Bildschirme, ohne dass man im Menü scrollen muss
-     (Florian, 18. September 2026). */
+  /* Kleiner als in der unteren Leiste — so passt die ganze Liste auf
+     jedes Handy, ohne dass man im Menü rollen muss (Florian,
+     18. September 2026; seit dem 26. September noch eine Stufe
+     kompakter). */
   .mobilmenue__symbol {
     flex: none;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     object-fit: contain;
   }
 
   .mobilmenue__text {
     font-size: 17px;
-    font-weight: 400;
+    font-weight: var(--gewicht-normal);
     line-height: 1.2;
   }
 
   .mobilmenue__punkt--knopf {
+    position: relative;
     width: 100%;
     border: 0;
     background: none;
@@ -633,7 +734,9 @@ const kategorien = (leistungen.kategorien ?? [])
     cursor: pointer;
   }
 
-  /* Pfeil rechts: dreht sich, wenn die Kategorien aufgeklappt sind */
+  /* Der Haken rechts: Auf der Ebene „Leistungen" dreht er nach links
+     und rückt ein Stück ein, dahinter blendet „Zurück" auf — aus dem
+     Menüpunkt wird der Zurück-Knopf. */
   .mobilmenue__pfeil {
     flex: none;
     /* 15 × 9: Der Kasten trägt den Rand der Zeichnung mit, der sichtbare
@@ -643,94 +746,68 @@ const kategorien = (leistungen.kategorien ?? [])
     margin-left: auto;
     margin-right: var(--abstand-2xs);
     background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
-    transition: transform 350ms var(--verlauf-betont);
+    transition:
+      transform 320ms var(--verlauf-betont),
+      margin-right 320ms var(--verlauf-betont);
   }
 
-  .mobilmenue__punkt--knopf[aria-expanded='true'] .mobilmenue__pfeil { transform: rotate(180deg); }
-
-  /* Das Akkordeon: klappt über die Rasterhöhe auf (0fr → 1fr) —
-     so braucht es keine feste Höhe und passt sich dem Inhalt an. */
-  .mobilmenue__unter {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 350ms var(--verlauf-betont);
+  .mobilmenue__punkt--knopf[aria-expanded='true'] .mobilmenue__pfeil {
+    transform: rotate(90deg);
+    margin-right: 62px;
   }
 
-  .mobilmenue__unter[data-offen] { grid-template-rows: 1fr; }
+  .mobilmenue__zurueck {
+    position: absolute;
+    right: var(--abstand-2xs);
+    top: 50%;
+    color: var(--farbe-text-gedeckt);
+    font-size: var(--text-s);
+    opacity: 0;
+    transform: translate(8px, -50%);
+    transition:
+      opacity 320ms var(--verlauf-betont),
+      transform 320ms var(--verlauf-betont);
+  }
 
-  /* Eingerückt, damit die drei Kategorien als Unterpunkte zu lesen
-     sind — aber nicht um die ganze Symbolbreite, sonst wirken sie
-     abgehängt (Florian, 18. September 2026). */
-  .mobilmenue__unterliste {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
-    padding-left: 20px;
+  .mobilmenue__punkt--knopf[aria-expanded='true'] .mobilmenue__zurueck {
+    opacity: 1;
+    transform: translate(0, -50%);
   }
 
   .mobilmenue__unterpunkt {
     gap: var(--abstand-xs);
-    padding: 10px 0;
-    border-top: 1px solid var(--farbe-linie-leise);
-    opacity: 0;
-    transform: translateY(-6px);
-    transition:
-      opacity 280ms var(--verlauf-betont),
-      transform 280ms var(--verlauf-betont);
+    padding: 8px 0;
   }
 
-  /* Die Kategorien erscheinen nacheinander, sobald Platz da ist */
-  .mobilmenue__unter[data-offen] .mobilmenue__unterpunkt {
-    opacity: 1;
-    transform: translateY(0);
-    transition-delay: calc(120ms + var(--stufe, 0) * 70ms);
-  }
-
-  .mobilmenue__symbol--klein { width: 32px; height: 32px; }
+  .mobilmenue__symbol--klein { width: 30px; height: 30px; }
 
   .mobilmenue__untertext { display: flex; flex-direction: column; }
   .mobilmenue__kurz { color: var(--farbe-text-gedeckt); font-size: var(--text-s); font-weight: var(--gewicht-normal); line-height: 1.35; }
 
+  /* Der Schleier hinter dem offenen Menü (Element vor `.navigation`):
+     die ganze Seite weiß und weichgezeichnet, wie hinter der
+     Hinweis-Karte. Unter den Leisten, über allem Inhalt. Ein Tipp
+     darauf schließt das Menü. */
+  :global(.menue-schleier) {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--ebene-navigation) - 1);
+    background: var(--farbe-schleier-hell);
+    backdrop-filter: blur(var(--weichzeichner-schleier));
+    -webkit-backdrop-filter: blur(var(--weichzeichner-schleier));
+    opacity: 0;
+    transition: opacity var(--dauer-normal) var(--verlauf);
+  }
+
+  :global(.menue-schleier[data-sichtbar]) { opacity: 1; }
+  :global(.menue-schleier[hidden]) { display: none; }
+
   @media (prefers-reduced-motion: reduce) {
-    .mobilmenue,
-    .mobilmenue__unter,
-    .mobilmenue__unterpunkt,
-    .mobilmenue__pfeil { transition: none; }
+    .mobilmenue__zeile,
+    .mobilmenue__zelle,
+    .mobilmenue__pfeil,
+    .mobilmenue__zurueck { transition: none; }
   }
-
-  /* .div-block-30: Punktlinie oben. Darunter eine Doppellinie, die das
-     Menü abschließt (Florian, 18. September 2026). */
-  .mobilmenue__recht {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: var(--abstand-m);
-    width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
-    margin: var(--abstand-s) auto 0;
-    /* Keine eigene Linie darunter: Die Punktlinie hier oben und die
-       gestrichelte Unterkante der Navigation schließen das Menü schon
-       ab — eine dritte Linie dazwischen war eine zu viel (Florian,
-       18. September 2026). Oben und unten derselbe Abstand: Die beiden
-       Verweise stehen genau zwischen den zwei Linien (Florian,
-       18. September 2026). */
-    padding-block: var(--abstand-s);
-    background: url('/bilder/deko/punktlinie.png') 50% 0 repeat-x;
-    background-size: auto 1px;
-  }
-
-  /* In der Hausfarbe wie die Punkte und die Zeile ganz oben — die
-     beiden Verweise gehören zur Navigation, nicht zum Fließtext
-     (Florian, 18. September 2026). */
-  .mobilmenue__recht a {
-    color: var(--farbe-primaer);
-    font-size: 14px;
-    text-decoration: none;
-    transition: opacity var(--dauer-schnell) var(--verlauf);
-  }
-
-  .mobilmenue__recht a:hover,
-  .mobilmenue__recht a:focus-visible { opacity: 0.65; }
 
   .logo img {
     width: 80px;
@@ -753,14 +830,17 @@ const kategorien = (leistungen.kategorien ?? [])
 
   /* ---------- Menüpunkte mit Text-Roll ----------
      Zwei identische Texte übereinander; beim Zeigen rollt der Block
-     um genau eine Höhe hoch. Aus Ablauf a-18 (300 ms, easeInOut).
+     um genau eine Höhe hoch. Aus Ablauf a-18.
 
      Wichtig: Die Vorlage kennt KEIN Hover-Out. Der Ablauf rollt hoch und
      springt danach in 0 ms auf den Anfang zurück — unsichtbar, weil beide
-     Texte gleich sind. Beim Verlassen läuft also nichts zurück. Deshalb
-     eine Animation ohne Nachzustand statt einer Transition: Fällt der
-     Zeiger weg, endet die Animation, der Block steht wieder auf 0, und
-     der nächste Hover startet sie erneut. */
+     Texte gleich sind. Beim Verlassen läuft also nichts zurück.
+
+     Die Rolle hängt nicht mehr an `:hover`, sondern an `data-rollt`
+     (Skript: `rollenAufbauen`): Das Attribut kommt beim Betreten und
+     geht erst am Ende der Animation. Eine `:hover`-Animation brach ab,
+     sobald der Zeiger den Punkt verließ — der Text sprang zurück, und
+     das wirkte hektisch (Florian, 26. September 2026). */
   .menuepunkt {
     display: block;
     height: 80px;
@@ -805,7 +885,7 @@ const kategorien = (leistungen.kategorien ?? [])
   /*
     Beim Öffnen wird aus diesem Haken der Pfeil der Blase: Er sinkt ab
     und blendet aus, während der andere ein paar Bildpunkte tiefer
-    aufblendet (`blaseZeichnen`). Ein Drehen an Ort und Stelle wäre das
+    aufblendet (`blaseAnlegen` im Skript). Ein Drehen an Ort und Stelle wäre das
     Gegenteil davon (Florian, 18. September 2026).
   */
   .menuepunkt--knopf[aria-expanded='true'] .menuepunkt__pfeil {
@@ -832,15 +912,18 @@ const kategorien = (leistungen.kategorien ?? [])
     font-weight: var(--gewicht-normal);
   }
 
-  /* Ablauf a-18: 300 ms, easeInOut — einmal hoch, kein Zurückrollen */
-  .menuepunkt:hover .menuepunkt__rolle {
-    animation: menue-rolle 300ms cubic-bezier(0.42, 0, 0.58, 1);
+  /* Einmal hoch, kein Zurückrollen — etwas länger und weicher als die
+     300 ms easeInOut der Vorlage */
+  .menuepunkt[data-rollt] .menuepunkt__rolle {
+    animation: menue-rolle 420ms var(--verlauf-betont);
   }
 
-  /* Solange das Aufklappmenü offen ist, steht der Text still oben */
-  .aufklapp[data-offen] .menuepunkt__rolle {
+  /* Solange das Aufklappmenü offen ist, steht der Text still oben —
+     aber erst, wenn eine laufende Rolle zu Ende ist: Sie endet ohnehin
+     genau dort. Vorher tötete `animation: none` hier die gerade
+     gestartete Rolle, und der Text sprang. */
+  .aufklapp[data-offen] .menuepunkt:not([data-rollt]) .menuepunkt__rolle {
     transform: translateY(-80px);
-    animation: none;
   }
 
   /* Tastatur: kein Rollen, dafür eine sichtbare Fokuslinie */
@@ -850,14 +933,14 @@ const kategorien = (leistungen.kategorien ?? [])
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .menuepunkt:hover .menuepunkt__rolle { animation: none; }
+    .menuepunkt[data-rollt] .menuepunkt__rolle { animation: none; }
     .menuepunkt__pfeil { transition: none; }
   }
 
   /* ---------- Aufklappmenü („Blase") ----------
      Die Punktlinie der Leiste wölbt sich zu einem abgerundeten Feld
      auf — nach oben aus der Symbolleiste, nach unten aus der Kopfleiste.
-     Gezeichnet wird das als SVG (Skript unten: `blaseZeichnen`), das
+     Gezeichnet wird das als SVG (Skript unten: `blaseAnlegen`), das
      Feld selbst ist nur der Inhalt darüber. */
   .aufklapp {
     position: relative;
@@ -927,8 +1010,8 @@ const kategorien = (leistungen.kategorien ?? [])
     opacity: 0;
     transform: translateY(6px);
     transition:
-      opacity 320ms cubic-bezier(0.2, 0, 0, 1),
-      transform 320ms cubic-bezier(0.2, 0, 0, 1),
+      opacity 320ms var(--verlauf-betont),
+      transform 320ms var(--verlauf-betont),
       background-color var(--dauer-schnell) var(--verlauf);
     transition-delay: calc(160ms + var(--stufe, 0) * 80ms), calc(160ms + var(--stufe, 0) * 80ms), 0ms;
   }
@@ -1008,7 +1091,7 @@ const kategorien = (leistungen.kategorien ?? [])
   .fussleiste-huelle {
     position: fixed;
     inset: auto 0 0;
-    z-index: 100;
+    z-index: var(--ebene-navigation);
     width: 100%;
     transition: transform 300ms cubic-bezier(0, 0, 0.58, 1);
   }
@@ -1135,7 +1218,6 @@ const kategorien = (leistungen.kategorien ?? [])
     background: var(--farbe-primaer);
   }
 
-  /* ---------- Kleine Bildschirme ---------- */
   /* ---------- Kleine Bildschirme (Umbruchpunkt der Vorlage) ---------- */
   @media (max-width: 991px) {
     .fussleiste__inhalt { width: 90%; }
@@ -1155,7 +1237,8 @@ const kategorien = (leistungen.kategorien ?? [])
     .fussleiste__inhalt--gross { display: none; }
     .fussleiste__inhalt--klein { display: flex; }
 
-    /* Ohne Telefonnummer — die steht unten als eigener Knopf */
+    /* Ohne Telefonnummer — die steht als Pille in der Kopfleiste und
+       unten als eigener Knopf */
     .punkt--ab-tablet,
     .kontaktzeile__text--ab-tablet { display: none; }
 
@@ -1182,6 +1265,7 @@ const kategorien = (leistungen.kategorien ?? [])
 <script>
   import { schnalzWeg } from '../scripts/scrollwege';
   import { zuSprungmarke } from '../scripts/anker';
+  import { KURVEN } from '../scripts/easing';
   import { navigate } from 'astro:transitions/client';
   /**
    * Verhalten der Navigation.
@@ -1193,6 +1277,12 @@ const kategorien = (leistungen.kategorien ?? [])
    *
    * 2. Aufklappmenü unter „Leistungen": öffnet per Klick, schließt per
    *    Escape, Klick nach außen oder wenn der Fokus den Bereich verlässt.
+   *
+   * 3. Handy-Menü: dieselbe Blase, zum rechten Rand hin offen; darin
+   *    die Ebene „Leistungen" mit den Kategorien. Solange es offen ist,
+   *    liegt ein Schleier über der Seite und sie steht still.
+   *
+   * 4. Die Text-Rolle der Menüpunkte läuft immer zu Ende (`data-rollt`).
    */
   /* Der Leistenwechsel hängt sich an Fenster und Dokument — das darf
      nur einmal geschehen, auch wenn Astro nach jedem Seitenwechsel
@@ -1205,6 +1295,7 @@ const kategorien = (leistungen.kategorien ?? [])
       leistenwechselAufbauen();
     }
     aufklappmenuesAufbauen();
+    rollenAufbauen();
     mobilmenueAufbauen();
   }
 
@@ -1290,13 +1381,179 @@ const kategorien = (leistungen.kategorien ?? [])
 
   }
 
+  /* ---------- Die Blase ----------
+     Die Punktlinie einer Leiste wölbt sich zu einem abgerundeten Feld
+     auf. Gezeichnet wird das als SVG über die volle Breite (die
+     gestrichelte Linie) plus einer Maske (`clip-path`) auf dem Umschlag
+     der Leiste, die Leiste und Blase zu EINER milchigen Fläche
+     zuschneidet — keine Kante dazwischen. Die Höhe wächst Bild für Bild
+     von 0 auf die Höhe des Inhalts.
+
+     Zwei Formen teilen sich Zeichnung, Maske und Bewegung
+     (`blaseAnlegen`): die Blase unter „Leistungen" (Desktop; aus der
+     Symbolleiste auch nach oben) und das Handy-Menü, das zum rechten
+     Rand hin offen ist. Die Form selbst liefert je eine
+     `Geometrie`-Funktion. Ein Überschwingen beim Öffnen gab es bis zum
+     26. September 2026 (ein kleiner Sinus-Zusatz); es ist weg — Florian
+     wollte es glatter. */
+
+  type Geometrie = (k: {
+    breite: number;                // Fensterbreite
+    h: number;                     // aktuelle Höhe der Wölbung
+    anteil: number;                // 0 = Linie, 1 = voll aufgewölbt
+    y0: number;                    // y der Grundlinie in der Zeichnung
+    s: number;                     // Richtung: 1 nach unten, -1 nach oben
+    k: number;                     // Kreiskonstante der Viertelbögen
+    f: (n: number) => string;
+  }) => {
+    /** Die Wölbung ab dem linken Rand bis zum rechten Rand, in
+        Leserichtung — um `dy` verschoben und um `auf` nach außen geweitet */
+    woelbung: (dy: number, auf: number) => string;
+    /** Dieselbe Wölbung vom rechten zum linken Rand (Maske der oberen Leiste) */
+    rueckwaerts: (dy: number, auf: number) => string;
+    /** Kleiner Pfeil an der Grundlinie, wenn die Form einen hat */
+    pfeil?: { d: string; sicht: number };
+  };
+
+  function blaseAnlegen(opt: {
+    /** Trägt die Zeichnung (`.kopfleiste` / `.fussleiste`) */
+    leiste: HTMLElement;
+    /** Trägt Maske und Punktlinie (`.navigation` / `.fussleiste-huelle`) */
+    linienTraeger: HTMLElement;
+    hoch: boolean;
+    geometrie: Geometrie;
+    /** Aufräumen, wenn die Blase ganz zu ist */
+    beimZu: () => void;
+  }) {
+    const { leiste, linienTraeger, hoch, geometrie, beimZu } = opt;
+    const wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Die Zeichnung: gestrichelte Linie und Pfeil; der milchige Grund
+    // ist die Maske am Umschlag
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'blase');
+    svg.setAttribute('aria-hidden', 'true');
+    const linie = document.createElementNS(NS, 'path'); linie.setAttribute('class', 'blase__linie');
+    const pfeil = document.createElementNS(NS, 'path'); pfeil.setAttribute('class', 'blase__pfeil');
+    svg.append(linie, pfeil);
+    svg.style.display = 'none';
+    leiste.append(svg);
+
+    let anteil = 0;        // 0 = Linie, 1 = voll aufgewölbt
+    let ziel = 0;
+    let laeuft = false;
+    let hoehe = 0;         // Höhe der Wölbung in px
+    let start = 0, von = 0, dauer = 520;
+    const s = hoch ? -1 : 1;   // Richtung: nach oben oder unten
+    const k = 0.5523;          // Viertelkreis als Bézier
+    const rand = 4;            // Luft in der Zeichnung ober- und unterhalb
+
+    /* Öffnen mit derselben Kurve wie alle betonten Bewegungen der Seite,
+       Schließen ease-in-out */
+    const kurveAuf = KURVEN.betont;
+    const kurveZu = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+    const zeichnen = () => {
+      const breite = document.documentElement.clientWidth;
+      const h = Math.max(0, hoehe * anteil);
+      /* Grundlinie im SVG — auf halbe Pixel gelegt, damit der 1-px-Strich
+         genau auf der Punktreihe der Leiste liegt und nicht verschmiert */
+      const y0 = hoch ? hoehe + rand + 0.5 : rand - 0.5;
+      const gesamt = hoehe + 2 * rand;
+
+      svg.style.width = `${breite}px`;
+      svg.style.height = `${gesamt}px`;
+      svg.style[hoch ? 'bottom' : 'top'] = `calc(100% - ${rand}px)`;
+      svg.setAttribute('viewBox', `0 0 ${breite} ${gesamt}`);
+
+      const f = (n: number) => n.toFixed(2);
+      const form = geometrie({ breite, h, anteil: Math.min(1, anteil), y0, s, k, f });
+
+      /* Bei (fast) null Höhe eine reine Linie: Die Bögen hätten sonst
+         Punkte, die um Bruchteile eines Pixels wackeln, und aus den
+         Strichen würde in der Mitte ein durchgezogener Strich */
+      linie.setAttribute('d', h < 1.5 ? `M0 ${f(y0)} L${breite} ${f(y0)}` : `M0 ${f(y0)} ${form.woelbung(0, 0)}`);
+
+      /* Die Maske des Leistengrunds: Leiste plus Blase als eine Form,
+         in den Koordinaten des Umschlags. Der reicht per Innenabstand
+         (`--blase-hoehe`) über die Leiste hinaus — gemessen wird die
+         Leiste selbst, also ohne diesen Abstand. */
+      const lr = linienTraeger.getBoundingClientRect();
+      const cs = getComputedStyle(linienTraeger);
+      const leisteH = lr.height - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
+      linienTraeger.style.setProperty('--blase-hoehe', `${gesamt}px`);
+      /* Nullpunkt-Versatz zwischen Zeichnung und Maske: unten liegt die
+         Zeichnung `rand` unter dem oberen Umschlagrand, oben liegt die
+         Grundlinie erst unter der Leiste */
+      const dy = hoch ? rand : leisteH - rand;
+      /* Der Strich liegt in der Zeichnung, die mit maskiert wird — die
+         Maske greift deshalb 1 px über ihn hinaus */
+      const auf = 1;
+      const yM = y0 + dy + s * auf;
+      const maske = hoch
+        ? `M0 ${f(gesamt + leisteH)} L0 ${f(yM)} ${form.woelbung(dy, auf)}L${breite} ${f(yM)} L${breite} ${f(gesamt + leisteH)} Z`
+        : `M0 0 L${breite} 0 L${breite} ${f(yM)} ${form.rueckwaerts(dy, auf)}L0 ${f(yM)} Z`;
+      linienTraeger.style.setProperty('--blase-form', `path("${maske}")`);
+
+      if (form.pfeil) {
+        pfeil.setAttribute('d', form.pfeil.d);
+        pfeil.setAttribute('opacity', f(form.pfeil.sicht));
+      } else {
+        pfeil.removeAttribute('d');
+      }
+    };
+
+    const schritt = (jetzt: number) => {
+      const t = Math.min(1, (jetzt - start) / dauer);
+      const kurve = ziel === 1 ? kurveAuf : kurveZu;
+      anteil = von + (ziel - von) * kurve(t);
+      zeichnen();
+      if (t < 1) { requestAnimationFrame(schritt); return; }
+      laeuft = false;
+      anteil = ziel;
+      if (ziel === 0) {
+        svg.style.display = 'none';
+        linienTraeger.style.removeProperty('--blase-form');
+        linienTraeger.style.removeProperty('--blase-hoehe');
+        delete linienTraeger.dataset.ohneLinie;
+        beimZu();
+      }
+    };
+
+    const animieren = (nachZiel: number, sofort = false) => {
+      ziel = nachZiel;
+      von = anteil;
+      start = performance.now();
+      dauer = nachZiel === 1 ? 520 : 400;
+      if (wenigerBewegung || sofort) { anteil = ziel; zeichnen(); dauer = 0; start = -1e9; }
+      if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
+    };
+
+    return {
+      /** Aufwölben auf die gegebene Inhaltshöhe */
+      oeffnen(h: number) {
+        hoehe = h;
+        linienTraeger.dataset.ohneLinie = 'ja';
+        svg.style.display = 'block';
+        zeichnen();
+        animieren(1);
+      },
+      schliessen(sofort = false) { animieren(0, sofort); },
+      /** Der Inhalt ist anders hoch geworden — die Blase folgt sofort */
+      hoeheSetzen(h: number) {
+        if (svg.style.display === 'none') return;
+        hoehe = h;
+        zeichnen();
+      },
+      get aktiv() { return svg.style.display !== 'none'; },
+    };
+  }
+
   function aufklappmenuesAufbauen() {
-    // ---- Aufklappmenü („Blase") ----
-    // Die Punktlinie der Leiste wölbt sich zu einem abgerundeten Feld.
-    // Gezeichnet als SVG über die volle Breite: links und rechts die
-    // Linie, in der Mitte die Wölbung, deren Höhe von 0 auf die Höhe
-    // des Inhalts wächst — mit leichtem Überschwingen, damit es
-    // organisch wirkt. Ein kleiner Pfeil zeigt auf den Menüpunkt.
+    // ---- Aufklappmenü „Leistungen" ----
+    // Die Wölbung sitzt unter (oder über) dem Menüpunkt; ein kleiner
+    // Pfeil an der Grundlinie zeigt auf ihn.
     document.querySelectorAll<HTMLElement>('[data-aufklapp]').forEach((huelle) => {
       if (huelle.dataset.bereit) return;
       huelle.dataset.bereit = 'ja';
@@ -1311,40 +1568,10 @@ const kategorien = (leistungen.kategorien ?? [])
       const linienTraeger = hoch ? huelle.closest<HTMLElement>('.fussleiste-huelle') : huelle.closest<HTMLElement>('.navigation');
       if (!knopf || !inhalt || !leiste || !linienTraeger) return;
 
-      const wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      // Die Zeichnung: milchiger Grund (zugeschnitten) + gestrichelte Linie
-      const NS = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(NS, 'svg');
-      svg.setAttribute('class', 'blase');
-      svg.setAttribute('aria-hidden', 'true');
-      const linie = document.createElementNS(NS, 'path'); linie.setAttribute('class', 'blase__linie');
-      const pfeil = document.createElementNS(NS, 'path'); pfeil.setAttribute('class', 'blase__pfeil');
-      svg.append(linie, pfeil);
-      svg.style.display = 'none';
-      leiste.append(svg);
-
-      let anteil = 0;        // 0 = Linie, 1 = voll aufgewölbt
-      let ziel = 0;
-      let laeuft = false;
-      let hoehe = 0;         // Höhe der Wölbung in px
-      let start = 0, von = 0, dauer = 520;
-      const s = hoch ? -1 : 1;   // Richtung: nach oben oder unten
       const ECKE = 40;             // Rundung am Ende — wie im Entwurf
-
-      /* Weich mit leichtem Überschwingen (nur beim Öffnen) */
-      /* Wie eine Blase, die von unten drückt: langsam anschwellend, dann
-         zügig steigend, mit einem Hauch Überschwingen zum Schluss */
-      const kurveAuf = (t: number) => {
-        const basis = 1 - Math.pow(1 - t, 3);
-        const u = Math.max(0, (t - 0.45) / 0.55);
-        return basis + 0.03 * Math.sin(Math.PI * u);
-      };
-      const kurveZu = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
       const weich = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
-      const zeichnen = () => {
-        const breite = document.documentElement.clientWidth;
+      const geometrie: Geometrie = ({ breite, h, anteil, y0, s, k, f }) => {
         const boxBreite = Math.min(400, breite - 32);
         const kr = knopf.getBoundingClientRect();
         const knopfX = kr.left + kr.width / 2;
@@ -1365,172 +1592,98 @@ const kategorien = (leistungen.kategorien ?? [])
 
         /* Sie wächst in Höhe UND Breite — die Linie fließt auf, statt
            eine fertige Form hochzuschieben. Die Rundung ist nie größer
-           als die halbe Höhe: so bleibt jede Zwischenform weich. */
-        const h = Math.max(0, hoehe * anteil);
-        const p = Math.min(1, anteil);
-        /* Die Form wie eine Blase, die von unten gegen die Linie drückt:
-           Anfangs ein breiter, flacher Hügel — die Ausrundungen an Fuß
-           und Schulter sind weit gestreckte Ellipsenbögen (breit `a`,
-           hoch `fa`). Mit der Höhe ziehen sie sich auf die 40-px-Kreise
-           des Entwurfs zusammen, dazwischen wächst die senkrechte Wand.
-           So gibt es in keiner Phase eine Ecke. */
-        /* Der Fuß der Blase steht fest (Außenmaß = Endbreite + Rundung);
+           als die halbe Höhe: so bleibt jede Zwischenform weich.
+           Der Fuß der Blase steht fest (Außenmaß = Endbreite + Rundung);
            nur der Scheitel weitet sich mit der Höhe, die Bögen werden
-           dadurch von breit-flach zu 40-px-Kreisen und die Seiten steiler. */
+           dadurch von breit-flach zu 40-px-Kreisen und die Seiten steiler.
+           So gibt es in keiner Phase eine Ecke. */
         const aussen = boxBreite / 2 + ECKE;                   // halbe Fußbreite, fest
         /* Scheitelbreite: beginnt bei der halben Fußbreite — dann sind die
            Bögen genau so breit wie der halbe Scheitel und stoßen in der
            Mitte aneinander (reiner Hügel ohne Plateau). Breiter dürfen
            die Bögen nie sein, sonst liefe die Linie über sich zurück. */
-        const w = aussen + (boxBreite - aussen) * weich(p);
+        const w = aussen + (boxBreite - aussen) * weich(anteil);
         const fa = Math.min(ECKE, h / 2);                       // Höhe der Bögen
         const aB = Math.min(w / 2, Math.max(fa, aussen - w / 2)); // Breite der Bögen
-        const k = 0.5523;
-        const rand = 4;
-        /* Grundlinie im SVG — auf halbe Pixel gelegt, damit der 1-px-Strich
-           genau auf der Punktreihe der Leiste liegt und nicht verschmiert */
-        const yBasis = hoch ? hoehe + rand + 0.5 : rand - 0.5;
-        const y0 = yBasis;
-        const xL = mitte - w / 2;
-        const xR = mitte + w / 2;
-        const gesamt = hoehe + 2 * rand;
 
-        svg.style.width = `${breite}px`;
-        svg.style.height = `${gesamt}px`;
-        svg.style[hoch ? 'bottom' : 'top'] = `calc(100% - ${rand}px)`;
-        svg.setAttribute('viewBox', `0 0 ${breite} ${gesamt}`);
-
-        const f = (n: number) => n.toFixed(2);
-        /* Die Wölbung als Pfadstück, um `dy` verschoben (die Maske des
-           Leistengrunds hat einen anderen Nullpunkt als die Zeichnung).
-           `auf` weitet die Form um so viele Bildpunkte nach außen — die
-           Maske greift damit über den Strich hinaus, statt ihn zur
-           Hälfte abzuschneiden. */
-        const woelbungMit = (dy: number, auf = 0) => {
+        const woelbung = (dy: number, auf: number) => {
           const g = (n: number) => f(n + dy);
           const xL = mitte - w / 2 - auf;
           const xR = mitte + w / 2 + auf;
-          const y0 = yBasis + s * auf;
+          const yb = y0 + s * auf;
           return (
             /* Fuß links: flacher Bogen von der Linie in die Wand */
-            `L${f(xL - aB)} ${g(y0)} C${f(xL - aB + k * aB)} ${g(y0)} ${f(xL)} ${g(y0 + s * (fa - k * fa))} ${f(xL)} ${g(y0 + s * fa)} ` +
+            `L${f(xL - aB)} ${g(yb)} C${f(xL - aB + k * aB)} ${g(yb)} ${f(xL)} ${g(yb + s * (fa - k * fa))} ${f(xL)} ${g(yb + s * fa)} ` +
             /* Wand */
-            `L${f(xL)} ${g(y0 + s * (h - fa))} ` +
+            `L${f(xL)} ${g(yb + s * (h - fa))} ` +
             /* Schulter links */
-            `C${f(xL)} ${g(y0 + s * (h - fa + k * fa))} ${f(xL + aB - k * aB)} ${g(y0 + s * h)} ${f(xL + aB)} ${g(y0 + s * h)} ` +
+            `C${f(xL)} ${g(yb + s * (h - fa + k * fa))} ${f(xL + aB - k * aB)} ${g(yb + s * h)} ${f(xL + aB)} ${g(yb + s * h)} ` +
             /* Scheitel */
-            `L${f(xR - aB)} ${g(y0 + s * h)} ` +
+            `L${f(xR - aB)} ${g(yb + s * h)} ` +
             /* Schulter rechts */
-            `C${f(xR - aB + k * aB)} ${g(y0 + s * h)} ${f(xR)} ${g(y0 + s * (h - fa + k * fa))} ${f(xR)} ${g(y0 + s * (h - fa))} ` +
+            `C${f(xR - aB + k * aB)} ${g(yb + s * h)} ${f(xR)} ${g(yb + s * (h - fa + k * fa))} ${f(xR)} ${g(yb + s * (h - fa))} ` +
             /* Wand */
-            `L${f(xR)} ${g(y0 + s * fa)} ` +
-            /* Fuß rechts */
-            `C${f(xR)} ${g(y0 + s * (fa - k * fa))} ${f(xR + aB - k * aB)} ${g(y0)} ${f(xR + aB)} ${g(y0)} `
+            `L${f(xR)} ${g(yb + s * fa)} ` +
+            /* Fuß rechts, dann weiter auf der Linie bis zum Rand */
+            `C${f(xR)} ${g(yb + s * (fa - k * fa))} ${f(xR + aB - k * aB)} ${g(yb)} ${f(xR + aB)} ${g(yb)} ` +
+            `L${breite} ${g(yb)} `
           );
         };
-        const woelbung = woelbungMit(0);
-        /* Bei (fast) null Höhe eine reine Linie: Die Bögen hätten sonst
-           Punkte, die um Bruchteile eines Pixels wackeln, und aus den
-           Strichen würde in der Mitte ein durchgezogener Strich */
-        linie.setAttribute('d', h < 1.5 ? `M0 ${f(y0)} L${breite} ${f(y0)}` : `M0 ${f(y0)} ${woelbung}L${breite} ${f(y0)}`);
 
-        /* Dieselbe Wölbung von rechts nach links, um `dy` verschoben —
-           für die Maske der oberen Leiste */
-        const woelbungRueckwaerts = (dy: number, auf = 0) => {
+        const rueckwaerts = (dy: number, auf: number) => {
           const g = (n: number) => f(n + dy);
           const xL = mitte - w / 2 - auf;
           const xR = mitte + w / 2 + auf;
-          const y0 = yBasis + s * auf;
+          const yb = y0 + s * auf;
           return (
-            `L${f(xR + aB)} ${g(y0)} ` +
-            `C${f(xR + aB - k * aB)} ${g(y0)} ${f(xR)} ${g(y0 + s * (fa - k * fa))} ${f(xR)} ${g(y0 + s * fa)} ` +
-            `L${f(xR)} ${g(y0 + s * (h - fa))} ` +
-            `C${f(xR)} ${g(y0 + s * (h - fa + k * fa))} ${f(xR - aB + k * aB)} ${g(y0 + s * h)} ${f(xR - aB)} ${g(y0 + s * h)} ` +
-            `L${f(xL + aB)} ${g(y0 + s * h)} ` +
-            `C${f(xL + aB - k * aB)} ${g(y0 + s * h)} ${f(xL)} ${g(y0 + s * (h - fa + k * fa))} ${f(xL)} ${g(y0 + s * (h - fa))} ` +
-            `L${f(xL)} ${g(y0 + s * fa)} ` +
-            `C${f(xL)} ${g(y0 + s * (fa - k * fa))} ${f(xL - aB + k * aB)} ${g(y0)} ${f(xL - aB)} ${g(y0)} `
+            `L${f(xR + aB)} ${g(yb)} ` +
+            `C${f(xR + aB - k * aB)} ${g(yb)} ${f(xR)} ${g(yb + s * (fa - k * fa))} ${f(xR)} ${g(yb + s * fa)} ` +
+            `L${f(xR)} ${g(yb + s * (h - fa))} ` +
+            `C${f(xR)} ${g(yb + s * (h - fa + k * fa))} ${f(xR - aB + k * aB)} ${g(yb + s * h)} ${f(xR - aB)} ${g(yb + s * h)} ` +
+            `L${f(xL + aB)} ${g(yb + s * h)} ` +
+            `C${f(xL + aB - k * aB)} ${g(yb + s * h)} ${f(xL)} ${g(yb + s * (h - fa + k * fa))} ${f(xL)} ${g(yb + s * (h - fa))} ` +
+            `L${f(xL)} ${g(yb + s * fa)} ` +
+            `C${f(xL)} ${g(yb + s * (fa - k * fa))} ${f(xL - aB + k * aB)} ${g(yb)} ${f(xL - aB)} ${g(yb)} `
           );
         };
 
-        /* Die Maske des Leistengrunds: Leiste plus Blase als eine Form,
-           in den Koordinaten des Umschlags. Der reicht per Innenabstand
-           (`--blase-hoehe`) über die Leiste hinaus — gemessen wird die
-           Leiste selbst, also ohne diesen Abstand. */
-        const lr = linienTraeger.getBoundingClientRect();
-        const cs = getComputedStyle(linienTraeger);
-        const leisteH = lr.height - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
-        linienTraeger.style.setProperty('--blase-hoehe', `${gesamt}px`);
-        /* Nullpunkt-Versatz zwischen Zeichnung und Maske:
-           unten liegt die Zeichnung `rand` unter dem oberen Umschlagrand,
-           oben liegt die Grundlinie erst unter der Leiste */
-        const dy = hoch ? rand : leisteH - rand;
-        /* Der Strich liegt in der Zeichnung, die mit maskiert wird — die
-           Maske greift deshalb 1 px über ihn hinaus */
-        const auf = 1;
-        const yM = y0 + dy + s * auf;
-        const form = hoch
-          ? `M0 ${f(gesamt + leisteH)} L0 ${f(yM)} ${woelbungMit(dy, auf)}L${breite} ${f(yM)} L${breite} ${f(gesamt + leisteH)} Z`
-          : `M0 0 L${breite} 0 L${breite} ${f(yM)} ${woelbungRueckwaerts(dy, auf)}L0 ${f(yM)} Z`;
-        linienTraeger.style.setProperty('--blase-form', `path("${form}")`);
-
-        /* Kleiner Pfeil an der Grundlinie, auf den Menüpunkt zeigend */
+        /* Kleiner Pfeil an der Grundlinie, auf den Menüpunkt zeigend —
+           Schenkel unter 45° wie der Haken am Menüpunkt, nur größer. Er
+           blendet im letzten Drittel des Wachsens auf. */
         const py = y0 + s * 22;
-        const sicht = Math.max(0, (anteil - 0.6) / 0.4);
-        /* Schenkel unter 45° — dieselbe Form wie der kleine Haken am
-           Menüpunkt (`icons/ui/pfeil-runter.svg`), nur größer. Vorher
-           standen sie flacher und die Spitze wirkte stumpf. */
+        const sicht = Math.min(1, Math.max(0, (anteil - 0.6) / 0.4));
         const arm = 9;
-        pfeil.setAttribute('d', `M${f(knopfX - arm)} ${f(py + s * -arm)} L${f(knopfX)} ${f(py)} L${f(knopfX + arm)} ${f(py + s * -arm)}`);
-        pfeil.setAttribute('opacity', f(sicht));
+        const pfeil = {
+          d: `M${f(knopfX - arm)} ${f(py + s * -arm)} L${f(knopfX)} ${f(py)} L${f(knopfX + arm)} ${f(py + s * -arm)}`,
+          sicht,
+        };
 
         /* Der Inhalt liegt in der voll aufgewölbten Blase */
         const hr = huelle.getBoundingClientRect();
         inhalt.style.left = `${links - hr.left}px`;
+
+        return { woelbung, rueckwaerts, pfeil };
       };
 
-      const schritt = (jetzt: number) => {
-        const t = Math.min(1, (jetzt - start) / dauer);
-        const kurve = ziel === 1 ? kurveAuf : kurveZu;
-        anteil = von + (ziel - von) * kurve(t);
-        zeichnen();
-        if (t < 1) { requestAnimationFrame(schritt); return; }
-        laeuft = false;
-        anteil = ziel;
-        if (ziel === 0) {
-          svg.style.display = 'none';
-          linienTraeger.style.removeProperty('--blase-form');
-          linienTraeger.style.removeProperty('--blase-hoehe');
-          delete linienTraeger.dataset.ohneLinie;
+      const blase = blaseAnlegen({
+        leiste, linienTraeger, hoch, geometrie,
+        beimZu: () => {
           delete huelle.dataset.aktiv;
           if (knopf.getAttribute('aria-expanded') !== 'true') inhalt.hidden = true;
-        }
-      };
-
-      const animieren = (nachZiel: number) => {
-        ziel = nachZiel;
-        von = anteil;
-        start = performance.now();
-        dauer = nachZiel === 1 ? 520 : 400;
-        if (wenigerBewegung) { anteil = ziel; zeichnen(); dauer = 0; start = -1e9; }
-        if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
-      };
+        },
+      });
 
       const setzen = (offen: boolean) => {
         if ((knopf.getAttribute('aria-expanded') === 'true') === offen) return;
         knopf.setAttribute('aria-expanded', String(offen));
         if (offen) {
           inhalt.hidden = false;
-          hoehe = inhalt.getBoundingClientRect().height;
           huelle.dataset.aktiv = 'ja';
-          linienTraeger.dataset.ohneLinie = 'ja';
-          svg.style.display = 'block';
-          zeichnen();
+          blase.oeffnen(inhalt.getBoundingClientRect().height);
           requestAnimationFrame(() => { huelle.dataset.offen = 'ja'; });
-          animieren(1);
         } else {
           delete huelle.dataset.offen;
-          animieren(0);
+          blase.schliessen();
         }
       };
 
@@ -1595,83 +1748,244 @@ const kategorien = (leistungen.kategorien ?? [])
         }
       });
 
-      window.addEventListener('resize', () => { if (huelle.dataset.aktiv) { hoehe = inhalt.getBoundingClientRect().height; zeichnen(); } }, { passive: true });
+      window.addEventListener('resize', () => {
+        if (huelle.dataset.aktiv) blase.hoeheSetzen(inhalt.getBoundingClientRect().height);
+      }, { passive: true });
       // Beim Seitenwechsel schließen
       document.addEventListener('astro:before-preparation', () => setzen(false));
     });
+  }
 
+  /**
+   * Die Text-Rolle der Menüpunkte (CSS `.menuepunkt__rolle`): Das
+   * Attribut kommt beim Betreten und geht erst, wenn die Animation zu
+   * Ende ist — eine `:hover`-Animation brach ab, sobald der Zeiger den
+   * Punkt verließ, und der Text sprang zurück (Florian, 26. September
+   * 2026). Zurückgerollt wird nie (Ablauf a-18).
+   */
+  function rollenAufbauen() {
+    const wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll<HTMLElement>('.menuepunkt').forEach((punkt) => {
+      if (punkt.dataset.rolleBereit) return;
+      punkt.dataset.rolleBereit = 'ja';
+      const rolle = punkt.querySelector('.menuepunkt__rolle');
+      punkt.addEventListener('pointerenter', () => { if (!wenigerBewegung) punkt.dataset.rollt = 'ja'; });
+      const fertig = (e: AnimationEvent) => { if (e.target === rolle) delete punkt.dataset.rollt; };
+      punkt.addEventListener('animationend', fertig);
+      /* Etwa beim Umbruch auf Handybreite mitten in der Rolle */
+      punkt.addEventListener('animationcancel', fertig);
+    });
   }
 
   function mobilmenueAufbauen() {
-    // ---- Mobiles Ausklappmenü ----
-    // Ablauf a-25 / a-27: Höhe 0 ↔ 338 px in 700 ms, der Lottie-Knopf
-    // läuft dabei in 600 ms von Bild 0 auf 99 und zurück.
+    // ---- Handy-Menü ----
+    // Dieselbe Blase wie unter „Leistungen", nur zum rechten Rand hin
+    // offen: Die Punktlinie bleibt unter dem Logo oben, schwingt rechts
+    // davon in einem großen Bogen nach unten und läuft am Fuß des
+    // Menüs bis zum rechten Fensterrand (Florians Entwurf, 26. September
+    // 2026). Der Lottie-Knopf läuft in 600 ms von Bild 0 auf 59 und
+    // zurück (Ablauf a-25 / a-27).
     const menueknopf = document.querySelector<HTMLButtonElement>('[data-menueknopf]');
     const navigation = document.querySelector<HTMLElement>('.navigation');
+    const kopfleiste = navigation?.querySelector<HTMLElement>('.kopfleiste');
+    const logo = navigation?.querySelector<HTMLElement>('.kopfleiste__mobil .logo');
+    const menue = document.querySelector<HTMLElement>('[data-mobilmenue]');
     const lottieKasten = document.querySelector<HTMLElement>('[data-menuelottie]');
+    if (!menueknopf || !navigation || !kopfleiste || !logo || !menue || menueknopf.dataset.bereit) return;
+    menueknopf.dataset.bereit = 'ja';
 
-    if (menueknopf && navigation && !menueknopf.dataset.bereit) {
-      menueknopf.dataset.bereit = 'ja';
-      let knopfSpieler: { playSegments: (b: [number, number], s?: boolean) => void; totalFrames: number } | null = null;
-
-      if (lottieKasten) {
-        import('../scripts/lottie').then(({ ladeAnimation }) => {
-          ladeAnimation(lottieKasten, '/lottie/menue-button.json').then((s) => { knopfSpieler = s as never; });
-        });
-      }
-
-      /* Solange das Menü offen ist, steht die Seite still: Sonst scrollt
-         beim Wischen über dem Menü der Inhalt dahinter weg — und mit ihm
-         fährt die Einstiegskarte, weil sie am Scrollweg hängt (Florian,
-         18. September 2026). */
-      const seiteSperren = (sperren: boolean) => {
-        document.documentElement.style.overflow = sperren ? 'hidden' : '';
-      };
-
-      const menueSchliessen = () => {
-        navigation.removeAttribute('data-menue-offen');
-        menueknopf.setAttribute('aria-expanded', 'false');
-        menueknopf.setAttribute('aria-label', 'Menü öffnen');
-        knopfSpieler?.playSegments([knopfSpieler.totalFrames - 1, 0], true);
-        seiteSperren(false);
-      };
-
-      menueknopf.addEventListener('click', () => {
-        if (navigation.hasAttribute('data-menue-offen')) {
-          menueSchliessen();
-        } else {
-          navigation.setAttribute('data-menue-offen', 'ja');
-          menueknopf.setAttribute('aria-expanded', 'true');
-          menueknopf.setAttribute('aria-label', 'Menü schließen');
-          knopfSpieler?.playSegments([0, knopfSpieler.totalFrames - 1], true);
-          seiteSperren(true);
-        }
-      });
-
-      // „Leistungen" klappt die Kategorien an Ort und Stelle auf
-      const unter = document.querySelector<HTMLElement>('[data-mobilunter]');
-      const knopfLeistungen = document.querySelector<HTMLButtonElement>('[data-mobilleistungen]');
-
-      const leistungenAufklappen = (offen: boolean) => {
-        if (!unter || !knopfLeistungen) return;
-        knopfLeistungen.setAttribute('aria-expanded', String(offen));
-        if (offen) unter.dataset.offen = 'ja';
-        else delete unter.dataset.offen;
-      };
-
-      knopfLeistungen?.addEventListener('click', () => {
-        leistungenAufklappen(knopfLeistungen.getAttribute('aria-expanded') !== 'true');
-      });
-
-      // Ein Klick auf ein Ziel schließt das Menü wieder (wie in a-27);
-      // das Akkordeon klappt dabei zu, sobald das Menü eingefahren ist.
-      document.querySelectorAll('a.mobilmenue__punkt').forEach((a) => {
-        a.addEventListener('click', () => {
-          menueSchliessen();
-          window.setTimeout(() => leistungenAufklappen(false), 700);
-        });
+    let knopfSpieler: { playSegments: (b: [number, number], s?: boolean) => void; totalFrames: number } | null = null;
+    if (lottieKasten) {
+      import('../scripts/lottie').then(({ ladeAnimation }) => {
+        ladeAnimation(lottieKasten, '/lottie/menue-button.json').then((s) => { knopfSpieler = s as never; });
       });
     }
+
+    /* ---- Form der Blase ---- */
+    const LOGO_ABSTAND = 12;    // Luft zwischen Logo und Wand
+    const SCHWUNG_BREIT = 120;  // der große Bogen oben: waagerechter Radius …
+    const SCHWUNG_HOCH = 80;    // … und senkrechter (wie im Entwurf leicht gestreckt)
+    const ECKE = 40;            // die kleine Rundung unten, wie bei der Desktop-Blase
+    /* Die Wand driftet nach rechts, etwa 4° — wie im Entwurf. 0 = senkrecht. */
+    const NEIGUNG = 0.07;
+
+    const geometrie: Geometrie = ({ breite, h, y0, k, f }) => {
+      /* `.navigation` liegt bei left 0 — Fensterkoordinaten sind
+         Zeichnungskoordinaten */
+      const xL = logo.getBoundingClientRect().right + LOGO_ABSTAND;
+      const ra = Math.min(SCHWUNG_BREIT, xL);   // der Bogen beginnt nie links vom Fensterrand
+      const rb = Math.min(SCHWUNG_HOCH, h / 2); // wächst mit der Höhe: erst flach, dann rund
+      const c = Math.min(ECKE, h / 2);          // rb + c ≤ h — die Wand wird nie negativ
+      const xW = xL + NEIGUNG * (h - c);        // Fuß der geneigten Wand
+      menue.style.setProperty('--menue-wand', `${xL.toFixed(1)}px`);
+
+      const woelbung = (dy: number, auf: number) => {
+        const g = (n: number) => f(n + dy);
+        const yb = y0 + auf;
+        return (
+          /* auf der Linie bis zum Bogen, dann der große Schwung nach unten */
+          `L${f(xL - ra)} ${g(yb)} C${f(xL - ra + k * ra)} ${g(yb)} ${f(xL - auf)} ${g(y0 + rb - k * rb)} ${f(xL - auf)} ${g(y0 + rb)} ` +
+          /* die Wand */
+          `L${f(xW - auf)} ${g(y0 + h - c)} ` +
+          /* die kleine Ecke, dann offen bis zum rechten Rand */
+          `C${f(xW - auf)} ${g(y0 + h - c + k * c)} ${f(xW + c - k * c)} ${g(y0 + h + auf)} ${f(xW + c)} ${g(y0 + h + auf)} ` +
+          `L${breite} ${g(y0 + h + auf)} `
+        );
+      };
+
+      const rueckwaerts = (dy: number, auf: number) => {
+        const g = (n: number) => f(n + dy);
+        const yb = y0 + auf;
+        return (
+          `L${breite} ${g(y0 + h + auf)} L${f(xW + c)} ${g(y0 + h + auf)} ` +
+          `C${f(xW + c - k * c)} ${g(y0 + h + auf)} ${f(xW - auf)} ${g(y0 + h - c + k * c)} ${f(xW - auf)} ${g(y0 + h - c)} ` +
+          `L${f(xL - auf)} ${g(y0 + rb)} ` +
+          `C${f(xL - auf)} ${g(y0 + rb - k * rb)} ${f(xL - ra + k * ra)} ${g(yb)} ${f(xL - ra)} ${g(yb)} `
+        );
+      };
+
+      return { woelbung, rueckwaerts };
+    };
+
+    /* Die Zeilen folgen der geneigten Wand: je Zeile ein Versatz aus
+       ihrer Höhe im Menü. Läuft bei jeder Höhenänderung neu (unten). */
+    const versatzSetzen = () => {
+      menue.querySelectorAll<HTMLElement>('.mobilmenue__zeile').forEach((z) => {
+        z.style.setProperty('--versatz', `${(NEIGUNG * z.offsetTop).toFixed(1)}px`);
+      });
+    };
+
+    /* ---- Ebene „Leistungen" ---- */
+    const knopfLeistungen = menue.querySelector<HTMLButtonElement>('[data-mobilleistungen]');
+    const ebeneSetzen = (leistungen: boolean) => {
+      if (!knopfLeistungen) return;
+      knopfLeistungen.setAttribute('aria-expanded', String(leistungen));
+      if (leistungen) {
+        knopfLeistungen.setAttribute('aria-label', 'Zurück zum Menü');
+        menue.dataset.ebene = 'leistungen';
+      } else {
+        knopfLeistungen.removeAttribute('aria-label');
+        delete menue.dataset.ebene;
+      }
+    };
+    knopfLeistungen?.addEventListener('click', () => {
+      ebeneSetzen(knopfLeistungen.getAttribute('aria-expanded') !== 'true');
+    });
+
+    /* ---- Schleier ----
+       Er steht außerhalb der persistierten Navigation und wird bei
+       jedem Seitenwechsel neu gebaut — deshalb hier stets frisch
+       abgefragt statt gemerkt. */
+    const schleier = () => document.querySelector<HTMLElement>('[data-menue-schleier]');
+    const schleierZeigen = () => {
+      const s = schleier();
+      if (!s) return;
+      s.hidden = false;
+      requestAnimationFrame(() => { s.dataset.sichtbar = 'ja'; });
+    };
+    const schleierAusblenden = () => { const s = schleier(); if (s) delete s.dataset.sichtbar; };
+    const schleierVerstecken = () => { const s = schleier(); if (s) s.hidden = true; };
+
+    /* ---- Seite stillhalten ----
+       Solange das Menü offen ist, steht die Seite still: Sonst scrollte
+       beim Wischen über dem Menü der Inhalt dahinter weg — und mit ihm
+       fährt die Einstiegskarte, weil sie am Scrollweg hängt (Florian,
+       18. September 2026). Kein `position: fixed` am Body: Das setzte
+       `scrollY` auf 0 und würfe die Karte aus der Bahn. Stattdessen
+       `overflow: hidden` an der Wurzel plus — nur solange offen — ein
+       Zuhörer, der das Wischen mit einem Finger unterbindet; iOS Safari
+       hält sich sonst nicht an das `overflow`. Pinch-Zoom bleibt. */
+    const beiTouch = (e: TouchEvent) => { if (e.touches.length === 1) e.preventDefault(); };
+    const seiteSperren = (sperren: boolean) => {
+      const html = document.documentElement;
+      html.style.overflow = sperren ? 'hidden' : '';
+      html.style.overscrollBehavior = sperren ? 'none' : '';
+      if (sperren) document.addEventListener('touchmove', beiTouch, { passive: false });
+      else document.removeEventListener('touchmove', beiTouch);
+    };
+
+    const blase = blaseAnlegen({
+      leiste: kopfleiste, linienTraeger: navigation, hoch: false, geometrie,
+      beimZu: () => {
+        delete navigation.dataset.menueAktiv;
+        menue.hidden = true;
+        schleierVerstecken();
+        ebeneSetzen(false);
+      },
+    });
+
+    const istOffen = () => navigation.hasAttribute('data-menue-offen');
+
+    const oeffnen = () => {
+      if (istOffen()) return;
+      menue.hidden = false;
+      versatzSetzen();
+      navigation.dataset.menueAktiv = 'ja';
+      /* Wie `data-offen` bei der Desktop-Blase: einen Frame später, damit
+         die Zeilen aus ihrem Grundzustand heraus einfahren */
+      requestAnimationFrame(() => { navigation.dataset.menueOffen = 'ja'; });
+      menueknopf.setAttribute('aria-expanded', 'true');
+      menueknopf.setAttribute('aria-label', 'Menü schließen');
+      knopfSpieler?.playSegments([0, knopfSpieler.totalFrames - 1], true);
+      schleierZeigen();
+      seiteSperren(true);
+      blase.oeffnen(menue.getBoundingClientRect().height);
+    };
+
+    const menueSchliessen = (sofort = false) => {
+      if (!istOffen() && !navigation.dataset.menueAktiv) return;
+      delete navigation.dataset.menueOffen;
+      menueknopf.setAttribute('aria-expanded', 'false');
+      menueknopf.setAttribute('aria-label', 'Menü öffnen');
+      knopfSpieler?.playSegments([knopfSpieler.totalFrames - 1, 0], true);
+      schleierAusblenden();
+      seiteSperren(false);
+      blase.schliessen(sofort);
+    };
+
+    menueknopf.addEventListener('click', () => { if (istOffen()) menueSchliessen(); else oeffnen(); });
+
+    /* Die Blase folgt der Höhe des Menüs Bild für Bild — beim
+       Ebenenwechsel, bei Drehung des Geräts, beim Laden der Schrift. */
+    new ResizeObserver(() => {
+      if (!navigation.dataset.menueAktiv) return;
+      versatzSetzen();
+      blase.hoeheSetzen(menue.getBoundingClientRect().height);
+    }).observe(menue);
+
+    // Ein Tipp auf ein Ziel schließt das Menü (wie in a-27)
+    menue.querySelectorAll('a.mobilmenue__punkt').forEach((a) => {
+      a.addEventListener('click', () => menueSchliessen());
+    });
+
+    // Tipp auf den Schleier
+    document.addEventListener('click', (e) => {
+      if ((e.target as Element | null)?.closest?.('[data-menue-schleier]')) menueSchliessen();
+    });
+
+    // Escape: erst die Ebene zurück, dann das Menü zu
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || !istOffen()) return;
+      if (menue.dataset.ebene) { ebeneSetzen(false); knopfLeistungen?.focus(); return; }
+      menueSchliessen();
+      menueknopf.focus();
+    });
+
+    // Fokus verlässt die Navigation (Tastatur)
+    navigation.addEventListener('focusout', (e) => {
+      const z = e.relatedTarget as Node | null;
+      if (z && !navigation.contains(z) && istOffen()) menueSchliessen();
+    });
+
+    // Beim Seitenwechsel zu — noch vor dem Tausch, damit die Sperre an
+    // der Wurzel nicht mit dem neuen Dokument verloren geht
+    document.addEventListener('astro:before-preparation', () => menueSchliessen());
+
+    // Wird das Fenster breiter als ein Handy, gibt es das Menü nicht mehr:
+    // sofort zu, ohne Bewegung — die Form misst das dann versteckte Logo
+    window.matchMedia('(max-width: 991px)').addEventListener('change', (e) => {
+      if (!e.matches) menueSchliessen(true);
+    });
   }
 
   navigationAufbauen();

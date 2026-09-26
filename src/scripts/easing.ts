@@ -38,6 +38,10 @@ export const KURVEN: Record<string, (x: number) => number> = {
   inCubic: bezier(0.55, 0.055, 0.675, 0.19),
   outCubic: bezier(0.215, 0.61, 0.355, 1),
   inOutCubic: bezier(0.645, 0.045, 0.355, 1),
+  /* Dieselbe Kurve wie `--verlauf-betont` in styles/tokens.css — dort
+     mitziehen, wenn sie sich ändert. Für Bewegungen, die das Skript
+     Bild für Bild rechnet (die Blase der Navigation). */
+  betont: bezier(0.22, 0.61, 0.24, 1),
 };
 
 export type Stuetzstelle = {
