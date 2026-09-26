@@ -384,7 +384,9 @@ const bewerbung = (titel: string) =>
   /* Dieselbe Textgröße wie in den freien Abschnitten (26. September
      2026); vorher 16,5 / 15,5 px fest. */
   .stelle__text :global(p) {
-    max-width: var(--breite-absatz);
+    /* Die Spalte begrenzt die Zeilenlänge; im Blocksatz muss der Absatz
+       sie füllen (global.css, „Blocksatz") */
+    max-width: none;
     margin-bottom: var(--abstand-s);
     font-size: var(--text-flies);
     line-height: var(--zeilenhoehe-lese);

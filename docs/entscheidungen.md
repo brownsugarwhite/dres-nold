@@ -1503,7 +1503,8 @@ zwischen zwei Abschnitten sonst — auf Handys unvermeidlich.
 (`.ozbereich` ist ein Geschwister): Der Desktop-Zipfel war 154 statt
 der festgelegten 175 px, während der Raum 175 abzog. Jetzt an der
 Wurzel, Umbruch bei 62 rem = 992 px wie die Navigation. Die
-Zipfel-Stützstellen (30/61/74/78 %) und `--oz-weg` 620vh bleiben: Die
+Zipfel-Stützstellen (30/61/74/78 %) bleiben (der Scrollweg selbst wurde
+später am Tag gekürzt, siehe „Die Sprechstunden kommen früher"): Die
 Wartezeit hängt am Logo, nicht an der Kartenhöhe; die kürzere Karte
 (788 statt ≈1 800 px) fährt 0,44 statt 1,0 px je Scroll-px — näher an
 der Vorlage. Das Skript setzt außerdem `--oz-start` nur noch aus der
@@ -1828,10 +1829,54 @@ Silbentrennung (`hyphens: auto`, deutsch über `lang="de"`) — ohne sie
 reißt Blocksatz die Zeilen auf; `hyphenate-limit-chars: 6 3 3`, damit
 auch auf Handys mit rund 45 Zeichen je Zeile genug Trennstellen da sind.
 Die letzte Zeile bleibt linksbündig. **Nicht** im Blocksatz:
-Überschriften, Kicker, Knöpfe, Menüs, Kurztexte auf Kacheln und Karten,
-Listen, Tabellen, Formularhinweise und alles Zentrierte (Begrüßung) —
-zu kurze oder zu wenige Zeilen. Geprüft bei 375 und 1440 px auf der
-Prophylaxe-Seite.
+Überschriften, Kicker, Knöpfe, Menüs, Listen, Tabellen,
+Formularhinweise und alles Zentrierte (Begrüßung) — zu kurze oder zu
+wenige Zeilen. Geprüft bei 375 und 1440 px auf der Prophylaxe-Seite.
+
+**Nachgebessert am selben Tag:** Der Blocksatz endete vor dem rechten
+Rand der Spalte, weil die allgemeine Lesebreite (`p { max-width:
+68ch }`) den Absatz begrenzte — ein Block mit geradem Rand, der vor der
+Spalte aufhört, sieht abgeschnitten aus (Florian). Im Blocksatz füllt
+der Absatz jetzt seine Spalte (`max-width: none`); die Spalten selbst
+begrenzen die Zeilenlänge: Leistungsseiten und Rechtsseiten 46 rem,
+Erklärtexte 48 rem, Stellen ihre Textspalte, Beiträge 58 rem (die
+weiteste — rund 95 Zeichen je Zeile; sollte das ermüden, ist dort eine
+eigene Grenze zu setzen). Die schmalen **Einleitungen** (34 rem unter
+breiter Überschrift) und die Kontakt-Einleitung stehen dafür wieder
+linksbündig: als Block sähen sie abgeschnitten aus. Die
+**Vorschautexte auf Leistungskacheln und Beitragskarten** stehen
+ebenfalls im Blocksatz (Florian) — sie füllen ihre Karte.
+
+### Die Sprechstunden kommen früher; der Team-Titel bleibt einzeilig (26. September 2026)
+
+**Der Scrollweg der Einstiegskarte ist kürzer:** Desktop 480 → 420 vh,
+Handys 620 → 360 vh (`ozWeg` in scrollwege.ts, `--oz-weg` in
+Oeffnungszeiten.astro). Die Karte soll früher kommen, auf Handys viel
+früher (Florian). Damit sie das noch stehende Logo nicht überfährt,
+löst sich das Logo schneller auf: über 1,1 (Desktop) bzw. 0,9
+Fensterhöhen (Handy) statt 1,5 (`LOGO_WEG` in Startbereich.astro).
+Nachgerechnet mit den Kurven des Ablaufs (easeIn ab 30 %, Karte 1 761
+bzw. 788 px hoch, Logo-Unterkante bei 580 bzw. 530 px):
+
+| | Fahrt beginnt | Oberkante erreicht das Logo | Logo fort | Schnalz |
+|---|---|---|---|---|
+| Desktop 1440 × 900, vorher | 0,74 vh | 1,41 vh | 1,39 vh | 3,52 vh |
+| Desktop, jetzt | 0,56 vh | 1,16 vh | 1,10 vh | 3,06 vh |
+| Handy 375 × 812, vorher | 1,16 vh | 2,33 vh | 1,50 vh | 4,62 vh |
+| Handy, jetzt | 0,38 vh | 1,13 vh | 0,90 vh | 2,59 vh |
+
+Die Karte erreicht das Logo also erst, wenn es weg ist — auf dem
+Desktop knapp (0,06 vh), auf dem Handy mit Luft. Wer eine der Zahlen
+ändert, rechnet die Tabelle nach (die Rechnung: Kartenoberkante =
+Fensterhöhe − Ruhelage − Kartenhöhe + Versatz(p), mit p = (Scrollweg +
+Fensterhöhe) / ((ozWeg + 1) · Fensterhöhe)).
+
+**„Wir freuen uns auf Sie" passt auf Handys immer in eine Zeile**
+(Florian): Der Titel bekommt bis 767 px `white-space: nowrap` und wird
+vom Skript (`titelEinpassen`) nur so weit verkleinert, dass er nicht
+umbricht — gemessen, weil der Text in der Redaktion änderbar ist. Bei
+375 px: 37,4 statt 44,8 px, eine Zeile. Läuft beim Aufbau, bei
+Größenänderung und nach dem Laden der Schrift.
 
 ### Kleinigkeiten aus demselben Durchgang
 

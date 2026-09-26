@@ -90,17 +90,31 @@ p {
   mindestens drei auf jeder Seite — eng genug, dass auf Handys
   (rund 45 Zeichen je Zeile) die Wortabstände ruhig bleiben.
 
-  NICHT im Blocksatz: Überschriften, Kicker, Knöpfe, Menüs, Kurztexte
-  auf Kacheln und Karten, Listen, Tabellen, Formularhinweise und alles
-  Zentrierte — dort sind die Zeilen zu kurz oder zu wenige, als dass er
-  gut aussähe.
+  Ein Blocksatz-Absatz füllt seine Spalte: Die allgemeine Lesebreite
+  von 68 Zeichen (`p { max-width }`) ist hier aufgehoben — sonst endete
+  der gerade rechte Rand vor dem Rand der Spalte und der Block sah
+  abgeschnitten aus (Florian, 26. September 2026). Die Spalten selbst
+  begrenzen die Zeilenlänge: Leistungsseiten und Rechtsseiten 46 rem,
+  Erklärtexte 48 rem, Beiträge 58 rem, eigene Abschnitte ihre Spalte.
+
+  Auch die Vorschautexte auf den Leistungskacheln und Beitragskarten
+  stehen im Blocksatz (Florian, 26. September 2026) — sie sind kurz,
+  füllen aber ihre Karte; die Silbentrennung hält die Abstände ruhig.
+
+  NICHT im Blocksatz: Überschriften, Kicker, Knöpfe, Menüs, Listen,
+  Tabellen, Formularhinweise, alles
+  Zentrierte — und die schmalen Einleitungen der Abschnitte (34 rem
+  unter einer breiten Überschrift: als Block sähen sie abgeschnitten
+  aus, linksbündig wirken sie leicht). Dort sind die Zeilen zu kurz
+  oder zu wenige, als dass Blocksatz gut aussähe.
 */
 .blocksatz,
 .redaktionstext p,
-.bereich__einleitung,
 .gruppe__text p,
-.kontakt__einleitung,
-.textseite__inhalt p {
+.textseite__inhalt p,
+.kachel__kurz,
+.beitrag__kurz {
+  max-width: none;
   text-align: justify;
   -webkit-hyphens: auto;
   hyphens: auto;

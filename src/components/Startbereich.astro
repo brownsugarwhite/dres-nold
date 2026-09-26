@@ -304,13 +304,17 @@ const { praxis } = seite;
        ist der Grund, warum das Logo so lange stehen bleibt — die Seite
        ist viele Fensterhöhen lang, 10 % davon sind entsprechend weit.
        Genau darüber fahren die Öffnungszeiten herein. */
-    /* Gedeckelt auf anderthalb Fensterhöhen: Je länger die Seite wird
-       (die Praxis legt Beiträge und Abschnitte an), desto länger wären
-       sonst die 10 % — auf Handys stünde das Logo dann noch, wenn die
-       Sprechstunden schon darüberfahren. */
+    /* Gedeckelt: Je länger die Seite wird (die Praxis legt Beiträge und
+       Abschnitte an), desto länger wären sonst die 10 % — das Logo
+       stünde noch, wenn die Sprechstunden schon darüberfahren. Der
+       Deckel muss zum Scrollweg der Karte passen (`ozWeg` in
+       scripts/scrollwege.ts): Seit dem 26. September 2026 kommt sie
+       früher, deshalb löst sich das Logo über 1,1 Fensterhöhen auf,
+       auf Handys über 0,9 (vorher beide 1,5). */
+    const LOGO_WEG = () => (window.matchMedia('(max-width: 991px)').matches ? 0.9 : 1.1);
     const fortschritt = () => {
       const weg = document.documentElement.scrollHeight - window.innerHeight;
-      const logoWeg = Math.min(0.1 * weg, 1.5 * window.innerHeight);
+      const logoWeg = Math.min(0.1 * weg, LOGO_WEG() * window.innerHeight);
       return logoWeg > 0 ? (window.scrollY / logoWeg) * 0.1 : 0;
     };
 

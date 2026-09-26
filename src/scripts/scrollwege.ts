@@ -15,13 +15,23 @@ import { ausStuetzstellen, type Stuetzstelle } from './easing';
 
 /**
  * Höhe von `.trigger-oz-scroll`, in Fensterhöhen — der Weg, über den
- * die Öffnungszeiten hereinfahren. Auf Handys länger (Florian, 14.
- * September 2026): Das Logo ist dort groß und braucht mehr Weg, um
- * sich aufzulösen, bevor die Blase darüberfährt. Muss zu `--oz-weg`
- * in Oeffnungszeiten.astro passen.
+ * die Öffnungszeiten hereinfahren. Muss zu `--oz-weg` in
+ * Oeffnungszeiten.astro passen.
+ *
+ * Seit dem 26. September 2026 deutlich kürzer (Desktop 4,8 → 4,2;
+ * Handys 6,2 → 3,6): Die Karte soll früher kommen, auf Handys viel
+ * früher (Florian). Damit sie das noch stehende Logo nicht überfährt,
+ * löst sich das Logo schneller auf (Startbereich.astro, `LOGO_WEG`:
+ * 1,1 bzw. 0,9 Fensterhöhen statt 1,5). Nachgerechnet: Die Oberkante
+ * der Karte erreicht die Unterkante des Logos bei 1,16 (Desktop) bzw.
+ * 1,13 Fensterhöhen (Handy) — das Logo ist dann seit 0,06 bzw. 0,23
+ * Fensterhöhen fort. Der Schnalz liegt bei 3,06 bzw. 2,59 Fensterhöhen
+ * (vorher 3,52 / 4,62). Wer eine der Zahlen ändert, rechnet die
+ * andere nach (Skript in docs/entscheidungen.md, „Die Sprechstunden
+ * kommen früher").
  */
 export function ozWeg(): number {
-  return window.matchMedia('(max-width: 991px)').matches ? 6.2 : 4.8;
+  return window.matchMedia('(max-width: 991px)').matches ? 3.6 : 4.2;
 }
 
 /** Bei diesem Anteil von Ablauf a-19 steht die Blase mit voll
@@ -68,8 +78,9 @@ export function schnalzWeg(): number {
  * Karte in Bewegung — sonst schöbe sich ihre weiße Fläche über das noch
  * stehende Logo (Florian, 18. September 2026). Der Scrollweg ist um
  * genau diese Wartezeit länger als vorher (3,5 → 4,8 Fensterhöhen;
- * mobil 4,5 → 6,2); Anfahrt, Bremsweg und Schnalzen dauern unverändert
- * so lange wie zuvor.
+ * mobil 4,5 → 6,2 — seit dem 26. September 2026 wieder kürzer, siehe
+ * `ozWeg`); Anfahrt, Bremsweg und Schnalzen dauern unverändert so
+ * lange wie zuvor.
  *
  * Die Wartezeit war zuerst 35 % — da war das Logo schon ganz fort,
  * wenn die Begrüßung kam. Jetzt setzt sich die Karte bei 30 % in

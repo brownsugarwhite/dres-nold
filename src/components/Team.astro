@@ -567,6 +567,11 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
     .team__kicker,
     .team__titel { text-align: center; }
 
+    /* Immer in einer Zeile, so groß wie die Zeile erlaubt: Das Skript
+       misst und verkleinert bei Bedarf (`titelEinpassen`). Ohne Skript
+       greift die Größe aus dem Token und der Titel darf umbrechen. */
+    .team__titel[data-einzeilig] { white-space: nowrap; }
+
     .arzt,
     .mitglied,
     .person { align-items: center; }
@@ -634,12 +639,36 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
    * Unterkante oben hinausläuft. Der gezeichnete Wert läuft dem
    * Scrollwert nach (Webflow „smoothing 70").
    */
+  /**
+   * „Wir freuen uns auf Sie" passt auf Handys immer genau in eine Zeile
+   * (Florian, 26. September 2026): Der Titel ist so groß wie das Token
+   * erlaubt — und wird nur so weit verkleinert, dass er nicht umbricht.
+   * Gemessen statt geraten, weil der Text in der Redaktion änderbar ist.
+   */
+  function titelEinpassen() {
+    const titel = document.querySelector<HTMLElement>('.team__titel');
+    if (!titel) return;
+    const handy = window.matchMedia('(max-width: 767px)').matches;
+    titel.style.removeProperty('font-size');
+    if (!handy) { delete titel.dataset.einzeilig; return; }
+    titel.dataset.einzeilig = 'ja';
+    const basis = parseFloat(getComputedStyle(titel).fontSize);
+    const platz = titel.clientWidth;
+    const noetig = titel.scrollWidth;
+    if (noetig > platz && platz > 0) {
+      titel.style.fontSize = `${Math.floor((basis * platz) / noetig * 100) / 100}px`;
+    }
+  }
+
   function teamAufbauen() {
     const kopf = document.querySelector<HTMLElement>('[data-teamkopf]');
     if (!kopf || kopf.dataset.bereit) return;
     kopf.dataset.bereit = 'ja';
 
     accordionAufbauen();
+    titelEinpassen();
+    window.addEventListener('resize', titelEinpassen, { passive: true });
+    document.fonts?.ready.then(titelEinpassen);
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
