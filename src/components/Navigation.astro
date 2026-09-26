@@ -129,23 +129,23 @@ const kategorien = (leistungen.kategorien ?? [])
       <a class="logo" href="/" aria-label={`${praxis.name} — zur Startseite`}>
         <img src="/icons/logo.svg" alt="" width="80" height="80" />
       </a>
-      {/* Die Telefonnummer als Pille zwischen Logo und Menüknopf — dieselbe
-          wie rechts außen auf dem Desktop (Florian, 26. September 2026).
-          Es ist nie beides zu sehen: `.kopfleiste__rechts` ist auf Handys
-          ausgeblendet, diese Zeile auf dem Desktop. */}
-      <a class="kn kn--klein kopfleiste__telefon kopfleiste__telefon--handy" href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>
-        <span class="kn__f" aria-hidden="true"></span>{praxis.telefon}
-      </a>
-      <button
-        class="menueknopf"
-        type="button"
-        data-menueknopf
-        aria-expanded="false"
-        aria-controls="mobilmenue"
-        aria-label="Menü öffnen"
-      >
-        <span class="menueknopf__lottie" data-menuelottie aria-hidden="true"></span>
-      </button>
+      {/* Rechts die Telefonnummer als schlichter Text, mit einem Punkt
+          vom Menüknopf getrennt — wie die Punkte zwischen den Menüpunkten
+          auf dem Desktop; keine Pille (Florian, 26. September 2026). */}
+      <div class="kopfleiste__handyrechts">
+        <a class="kopfleiste__nummer" href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
+        <span class="punkt" aria-hidden="true"></span>
+        <button
+          class="menueknopf"
+          type="button"
+          data-menueknopf
+          aria-expanded="false"
+          aria-controls="mobilmenue"
+          aria-label="Menü öffnen"
+        >
+          <span class="menueknopf__lottie" data-menuelottie aria-hidden="true"></span>
+        </button>
+      </div>
     </div>
 
     <a class="logo logo--desktop" href="/" aria-label={`${praxis.name} — zur Startseite`}>
@@ -518,10 +518,21 @@ const kategorien = (leistungen.kategorien ?? [])
      zum letzten Menüpunkt als zwischen den Punkten selbst. */
   .kopfleiste__telefon { margin-left: 4px; white-space: nowrap; }
 
-  /* Auf Handys zwischen Logo und Menüknopf: `space-between` der Zeile
-     stellt sie von selbst in die Mitte. ≈116 px breit — bei 320 px
-     Fensterbreite bleiben links und rechts noch je 21 px Luft. */
-  .kopfleiste__telefon--handy { margin-left: 0; }
+  /* Handys: rechts die Nummer als Text, ein Punkt, der Menüknopf */
+  .kopfleiste__handyrechts {
+    display: flex;
+    align-items: center;
+    gap: var(--abstand-s);
+  }
+
+  .kopfleiste__nummer {
+    color: var(--farbe-primaer);
+    font-family: var(--schrift-titel);
+    font-size: var(--text-s);
+    font-weight: var(--gewicht-mittel);
+    text-decoration: none;
+    white-space: nowrap;
+  }
 
   /* .nav-buttons-mobile / -desktop: beide 80 px hoch.
      Logo ganz links, Menüknopf ganz rechts — und weil die Zeile so breit
@@ -561,13 +572,13 @@ const kategorien = (leistungen.kategorien ?? [])
 
   /* ---------- Handy-Menü ----------
      Klappt als Blase aus der Punktlinie der Kopfleiste auf — dieselbe
-     Zeichnung wie das Aufklappmenü „Leistungen" auf dem Desktop
-     (`blaseAnlegen` im Skript), nur mit anderer Form: Der Teil der Linie
-     unter dem Logo bleibt oben, rechts davon schwingt sie in einem
-     großen Bogen nach unten, und die Blase ist zum rechten Rand hin
-     offen (Florians Entwurf, 26. September 2026). Das Menü selbst ist
-     nur der Inhalt darin; die Maske am Umschlag (`clip-path`) gibt ihn
-     frei, während die Blase wächst.
+     Zeichnung und Bewegung wie das Aufklappmenü „Leistungen" auf dem
+     Desktop (`blaseAnlegen` im Skript), nur mit anderer Form: Der Teil
+     der Linie unter dem Logo bleibt oben, rechts davon senkt sie sich
+     in eine senkrechte Wand, und die Blase ist zum rechten Rand hin
+     offen (Florian, 26. September 2026). Das Menü selbst ist nur der
+     Inhalt darin; die Maske am Umschlag (`clip-path`) gibt ihn frei,
+     während die Blase wächst.
 
      Vorher klappte es über die Rasterhöhe auf (0fr → 1fr) und rollte
      bei Platzmangel in einem Rahmen. Beides ist weg: Die Blase bringt
@@ -601,13 +612,13 @@ const kategorien = (leistungen.kategorien ?? [])
     beim Schließen rückwärts (`--stufe-hoch` zählt von unten), deshalb
     steht die Schließ-Verzögerung im Grundzustand.
 
-    Die Zellen folgen der leicht geneigten Wand der Blase: Das Skript
-    setzt je Zeile `--versatz` aus ihrer Höhe im Menü.
+    Die Zeilen stehen genau untereinander — die Wand der Blase läuft
+    senkrecht wie beim Aufklappmenü auf dem Desktop; die Neigung aus
+    Florians erstem Entwurf ist zurückgenommen (26. September 2026).
   */
   .mobilmenue__zeile {
     display: grid;
     grid-template-rows: 1fr;
-    margin-left: var(--versatz, 0px);
     opacity: 0;
     transform: translateY(-10px);
     transition-property: grid-template-rows, opacity, transform;
@@ -773,6 +784,10 @@ const kategorien = (leistungen.kategorien ?? [])
     opacity: 1;
     transform: translate(0, -50%);
   }
+
+  /* Die Kategorien stehen ein Stück eingerückt — als Unterpunkte
+     lesbar, ohne abgehängt zu wirken */
+  .mobilmenue__zeile--unter { margin-left: 22px; }
 
   .mobilmenue__unterpunkt {
     gap: var(--abstand-xs);
@@ -1415,6 +1430,9 @@ const kategorien = (leistungen.kategorien ?? [])
     pfeil?: { d: string; sicht: number };
   };
 
+  /** Weiche Kurve (ease-in-out quad) für das Breiterwerden der Blase */
+  const weich = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
   function blaseAnlegen(opt: {
     /** Trägt die Zeichnung (`.kopfleiste` / `.fussleiste`) */
     leiste: HTMLElement;
@@ -1569,7 +1587,6 @@ const kategorien = (leistungen.kategorien ?? [])
       if (!knopf || !inhalt || !leiste || !linienTraeger) return;
 
       const ECKE = 40;             // Rundung am Ende — wie im Entwurf
-      const weich = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
       const geometrie: Geometrie = ({ breite, h, anteil, y0, s, k, f }) => {
         const boxBreite = Math.min(400, breite - 32);
@@ -1795,40 +1812,60 @@ const kategorien = (leistungen.kategorien ?? [])
     menueknopf.dataset.bereit = 'ja';
 
     let knopfSpieler: { playSegments: (b: [number, number], s?: boolean) => void; totalFrames: number } | null = null;
+    /* Das letzte Bild, EINMAL beim Laden gemerkt: lottie-web setzt
+       `totalFrames` nach `playSegments` auf die Länge des gespielten
+       Abschnitts. Wer den Wert bei jedem Klick neu liest, spielt jedes
+       Mal ein Bild weniger — das X wurde mit jedem Klick schmaler,
+       bis die Balken gar nicht mehr drehten (Florian, 26. September
+       2026). */
+    let letztesBild = 0;
     if (lottieKasten) {
       import('../scripts/lottie').then(({ ladeAnimation }) => {
-        ladeAnimation(lottieKasten, '/lottie/menue-button.json').then((s) => { knopfSpieler = s as never; });
+        ladeAnimation(lottieKasten, '/lottie/menue-button.json').then((s) => {
+          knopfSpieler = s as never;
+          letztesBild = s ? s.totalFrames - 1 : 0;
+        });
       });
     }
 
-    /* ---- Form der Blase ---- */
+    /* ---- Form der Blase ----
+       Die linke Hälfte der Desktop-Blase, zum rechten Rand hin offen:
+       Fuß auf der Leistenlinie, senkrechte Wand rechts neben dem Logo,
+       unten die Schulter in die Grundlinie, die bis zum Fensterrand
+       läuft. Und dieselbe Bewegung: Der Fuß steht fest, die Bögen sind
+       anfangs breit und flach (ein Hügel, der von unten gegen die Linie
+       drückt) und ziehen sich mit der Höhe auf die 40-px-Rundung
+       zusammen, während die Wand nach links an ihren Platz rückt. So
+       gibt es in keiner Phase eine Ecke. Der erste Entwurf hatte einen
+       großen Schwung oben und eine geneigte Wand — das wirkte beim
+       Öffnen weniger „blasig" als der Desktop (Florian, 26. September
+       2026). */
     const LOGO_ABSTAND = 12;    // Luft zwischen Logo und Wand
-    const SCHWUNG_BREIT = 120;  // der große Bogen oben: waagerechter Radius …
-    const SCHWUNG_HOCH = 80;    // … und senkrechter (wie im Entwurf leicht gestreckt)
-    const ECKE = 40;            // die kleine Rundung unten, wie bei der Desktop-Blase
-    /* Die Wand driftet nach rechts, etwa 4° — wie im Entwurf. 0 = senkrecht. */
-    const NEIGUNG = 0.07;
+    const ECKE = 40;            // Rundung am Ende — wie bei der Desktop-Blase
+    const HUEGEL = 150;         // Breite der Bögen am Anfang: so flach beginnt der Hügel
 
-    const geometrie: Geometrie = ({ breite, h, y0, k, f }) => {
+    const geometrie: Geometrie = ({ breite, h, anteil, y0, k, f }) => {
       /* `.navigation` liegt bei left 0 — Fensterkoordinaten sind
          Zeichnungskoordinaten */
-      const xL = logo.getBoundingClientRect().right + LOGO_ABSTAND;
-      const ra = Math.min(SCHWUNG_BREIT, xL);   // der Bogen beginnt nie links vom Fensterrand
-      const rb = Math.min(SCHWUNG_HOCH, h / 2); // wächst mit der Höhe: erst flach, dann rund
-      const c = Math.min(ECKE, h / 2);          // rb + c ≤ h — die Wand wird nie negativ
-      const xW = xL + NEIGUNG * (h - c);        // Fuß der geneigten Wand
+      const xL = logo.getBoundingClientRect().right + LOGO_ABSTAND;   // die Wand am Ende
+      const xF = xL - ECKE;                                             // der Fuß, fest
+      const fa = Math.min(ECKE, h / 2);                                 // Höhe der Bögen
+      /* Breite der Bögen: vom flachen Hügel zur Rundung, nie flacher
+         als hoch — wie `aB` bei der Desktop-Blase */
+      const aB = Math.max(fa, HUEGEL - (HUEGEL - ECKE) * weich(anteil));
+      const xW = xF + aB;                                               // die Wand jetzt
       menue.style.setProperty('--menue-wand', `${xL.toFixed(1)}px`);
 
       const woelbung = (dy: number, auf: number) => {
         const g = (n: number) => f(n + dy);
         const yb = y0 + auf;
         return (
-          /* auf der Linie bis zum Bogen, dann der große Schwung nach unten */
-          `L${f(xL - ra)} ${g(yb)} C${f(xL - ra + k * ra)} ${g(yb)} ${f(xL - auf)} ${g(y0 + rb - k * rb)} ${f(xL - auf)} ${g(y0 + rb)} ` +
+          /* auf der Linie bis zum Fuß, Bogen von der Linie in die Wand */
+          `L${f(xF - auf)} ${g(yb)} C${f(xF - auf + k * aB)} ${g(yb)} ${f(xW - auf)} ${g(y0 + fa - k * fa)} ${f(xW - auf)} ${g(y0 + fa)} ` +
           /* die Wand */
-          `L${f(xW - auf)} ${g(y0 + h - c)} ` +
-          /* die kleine Ecke, dann offen bis zum rechten Rand */
-          `C${f(xW - auf)} ${g(y0 + h - c + k * c)} ${f(xW + c - k * c)} ${g(y0 + h + auf)} ${f(xW + c)} ${g(y0 + h + auf)} ` +
+          `L${f(xW - auf)} ${g(y0 + h - fa)} ` +
+          /* die Schulter in die Grundlinie, dann offen bis zum rechten Rand */
+          `C${f(xW - auf)} ${g(y0 + h - fa + k * fa)} ${f(xW + aB - k * aB)} ${g(y0 + h + auf)} ${f(xW + aB)} ${g(y0 + h + auf)} ` +
           `L${breite} ${g(y0 + h + auf)} `
         );
       };
@@ -1837,22 +1874,14 @@ const kategorien = (leistungen.kategorien ?? [])
         const g = (n: number) => f(n + dy);
         const yb = y0 + auf;
         return (
-          `L${breite} ${g(y0 + h + auf)} L${f(xW + c)} ${g(y0 + h + auf)} ` +
-          `C${f(xW + c - k * c)} ${g(y0 + h + auf)} ${f(xW - auf)} ${g(y0 + h - c + k * c)} ${f(xW - auf)} ${g(y0 + h - c)} ` +
-          `L${f(xL - auf)} ${g(y0 + rb)} ` +
-          `C${f(xL - auf)} ${g(y0 + rb - k * rb)} ${f(xL - ra + k * ra)} ${g(yb)} ${f(xL - ra)} ${g(yb)} `
+          `L${breite} ${g(y0 + h + auf)} L${f(xW + aB)} ${g(y0 + h + auf)} ` +
+          `C${f(xW + aB - k * aB)} ${g(y0 + h + auf)} ${f(xW - auf)} ${g(y0 + h - fa + k * fa)} ${f(xW - auf)} ${g(y0 + h - fa)} ` +
+          `L${f(xW - auf)} ${g(y0 + fa)} ` +
+          `C${f(xW - auf)} ${g(y0 + fa - k * fa)} ${f(xF - auf + k * aB)} ${g(yb)} ${f(xF - auf)} ${g(yb)} `
         );
       };
 
       return { woelbung, rueckwaerts };
-    };
-
-    /* Die Zeilen folgen der geneigten Wand: je Zeile ein Versatz aus
-       ihrer Höhe im Menü. Läuft bei jeder Höhenänderung neu (unten). */
-    const versatzSetzen = () => {
-      menue.querySelectorAll<HTMLElement>('.mobilmenue__zeile').forEach((z) => {
-        z.style.setProperty('--versatz', `${(NEIGUNG * z.offsetTop).toFixed(1)}px`);
-      });
     };
 
     /* ---- Ebene „Leistungen" ---- */
@@ -1919,14 +1948,13 @@ const kategorien = (leistungen.kategorien ?? [])
     const oeffnen = () => {
       if (istOffen()) return;
       menue.hidden = false;
-      versatzSetzen();
       navigation.dataset.menueAktiv = 'ja';
       /* Wie `data-offen` bei der Desktop-Blase: einen Frame später, damit
          die Zeilen aus ihrem Grundzustand heraus einfahren */
       requestAnimationFrame(() => { navigation.dataset.menueOffen = 'ja'; });
       menueknopf.setAttribute('aria-expanded', 'true');
       menueknopf.setAttribute('aria-label', 'Menü schließen');
-      knopfSpieler?.playSegments([0, knopfSpieler.totalFrames - 1], true);
+      knopfSpieler?.playSegments([0, letztesBild], true);
       schleierZeigen();
       seiteSperren(true);
       blase.oeffnen(menue.getBoundingClientRect().height);
@@ -1937,7 +1965,7 @@ const kategorien = (leistungen.kategorien ?? [])
       delete navigation.dataset.menueOffen;
       menueknopf.setAttribute('aria-expanded', 'false');
       menueknopf.setAttribute('aria-label', 'Menü öffnen');
-      knopfSpieler?.playSegments([knopfSpieler.totalFrames - 1, 0], true);
+      knopfSpieler?.playSegments([letztesBild, 0], true);
       schleierAusblenden();
       seiteSperren(false);
       blase.schliessen(sofort);
@@ -1949,7 +1977,6 @@ const kategorien = (leistungen.kategorien ?? [])
        Ebenenwechsel, bei Drehung des Geräts, beim Laden der Schrift. */
     new ResizeObserver(() => {
       if (!navigation.dataset.menueAktiv) return;
-      versatzSetzen();
       blase.hoeheSetzen(menue.getBoundingClientRect().height);
     }).observe(menue);
 

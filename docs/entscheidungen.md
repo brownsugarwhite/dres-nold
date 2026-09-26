@@ -1788,6 +1788,33 @@ dem nicht mehr die Bildmitte, sondern den Praxispunkt der jeweiligen
 Zeichnung unter die Spitze der Marke. Das Querformat bleibt die Datei
 des Handoffs; das Skript zeichnet nur das Hochformat.
 
+### Handy-Menü: gerade Wand, Nummer als Text; Team-Banner größer (26. September 2026, abends)
+
+- **Die Wand der Handy-Blase läuft senkrecht**, die Zeilen stehen genau
+  untereinander, die Kategorien 22 px eingerückt. Die Neigung und der
+  große Schwung aus Florians erstem Entwurf sind zurückgenommen: Das
+  Öffnen wirkte damit weniger „blasig" als das Aufklappmenü auf dem
+  Desktop. Jetzt ist die Handy-Blase die linke Hälfte der Desktop-Blase
+  — mit derselben Bewegung: Der Fuß steht fest (40 px links der Wand),
+  die Bögen beginnen 150 px breit und flach und ziehen sich mit der Höhe
+  auf die 40-px-Rundung zusammen, während die Wand nach links an ihren
+  Platz rückt (`HUEGEL`, `weich`). In keiner Phase gibt es eine Ecke.
+- **Die Telefonnummer in der Handy-Kopfleiste ist Text, keine Pille**:
+  rechts neben dem Menüknopf, durch einen Punkt getrennt — wie die
+  Punkte zwischen den Menüpunkten auf dem Desktop (Florian).
+- **Das X des Menüknopfs wurde mit jedem Klick schmaler** (Florian).
+  Ursache in lottie-web: `playSegments` setzt `totalFrames` auf die
+  Länge des gespielten Abschnitts (`adjustSegment`). Der Code las den
+  Wert bei jedem Klick neu — `[0, totalFrames − 1]`, dann
+  `[totalFrames − 1, 0]` — und spielte so jedes Mal ein Bild weniger,
+  bis die Balken gar nicht mehr drehten. Die Bildzahl wird jetzt einmal
+  beim Laden gemerkt (`letztesBild`). Regel: `totalFrames` nach einem
+  `playSegments` nie wieder als Gesamtlänge lesen.
+- **„Wir freuen uns auf Sie" deutlich größer**: `--text-banner` von
+  `clamp(2rem, 1.1rem + 3.4vw, 4.2rem)` auf `clamp(2.8rem, 1.2rem +
+  5vw, 6rem)` — bei 375 px 44,8 statt 32 px, bei 1440 px 91 statt 67 px.
+  Der Kicker „Unser Team" rückt näher heran (8 statt 16 px).
+
 ### Kleinigkeiten aus demselben Durchgang
 
 - Knopfgruppen überall 12 px Abstand (Begrüßung und Abschnitte hatten

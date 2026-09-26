@@ -108,7 +108,9 @@
   --text-willkommen: clamp(2.6rem, 1.1rem + 5vw, 4.9rem);  /* H1 */
   --text-titel: clamp(1.9rem, 1.1rem + 2.6vw, 3rem);       /* H2 Abschnitt */
   --text-titel-klein: clamp(1.5rem, 1.1rem + 1.2vw, 2rem); /* H2 im Formular */
-  --text-banner: clamp(2rem, 1.1rem + 3.4vw, 4.2rem);      /* Titel im Team-Banner */
+  /* Titel im Team-Banner — deutlich größer als die übrigen Überschriften
+     (Florian, 26. September 2026; vorher clamp(2rem, 1.1rem + 3.4vw, 4.2rem)) */
+  --text-banner: clamp(2.8rem, 1.2rem + 5vw, 6rem);
 
   /* Lesegrößen */
   --text-lead: clamp(1.06rem, 0.95rem + 0.5vw, 1.32rem);   /* Einleitung */
