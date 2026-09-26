@@ -100,6 +100,14 @@ export const leistungenSchema = z.object({
       kurz: text,
       icon: pfad,
       inhalt: richtext,
+      /* Die Knopfzeile unter dem Text (components/Knopfzeile.astro) —
+         freiwillig, bestehende Einträge haben die Felder nicht
+         (Florian, 26. September 2026). */
+      knoepfe_text: text.optional(),
+      link_text: text.optional(),
+      link_ziel: text.optional(),
+      pdf_text: text.optional(),
+      pdf_datei: pfad.optional(),
     }),
   ),
 });
@@ -212,6 +220,8 @@ export const abschnitteSchema = z.object({
       ...basisEintrag,
       titel: text.min(1),
       bereiche: z.array(abschnittsbereich).default([]),
+      /** Die Zeile über den Knöpfen — freiwillig, ältere Einträge haben sie nicht */
+      knoepfe_text: text.optional(),
       link_text: text,
       link_ziel: text,
       pdf_text: text,

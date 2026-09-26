@@ -21,7 +21,9 @@ Website der Zahnarzt- und Kieferorthopädie-Praxis **Dres. Nold**, Rosenstraße 
 >   Bilderband und Sprechstunden sind EINE Karte, die gemeinsam über
 >   das Logo hereinfährt (`Oeffnungszeiten.astro`, 17. September 2026).
 >   Begrüßung und Band gehören also **nicht** als eigene Abschnitte in
->   `main`.
+>   `main` — **außer auf Handys** (bis 991 px): Dort stellt das Skript
+>   sie hinter die Karte, die dann nur die Sprechstunden ist
+>   (Reihenfolge der mobilen Vorlage, 26. September 2026).
 > - **Kein Briefumschlag** im Kontakt.
 
 > - **Gar keine eingebettete Google-Karte mehr.** Der Kontaktbereich
@@ -218,7 +220,7 @@ docs/
 
 `#start` · `#praxis` (Begrüßung) · `#galerie` · `#oz_anchor` (Sprechstunden) · `#abschnitte` · `#leistungen` (Kachelübersicht) · `#neuigkeiten` · `#team` · `#stellen` · `#contact` · `#information` (Hinweis)
 
-Die ersten drei Marken liegen alle **in der Einstiegskarte**, die scrollgesteuert hereinfährt. Sie stehen damit nicht an einer festen Stelle im Dokument — `scripts/anker.ts` rechnet sie in eine Scrolltiefe um (`tiefeInKarte`), statt sie zu messen.
+Die ersten drei Marken liegen auf dem Desktop alle **in der Einstiegskarte**, die scrollgesteuert hereinfährt. Sie stehen damit nicht an einer festen Stelle im Dokument — `scripts/anker.ts` rechnet sie in eine Scrolltiefe um (`tiefeInKarte`), statt sie zu messen. Auf Handys stehen `#praxis` und `#galerie` als gewöhnliche Abschnitte hinter der Karte und werden normal gemessen.
 
 **Unterseiten** — von der Startseite aus als Vollbild geöffnet, aber mit eigener Adresse:
 
@@ -232,9 +234,9 @@ Die ersten drei Marken liegen alle **in der Einstiegskarte**, die scrollgesteuer
 Die Leistungs-Adressen stehen fest und dürfen nicht mehr geändert werden:
 `prophylaxe` · `zahnerhaltung` · `wurzelkanalbehandlung` · `parodontitis` · `zahnersatz` · `implantate` · `3d-roentgen` · `bleaching` · `intraoralscanner` · `kieferorthopaedie-kinder` · `kieferorthopaedie-erwachsene`
 
-**Navigation:** Praxis · Leistungen ▾ · Team · Neuigkeiten · Kontakt · Öffnungszeiten · Telefon 07245 7171
+**Navigation:** Praxis · Leistungen ▾ · Team · Neuigkeiten · Kontakt · Sprechstunden · Telefon 07245 7171 (als Pille)
 
-Der Punkt *Leistungen* klappt zweispaltig auf — links Zahnmedizin (9), rechts Kieferorthopädie (2), jeweils mit Symbol. Die Einträge kommen automatisch aus `leistungen.json`.
+Der Punkt *Leistungen* klappt als Blase aus der Punktlinie auf und listet die Kategorien aus `leistungen.json`. Auf Handys öffnet das ganze Menü als dieselbe Blase — zum rechten Rand hin offen, mit Schleier über der Seite —, und *Leistungen* wechselt darin die Ebene: Die anderen Zeilen schließen sich, die Kategorien wachsen darunter (`Navigation.astro`, 26. September 2026). Die Telefonnummer steht als Pille in der Kopfleiste, nicht im Menü; Datenschutz und Impressum nur im Fußbereich.
 
 **Kontakt:** Rosenstraße 1, 76467 Bietigheim · Tel. 07245 7171 · Fax 07245 939269 · info@dres-nold.de
 

@@ -122,6 +122,12 @@ li {
   padding: 0;
 }
 
+/* Endet ein Text mit einer Liste, addierte sich ihr Nachlauf zu dem
+   Abstand, den der Folgende ohnehin mitbringt (die Knopfzeile etwa) —
+   nach einer Liste war die Lücke 58 statt 28 px (Florian,
+   26. September 2026). */
+.redaktionstext :is(ul, ol):last-child { margin-bottom: 0; }
+
 .redaktionstext :is(ul, ol) > li {
   display: flex;
   margin: 0;
@@ -655,6 +661,31 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
   .schliessen__kreis { transition: none; }
   .schliessen:hover,
   .schliessen:focus-visible { transform: none; }
+}
+
+/*
+  DIE KNOPFZEILE UNTER EINEM TEXT (components/Knopfzeile.astro)
+  ==================================================================
+  Ein kurzer Satz in gedeckter Farbe, darunter bis zu zwei Knöpfe. Der
+  Satz liest sich als Hinführung, nicht als weiterer Absatz; die 14 px
+  binden ihn an die Knöpfe. Vom Text darüber 28 px — vorher waren es 34,
+  und nach einer Liste 58 (Florian, 26. September 2026).
+*/
+.knopfzeile { margin-top: 28px; }
+.knopfzeile--allein { margin-top: 36px; }
+
+.knopfzeile__satz {
+  max-width: none;
+  margin: 0 0 14px;
+  color: var(--farbe-text-gedeckt);
+  font-size: var(--text-flies);
+  line-height: var(--zeilenhoehe-lese);
+}
+
+.knopfzeile__knoepfe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 /*

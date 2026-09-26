@@ -15,6 +15,7 @@
 import Navigation from '../../components/Navigation.astro';
 import Fussbereich from '../../components/Fussbereich.astro';
 import Basis from '../../layouts/Basis.astro';
+import Knopfzeile from '../../components/Knopfzeile.astro';
 import daten from '../../content/leistungen.json';
 import seite from '../../content/seite.json';
 
@@ -25,6 +26,11 @@ export function getStaticPaths() {
 }
 
 const { leistung } = Astro.props;
+/* Die Knopfzeile ist in der Redaktion freiwillig — bestehende Einträge
+   haben die Felder noch nicht (content/schema.ts lässt sie offen). */
+const knoepfe = leistung as typeof leistung & {
+  knoepfe_text?: string; link_text?: string; link_ziel?: string; pdf_text?: string; pdf_datei?: string;
+};
 const alle = daten.eintraege.filter((e) => e.aktiv);
 const i = alle.findIndex((e) => e.id === leistung.id);
 const vorherige = alle[i - 1];
@@ -60,6 +66,10 @@ const naechste = alle[i + 1];
           hereinzugleiten (styles/uebergaenge.css). */}
       <div class="leistung__rest">
         <div class="leistung__text redaktionstext" set:html={leistung.inhalt} />
+
+        {/* Satz und Knöpfe aus der Redaktion — ohne eigenen Übergangsnamen,
+            sie gehören zur Karte und wachsen mit ihr */}
+        <Knopfzeile satz={knoepfe.knoepfe_text} linkText={knoepfe.link_text} linkZiel={knoepfe.link_ziel} pdfText={knoepfe.pdf_text} pdfDatei={knoepfe.pdf_datei} />
 
         <nav class="leistung__nachbarn" aria-label="Weitere Leistungen">
           {vorherige && (

@@ -1281,3 +1281,462 @@ rund 75 Zeichen je Zeile. Das liegt noch gut im lesbaren Bereich
 (45–90); deutlich weiter zu gehen ginge auf Kosten der Lesbarkeit. Die
 Einleitung des Abschnitts darüber bleibt auf der schmalen Absatzbreite —
 sie gehört zur Überschrift, nicht zu den Kacheln.
+
+## Die Durchsicht der Praxis (26. September 2026)
+
+Siebzehn Rückmeldungen von Florian und der Kundin, an einem Tag
+umgesetzt. Jeder Punkt hat hier seinen Absatz; wo ein Wert nur so und
+nicht anders sein darf, steht warum.
+
+### Überschriften wieder kräftig
+
+Die Praxis wollte die dicken Überschriften zurück. Alle Überschriften
+tragen jetzt `--gewicht-titel: 580` — Source Sans 3 ist eine variable
+Schrift, jeder Zwischenwert ist ein echter Schnitt. Die alte
+Webflow-Seite setzte 600 und 700; 580 ist „minimal weniger dick" als
+dort und bleibt unter den Labels (600), damit Kicker und Überschrift
+nicht dasselbe Gewicht tragen. Der leichte Schnitt (300) des Handoffs
+vom 17. September ist damit zurückgenommen; die Sperrungen, die für 300
+gesetzt waren, sind um rund 0,003 em gelockert (bei 580 sind die Stämme
+breiter, große Grade liefen sonst zu dicht). Auch Kachel- und
+Beitragstitel hängen am Token. Nur die große Telefonnummer im Kontakt
+bleibt leicht (300). Sollte 580 neben der Live-Seite noch zu schwer
+wirken, ist 560 der nächste Schritt — eine Zeile in tokens.css.
+
+### Pfeilspitzen und der Haken, der sich nicht mehr dreht
+
+`pfeil-runter.svg` hatte 0,71 Einheiten Rand; der Gehrungsstachel eines
+90°-Winkels bei 1,5 px ragt aber gut 1 px über den Scheitel. Als
+Hintergrundbild mit `contain` wurde die Spitze überall abgeschnitten
+(Kopfmenü-Haken, Handy-Menü, Scrollhinweis). Jetzt `viewBox 0 0 62 38`
+mit Rand seitlich/oben 3,5 und unten 7 Einheiten; die Kästen sind
+entsprechend gewachsen, der sichtbare Haken ist gleich groß. Der
+Textlink-Pfeil („Mehr erfahren", „Beitrag lesen") war die um 90°
+gedrehte Zeichnung, deren Schenkel der 28er-Kasten flach abschnitt —
+jetzt ein eigener Rechtshaken 9 × 14. Die Kontakt-Marke darf über ihren
+Kasten hinaus (`overflow="visible"`), sonst fehlten 0,46 px weißer Saum
+an der Spitze.
+
+Die Haken an Aufklappern (Stellen, Tätigkeiten im Team) **drehen sich
+nicht mehr um 180°**: Sie bestehen aus zwei Schenkeln
+(`components/Haken.astro`), die um die Spitze schwenken — erst liegen
+sie flach zu einer waagerechten Linie, dann klappen sie nach oben
+heraus (Florian). Weil die Spitze fest in der Kastenmitte sitzt, fährt
+der Kasten um die halbe Hakenhöhe mit, und die Zeichnung bleibt optisch
+an Ort und Stelle. Eckige Enden (`square`) treffen sich an der Spitze
+wie ein Gehrungsstoß. Der Zustand kommt vom `aria-expanded` des
+Aufklappers, die Bewegung steht in global.css.
+
+### Kein Tipp-Blitz, kein Widerrufsknopf
+
+`-webkit-tap-highlight-color: transparent` auf Verweisen, Knöpfen und
+Labels — iOS zeichnete beim Tippen einen grauen Schatten; die Knöpfe
+zeigen ihre Reaktion selbst. Der Fokusring für die Tastatur bleibt.
+
+Der Widerrufsknopf im Fußbereich und `scripts/einwilligung.ts` sind
+weg: Nichts setzt die Zustimmung mehr, seit die Karte nicht mehr
+eingebettet ist. Bewusst **keine** Bereinigung des alten
+`localStorage`-Eintrags: Die Seite ist noch nicht live, der Wert ist ein
+wirkungsloser Boolean im Browser des Testers — ein Einzeiler, der für
+immer bei jedem Aufruf liefe, widerspräche der Regel, dass alles in zwei
+Jahren noch nachvollziehbar sein soll. Datenschutzerklärung, README,
+CLAUDE.md und das Prüfskript sprechen nicht mehr von der Ausnahme.
+
+### Das Handy-Menü als Blase
+
+Es öffnet wie das Aufklappmenü „Leistungen" auf dem Desktop: Die
+Punktlinie der Kopfleiste wölbt sich zu einem milchigen Feld — nur mit
+anderer Form (Florians Entwurf): Der Teil der Linie unter dem Logo
+bleibt oben, rechts davon schwingt sie in einem großen Bogen nach unten
+(Radius 120 × 80 px), die Wand driftet 4° nach rechts, unten eine
+40-px-Ecke, und die Blase ist zum rechten Rand hin offen. Zeichnung,
+Maske und Bewegung teilen sich beide Formen in `blaseAnlegen()`; die
+Form selbst ist je eine `Geometrie`-Funktion. Die Wand steht 12 px
+rechts von der Logokante (gemessen), die Zeilen folgen ihr über einen
+Versatz aus ihrer Höhe im Menü. Der 700-ms-Rasteraufklapp, der
+Rollkasten und die Doppellinie von früher sind weg — die Liste ist
+kompakt genug für jedes Handy (Hauptliste 452 px samt Kopfleiste).
+
+Hinter dem offenen Menü liegt ein **weißer Schleier** über der ganzen
+Seite (60 % Weiß, 7 px Weichzeichner wie hinter der Hinweis-Karte),
+ein Tipp darauf schließt. Er steht außerhalb der Navigation, weil deren
+Maske ihn sonst mit beschnitte. Die Seite steht still: `overflow:
+hidden` an der Wurzel plus — nur solange offen — ein Zuhörer, der das
+Wischen mit einem Finger unterbindet; iOS Safari hält sich sonst nicht
+an das `overflow`. Kein `position: fixed` am Body: Das setzte `scrollY`
+auf 0 und würfe die Einstiegskarte aus der Bahn. Das Menü schließt bei
+Escape, `focusout`, Seitenwechsel (`astro:before-preparation`, also
+bevor Astro die Wurzelattribute tauscht) und beim Verbreitern über
+991 px.
+
+**„Leistungen" ist kein Akkordeon mehr, sondern ein Ebenenwechsel**
+(Florian): Beim Tipp schrumpfen alle anderen Zeilen über ihre
+Rasterhöhe auf Null (320 ms), die Leistungen-Zeile rückt dadurch in
+derselben Bewegung an den Kopf und wird zum Zurück-Knopf (Haken dreht
+nach links, „Zurück" blendet ein), die Kategorien wachsen darunter
+gestaffelt von Null (ab 140 ms, je 60 ms später). Zurück:
+Kategorien sofort zu (260 ms), Hauptliste ab 120 ms nach. Jede Zeile
+ist ein kleines Raster; die Zelle darin trägt Inhalt und Haarlinie,
+damit die Linie mit der Zeile verschwindet. Die Blase folgt der Höhe
+über einen `ResizeObserver` Bild für Bild.
+
+**Die Telefonnummer** steht als Pille zwischen Logo und Menüknopf
+(≈116 px; bei 320 px Fensterbreite bleiben je 21 px Luft) und in der
+Symbolleiste — nicht mehr im Menü. Datenschutz und Impressum nur noch
+im Fußbereich.
+
+### Blase ohne Bounce, Rolle ohne Abbruch
+
+Das Öffnen der Leistungs-Blase hatte einen Sinus-Zusatz („leichtes
+Überschwingen"). Weg — `KURVEN.betont` ist jetzt dieselbe Kurve wie
+`--verlauf-betont`, und die Oberpunkte nehmen sie auch (statt der
+„Aufreißen"-Kurve, die tokens.css für die Seitenwechsel schon
+verworfen hatte).
+
+Die Text-Rolle der Menüpunkte hing an `:hover` und brach ab, sobald der
+Zeiger den Punkt verließ — der Text sprang zurück. Jetzt setzt das
+Skript `data-rollt` beim Betreten und nimmt es erst am Ende der
+Animation (420 ms, `--verlauf-betont`). Bei „Leistungen" tötete
+`animation: none` im Zustand `data-offen` die gerade gestartete Rolle;
+die Regel greift jetzt nur, wenn keine Rolle läuft — sie endet ohnehin
+genau dort.
+
+### Erster Seitenaufbau ohne Blitzer
+
+Vorher stand das statische Logo im HTML, verschwand hart, sobald die
+Lottie bereit war, und zeichnete sich dann 2,5 s ein. Jetzt beginnt die
+Seite weiß, das Logo zeichnet sich ein, und erst wenn es halb steht
+(≈1,25 s), blenden Kontaktzeile, Symbolleiste, Scrollhinweis und die
+Hinweis-Karte ein — scharf werdend aus 10 px Unschärfe, in 800 ms,
+leicht gestaffelt (Florian).
+
+Gesteuert über `<html data-laden>`: `public/laden.js` setzt `wartet`
+vor dem ersten Bild — blockierend im `<head>` und als **eigene Datei,
+weil die CSP (`public/_headers`) keine eingebetteten Skripte erlaubt**.
+Startbereich.astro setzt `da`, sobald die Zeichnung halb steht; ein
+Sicherheitsnetz tut es nach 2,5 s auf jeden Fall (dann mit dem
+statischen Logo, und die Lottie übernimmt später fertig gezeichnet,
+statt sich noch einmal einzuzeichnen — `data-lottie-spaet`). Ohne das
+Attribut ist alles sichtbar: Unterseiten, Seitenwechsel per Router
+(Astro tauscht die Attribute von `<html>`), Aufruf mit Sprungmarke,
+reduzierte Bewegung, ohne JavaScript. Ein Neuladen mit gemerkter
+Scrollposition räumt das Attribut beim ersten `scroll` ab. Die
+Lottie-Datei wird vorgeladen (`as="fetch" crossorigin` — lottie-web
+holt sie per XHR im CORS-Modus). Eine Animation statt einer Transition,
+weil Symbolleiste und Kontaktzeile eigene Transitions für den
+Leistenwechsel tragen.
+
+Nebenbei: Die Einstiegskarte stand vor dem Skript mit 700 px Versatz
+über dem Logo; die Vorgabe stellt sie jetzt ganz unter die Bühne
+(`100 % + Ruhelage + 40 px`, dasselbe wie `startBestimmen()`), und
+ohne JavaScript greift ein `<noscript>`-Block mit den Regeln der
+reduzierten Bewegung.
+
+### Das Symbol wandert als ein Bild
+
+Im Morph der Leistungen lief das Symbol über die allgemeine Blende
+(alt 45 % der Dauer, neu ab 20 % für 55 %) — zusammen 13 % Deckkraft
+nach 128 ms, das Symbol flackerte. Jetzt wird nur die Aufnahme der
+Leistungsseite gezeigt (hin: die neue, zurück: die alte), ohne Blende,
+wie beim Beitragsbild; `object-fit: contain` passt sie in die wachsende
+Hülle. Kein `--morph-zoom`: gleiches Seitenverhältnis. Der Titel
+(h3 einfarbig gegen h1 mit Verlauf — verschiedene Inhalte) blendet
+weiter, aber beide Aufnahmen über die volle Dauer und addiert
+(`plus-lighter`): Die Summe der Deckkräfte ist immer 1.
+
+### Der Einstieg auf Handys: erst die Sprechstunden
+
+Bis 991 px gilt wieder die Reihenfolge der mobilen Vorlage: Logo →
+Sprechstunden-Blase schnalzt herein → Begrüßung → Bilderband
+(Florian). Das Skript nimmt Begrüßung und Band aus der Karte und stellt
+sie an den Anfang von `<main>` (`vorspannAnordnen`, auch beim
+Größenwechsel); die Karte ist dann nur die Sprechstunden, und **die
+ganze Bewegungsrechnung bleibt unverändert** — Scrollweg, Stützstellen,
+Raumhöhe, Startwert. Die Alternative (Sprechstunden per `order` in der
+Karte zuerst) hätte die zentrierte Begrüßung in Ruhelage genau in die
+Zipfelzone gestellt und vier neue gekoppelte Maße gebraucht. Auf dem
+Desktop fährt weiter alles gemeinsam herein („Der Einstieg ist eine
+Karte" gilt dort unverändert). `scripts/anker.ts` misst Sprungmarken
+außerhalb der Karte normal — `#praxis` und `#galerie` sind auf Handys
+gewöhnliche Abschnitte.
+
+Die Begrüßung braucht dort oben so viel Luft, dass der Zipfel in
+Ruhelage über leerem Weiß steht und die Überschrift noch unter der
+Symbolleiste liegt (`Zipfellänge + 16 px`, als Außenabstand); die
+Leiste fährt beim Schnalz weg und gibt sie frei. Nach dem Schnalz
+bleibt dadurch rund 60 px mehr Weiß zwischen Karte und Begrüßung als
+zwischen zwei Abschnitten sonst — auf Handys unvermeidlich.
+
+**`--zipfel-laenge` stand am Raum und kam bei der Karte nie an**
+(`.ozbereich` ist ein Geschwister): Der Desktop-Zipfel war 154 statt
+der festgelegten 175 px, während der Raum 175 abzog. Jetzt an der
+Wurzel, Umbruch bei 62 rem = 992 px wie die Navigation. Die
+Zipfel-Stützstellen (30/61/74/78 %) und `--oz-weg` 620vh bleiben: Die
+Wartezeit hängt am Logo, nicht an der Kartenhöhe; die kürzere Karte
+(788 statt ≈1 800 px) fährt 0,44 statt 1,0 px je Scroll-px — näher an
+der Vorlage. Das Skript setzt außerdem `--oz-start` nur noch aus der
+Sprechstunden-Höhe (1106 px bei 375 px Breite).
+
+**Kompakter:** Die Sprechstunden sind auf Handys rund 130 px kürzer
+(788 statt ≈914 px): Innenabstand oben 24 statt 40 px, Zeile 8 statt
+14, Einleitung 15 px mit engerer Zeilenhöhe, Spaltenabstand 32 statt
+40, Listentitel 12 statt 16, Zeilen 6 statt 8 px. Die 14 px unter
+480 px bleiben: Bei 15 px bräche die Zeitspalte um.
+
+**Das Kreuz klebt auf Handys wie auf den Leistungsseiten:** In der
+Zeile steht erst das nackte Kreuz ohne Kreis; erreicht es beim
+Scrollen die Kopfleiste (96 px), übernimmt ein Zwilling fest im Fenster
+— milchiger Grund, der Kreis zeichnet sich ein. `sticky` oder `fixed`
+in der Karte selbst geht nicht (sie ist transformiert und
+beschnitten), deshalb misst `kreuzKleben()` je Bild die Lage des
+Zeilen-Kreuzes; beide stehen bei der Übergabe deckungsgleich. Fährt die
+Karte oben hinaus, nimmt der Zwilling das Kreuz mit
+(`--kreuz-oben = min(96, Kartenunterkante − 48)`). Die geteilten
+Klebe-Regeln aller drei Stellen stehen jetzt in global.css. Die Bühne
+beschneidet mit `overflow: clip` statt `hidden`: `hidden` machte sie
+zum Scroll-Container, und ein Tastaturfokus auf etwas Abgeschnittenes
+hätte ihren `scrollTop` verstellen können. Das Kreuz scrollt auf
+Handys zur Begrüßung, auf dem Desktop wie bisher ans Ende des
+Bereichs. Die Festlegung „40 px unter der Oberkante" vom 17. September
+ist seit dem 18. überholt (Kreuz in der Titelzeile).
+
+### Die Knopfzeile — für Abschnitte und Leistungen
+
+Unter einem Redaktionstext kann ein kurzer Satz über den Knöpfen
+stehen (Florian): neues Feld `knoepfe_text`, „Satz über den Knöpfen".
+Satz und bis zu zwei Knöpfe (Verweis, PDF) sind ein gemeinsamer
+Baustein (`components/Knopfzeile.astro`), den die eigenen Abschnitte
+und **neu auch die Leistungsseiten** nutzen — dort mit denselben fünf
+Feldern in Schema und Redaktion, alle freiwillig (bestehende Einträge
+haben sie nicht). Abstand zum Text 28 px statt 34 (und nach einer Liste
+58 — der Nachlauf der letzten Liste ist jetzt überall weg), der Satz
+gedeckt in Fließgröße, 14 px über den Knöpfen. Sprungmarken werden zu
+`/#…`, damit sie auch von einer Leistungsseite zur Startseite führen;
+`anker.ts` setzt jede Sprungmarke beim Laden mit Platz für die
+Kopfleiste nach (vorher nur `#oz_anchor`).
+
+### Kieferorthopädie sichtbarer
+
+Der Erklärtext der Kategorie war dreimal so lang wie der der
+zahnärztlichen Leistungen — jetzt ein Satz. Dafür gibt es einen eigenen
+Abschnitt „Zahnmedizin und Kieferorthopädie unter einem Dach" in
+`abschnitte.json` (ohne Bild — es gibt kein kieferorthopädisches Foto;
+die Praxis kann eines nachreichen) mit Satz und Knopf zur
+Kategorie (`#leistungen-kieferorthopaedie`). Die Praxis ist zahnärztlich
+ausgelastet und wünscht sich mehr kieferorthopädische Patienten. Alle
+Aussagen stammen aus dem bisherigen Erklärtext und den beiden
+Leistungsseiten.
+
+**Offen (nicht geändert):** In `abschnitte.json` steht beim Eintrag der
+Praxis ein Platzhalter-Knopf „hallo" → „hallo" (live sichtbar) und die
+Bildbeschreibung „Bildschirmfoto einer Newsletter-Anmeldung"; in
+`leistungen.json` ist `beispielleistung` unter „Sonstige" aktiv.
+
+### Kontakt: Karte am Scrollweg, Marke sofort, Handys herausgezoomt (26. September 2026)
+
+Alles in `src/components/Kontakt.astro`; das Token `--farbe-karte-grund`
+(`#f5f3f4`) ist der Grundton der Zeichnung selbst.
+
+**Der Anflug hängt am Scrollweg, nicht mehr an der Uhr.** Bisher fuhr die
+Zeichnung als CSS-Übergang von 110 auf 100 % (2,2 s), ausgelöst von einem
+IntersectionObserver, sobald 30 % des Bereichs im Bild waren — und die
+Marke wartete danach noch 2,3 s. Wer flott herunterscrollte, sah davon nur
+den Rest, wer langsam kam, wartete. Jetzt ist der Weg der Spitze der Marke
+das Maß: 0, wenn sie unten ins Fenster tritt, 1, wenn sie bei 45 % der
+Fensterhöhe steht (Weg = 0,55 Fensterhöhen; bei 900 px hoch 495 px, auf
+dem Handy mit 812 px 447 px). Darüber fährt die Zeichnung von 125 auf
+100 % herunter, quadratisch auslaufend (`1 + 0,25 · (1 − p)²`): erst
+zügig, dann immer sanfter — dasselbe Gefühl wie das `flyTo` des Entwurfs.
+Der gezeichnete Wert läuft dem Scrollwert nach (`nachziehen` aus
+`scrollwege.ts`, wie das Gruppenfoto). Das Skript schreibt `--karte-zoom`
+auf den Bereich; das CSS setzt `scale: var(--karte-zoom, 1)` mit dem
+Bezugspunkt auf der Marke — die Praxis steht, alles andere kommt auf sie
+zu. Ohne Skript steht die Zeichnung still auf 100 % (vorher hing sie ohne
+Skript auf 110 %).
+
+**Die Marke fällt bei 55 % des Wegs** (`data-da`, einmal und endgültig),
+also wenn die Spitze etwa 70 % der Fensterhöhe von oben erreicht — die
+Zeichnung ist dann auf 105 % und rollt nur noch aus. Wer zurückscrollt,
+sieht die Karte wieder heranfahren; die Marke bleibt. Bei
+`prefers-reduced-motion` läuft keine Schleife: `--karte-zoom` bleibt 1,
+`data-da` wird sofort gesetzt.
+
+**Die Marke fällt kürzer, näher und setzt hörbar auf.** 0,6 s statt 0,9 s,
+ohne Wartezeit (vorher 2,3 s), aus 56 px Höhe statt 70, mit 4 px
+Durchsetzen und 2 px Zurückfedern (Stützstellen 65 / 85 %); der
+Schlagschatten ist flacher (8/12 px, 30 % statt 10/14 px, 35 %). Neu ist
+ein **Bodenschatten** (`.kontakt__aufsetzer`, 26 × 9 px, radial 30 % → 0),
+der bis 45 % der Fallzeit unsichtbar bleibt, beim Aufsetzen auf 115 %
+aufblitzt und auf 100 % / 90 % Deckung zurücknimmt. Er steht im Baum VOR
+dem Tropfen, damit er unter dessen Spitze gemalt wird. Die Ringe setzen
+0,55 s nach `data-da` ein (statt 3,2 s), laufen 2,4 s (statt 2,6) und der
+zweite um genau eine halbe Runde versetzt (1,75 s = 0,55 + 1,2). Alle
+drei Abläufe nehmen `--verlauf-betont` — es war ohnehin dieselbe Kurve,
+nur ausgeschrieben.
+
+**Handys sehen den Ort, nicht den Häuserblock.** Das Maß der Zeichnung
+rechnete bisher auf allen Größen so, dass sie bis in alle vier Ecken des
+Bereichs reicht. Gestapelt (bis 900 px) ist der Bereich aber viel höher
+als breit, und die Senkrechte gab den Ausschlag: Bei 375 px Breite und
+einem 1 200 bis 1 400 px hohen Bereich ergibt die Formel rechnerisch 1,2
+bis 1,5 — eine 2 300 bis 2 900 px breite Zeichnung, von der 375 px zu
+sehen waren. Jetzt steht sie gestapelt in festem Maß `MASS_SCHMAL = 0,73`
+(1402 × 789 px) und muss nur noch waagerecht bis in beide Ecken reichen
+(bei 375 px verlangt das 0,28, bei 900 px im Modus `seite` 0,74 — der
+feste Wert greift also praktisch überall). „Gestapelt" wird gemessen, nicht geraten: Es ist
+dasselbe `nebeneinander`, mit dem auch die Marke ihre Stelle wählt, und
+damit exakt der CSS-Umbruch — auch mit sichtbarem Rollbalken.
+
+Was die Zeichnung senkrecht nicht mehr deckt, läuft weich aus: Der
+Bereich hat als Hintergrund `--farbe-karte-grund` (nebeneinander nie zu
+sehen, weil die Zeichnung deckt), und bis 900 px liegt auf der Zeichnung
+eine **Maske** — eine Ellipse in Maß und Lage der Zeichnung, bis zur
+halben Achse voll, dann bis zur Kante auf nichts (`radial-gradient(ellipse
+farthest-side at center, #000 50%, transparent 100%)`, mit
+`-webkit-`-Präfix für Safari bis 15). Nötig, weil der eigene Randverlauf
+der SVG (`radialGradient#rand`, 55 → 100 %) an der Kante nur auf 85 %
+Grund ausläuft — 15 % der Zeichnung blieben sichtbar, und damit ihre
+rechteckige Kante. Ohne Skript bleibt beides `cover`; die Ellipse liegt
+dann auf dem Bereich selbst, und die Ecken laufen in den Grund aus.
+
+**Die Formularkarte geht auf volle Breite, wenn die Marke über ihr
+steht** (`data-marke="unten"`): Sie steht dann unter der Marke, nicht
+neben ihr, und das feste Maß von 480 px ließ rechts nur einen leeren
+Streifen. Rechnerisch: `unten` gilt bis 627 px Fensterbreite
+(Platz rechts = 0,95 · Breite − 480 ≤ 116), und ab 534 px war die Karte
+schmaler als die Spalte — zwischen 534 und 627 px wächst sie also, bei
+600 px von 480 auf 540 px. Ab 628 px steht die Marke rechts neben der
+Karte (`seite`), die bleibt bei 480. Auf 375 px ändert sich nichts, die
+Karte war schon so breit wie die Spalte.
+
+Damit das nicht kippt, geht jede Messung vom selben Stand aus: `messen()`
+löscht `data-marke`, bevor es zweimal misst — der erste Durchgang sieht
+immer die 480-px-Karte, der zweite das Ergebnis. Vorher hinge das
+Ergebnis davon ab, wo man herkommt: Eine Karte, die einmal auf volle
+Breite gegangen war, ließe rechts nie wieder Platz für die Marke (bei
+640 px bliebe es bei `unten`, käme man von schmaler). Nach jeder Messung läuft
+außerdem der Anflug einmal nach, weil die Marke gewandert sein kann.
+
+**Kleinigkeiten:** Die Einleitung im Kontakt steht auf `--breite-absatz`
+(34 rem = 544 px) statt 30 rem (480) wie alle anderen Einleitungen; die
+Notiz unter den Knöpfen ist 15 px wie die Faxzeile darüber (vorher 14).
+
+### Die Stellenliste: ruhiger auf und zu (26. September 2026)
+
+**Nichts wandert mehr, während der Anriss verschwindet.** Der Knopf
+richtete seinen Inhalt mittig aus (`align-items: center`); zog sich
+beim Aufklappen der Anriss unter der Bezeichnung zusammen, rückten
+Kreis und Umfang mit ihm nach oben. Jetzt steht alles oben
+(`flex-start`), und Kreis, Umfang und — einspaltig — die Nummer sitzen
+rechnerisch auf der **ersten Zeile** der Bezeichnung:
+`margin-top = (Zeilenhöhe − eigene Höhe) / 2`, mit der Zeilenhöhe
+`1,28 × Schriftgröße` als eigener Variable am Knopf (`--titel-zeile`).
+Eigene Höhen: Kreis 32 px, Umfang 29 px (13 px Zeile + 2 × 7 px
+Innenabstand + 2 × 1 px Rahmen), Nummer 12 px. Bei 1440 px ist die
+Zeile 32,8 px hoch — der Kreis rückt 0,4 px, der Umfang 1,9 px nach
+unten; bei 375 px (Zeile 23,8 px) steht der Kreis 4 px **über** der
+Zeile, also ein Stück im Innenabstand des Knopfs. Das ist gewollt: Er
+bleibt mittig auf der Zeile. Die Nummer auf breiten Fenstern bleibt
+absolut im Seitenrand, wie gehabt.
+
+**Auf Handys wächst die aufgeklappte Bezeichnung** (bis 800 px): von
+`clamp(1.15rem, 1rem + 0.7vw, 1.6rem)` auf
+`clamp(1.35rem, 1.15rem + 0.85vw, 1.85rem)`, bei 375 px also
+18,6 → 21,6 px, bei 800 px 21,6 → 25,2 px, in 0,45 s mit derselben
+Kurve wie der Anriss. Einspaltig gibt es sonst nichts, was die offene
+Zeile von den zugeklappten abhebt — auf breiten Fenstern tut das die
+zweite Spalte, dort bleibt die Größe. Kreis und Nummer ziehen auf ihrer
+Zeile mit (Übergang auf `margin-top`, ebenfalls 0,45 s). Die Übergänge
+sind wie alle anderen erst nach dem Zuklappen beim Laden freigegeben
+(`[data-bereit]`), sonst schrumpften beim Laden alle Bezeichnungen.
+
+**Straffer:** Die Höhe läuft in 0,5 s statt 0,62; der Text kommt nach
+0,1 s statt 0,14; die Spalte mit der Ansprechperson kommt **ohne**
+Verzögerung (vorher 0,04 s) und in 0,4 s statt 0,5 — die Klappe hat ja
+schon gewartet. Beim Öffnen ist der Text damit nach 600 ms ganz da, die
+Ansprechperson nach rund 900 ms (vorher 640 bzw. 1160 ms).
+
+**Zuklappen in zwei Schritten.** Bisher fielen Höhe und Inhalt zugleich,
+und mit dem Zuklappen verlor die Ansprechperson sofort ihre klebende
+Lage: ein sichtbarer Sprung zurück in die Zeile, unten wie oben. Jetzt
+(`data-schliesst`):
+
+1. 0–200 ms: Text und Ansprechperson blenden aus und sinken 16 px
+   (auf Handys sinkt die Ansprechperson 28 px — dorthin, wo sie am
+   unteren Rand auch herkam); die Klappe steht dabei in voller Höhe,
+   die Spalte klebt noch.
+2. ab 200 ms: `data-offen` fällt (Überlauf wieder beschnitten), die
+   Höhe fährt in 0,5 s zu.
+
+Zusammen 700 ms statt 620 — davon sieht man aber nichts mehr springen.
+Die Dauern stehen als `KLAPPEN = 500` und `AUSBLENDEN = 200` im Skript
+und **müssen mit dem CSS übereinstimmen**. Die alten Regeln unter
+`[data-zu]` bleiben als Rückfall: für eine Klappe, die zugeht, bevor sie
+je ganz offen stand (schnelles Hin und Her), und ohne Bewegung.
+
+Das Warten auf das Ende der Höhenbewegung hat einen Zeitgeber als
+Ersatz (`KLAPPEN + 80` ms) und hört auch auf `transitioncancel`. Eine
+Feinheit: Wird eine Klappe wieder geöffnet, während sie noch zufährt,
+**bricht der Browser die alte Bewegung ab und meldet das** — obwohl
+sofort die neue läuft. Deshalb wird bei einem Abbruch erst mit
+`getAnimations()` nachgesehen, ob noch eine Höhenbewegung läuft; nur
+wenn nicht, gilt die Klappe als angekommen. Ohne diese Prüfung bliebe
+eine so wiedergeöffnete Stelle ohne Ansprechperson.
+
+**Die geöffnete Bezeichnung kommt unter die Kopfleiste.** Wer weit
+unten eine Stelle öffnet, während oben eine andere zugeht, sah die
+Bezeichnung nach oben aus dem Fenster rutschen. Jetzt misst das Skript
+ihre Zeile und rechnet vor, was das Zuklappen der anderen Stelle
+darüber verändert: minus deren Klappenhöhe, plus deren Anriss, der
+wieder zum Vorschein kommt (`scrollHeight` + 6 px Abstand). Landet die
+Zeile über 96 px (80 px Kopfleiste + 16 px Luft, dieselben Werte wie in
+`scripts/anker.ts`), scrollt die Seite sanft so weit, dass sie genau
+dort steht. Steht sie ohnehin tiefer, passiert nichts.
+
+**Zwei Kleinigkeiten am Rande:** Der Text in der Klappe hat jetzt die
+Größe der freien Abschnitte (`--text-flies`, 16,3–18,9 px statt fest
+16,5 px; Aufzählungen ebenso statt 15,5 px). Und die
+`prefers-reduced-motion`-Regeln der Liste griffen bisher nicht: Die
+Übergänge sind über `.stellen__liste[data-bereit] …` freigegeben, die
+Abschaltung stand nur an der Klasse — geringere Spezifität, keine
+Wirkung. Jetzt hat sie denselben Vorspann.
+
+### Das Team auf Handys mittig (26. September 2026)
+
+Bis 767 px steht im Team-Bereich alles **mittig**: Kicker und Titel im
+Banner, Name, Funktion, der Tätigkeiten-Knopf und die Liste darunter
+(Florian). Zwei Karten nebeneinander wirkten linksbündig ausgefranst —
+jede Karte ist breiter als ihr Text. Auf breiten Fenstern bleibt es beim
+Handoff, alles links; die Regeln stehen vollständig im Umbruch.
+
+Dafür haben beide Raster jetzt **feste zwei Spalten**. Das Praxisteam
+stand auf `auto-fill` ab 180 px, und das ergab zwischen rund 655 und
+767 px drei Spalten (3 × 180 + 2 × 24 = 588 px Inhalt; der Seitenrand
+misst dort 5 %, also 0,9 × Fensterbreite ≥ 588) — dann konnte CSS nicht
+wissen, welche Karte allein in ihrer Reihe steht.
+Mit zwei Spalten weiß es das: Die letzte Karte an ungerader Stelle
+(`:last-child:nth-child(odd)` — der dritte Arzt, die dreizehnte im
+Praxisteam) liegt über beide Spalten, mittig, in Spaltenbreite
+(`50 % − halbe Lücke`). Bewusst **nicht** `justify-items: center` fürs
+ganze Raster: Damit schrumpften alle Karten auf ihren Inhalt, und unter
+480 px bezieht das Porträt seine Größe aus der Kartenbreite. Das Skript
+für die Reihenenden erkennt die allein stehende Karte weiter über ihre
+Höhe (`offsetTop`) und markiert sie `allein` — der Schattensaum läuft
+bei ihr nach beiden Seiten symmetrisch aus. Die frühere Sonderregel
+unter 480 px (dort schon zwei feste Spalten) ist damit überflüssig und
+weg.
+
+Der Tätigkeiten-Knopf hatte einen eigenen, dünneren Fokusring
+(2 px, Versatz 3 px). Der ist weg — es gilt der allgemeine 3-px-Ring
+der Seite wie überall.
+
+### Kleinigkeiten aus demselben Durchgang
+
+- Knopfgruppen überall 12 px Abstand (Begrüßung und Abschnitte hatten
+  14).
+- Beitragstitel −0.012 em wie der Kacheltitel.
+- Der Zipfel-Typ `Stuetzstelle` ist in Oeffnungszeiten.astro importiert
+  (vorher nur stillschweigend vorhanden).
+- Die Karte setzt sich bei **30 %** von Ablauf a-19 in Bewegung (der
+  Eintrag vom 18. September nennt noch 35 % — der Wert wurde am selben
+  Abend gesenkt, siehe „Die Begrüßung kommt früher").

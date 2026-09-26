@@ -118,11 +118,13 @@ document.addEventListener('click', (e) => {
   try { history.replaceState(history.state, '', ziel.hash); } catch { /* egal */ }
 }, true);
 
-/* Wird die Startseite mit `#oz_anchor` aufgerufen (auch von einer
-   Unterseite aus), landet der Browser am Dokumentanfang — die Blase
-   ist dort noch nicht zu sehen. Also nachsetzen. */
+/* Wird eine Seite mit Sprungmarke aufgerufen (auch von einer Unterseite
+   aus, etwa über einen Knopf `/#contact`), setzt der Browser das Ziel an
+   die Oberkante — ohne Platz für die Kopfleiste; bei `#oz_anchor` landet
+   er sogar am Dokumentanfang, weil die Blase dort noch nicht steht. Also
+   nachsetzen, ohne Bewegung. */
 function beimLaden() {
-  if (location.hash === '#oz_anchor') zuSprungmarke(location.hash, true);
+  if (location.hash) zuSprungmarke(location.hash, true);
 }
 
 document.addEventListener('astro:page-load', beimLaden);

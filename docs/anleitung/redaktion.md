@@ -42,6 +42,12 @@ geht etwas online, etwa eine Minute später.
 (bis 15 MB). Danach **Speichern** nicht vergessen. Bilder werden beim
 Bauen der Seite automatisch verkleinert und optimiert.
 
+**Symbole** (bei Leistungen, Bereichen und Menüpunkten) dürfen zusätzlich
+SVG sein (bis 512 KB) — das ist sogar die beste Wahl, weil sie in jeder
+Größe scharf bleiben. Eine SVG mit Skripten oder Verweisen auf fremde
+Server wird abgelehnt; ein normaler Export aus Illustrator oder Figma
+enthält so etwas nicht.
+
 Bitte jedes Bild kurz beschreiben („Bildbeschreibung") — das lesen
 blinde Besucher vor, und Google versteht die Seite besser.
 
@@ -62,6 +68,28 @@ danach und drücken **Fett**.
 Steht eine Zeile versehentlich als Zwischentitel da: hineinklicken und
 **Absatz** drücken. **Format löschen** nimmt Hervorhebungen innerhalb
 einer Zeile wieder weg.
+
+## Eigene Abschnitte
+
+Ein Abschnitt hat eine Überschrift und darunter einen oder mehrere
+**Bereiche** — je ein Bild neben einem Text (ohne Bild steht der Text
+allein auf Lesebreite). Mehrere Bereiche stehen untereinander.
+
+## Knöpfe unter einem Text
+
+Bei den eigenen Abschnitten und bei jeder Leistung können am Ende des
+Textes bis zu zwei Knöpfe stehen:
+
+- **Verweis** — Beschriftung und Adresse. Eine vollständige Adresse
+  (`https://…`) oder eine Sprungmarke der Startseite wie `#contact` oder
+  `#leistungen-kieferorthopaedie`; Sprungmarken funktionieren auch von
+  einer Leistungsseite aus.
+- **PDF-Knopf** — Beschriftung und Datei (Hochladen wie oben).
+
+Der **Satz über den Knöpfen** ist eine einzelne Zeile direkt darüber
+(„Mehr dazu erfahren Sie hier:“). Er erscheint nur, wenn mindestens ein
+Knopf eingetragen ist. Ohne Knöpfe bleibt alles leer — dann steht dort
+nichts.
 
 ## Der Urlaubshinweis, Schritt für Schritt
 

@@ -20,6 +20,27 @@
       "link_ziel": "hallo",
       "pdf_text": "",
       "pdf_datei": ""
+    },
+    {
+      "id": "kieferorthopaedie-unter-einem-dach",
+      "aktiv": true,
+      "position": 2,
+      "titel": "Zahnmedizin und Kieferorthopädie unter einem Dach",
+      "bereiche": [
+        {
+          "titel": "",
+          "text": "<p>Viele wissen es nicht: Zu unserer Zahnarztpraxis gehört eine eigene Fachpraxis für Kieferorthopädie. Zahn- und Kieferfehlstellungen behandeln wir direkt hier in Bietigheim — bei Kindern und Jugendlichen ebenso wie bei Erwachsenen.</p><p>Je nach Befund und Wunsch kommen die klassische Spange, festsitzende Apparaturen oder nahezu unsichtbare Kunststoffschienen (Aligner) zum Einsatz. Weil alles in einem Haus geschieht, greifen zahnärztliche und kieferorthopädische Behandlung nahtlos ineinander — kurze Wege, ein Team.</p>",
+          "bild": "",
+          "bild_alt": "",
+          "bild_seite": "links",
+          "bild_hoehe": "format"
+        }
+      ],
+      "knoepfe_text": "Mehr zu unseren kieferorthopädischen Leistungen für Kinder und Erwachsene:",
+      "link_text": "Zu den kieferorthopädischen Leistungen",
+      "link_ziel": "#leistungen-kieferorthopaedie",
+      "pdf_text": "",
+      "pdf_datei": ""
     }
   ]
 }

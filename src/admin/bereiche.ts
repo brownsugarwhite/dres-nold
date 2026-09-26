@@ -54,6 +54,11 @@ export type Feld = {
 
 const SYMBOL_HILFE = 'Am besten als SVG in der Hausfarbe, wie die vorhandenen Symbole.';
 
+/* Die Knopfzeile unter einem Text (components/Knopfzeile.astro) —
+   dieselben Felder bei eigenen Abschnitten und Leistungen. */
+const KNOPF_HILFE = 'Eine Zeile direkt über Verweis und PDF-Knopf, z. B. „Mehr dazu erfahren Sie hier:“. Erscheint nur, wenn mindestens ein Knopf eingetragen ist.';
+const VERWEIS_HILFE = 'Eine vollständige Adresse (https://…) oder eine Sprungmarke der Startseite wie #contact oder #leistungen-kieferorthopaedie.';
+
 export type BereichDefinition = {
   titel: string;
   beschreibung: string;
@@ -143,6 +148,12 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
           { name: 'kurz', label: 'Kurztext auf der Kachel', typ: 'mehrzeilig', hilfe: 'Ein bis zwei Sätze.' },
           { name: 'icon', label: 'Symbol', typ: 'bild', ordner: 'symbole', hilfe: SYMBOL_HILFE },
           { name: 'inhalt', label: 'Text der Seite', typ: 'richtext', ordner: 'allgemein', hilfe: 'Mit dem Knopf „Bild" lassen sich Bilder direkt in den Text setzen.' },
+          /* Die Knopfzeile unter dem Text — wie bei den eigenen Abschnitten */
+          { name: 'knoepfe_text', label: 'Satz über den Knöpfen', typ: 'text', hilfe: KNOPF_HILFE },
+          { name: 'link_text', label: 'Verweis: Beschriftung', typ: 'text' },
+          { name: 'link_ziel', label: 'Verweis: Adresse', typ: 'text', hilfe: VERWEIS_HILFE },
+          { name: 'pdf_text', label: 'PDF-Knopf: Beschriftung', typ: 'text' },
+          { name: 'pdf_datei', label: 'PDF-Knopf: Datei', typ: 'pdf', ordner: 'dokumente' },
         ],
       },
       {
@@ -288,8 +299,9 @@ export const bereiche: Record<Bereich, BereichDefinition> = {
               { name: 'text', label: 'Text', typ: 'richtext', ohneBild: true, hilfe: 'Bilder kommen aus dem Feld darüber — ein Bild je Bereich.' },
             ],
           },
+          { name: 'knoepfe_text', label: 'Satz über den Knöpfen', typ: 'text', hilfe: KNOPF_HILFE },
           { name: 'link_text', label: 'Verweis: Beschriftung', typ: 'text' },
-          { name: 'link_ziel', label: 'Verweis: Adresse', typ: 'text' },
+          { name: 'link_ziel', label: 'Verweis: Adresse', typ: 'text', hilfe: VERWEIS_HILFE },
           { name: 'pdf_text', label: 'PDF-Knopf: Beschriftung', typ: 'text' },
           { name: 'pdf_datei', label: 'PDF-Knopf: Datei', typ: 'pdf', ordner: 'dokumente' },
         ],
