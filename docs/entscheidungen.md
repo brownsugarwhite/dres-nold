@@ -1985,3 +1985,25 @@ weg, ein Tipp auf den Menüknopf auch. Florian schrieb „darunter";
 umgesetzt ist „daneben" — die Nummer erscheint dort, wo der Hörer
 war. Wenn sie wirklich UNTER dem Hörer stehen soll: eine Rückfrage
 wert, die Kopfleiste ist 80 px hoch, Platz wäre da.
+
+### Die Kachel morpht von dort, wo sie steht (26. September 2026, spät)
+
+Die Leistungskacheln sprangen beim Anklicken einen Pixel und morphten
+nicht aus ihrer Zeige-Lage (Florian). Ursache in
+`LeistungKachel.astro`: Die Regel für die morphende Kachel
+(`[data-morph]`, gesetzt vor der Momentaufnahme) setzte `transform:
+none` und weißen Grund — die gezeigte Kachel rutschte also erst die
+3 px Anhebung herunter, wuchs von ihrer Scroll-Skalierung (0,9 … 1,
+Ablauf a-8) auf 1 und wurde weiß, und erst dann begann der Morph. Bei
+den Beitragskarten war genau das am 18. September schon
+zurückgenommen worden („Beim Klick bleibt alles stehen, wie es
+steht"); die Kachel hatte die Regel behalten.
+
+Jetzt bleibt auch die Kachel, wie sie steht: keine Rücksetzung von
+Anhebung, Skalierung, Symbolgröße oder Grund. Der Browser nimmt den
+`transform` des Elements in die Ausgangslage der Hülle auf, der Morph
+beginnt bei der angehobenen, gerade so skalierten Kachel mit ihrem
+vergrößerten Symbol. Ein grauer Grund (Kachel am Rand des Scrollwegs)
+blendet im Kreuzen der Abbilder nach Weiß, statt vorher zu springen.
+Auf dem Rückweg steht die Zielkachel mittig — dort ist die Skalierung
+ohnehin 1.

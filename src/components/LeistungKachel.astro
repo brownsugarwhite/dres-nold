@@ -110,21 +110,17 @@ const { id, titel, kurz, icon } = Astro.props;
     view-transition-class: karte;
   }
 
-  /* Die morphende Karte gibt ihre Zeige-Zustände ab: Das Kennzeichen
-     steht schon VOR der Momentaufnahme (astro:before-preparation), der
-     Morph beginnt also bei der ruhenden Kachel — ohne Anhebung und
-     ohne vergrößertes Symbol. */
-  .kachel[data-morph],
-  .kachel[data-morph] .kachel__icon {
-    transform: none;
-    transition: none;
-  }
-
-  /* Ebenso der Grund: Die morphende Karte startet auf Weiß, egal wo auf
-     dem Scrollweg sie gerade steht. */
-  .kachel[data-morph] {
-    background: var(--farbe-flaeche);
-  }
+  /* Beim Klick bleibt alles stehen, wie es steht — wie bei den
+     Beitragskarten (Neuigkeiten.astro, 18. September 2026). Das
+     Kennzeichen steht schon VOR der Momentaufnahme; bis zum 26.
+     September 2026 setzte diese Regel hier Anhebung, Scroll-Skalierung
+     und Grund zurück (`transform: none`, weißer Grund). Das war der
+     Sprung, den man sah: Die gezeigte Kachel rutschte 3 px herunter und
+     wuchs um ihre Scroll-Skalierung, bevor der Morph begann (Florian).
+     Der Browser nimmt Anhebung, Skalierung und das vergrößerte Symbol
+     in die Ausgangslage der Hüllen auf — der Morph beginnt also genau
+     dort, wo die Kachel gerade steht; ein grauer Grund blendet im
+     Kreuzen der Abbilder nach Weiß. */
 
   .kachel:not([data-morph]),
   .kachel:not([data-morph]) .kachel__icon,
