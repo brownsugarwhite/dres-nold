@@ -40,10 +40,14 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     <span class="kontakt__toenung"></span>
     <span class="kontakt__schleier"></span>
 
-    {/* Die Marke des Entwurfs: ein Tropfen, der von oben hereinfällt,
-        darunter zwei Ringe, die sich nacheinander ausbreiten. Ihre
-        Spitze sitzt auf der Praxis. */}
+    {/* Die Marke des Entwurfs: ein Tropfen, der von oben hereinfällt
+        und beim Aufsetzen einen kurzen Bodenschatten wirft, darunter
+        zwei Ringe, die sich nacheinander ausbreiten. Ihre Spitze sitzt
+        auf der Praxis. */}
     <span class="kontakt__marke" data-marke>
+      {/* Der Bodenschatten steht VOR dem Tropfen im Baum, damit er
+          unter dessen Spitze gemalt wird und nicht darüber. */}
+      <span class="kontakt__aufsetzer"></span>
       {/* `overflow="visible"`: Der weiße Saum an der Spitze ragt ein paar
           Zehntel über den Zeichenkasten hinaus und wurde sonst abgeschnitten. */}
       <svg viewBox="0 0 52 72" overflow="visible" focusable="false">
@@ -107,7 +111,12 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     z-index: 40;
     width: 100%;
     overflow: hidden;
-    background: var(--farbe-flaeche);
+    /* Der Grundton der Zeichnung selbst — ihr eigener Randverlauf läuft
+       auf genau dieses Grau aus. Nebeneinander deckt die Zeichnung den
+       Bereich, und der Grund ist nie zu sehen; gestapelt ist sie
+       kleiner als der Bereich und läuft weich in ihn aus (siehe die
+       Maske unten). */
+    background: var(--farbe-karte-grund);
   }
 
   /*
@@ -130,8 +139,10 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     wird nicht die Ebene, sondern die Zeichnung DARIN: Ihr Mittelpunkt
     ist die Praxis und liegt unter der Spitze der Marke, wo immer die
     gerade sitzt. Maß und Lage rechnet das Skript unten aus (`--karte-mass`,
-    `--karte-lage`) und wählt das Maß dabei so groß, dass die Zeichnung
-    auch bei weit außen stehender Marke bis in alle Ecken reicht.
+    `--karte-lage`). Nebeneinander wählt es das Maß so groß, dass die
+    Zeichnung auch bei weit außen stehender Marke bis in alle Ecken
+    reicht; gestapelt (bis 900 px) steht sie in festem Maß und läuft
+    über eine Maske (siehe dort) weich in den Grund aus.
 
     Ohne JavaScript bleibt es bei `cover` und mittiger Lage — der Punkt
     sitzt dann in der Mitte, wie die Zeichnung selbst.
@@ -144,16 +155,14 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     background-repeat: no-repeat;
     background-size: var(--karte-mass, cover);
     background-position: var(--karte-lage, center);
-    /* Fährt beim Hereinscrollen ganz leicht heran — das ist der
-       Anflug der Entwurfsfassung, nur ohne Karten-Bibliothek. Der
-       Bezugspunkt ist die Marke: Die Praxis bleibt beim Anflug stehen,
-       alles andere kommt auf sie zu. */
+    /* Der Anflug: Beim Hereinscrollen fährt die Zeichnung von 125 % auf
+       ihre Größe herunter — am Scrollweg, nicht an der Uhr; das Skript
+       unten schreibt `--karte-zoom`. Der Bezugspunkt ist die Marke:
+       Die Praxis bleibt beim Anflug stehen, alles andere kommt auf sie
+       zu. Ohne Skript steht die Zeichnung still auf 100 %. */
     transform-origin: var(--marke-x, 50%) var(--marke-y, 50%);
-    scale: 1.1;
-    transition: scale 2.2s cubic-bezier(0.22, 0.61, 0.24, 1);
+    scale: var(--karte-zoom, 1);
   }
-
-  .kontakt[data-da] .kontakt__bild { scale: 1; }
 
   /* Tönung in der Hausfarbe, 4,5 % (Handoff) */
   .kontakt__toenung {
@@ -213,8 +222,10 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
 
   /*
     Die Marke des Entwurfs: 52 × 72, die Spitze unten auf der Praxis.
-    Sie fällt von oben herein, sobald der Anflug der Karte zu Ende ist
-    (2,2 s), und darunter breiten sich zwei Ringe versetzt aus.
+    Sie fällt herein, sobald der Anflug zu gut der Hälfte geschafft ist
+    (`data-da`, siehe Skript): 0,6 s von oben, setzt kurz durch und
+    federt zurück. Beim Aufsetzen wirft sie einen kleinen Bodenschatten,
+    und darunter breiten sich zwei Ringe versetzt aus.
   */
   .kontakt__marke {
     position: absolute;
@@ -235,19 +246,45 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     width: 100%;
     height: 100%;
     opacity: 0;
-    filter: drop-shadow(0 10px 14px rgb(30 8 22 / 35%));
+    filter: drop-shadow(0 8px 12px rgb(30 8 22 / 30%));
   }
 
-  /* Erst fliegt die Karte an (2,2 s), dann fällt die Marke */
   .kontakt[data-da] .kontakt__marke svg {
-    animation: kontakt-marke-fallen 0.9s cubic-bezier(0.22, 0.61, 0.24, 1) 2.3s both;
+    animation: kontakt-marke-fallen 0.6s var(--verlauf-betont) both;
   }
 
+  /* Fallen, 4 px durchsetzen, zurückfedern */
   @keyframes kontakt-marke-fallen {
-    0% { opacity: 0; transform: translateY(-70px) scale(0.9); }
-    60% { opacity: 1; transform: translateY(4px) scale(1.02); }
-    80% { transform: translateY(-3px) scale(1); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
+    0% { opacity: 0; transform: translateY(-56px) scale(0.92); }
+    65% { opacity: 1; transform: translateY(4px) scale(1.03); }
+    85% { transform: translateY(-2px) scale(0.995); }
+    100% { opacity: 1; transform: none; }
+  }
+
+  /* Der Bodenschatten: eine flache Ellipse unter der Spitze, die im
+     Moment des Aufsetzens aufblitzt und dann leicht zurücknimmt. */
+  .kontakt__aufsetzer {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 26px;
+    height: 9px;
+    margin: 0 0 -4px -13px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(30 8 22 / 30%), rgb(30 8 22 / 0));
+    opacity: 0;
+    transform: scale(0.4);
+  }
+
+  .kontakt[data-da] .kontakt__aufsetzer {
+    animation: kontakt-aufsetzen 0.6s var(--verlauf-betont) both;
+  }
+
+  /* Bis 45 % nichts — so lange ist die Marke noch in der Luft */
+  @keyframes kontakt-aufsetzen {
+    0%, 45% { opacity: 0; transform: scale(0.4); }
+    70% { opacity: 1; transform: scale(1.15); }
+    100% { opacity: 0.9; transform: scale(1); }
   }
 
   .kontakt__halo {
@@ -264,11 +301,13 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     transform: scale(0.3);
   }
 
+  /* Die Ringe setzen ein, sobald die Marke aufgesetzt hat (bei 0,55 s
+     von 0,6), und laufen um eine halbe Runde versetzt. */
   .kontakt[data-da] .kontakt__halo {
-    animation: kontakt-halo 2.6s cubic-bezier(0.22, 0.61, 0.24, 1) 3.2s infinite;
+    animation: kontakt-halo 2.4s var(--verlauf-betont) 0.55s infinite;
   }
 
-  .kontakt[data-da] .kontakt__halo--zwei { animation-delay: 4.5s; }
+  .kontakt[data-da] .kontakt__halo--zwei { animation-delay: 1.75s; }
 
   @keyframes kontakt-halo {
     0% { opacity: 0.7; transform: scale(0.3); }
@@ -331,7 +370,7 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
   }
 
   .kontakt__einleitung {
-    max-width: 30rem;
+    max-width: var(--breite-absatz);
     margin: 18px 0 0;
     color: var(--farbe-text-gedeckt);
     font-size: var(--text-lead);
@@ -396,7 +435,7 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     max-width: none;
     margin: 16px 0 0;
     color: var(--farbe-text-gedeckt);
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.6;
   }
 
@@ -437,6 +476,26 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     }
     .kontakt__text { padding-top: 0; }
     .kontakt__formular { justify-self: start; }
+
+    /* Gestapelt steht die Zeichnung in festem Maß (siehe Skript,
+       `MASS_SCHMAL`) und ist damit kleiner als der Bereich. Ihr eigener
+       Randverlauf lässt an der Kante noch 15 % durch — die rechteckige
+       Kante wäre zu sehen. Die Maske lässt sie deshalb ringsum
+       auslaufen: bis zur Hälfte voll, dann bis zur Kante auf nichts.
+       Maß und Lage sind die der Zeichnung, damit die Ellipse mit ihr
+       wandert. Ohne Skript bleibt beides `cover`, und die Ellipse
+       liegt auf dem Bereich selbst. Die `-webkit-`-Fassung braucht
+       Safari bis 15 (Florian, 26. September 2026). */
+    .kontakt__bild {
+      -webkit-mask-image: radial-gradient(ellipse farthest-side at center, #000 50%, transparent 100%);
+      -webkit-mask-size: var(--karte-mass, cover);
+      -webkit-mask-position: var(--karte-lage, center);
+      -webkit-mask-repeat: no-repeat;
+      mask-image: radial-gradient(ellipse farthest-side at center, #000 50%, transparent 100%);
+      mask-size: var(--karte-mass, cover);
+      mask-position: var(--karte-lage, center);
+      mask-repeat: no-repeat;
+    }
   }
 
   /* Steht die Marke zwischen Knöpfen und Formular (Handys, siehe
@@ -444,24 +503,35 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
      ihre Höhe plus Luft (Florian, 18. September 2026). */
   .kontakt[data-marke='unten'] .kontakt__inhalt { row-gap: 128px; }
 
+  /* … und die Formularkarte nimmt dann die ganze Breite: Sie steht
+     unter der Marke, nicht neben ihr — das feste Maß von 480 px ließe
+     rechts nur einen leeren Streifen (Florian, 26. September 2026). */
+  .kontakt[data-marke='unten'] .kontakt__formular { max-width: none; }
+
   @media (max-width: 560px) {
     .kontakt__knoepfe .kn { flex: 1; justify-content: center; white-space: nowrap; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .kontakt__bild,
     .kontakt__telefon,
     .kontakt__mail { transition: none; }
+    /* Kein Anflug: Die Zeichnung steht auf 100 % (das Skript schreibt
+       dann kein `--karte-zoom`), Marke und Bodenschatten stehen von
+       Anfang an, die Ringe stehen still. */
     .kontakt__bild { scale: 1; }
     .kontakt[data-da] .kontakt__marke svg { animation: none; }
     .kontakt__marke svg { opacity: 1; }
+    .kontakt[data-da] .kontakt__aufsetzer { animation: none; }
+    .kontakt__aufsetzer { opacity: 0.9; transform: none; }
     .kontakt[data-da] .kontakt__halo { animation: none; opacity: 0.35; transform: scale(2.2); }
   }
 </style>
 
 <script>
+  import { nachziehen } from '../scripts/scrollwege';
+
   /**
-   * Zwei Dinge: wo die Marke steht, und wann der Anflug losgeht.
+   * Zwei Dinge: wo die Marke steht, und wie die Karte anfliegt.
    *
    * 1. Die Stelle
    *    Die Marke soll auf jeder Bildschirmgröße frei stehen — nicht
@@ -479,10 +549,21 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
    *    (Florian, 18. September 2026).
    *
    * 2. Der Anflug
-   *    Sobald ein knappes Drittel des Bereichs im Bild ist, fährt die
-   *    Karte von 110 % auf ihre Größe herunter; danach fällt die Marke
-   *    herein — dieselbe Choreografie wie der `flyTo` des Entwurfs,
-   *    nur ohne Karten-Bibliothek (Handoff, 18. September 2026).
+   *    Die Karte hängt am Scrollweg, nicht an der Uhr: Tritt die Spitze
+   *    der Marke unten ins Fenster, steht die Zeichnung auf 125 %; bis
+   *    die Spitze bei 45 % der Fensterhöhe angekommen ist, fährt sie
+   *    auf 100 % herunter — quadratisch auslaufend, erst zügig, dann
+   *    immer sanfter. Der gezeichnete Wert läuft dem Scrollwert nach
+   *    (`nachziehen`, wie beim Gruppenfoto). Bei 55 % des Wegs fällt
+   *    die Marke herein (`data-da`), einmal und endgültig; die Ringe
+   *    folgen ihr. Wer zurückscrollt, sieht die Karte wieder
+   *    heranfahren — die Marke bleibt. Das ist die Choreografie des
+   *    `flyTo` im Entwurf, nur ohne Karten-Bibliothek und ohne Uhr.
+   *
+   *    Vorher lief der Anflug als Übergang von 2,2 s, ausgelöst, sobald
+   *    ein knappes Drittel des Bereichs im Bild war, und die Marke
+   *    wartete noch 2,3 s länger. Wer flott herunterscrollte, sah davon
+   *    nur den Rest (Florian, 26. September 2026).
    */
   function karteAufbauen() {
     const bereich = document.querySelector<HTMLElement>('#contact');
@@ -498,6 +579,10 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
 
     /** Luft, die links und rechts der Marke frei bleiben soll. */
     const LUFT = 56;
+
+    /** Maß der Zeichnung, wenn Text und Formular gestapelt stehen —
+        als Anteil ihrer vollen Größe (1920 × 1080 → 1402 × 789). */
+    const MASS_SCHMAL = 0.73;
 
     /**
      * Wie weit der Text WIRKLICH nach rechts reicht.
@@ -584,44 +669,126 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
         Zeichnung, nicht ihre Ebene; die deckt den Bereich ohnehin
         (siehe CSS).
 
-        Das Maß ist so gewählt, dass sie auch nach dem Verschieben bis
-        in alle vier Ecken reicht: Vom Mittelpunkt bis zur fernsten
-        Kante ist es `max(x, Breite − x)` — das Doppelte davon ist die
-        Mindestbreite, senkrecht entsprechend.
+        Nebeneinander ist das Maß so gewählt, dass sie auch nach dem
+        Verschieben bis in alle vier Ecken reicht: Vom Mittelpunkt bis
+        zur fernsten Kante ist es `max(x, Breite − x)` — das Doppelte
+        davon ist die Mindestbreite, senkrecht entsprechend.
+
+        Gestapelt (der Umbruch bei 900 px, hier gemessen statt geraten)
+        ist der Bereich viel höher als breit, und dieselbe Rechnung
+        bliese die Zeichnung auf gut das Doppelte auf — vom Ort blieb
+        nur noch die nächste Straße. Dort steht sie deshalb in festem
+        Maß (`MASS_SCHMAL`) und muss nur noch waagerecht bis in beide
+        Ecken reichen; was sie senkrecht nicht deckt, läuft über die
+        Maske (CSS) weich in den Grund aus (Florian, 26. September 2026).
       */
-      const mass = Math.max(
-        b.width / 1920,
-        b.height / 1080,
-        (2 * Math.max(x, b.width - x)) / 1920,
-        (2 * Math.max(y, b.height - y)) / 1080,
-      );
+      const mass = nebeneinander
+        ? Math.max(
+            b.width / 1920,
+            b.height / 1080,
+            (2 * Math.max(x, b.width - x)) / 1920,
+            (2 * Math.max(y, b.height - y)) / 1080,
+          )
+        : Math.max(MASS_SCHMAL, (2 * Math.max(x, b.width - x)) / 1920);
       const breit = Math.ceil(1920 * mass);
       const hoch = Math.ceil(1080 * mass);
       bereich.style.setProperty('--karte-mass', `${breit}px ${hoch}px`);
       bereich.style.setProperty('--karte-lage', `${Math.round(x - breit / 2)}px ${Math.round(y - hoch / 2)}px`);
     };
 
-    /* Die Reihenlücke hängt ihrerseits von `data-marke` ab — deshalb
-       zweimal messen: Der zweite Durchgang sieht die neue Lücke. */
-    const messen = () => { markeStellen(); markeStellen(); };
+    /* ---------- 2. Der Anflug ---------- */
+
+    const marke = bereich.querySelector<HTMLElement>('.kontakt__marke');
+    const reduziert = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /** Ab diesem Anteil des Wegs fällt die Marke — die Zeichnung ist
+        dann auf 105 % und rollt nur noch aus. */
+    const MARKE_BEI = 0.55;
+
+    /**
+     * Wie weit der Anflug ist (0 … 1): 0, wenn die Spitze der Marke
+     * unten ins Fenster tritt; 1, wenn sie bei 45 % der Fensterhöhe
+     * steht. Gemessen wird die Marke selbst, nicht der Bereich — der
+     * ist auf Handys so hoch, dass sein Anteil im Bild wenig über die
+     * Karte sagt.
+     */
+    const fortschritt = (): number => {
+      if (!marke) return 1;
+      const spitze = marke.getBoundingClientRect().bottom;
+      const fenster = window.innerHeight;
+      return Math.min(1, Math.max(0, (fenster - spitze) / (0.55 * fenster)));
+    };
+
+    /* Der gezeichnete Wert läuft dem Scrollwert nach — wie beim
+       Gruppenfoto (Team.astro): eine Schleife je Anstoß, die endet,
+       sobald beide zusammengefunden haben. */
+    let wert = 0;
+    let laeuft = false;
+    let zuletzt = 0;
+
+    const zeichnen = () => {
+      /* Von 125 % auf 100 %, quadratisch auslaufend */
+      const zoom = 1 + 0.25 * (1 - wert) * (1 - wert);
+      bereich.style.setProperty('--karte-zoom', zoom.toFixed(4));
+      if (wert >= MARKE_BEI && !bereich.dataset.da) bereich.dataset.da = 'ja';
+    };
+
+    const schritt = (jetzt: number) => {
+      const dt = zuletzt ? Math.min(100, jetzt - zuletzt) : 16.7;
+      zuletzt = jetzt;
+
+      const ziel = fortschritt();
+      wert = nachziehen(wert, ziel, dt);
+      if (Math.abs(ziel - wert) < 0.0005) wert = ziel;
+      zeichnen();
+
+      if (wert !== ziel) requestAnimationFrame(schritt);
+      else laeuft = false;
+    };
+
+    const anstossen = () => {
+      if (reduziert || laeuft) return;
+      laeuft = true;
+      zuletzt = 0;
+      requestAnimationFrame(schritt);
+    };
+
+    /* ---------- Los ---------- */
+
+    /* Reihenlücke und Formularbreite hängen ihrerseits von `data-marke`
+       ab — deshalb zweimal messen: Der zweite Durchgang sieht das
+       Ergebnis des ersten. Und vor dem ersten wird `data-marke`
+       gelöscht, damit er immer vom selben Stand ausgeht (Karte auf
+       480 px). Sonst hinge das Ergebnis davon ab, wo man herkommt: Eine
+       Karte, die einmal auf volle Breite gegangen war, ließe rechts nie
+       wieder Platz für die Marke (Florian, 26. September 2026).
+       Danach läuft der Anflug einmal nach, weil die Marke gewandert
+       sein kann. */
+    const messen = () => {
+      delete bereich.dataset.marke;
+      markeStellen();
+      markeStellen();
+      anstossen();
+    };
 
     messen();
     requestAnimationFrame(messen);
     window.addEventListener('resize', messen, { passive: true });
     if ('ResizeObserver' in window) new ResizeObserver(messen).observe(bereich);
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (reduziert) {
+      /* Ohne Bewegung: Die Zeichnung bleibt auf 100 % (CSS), die Marke
+         steht von Anfang an. */
       bereich.dataset.da = 'ja';
       return;
     }
 
-    const beobachter = new IntersectionObserver((eintraege) => {
-      if (!eintraege.some((e) => e.isIntersecting)) return;
-      bereich.dataset.da = 'ja';
-      beobachter.disconnect();
-    }, { threshold: 0.3 });
-
-    beobachter.observe(bereich);
+    /* Ohne Nachlauf auf den Stand springen, den die Seite gerade hat —
+       wer direkt zu #contact kommt, soll die Karte nicht erst
+       heranfahren sehen. */
+    wert = fortschritt();
+    zeichnen();
+    window.addEventListener('scroll', anstossen, { passive: true });
   }
 
   karteAufbauen();
