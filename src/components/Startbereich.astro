@@ -228,6 +228,16 @@ const { praxis } = seite;
     display: none;
   }
 
+  /* Spätfall des ersten Aufbaus: Das Sicherheitsnetz (public/laden.js)
+     hat die Seite schon mit dem statischen Logo gezeigt, und die
+     Animation kommt erst danach. Dann blendet das Bild weich aus,
+     statt hart zu verschwinden — sonst blitzte es. */
+  .logo__kontur[data-lottie-spaet] .logo__bild {
+    display: block;
+    opacity: 0;
+    transition: opacity 300ms var(--verlauf);
+  }
+
 
 
   /* Scroll-Hinweis darunter */
@@ -342,8 +352,15 @@ const { praxis } = seite;
       2500 ms fährt sie auf Bild 0, wodurch das Logo erscheint.
       Erst danach folgt sie dem Scrollweg (Ablauf a-7).
     */
+    /* Erster Aufbau der Startseite (public/laden.js, styles/global.css):
+       Solange <html data-laden="wartet"> steht, wartet der Rest der
+       Seite auf das Logo. Sobald es halb gezeichnet ist, gibt `da` ihn
+       frei. */
+    const wurzel = document.documentElement;
+    const freigeben = () => { if (wurzel.dataset.laden === 'wartet') wurzel.dataset.laden = 'da'; };
+
     ladeAnimation(logo, '/lottie/logo.json').then((spieler) => {
-      if (!spieler) return;
+      if (!spieler) { freigeben(); return; }
 
       /* Die Vorlage arbeitet mit Prozentwerten und trägt hier 99 ein,
          nicht 100 — sowohl für den Startwert der Ladeanimation
@@ -351,11 +368,23 @@ const { praxis } = seite;
          Ablauf a-7. */
       const ENDE = 0.99;
       const letztes = (spieler.totalFrames - 1) * ENDE;
+
+      /* Spätfall: Das Sicherheitsnetz hat die Seite schon gezeigt, das
+         statische Logo steht. Dann nicht bei leerem Bild beginnen —
+         das Logo stünde fertig da, verschwände und zeichnete sich neu.
+         Stattdessen fertig gezeichnet übernehmen; das statische Bild
+         blendet weich aus (`data-lottie-spaet`). */
+      if (wurzel.dataset.laden === 'da') {
+        logo.dataset.lottieSpaet = 'ja';
+        spieler.goToAndStop(0, true);
+        anScrollKoppeln(spieler, () => fortschritt() / 0.1, ENDE);
+        return;
+      }
+
       spieler.goToAndStop(letztes, true);
 
       const DAUER = 2500;
       let start: number | null = null;
-      let fertig = false;
 
       const einblenden = (jetzt: number) => {
         if (start === null) start = jetzt;
@@ -363,9 +392,10 @@ const { praxis } = seite;
         // Weiche Kurve wie in der Vorlage
         const weich = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
         spieler.goToAndStop(letztes * (1 - weich), true);
+        // Halb gezeichnet: Der Rest der Seite darf kommen
+        if (p >= 0.5) freigeben();
         if (p < 1) requestAnimationFrame(einblenden);
         else {
-          fertig = true;
           // Ab jetzt folgt das Logo dem Scrollweg
           anScrollKoppeln(spieler, () => fortschritt() / 0.1, ENDE);
         }

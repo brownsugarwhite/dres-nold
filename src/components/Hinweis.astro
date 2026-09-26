@@ -203,17 +203,34 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
       zuletztFokussiert?.focus();
     };
 
-    kasten.hidden = false;
-    // Zwei Bilder abwarten, damit der Ausgangszustand gezeichnet ist
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      kasten.setAttribute('data-offen', 'ja');
-    }));
-    /* Der Fokus geht auf den Dialog, nicht auf das Kreuz: Sonst zeichnet
-       der Browser seinen Fokusring um das Kreuz, und der sah beim
-       Öffnen aus wie ein zweiter, dicker Ring (Florian, 18. September
-       2026). Mit der Tabulatortaste ist das Kreuz weiterhin das erste,
-       was man erreicht. */
-    kasten.focus({ preventScroll: true });
+    const zeigen = () => {
+      kasten.hidden = false;
+      // Zwei Bilder abwarten, damit der Ausgangszustand gezeichnet ist
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        kasten.setAttribute('data-offen', 'ja');
+      }));
+      /* Der Fokus geht auf den Dialog, nicht auf das Kreuz: Sonst zeichnet
+         der Browser seinen Fokusring um das Kreuz, und der sah beim
+         Öffnen aus wie ein zweiter, dicker Ring (Florian, 18. September
+         2026). Mit der Tabulatortaste ist das Kreuz weiterhin das erste,
+         was man erreicht. */
+      kasten.focus({ preventScroll: true });
+    };
+
+    /* Beim ersten Aufbau der Startseite wartet die Karte, bis das Logo
+       halb gezeichnet ist (<html data-laden="wartet">, siehe
+       public/laden.js) — sie soll nicht in die leere Fläche fliegen. */
+    const wurzel = document.documentElement;
+    if (wurzel.dataset.laden === 'wartet') {
+      const beobachter = new MutationObserver(() => {
+        if (wurzel.dataset.laden === 'wartet') return;
+        beobachter.disconnect();
+        zeigen();
+      });
+      beobachter.observe(wurzel, { attributes: true, attributeFilter: ['data-laden'] });
+    } else {
+      zeigen();
+    }
 
     kasten.querySelector('.hinweis__schliessen')?.addEventListener('click', schliessen);
 

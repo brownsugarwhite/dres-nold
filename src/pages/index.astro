@@ -42,6 +42,12 @@ const gruppen = (leistungen.kategorien ?? [])
 ---
 
 <Basis>
+  {/* Das Logo zeichnet sich beim ersten Aufbau ein — seine Lottie-Datei
+      soll da sein, sobald das Skript sie anfordert. `crossorigin`, weil
+      lottie-web sie per XHR im CORS-Modus holt; ohne das Attribut träfe
+      das Vorladen nicht. */}
+  <link slot="head" rel="preload" href="/lottie/logo.json" as="fetch" crossorigin />
+
   <Hinweis />
 
   {/*
@@ -97,6 +103,12 @@ const gruppen = (leistungen.kategorien ?? [])
 </Basis>
 
 <style>
+  /* Handys: Steht das Bilderband vor den Leistungen (keine aktiven
+     freien Abschnitte), braucht der Abschnitt seinen oberen Abstand
+     wieder — er ist sonst „ohne oben", weil die Abschnitte davor ihn
+     mitbringen. */
+  :global(.ozband[data-nach-karte]) + .leistungen { padding-top: var(--abstand-abschnitt); }
+
   /* Der Inhalt schiebt sich über den fixierten Startbereich */
   .seiteninhalt {
     position: relative;

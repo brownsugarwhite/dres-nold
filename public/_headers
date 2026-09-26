@@ -30,3 +30,8 @@
 
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Das Lade-Skript der Startseite steht blockierend im <head> — einen Tag
+# zwischenspeichern, damit es den ersten Aufbau nicht aufhält.
+/laden.js
+  Cache-Control: public, max-age=86400

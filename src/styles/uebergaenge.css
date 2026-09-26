@@ -184,6 +184,37 @@ html[data-rueckmorph]::view-transition-new(root) {
   z-index: 91;
 }
 
+/* --- Das Symbol wandert als EIN Bild -----------------------------
+   Auf Kachel und Seite steht dieselbe SVG-Datei, nur die Größe ist
+   anders. Die allgemeine Blende oben ließ beide Aufnahmen in der Mitte
+   des Wegs fast verschwinden (zusammen 13 % Deckkraft nach 128 ms) —
+   das Symbol flackerte. Jetzt wird nur die Aufnahme der Leistungsseite
+   gezeigt (hin: die neue, zurück: die alte), ohne Blende;
+   `object-fit: contain` oben passt sie in die wachsende Hülle. Kein
+   `--morph-zoom` wie beim Beitragsbild: gleiches Seitenverhältnis
+   (Florian, 26. September 2026).
+
+   Die Selektoren stehen OHNE Leerzeichen an `html` — siehe unten. */
+html:not([data-rueckmorph])::view-transition-old(.symbol) { display: none; }
+html:not([data-rueckmorph])::view-transition-new(.symbol) { animation: none; opacity: 1; }
+html[data-rueckmorph]::view-transition-new(.symbol) { display: none; }
+html[data-rueckmorph]::view-transition-old(.symbol) { animation: none; opacity: 1; }
+
+/* --- Der Titel blendet ohne Einbruch -----------------------------
+   Kacheltitel (h3, einfarbig) und Seitentitel (h1 mit Verlauf) sind
+   verschiedene Inhalte, hier bleibt es bei zwei Aufnahmen. Aber beide
+   laufen über die volle Dauer, ohne Versatz, und werden addiert
+   (`plus-lighter`): Wo beide Tinte haben, ergibt die Summe der
+   Deckkräfte immer 1 — nichts blitzt auf. */
+::view-transition-image-pair(.titel) { isolation: isolate; }
+
+::view-transition-old(.titel),
+::view-transition-new(.titel) {
+  animation-duration: var(--dauer-uebergang);
+  animation-delay: 0ms;
+  mix-blend-mode: plus-lighter;
+}
+
 /* --- Das Bild der Neuigkeiten wandert wirklich ------------------
 
    EIN Bild, das von einem Rahmen in den anderen wandert — kein

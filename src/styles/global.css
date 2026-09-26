@@ -637,11 +637,62 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
 
 .schliessen--fest .schliessen__kreis { stroke-dashoffset: 0; }
 
+/* Klebt das Kreuz beim Scrollen oben, bekommt es einen milchigen Grund
+   und der Kreis zeichnet sich ein. `data-klebt` setzt das Skript — auf
+   den Unterseiten am Halter (`scripts/uebergaenge.ts`), in der
+   Einstiegskarte auf Handys am Kreuz selbst (Oeffnungszeiten.astro). */
+[data-klebt] .schliessen,
+.schliessen[data-klebt] {
+  background-color: rgb(255 255 255 / 85%);
+  border-radius: var(--radius-rund);
+}
+
+[data-klebt] .schliessen__kreis,
+.schliessen[data-klebt] .schliessen__kreis { stroke-dashoffset: 0; }
+
 @media (prefers-reduced-motion: reduce) {
   .schliessen,
   .schliessen__kreis { transition: none; }
   .schliessen:hover,
   .schliessen:focus-visible { transform: none; }
+}
+
+/*
+  ERSTER SEITENAUFBAU DER STARTSEITE
+  ==================================================================
+  Nichts blitzt auf (Florian, 26. September 2026): Die Seite beginnt
+  weiß, das Logo zeichnet sich ein, und erst wenn es halb steht,
+  blenden Kontaktzeile, Symbolleiste, Scrollhinweis und das statische
+  Logo ein — scharf werdend aus einer Unschärfe, leicht gestaffelt.
+
+  `data-laden` an <html> setzt public/laden.js vor dem ersten Bild
+  (`wartet`) und Startbereich.astro, sobald das Logo halb gezeichnet
+  ist (`da`). Ohne das Attribut ist alles sichtbar: Unterseiten,
+  Seitenwechsel per Router (Astro tauscht die Attribute von <html>
+  gegen die des neuen Dokuments), reduzierte Bewegung, ohne JavaScript.
+
+  Eine Animation statt einer Transition: Symbolleiste und Kontaktzeile
+  tragen eigene Transitions für den Leistenwechsel, die nicht
+  überschrieben werden dürfen. Und nur ein `from`: So endet jedes
+  Element in seinem natürlichen Wert — der Scrollhinweis etwa in der
+  Deckkraft, die das Skript ihm gerade gibt.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  html[data-laden='wartet'] body:not([data-gescrollt]) :is(.logo__bild, .kontaktzeile, .fussleiste-huelle, .scrollhinweis) {
+    opacity: 0;
+    filter: blur(10px);
+  }
+
+  @keyframes laden-ein {
+    from { opacity: 0; filter: blur(10px); }
+  }
+
+  html[data-laden='da'] :is(.logo__bild, .kontaktzeile, .fussleiste-huelle, .scrollhinweis) {
+    animation: laden-ein 800ms var(--verlauf-betont) backwards;
+  }
+
+  html[data-laden='da'] .fussleiste-huelle { animation-delay: 120ms; }
+  html[data-laden='da'] .scrollhinweis { animation-delay: 240ms; }
 }
 
 /*
