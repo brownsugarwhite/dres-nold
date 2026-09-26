@@ -1445,6 +1445,19 @@ wird nur über `visibility` verborgen. Die Leisten behalten ihren
 Weichzeichner. Regel: **Im Startbereich nichts über `opacity`,
 `filter` oder `transform` animieren, solange der Verlauf steht.**
 
+**Zwei Nachbesserungen am selben Tag (Florian):** Die Punktlinie oben
+hängt als `::after` am Umschlag der Navigation, nicht an der
+Kontaktzeile — sie stand deshalb von Anfang an da. Jetzt blenden die
+ganzen Umschläge ein (`.navigation`, `.fussleiste-huelle`), wie unten
+schon die Symbolleiste. Und das Einzeichnen des Logos gehört allein dem
+ersten Aufbau: In jedem anderen Fall — Seitenwechsel per Router zur
+Startseite, Neuladen mit gemerkter Scrollposition, nach dem
+Sicherheitsnetz — steht das statische Logo schon, und die Animation
+übernahm bisher bei leerem Bild: Logo da, Logo weg, Logo zeichnet sich
+neu. Das war das „manchmal blitzt etwas auf". Jetzt übernimmt sie in
+diesen Fällen fertig gezeichnet (Bild 0), der Tausch ist nicht zu
+sehen.
+
 Nebenbei: Die Einstiegskarte stand vor dem Skript mit 700 px Versatz
 über dem Logo; die Vorgabe stellt sie jetzt ganz unter die Bühne
 (`100 % + Ruhelage + 40 px`, dasselbe wie `startBestimmen()`), und

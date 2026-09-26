@@ -32,8 +32,8 @@
   wurzel.setAttribute('data-laden', 'wartet');
 
   /* Ein Neuladen mit gemerkter Scrollposition: Der Browser scrollt gleich
-     nach unten, das Logo ist nicht im Bild — dann sofort alles zeigen,
-     ohne Übergang. */
+     nach unten — dann sofort alles zeigen, ohne Übergang; das Logo
+     übernimmt fertig gezeichnet (Startbereich.astro). */
   window.addEventListener('scroll', function () {
     if (wurzel.getAttribute('data-laden') === 'wartet') wurzel.removeAttribute('data-laden');
   }, { once: true, passive: true });

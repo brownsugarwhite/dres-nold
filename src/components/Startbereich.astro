@@ -369,14 +369,18 @@ const { praxis } = seite;
       const ENDE = 0.99;
       const letztes = (spieler.totalFrames - 1) * ENDE;
 
-      /* Spätfall: Das Sicherheitsnetz hat die Seite schon gezeigt, das
-         statische Logo steht. Dann nicht bei leerem Bild beginnen —
-         das Logo stünde fertig da, verschwände und zeichnete sich neu.
-         Stattdessen fertig gezeichnet übernehmen: Die Animation zeigt
-         bei Bild 0 dasselbe Logo, der Tausch ist nicht zu sehen. Kein
-         weicher Übergang am statischen Bild — eine Deckkraft-Animation
-         im Logo erzeugte den Saum um den Verlauf (siehe CSS oben). */
-      if (wurzel.dataset.laden === 'da') {
+      /* Das Einzeichnen gehört allein dem ersten Aufbau (<html
+         data-laden="wartet">). In jedem anderen Fall steht das statische
+         Logo schon — nach einem Seitenwechsel per Router, bei einem
+         Neuladen mit gemerkter Scrollposition, nach dem Sicherheitsnetz
+         von public/laden.js. Dann nicht bei leerem Bild beginnen: Das
+         Logo stünde fertig da, verschwände und zeichnete sich neu — ein
+         Blitzer (Florian, 26. September 2026). Stattdessen fertig
+         gezeichnet übernehmen: Bild 0 zeigt dasselbe Logo, der Tausch
+         ist nicht zu sehen. Kein weicher Übergang am statischen Bild —
+         eine Deckkraft-Animation im Logo erzeugte den Saum um den
+         Verlauf (siehe CSS oben). */
+      if (wurzel.dataset.laden !== 'wartet') {
         spieler.goToAndStop(0, true);
         anScrollKoppeln(spieler, () => fortschritt() / 0.1, ENDE);
         return;

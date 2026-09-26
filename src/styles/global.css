@@ -720,7 +720,10 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
   aus demselben Grund nur über `visibility` verborgen.
 */
 @media (prefers-reduced-motion: no-preference) {
-  html[data-laden='wartet'] body:not([data-gescrollt]) :is(.kontaktzeile, .fussleiste-huelle) {
+  /* Die ganzen Umschläge, nicht nur die Zeilen darin: Sie tragen den
+     milchigen Grund und die Punktlinie (`::after`) — sonst stünde die
+     Linie oben von Anfang an da (Florian, 26. September 2026). */
+  html[data-laden='wartet'] body:not([data-gescrollt]) :is(.navigation, .fussleiste-huelle) {
     opacity: 0;
     filter: blur(10px);
   }
@@ -736,7 +739,7 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
     from { color: transparent; }
   }
 
-  html[data-laden='da'] :is(.kontaktzeile, .fussleiste-huelle) {
+  html[data-laden='da'] :is(.navigation, .fussleiste-huelle) {
     animation: laden-ein 800ms var(--verlauf-betont) backwards;
   }
 
