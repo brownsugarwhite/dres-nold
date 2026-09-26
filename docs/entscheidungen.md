@@ -1809,7 +1809,9 @@ des Handoffs; das Skript zeichnet nur das Hochformat.
   `[totalFrames − 1, 0]` — und spielte so jedes Mal ein Bild weniger,
   bis die Balken gar nicht mehr drehten. Die Bildzahl wird jetzt einmal
   beim Laden gemerkt (`letztesBild`). Regel: `totalFrames` nach einem
-  `playSegments` nie wieder als Gesamtlänge lesen.
+  `playSegments` nie wieder als Gesamtlänge lesen. Und der Wechsel
+  Burger ↔ X läuft 1,6-fach (375 statt 600 ms) — er soll vor der Blase
+  fertig sein, die 520 ms wächst (Florian).
 - **„Wir freuen uns auf Sie" deutlich größer**: `--text-banner` von
   `clamp(2rem, 1.1rem + 3.4vw, 4.2rem)` auf `clamp(2.8rem, 1.2rem +
   5vw, 6rem)` — bei 375 px 44,8 statt 32 px, bei 1440 px 91 statt 67 px.

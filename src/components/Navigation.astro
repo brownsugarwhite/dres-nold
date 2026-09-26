@@ -1797,11 +1797,11 @@ const kategorien = (leistungen.kategorien ?? [])
   function mobilmenueAufbauen() {
     // ---- Handy-Menü ----
     // Dieselbe Blase wie unter „Leistungen", nur zum rechten Rand hin
-    // offen: Die Punktlinie bleibt unter dem Logo oben, schwingt rechts
-    // davon in einem großen Bogen nach unten und läuft am Fuß des
-    // Menüs bis zum rechten Fensterrand (Florians Entwurf, 26. September
-    // 2026). Der Lottie-Knopf läuft in 600 ms von Bild 0 auf 59 und
-    // zurück (Ablauf a-25 / a-27).
+    // offen: Die Punktlinie bleibt unter dem Logo oben, senkt sich rechts
+    // davon in eine senkrechte Wand und läuft am Fuß des Menüs bis zum
+    // rechten Fensterrand (Florian, 26. September 2026). Der Lottie-Knopf
+    // läuft von Bild 0 auf 59 und zurück (Ablauf a-25 / a-27), mit
+    // `KNOPF_TEMPO` beschleunigt.
     const menueknopf = document.querySelector<HTMLButtonElement>('[data-menueknopf]');
     const navigation = document.querySelector<HTMLElement>('.navigation');
     const kopfleiste = navigation?.querySelector<HTMLElement>('.kopfleiste');
@@ -1811,7 +1811,11 @@ const kategorien = (leistungen.kategorien ?? [])
     if (!menueknopf || !navigation || !kopfleiste || !logo || !menue || menueknopf.dataset.bereit) return;
     menueknopf.dataset.bereit = 'ja';
 
-    let knopfSpieler: { playSegments: (b: [number, number], s?: boolean) => void; totalFrames: number } | null = null;
+    let knopfSpieler: { playSegments: (b: [number, number], s?: boolean) => void; setSpeed: (f: number) => void; totalFrames: number } | null = null;
+    /* Die Datei ist auf 600 ms angelegt (Ablauf a-25); der Wechsel
+       Burger ↔ X soll flotter sein als die Blase, die 520 ms wächst:
+       1,6-fach → 375 ms (Florian, 26. September 2026). */
+    const KNOPF_TEMPO = 1.6;
     /* Das letzte Bild, EINMAL beim Laden gemerkt: lottie-web setzt
        `totalFrames` nach `playSegments` auf die Länge des gespielten
        Abschnitts. Wer den Wert bei jedem Klick neu liest, spielt jedes
@@ -1824,6 +1828,7 @@ const kategorien = (leistungen.kategorien ?? [])
         ladeAnimation(lottieKasten, '/lottie/menue-button.json').then((s) => {
           knopfSpieler = s as never;
           letztesBild = s ? s.totalFrames - 1 : 0;
+          s?.setSpeed(KNOPF_TEMPO);
         });
       });
     }

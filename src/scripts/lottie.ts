@@ -12,6 +12,8 @@
 type Spieler = {
   goToAndStop: (wert: number, istBild?: boolean) => void;
   playSegments: (bereich: [number, number], sofort?: boolean) => void;
+  /** Abspielgeschwindigkeit als Faktor (1 = wie in der Datei) */
+  setSpeed: (faktor: number) => void;
   addEventListener: (name: string, rueckruf: () => void) => void;
   destroy: () => void;
   totalFrames: number;
