@@ -44,6 +44,11 @@ const { titel = seite.titel, beschreibung = seite.beschreibung } = Astro.props;
 
     <slot name="head" />
 
+    {/* Das Zahn-Symbol der Praxis als Favicon — vorher gab es keins, und
+        der Browser holte sich bei jedem Aufruf vergeblich /favicon.ico
+        (26. September 2026). SVG genügt allen aktuellen Browsern. */}
+    <link rel="icon" type="image/svg+xml" href="/icons/navigation/praxis.svg" />
+
     <link rel="canonical" href={Astro.url.href} />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
