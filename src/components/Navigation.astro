@@ -129,32 +129,28 @@ const kategorien = (leistungen.kategorien ?? [])
       <a class="logo" href="/" aria-label={`${praxis.name} — zur Startseite`}>
         <img src="/icons/logo.svg" alt="" width="80" height="80" />
       </a>
-      {/* Rechts ein Hörer: Ein Tipp schiebt ihn nach links und holt
-          daneben die Nummer als Verweis hervor, ein zweiter Tipp nimmt
-          sie wieder weg (Florian, 26. September 2026). Ein Punkt trennt
-          zum Menüknopf — wie die Punkte zwischen den Menüpunkten auf dem
-          Desktop. Die Zeichnung ist der Hörer aus dem Symbol der
-          Telefon-Kategorie (icons/navigation/telefon.svg), ohne den
-          Kreis darum. */}
+      {/* Der Hörer — das Telefon-Symbol der Navigation, mit Kreis wie die
+          Symbole im Menü. Er steht absolut in der Zeile und hat drei
+          Plätze (Skript `telefonStellen`): zu rechts neben dem Punkt vor
+          dem Menüknopf; allein geöffnet mit der Nummer daneben genau
+          zwischen Logo und Menüknopf; bei offenem Menü als dessen erste
+          Zeile, bündig mit den Symbolen darunter (Florian, 27. September
+          2026). */}
+      <div class="kopftelefon" data-kopftelefon>
+        <button
+          class="kopftelefon__knopf"
+          type="button"
+          aria-expanded="false"
+          aria-controls="kopftelefon-nummer"
+          aria-label="Telefonnummer anzeigen"
+          data-kopftelefonknopf
+        >
+          <img class="kopftelefon__symbol" src="/icons/navigation/telefon.svg" alt="" width="40" height="40" />
+        </button>
+        <a class="kopftelefon__nummer" id="kopftelefon-nummer" href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
+      </div>
       <div class="kopfleiste__handyrechts">
-        <div class="kopftelefon" data-kopftelefon>
-          <button
-            class="kopftelefon__knopf"
-            type="button"
-            aria-expanded="false"
-            aria-controls="kopftelefon-nummer"
-            aria-label="Telefonnummer anzeigen"
-            data-kopftelefonknopf
-          >
-            <svg class="kopftelefon__symbol" viewBox="10 8 43 43" aria-hidden="true" focusable="false">
-              <path fill="currentColor" d="M45.84,48.45a14.43,14.43,0,0,1-9.77.86C24.19,45.51,16,37,12.17,25.12a10.23,10.23,0,0,1,1.12-8.57,6.19,6.19,0,0,1,5.46-3.12,2.15,2.15,0,0,1,1.59.9,39.18,39.18,0,0,1,3.11,6.42A2,2,0,0,1,23,23.33c-1,.85-1.94,1.71-2.94,2.57-.81.68-1.56,2.1-1.1,3.07,2.77,6,7.86,11.41,13.79,13.52.86.3,2.25-.65,2.72-1a32,32,0,0,0,2.7-3.36,1.91,1.91,0,0,1,2.58-.36c2.69,1.3,4.38,2,6.42,3a2.38,2.38,0,0,1,1.08,1.81C48.45,43.73,48.22,47.44,45.84,48.45Z"/>
-              <path class="kopftelefon__welle" d="M28.51,16.85a17.23,17.23,0,0,1,10.38,4.89,20.36,20.36,0,0,1,5.82,10.61"/>
-              <path class="kopftelefon__welle" d="M28.86,10.18s8.65.85,14.79,6.51a24.92,24.92,0,0,1,7.46,14.74"/>
-            </svg>
-          </button>
-          <a class="kopftelefon__nummer" id="kopftelefon-nummer" href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>{praxis.telefon}</a>
-        </div>
-        <span class="punkt" aria-hidden="true"></span>
+        <span class="punkt" data-kopfpunkt aria-hidden="true"></span>
         <button
           class="menueknopf"
           type="button"
@@ -540,19 +536,38 @@ const kategorien = (leistungen.kategorien ?? [])
      zum letzten Menüpunkt als zwischen den Punkten selbst. */
   .kopfleiste__telefon { margin-left: 4px; white-space: nowrap; }
 
-  /* Handys: rechts der Hörer, ein Punkt, der Menüknopf */
+  /* Handys: rechts der Punkt und der Menüknopf; der Hörer steht
+     absolut in der Zeile (siehe Markup) */
   .kopfleiste__handyrechts {
     display: flex;
     align-items: center;
     gap: var(--abstand-s);
   }
 
+  /* Der Punkt tritt zurück, sobald der Hörer geöffnet ist — dann hängt
+     er nicht mehr am Menüknopf */
+  .kopfleiste__handyrechts .punkt { transition: opacity 240ms var(--verlauf); }
+  .kopfleiste__mobil[data-telefon-offen] .punkt { opacity: 0; }
+
+  /* Der Hörer: absolut, senkrecht mittig, waagerecht an `--telefon-x`
+     (Skript). Bis das Skript den ersten Platz gemessen hat, hängt er
+     rechts vor Punkt und Menüknopf. Der Platz wechselt weich. */
   .kopftelefon {
+    position: absolute;
+    top: 50%;
+    right: calc(50px + 2 * var(--abstand-s) + 3px);
     display: flex;
     align-items: center;
+    transform: translateY(-50%);
+    transition: left 420ms var(--verlauf-betont);
   }
 
-  /* Der Hörer: 30 px Zeichnung in einer 44-px-Tippfläche */
+  .kopftelefon[data-gestellt] {
+    right: auto;
+    left: var(--telefon-x, 0px);
+  }
+
+  /* 40-px-Symbol wie im Menü, in einer 44-px-Tippfläche */
   .kopftelefon__knopf {
     display: grid;
     place-items: center;
@@ -561,28 +576,19 @@ const kategorien = (leistungen.kategorien ?? [])
     padding: 0;
     border: 0;
     background: none;
-    color: var(--farbe-primaer);
     cursor: pointer;
   }
 
   .kopftelefon__symbol {
-    width: 30px;
-    height: 30px;
-    overflow: visible;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
   }
 
-  .kopftelefon__welle {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.5;
-    vector-effect: non-scaling-stroke;
-  }
-
-  /* Die Nummer liegt zusammengeschoben hinter dem Hörer (Breite 0). Beim
-     Aufklappen bekommt sie ihre gemessene Breite (`--nummer-breite`,
-     setzt das Skript) — und weil die ganze Gruppe am rechten Rand hängt,
-     rückt der Hörer dabei nach links. `visibility` nimmt den Verweis
-     aus der Tab-Reihenfolge, solange er nicht zu sehen ist. */
+  /* Die Nummer liegt zusammengeschoben hinter dem Hörer (Breite 0) und
+     bekommt beim Öffnen ihre gemessene Breite (`--nummer-breite`, setzt
+     das Skript). Schrift wie die Menüpunkte. `visibility` nimmt den
+     Verweis aus der Tab-Reihenfolge, solange er nicht zu sehen ist. */
   .kopftelefon__nummer {
     display: block;
     max-width: 0;
@@ -590,28 +596,32 @@ const kategorien = (leistungen.kategorien ?? [])
     opacity: 0;
     visibility: hidden;
     color: var(--farbe-primaer);
-    font-family: var(--schrift-titel);
-    font-size: var(--text-s);
-    font-weight: var(--gewicht-mittel);
+    font-size: 17px;
+    font-weight: var(--gewicht-normal);
     text-decoration: none;
     white-space: nowrap;
+    /* Der Abstand zum Hörer kommt erst mit der Nummer — zu hätte die
+       Gruppe sonst 12 px unsichtbaren Zwischenraum */
+    margin-left: 0;
     transition:
-      max-width 400ms var(--verlauf-betont),
-      margin-left 400ms var(--verlauf-betont),
+      max-width 420ms var(--verlauf-betont),
+      margin-left 420ms var(--verlauf-betont),
       opacity 240ms var(--verlauf),
-      visibility 0s linear 400ms;
+      visibility 0s linear 420ms;
   }
 
   .kopftelefon[data-offen] .kopftelefon__nummer {
     max-width: var(--nummer-breite, 140px);
-    margin-left: 2px;
+    margin-left: var(--abstand-xs);
     opacity: 1;
     visibility: visible;
     transition-delay: 0s, 0s, 120ms, 0s;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .kopftelefon__nummer { transition: none; }
+    .kopftelefon,
+    .kopftelefon__nummer,
+    .kopfleiste__handyrechts .punkt { transition: none; }
   }
 
   /* .nav-buttons-mobile / -desktop: beide 80 px hoch.
@@ -619,6 +629,7 @@ const kategorien = (leistungen.kategorien ?? [])
      ist wie die Liste im Aufklappmenü, steht das Logo genau über deren
      Symbolen (Florian, 18. September 2026). */
   .kopfleiste__mobil {
+    position: relative;
     display: none;
     justify-content: space-between;
     align-items: center;
@@ -738,9 +749,18 @@ const kategorien = (leistungen.kategorien ?? [])
     transition-delay: 120ms, 120ms, 0s, 0s;
   }
 
-  .mobilmenue__zeile + .mobilmenue__zeile .mobilmenue__zelle {
+  /* Eine Haarlinie ÜBER jeder Zeile — auch über der ersten: Darüber
+     steht in der Kopfleiste der Hörer als erste „Zeile" des Menüs
+     (Florian, 27. September 2026). Unter der letzten Zeile keine. Die
+     Kategorien-Zeilen zeigen ihre Linie nur auf ihrer Ebene (unten),
+     die Hauptzeilen nur auf der Hauptebene — sonst blieben von den
+     geschlossenen Zeilen Linien übrig, oder es fehlte die unter
+     „Leistungen". */
+  .mobilmenue__zelle {
     border-top: 1px solid var(--farbe-linie-leise);
   }
+
+  .mobilmenue__zeile--unter .mobilmenue__zelle { border-top-color: transparent; }
 
   /* ---- Ebene „Leistungen" ----
      Ein Tipp auf „Leistungen" schließt alle anderen Zeilen; die
@@ -792,8 +812,14 @@ const kategorien = (leistungen.kategorien ?? [])
     transition-delay: calc(80ms + var(--stufe, 0) * 50ms), calc(80ms + var(--stufe, 0) * 50ms), 0s, 0s;
   }
 
-  /* Ganz oben braucht die Leistungen-Zeile keine Haarlinie mehr */
-  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile--leistungen .mobilmenue__zelle {
+  /* Auf der Ebene „Leistungen": Linien an den Kategorien, keine an den
+     geschlossenen Hauptzeilen; „Leistungen" selbst behält seine Linie
+     zum Hörer darüber */
+  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile--unter .mobilmenue__zelle {
+    border-top-color: var(--farbe-linie-leise);
+  }
+
+  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile:not(.mobilmenue__zeile--leistungen):not(.mobilmenue__zeile--unter) .mobilmenue__zelle {
     border-top-color: transparent;
   }
 
@@ -2065,9 +2091,77 @@ const kategorien = (leistungen.kategorien ?? [])
     });
 
     const istOffen = () => navigation.hasAttribute('data-menue-offen');
+    /* Der logische Zustand — `data-menue-aktiv` bleibt bis zum Ende der
+       Schließbewegung stehen, der Hörer braucht aber sofort den
+       Zielplatz */
+    let menueGewollt = false;
+
+    /* ---- Der Hörer in der Kopfleiste ----
+       Drei Plätze (Florian, 27. September 2026): zu — rechts neben dem
+       Punkt vor dem Menüknopf; allein geöffnet — mit der Nummer daneben
+       genau in der Mitte zwischen Logo und Menüknopf; bei offenem Menü —
+       als dessen erste Zeile, sein Symbol bündig mit den Symbolen der
+       Zeilen darunter. Der Platz ist eine `left`-Angabe in der
+       Kopfleiste, die das Skript misst; das CSS fährt dorthin. */
+    const kopfleisteMobil = navigation.querySelector<HTMLElement>('.kopfleiste__mobil');
+    const telefon = navigation.querySelector<HTMLElement>('[data-kopftelefon]');
+    const telefonKnopf = telefon?.querySelector<HTMLButtonElement>('[data-kopftelefonknopf]');
+    const nummer = telefon?.querySelector<HTMLElement>('.kopftelefon__nummer');
+    const punkt = navigation.querySelector<HTMLElement>('[data-kopfpunkt]');
+    let telefonOffen = false;
+
+    const telefonStellen = () => {
+      if (!kopfleisteMobil || !telefon || !telefonKnopf) return;
+      const k = kopfleisteMobil.getBoundingClientRect();
+      if (!k.width) return;   // Desktop: die Zeile ist ausgeblendet
+      const b = menueknopf.getBoundingClientRect();
+      const knopfBreite = telefonKnopf.getBoundingClientRect().width || 44;
+      const luft = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--abstand-xs')) * 16 || 12;
+      const abstand = parseFloat(getComputedStyle(kopfleisteMobil.querySelector('.kopfleiste__handyrechts') as Element).columnGap) || 16;
+      let x: number;
+      if (menueGewollt && !menue.hidden) {
+        const s = menue.querySelector<HTMLElement>('.mobilmenue__symbol')?.getBoundingClientRect();
+        x = s ? s.left - (knopfBreite - s.width) / 2 - k.left : k.width / 2;
+      } else if (telefonOffen) {
+        const breite = knopfBreite + luft + (nummer?.scrollWidth ?? 0);
+        x = (logo.getBoundingClientRect().right + b.left) / 2 - breite / 2 - k.left;
+      } else {
+        const p = punkt?.getBoundingClientRect();
+        x = (p && p.width ? p.left : b.left) - abstand - knopfBreite - k.left;
+      }
+      telefon.style.setProperty('--telefon-x', `${Math.round(x)}px`);
+      telefon.dataset.gestellt = 'ja';
+    };
+
+    const telefonSetzen = (offen: boolean) => {
+      if (!telefon || !telefonKnopf) return;
+      telefonOffen = offen;
+      telefonKnopf.setAttribute('aria-expanded', String(offen));
+      telefonKnopf.setAttribute('aria-label', offen ? 'Telefonnummer verbergen' : 'Telefonnummer anzeigen');
+      if (offen) {
+        /* Die Breite des Texts, jetzt gemessen — die Schrift könnte beim
+           Laden noch gewechselt haben */
+        telefon.style.setProperty('--nummer-breite', `${nummer?.scrollWidth ?? 0}px`);
+        telefon.dataset.offen = 'ja';
+        kopfleisteMobil?.setAttribute('data-telefon-offen', '');
+      } else {
+        delete telefon.dataset.offen;
+        kopfleisteMobil?.removeAttribute('data-telefon-offen');
+      }
+      telefonStellen();
+    };
+
+    telefonKnopf?.addEventListener('click', () => {
+      /* Bei offenem Menü ist der Hörer ein Menüpunkt: ein Tipp ruft an */
+      if (menueGewollt) { nummer?.click(); return; }
+      telefonSetzen(!telefonOffen);
+    });
+    window.addEventListener('resize', telefonStellen, { passive: true });
+    telefonStellen();
 
     const oeffnen = () => {
       if (istOffen()) return;
+      menueGewollt = true;
       menue.hidden = false;
       navigation.dataset.menueAktiv = 'ja';
       /* Wie `data-offen` bei der Desktop-Blase: einen Frame später, damit
@@ -2080,10 +2174,16 @@ const kategorien = (leistungen.kategorien ?? [])
       seiteSperren(true);
       zuruecktreten(true);
       blase.oeffnen(menue.getBoundingClientRect().height);
+      /* Der Hörer öffnet sich mit und rückt als erste Zeile an die
+         Symbolspalte — erst jetzt, die Wand der Blase ist gerade
+         gemessen */
+      telefonSetzen(true);
     };
 
     const menueSchliessen = (sofort = false) => {
       if (!istOffen() && !navigation.dataset.menueAktiv) return;
+      menueGewollt = false;
+      telefonSetzen(false);
       delete navigation.dataset.menueOffen;
       menueknopf.setAttribute('aria-expanded', 'false');
       menueknopf.setAttribute('aria-label', 'Menü öffnen');
@@ -2138,36 +2238,6 @@ const kategorien = (leistungen.kategorien ?? [])
     });
   }
 
-  /**
-   * Der Hörer in der Handy-Kopfleiste: Ein Tipp holt die Nummer hervor,
-   * ein zweiter nimmt sie weg. Ein Tipp auf den Menüknopf nimmt sie
-   * ebenfalls weg — Menü und Nummer sollen sich nicht ins Gehege kommen.
-   */
-  function kopftelefonAufbauen() {
-    const gruppe = document.querySelector<HTMLElement>('[data-kopftelefon]');
-    const knopf = gruppe?.querySelector<HTMLButtonElement>('[data-kopftelefonknopf]');
-    const nummer = gruppe?.querySelector<HTMLElement>('.kopftelefon__nummer');
-    if (!gruppe || !knopf || !nummer || knopf.dataset.bereit) return;
-    knopf.dataset.bereit = 'ja';
-
-    const setzen = (offen: boolean) => {
-      knopf.setAttribute('aria-expanded', String(offen));
-      knopf.setAttribute('aria-label', offen ? 'Telefonnummer verbergen' : 'Telefonnummer anzeigen');
-      if (offen) {
-        // Die Breite des Texts, jetzt gemessen — die Schrift könnte beim
-        // Laden noch gewechselt haben
-        gruppe.style.setProperty('--nummer-breite', `${nummer.scrollWidth}px`);
-        gruppe.dataset.offen = 'ja';
-      } else {
-        delete gruppe.dataset.offen;
-      }
-    };
-
-    knopf.addEventListener('click', () => setzen(!gruppe.dataset.offen));
-    document.querySelector('[data-menueknopf]')?.addEventListener('click', () => setzen(false));
-  }
-
   navigationAufbauen();
-  kopftelefonAufbauen();
-  document.addEventListener('astro:page-load', () => { navigationAufbauen(); kopftelefonAufbauen(); });
+  document.addEventListener('astro:page-load', navigationAufbauen);
 </script>

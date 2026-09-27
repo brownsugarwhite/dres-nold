@@ -775,15 +775,11 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
     filter: blur(10px);
   }
 
-  html[data-laden='wartet'] body:not([data-gescrollt]) .scrollhinweis { color: transparent; top: -52px; }
+  html[data-laden='wartet'] body:not([data-gescrollt]) .scrollhinweis { opacity: 0; filter: blur(10px); }
   html[data-laden='wartet'] body:not([data-gescrollt]) .logo__bild { visibility: hidden; }
 
   @keyframes laden-ein {
     from { opacity: 0; filter: blur(10px); }
-  }
-
-  @keyframes laden-farbe {
-    from { color: transparent; }
   }
 
   html[data-laden='da'] :is(.navigation, .fussleiste-huelle) {
@@ -791,16 +787,12 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
   }
 
   html[data-laden='da'] .fussleiste-huelle { animation-delay: 120ms; }
-  /* Der Hinweis kommt von unten (48 px, über `top` — keine
-     Compositor-Eigenschaft, siehe Startbereich.astro) und blendet über
-     die Farbe ein; flotter als zuvor (Florian, 27. September 2026:
-     600 ms ab 100 ms statt 800 ab 240). */
-  @keyframes laden-hoch { from { top: -52px; } }
-  html[data-laden='da'] .scrollhinweis {
-    animation:
-      laden-farbe 600ms var(--verlauf-betont) 100ms backwards,
-      laden-hoch 700ms var(--verlauf-betont) 100ms backwards;
-  }
+  /* Der Scroll-Hinweis blendet wie die Leisten auf und wird scharf —
+     eine Spur nach ihnen. Möglich, seit er in einem eigenen festen
+     Rahmen neben dem Startbereich steht (Startbereich.astro): Im
+     Startbereich selbst zeichnete diese Animation den Saum um das Logo.
+     (Florian, 27. September 2026) */
+  html[data-laden='da'] .scrollhinweis { animation: laden-ein 800ms var(--verlauf-betont) 240ms backwards; }
 }
 
 /*

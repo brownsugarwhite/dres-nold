@@ -2114,3 +2114,54 @@ blendete sie auf 65 %; Florian, 27. September 2026).
 
 **Die Leistungskachel morpht aus ihrer Zeige-Lage** — siehe den Eintrag
 davor (noch vom 26. September).
+
+### Scroll-Hinweis im eigenen Rahmen, Logo folgt dem Scrollen sofort, Hörer als erste Menüzeile (27. September 2026, mittags)
+
+**Der Scroll-Hinweis war verschwunden.** Die 100 px nach oben (siehe
+oben) schoben ihn unter die weiße Fläche der Lottie-Grafik — die
+liegt über ihm, und ihre Zeichnung füllt ihren Kasten nicht aus
+(Seitenverhältnis 868 : 590 in einem 5 : 4-Kasten, dazu Luft unter den
+Buchstaben). Ganz gehen die 100 px deshalb nicht. Jetzt rückt der
+Hinweis so weit hinauf, dass er rund 28 px unter den Buchstaben steht:
+`top: calc(28px − 17 % der Kastenhöhe)` — bei 900 px Fensterhöhe 33 px,
+bei 1120 px 48 px, auf Handys (375 px) 10 px.
+
+**Er blendet jetzt wie die Leisten auf und wird scharf** (Florian) —
+und dafür steht er in einem EIGENEN festen Rahmen NEBEN dem
+Startbereich (`.starthinweis`), nicht mehr darin: Deckkraft- und
+Weichzeichner-Animationen im Startbereich zeichneten den Saum um den
+Verlauf des Logos (Eintrag „Erster Seitenaufbau ohne Blitzer"). Der
+Rahmen baut denselben Satz nach: dieselbe Mitte, ein Platzhalter in
+Höhe und Wachstum des Logos (`--logo-groesse` bekommt er vom Skript
+mit), darunter der Hinweis; umgekehrt steht in der Logo-Spalte ein
+Platzhalter in der Höhe des Hinweises (gemessen, `--hinweis-hoehe`),
+sonst rutschte das Logo um die halbe Hinweishöhe nach unten. Die Maße
+des Logos (`--logo-breite`, `--logo-hoehe`, …) stehen dafür an den
+beiden Mitten statt am Logo. Beide Rahmen verstecken sich gemeinsam,
+wenn das Logo aufgelöst ist. Am Gerät gegenprüfen, ob der Saum
+wirklich ausbleibt.
+
+**Das Logo folgt dem Scrollen sofort.** Wer scrollte, bevor das Logo
+fertig gezeichnet war, sah es erst zu Ende zeichnen und dann auf den
+Scrollstand springen. Jetzt bricht die Einzeichnung beim ersten
+Scrollen ab, und die Kopplung an den Scrollweg übernimmt von dem Bild,
+das gerade steht, und vom Scrollstand dieses Moments: Von dort bis
+zum Ende des Wegs löst sich das Logo auf (`anScrollKoppeln` in
+`scripts/lottie.ts` mit dem neuen Parameter `ab`). Der Rest der Seite
+wird dabei sofort freigegeben.
+
+**Der Hörer in der Handy-Kopfleiste hat drei Plätze** (Florians
+Skizze): zu rechts neben dem Punkt vor dem Menüknopf; allein geöffnet
+mit der Nummer daneben genau in der Mitte zwischen Logo und Menüknopf
+(gleicher Abstand zu beiden, der Punkt tritt zurück); bei offenem
+Menü öffnet er sich mit und rückt als dessen erste Zeile an die
+Symbolspalte — sein Symbol bündig mit den Symbolen der Zeilen darunter,
+ein Tipp darauf ruft dann an. Er ist das Telefon-Symbol der Navigation
+mit Kreis (40 px, wie die Menüsymbole), die Nummer in der Schrift der
+Menüpunkte (17 px). Technisch steht er absolut in der Zeile, das Skript
+misst je Zustand die `left`-Lage (`telefonStellen`), das CSS fährt
+dorthin (420 ms). Die Menüzeilen haben jetzt über JEDER Zeile eine
+Haarlinie — auch über der ersten, unter dem Hörer — und keine unter der
+letzten; die Kategorien zeigen ihre Linien nur auf ihrer Ebene, die
+Hauptzeilen nur auf der Hauptebene. So gibt es auch die Linie unter
+„Leistungen", die vorher fehlte.

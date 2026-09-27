@@ -42,15 +42,33 @@ const { praxis } = seite;
       </div>
       <div class="logo__verlauf" aria-hidden="true"></div>
     </div>
+    {/* Platzhalter in der Höhe des Scroll-Hinweises (der steht im
+        Rahmen darunter): So bleibt die Mitte dieser Spalte dieselbe wie
+        die des Hinweis-Rahmens — sonst rückte das Logo um die halbe
+        Hinweishöhe nach unten. Die Höhe misst das Skript. */}
+    <div class="startbereich__platz" data-startplatz></div>
+  </div>
+</div>
 
-    <div class="scrollhinweis" aria-hidden="true">
+{/*
+  Der Scroll-Hinweis steht in einem EIGENEN festen Rahmen neben dem
+  Startbereich, nicht darin. Er soll beim ersten Aufbau wie die Leisten
+  aufblenden und scharf werden (Florian, 27. September 2026) — und
+  genau solche Deckkraft- und Weichzeichner-Animationen zeichneten,
+  solange er IM Startbereich stand, den Saum um den Verlauf des Logos
+  (siehe `.logo`). In einem eigenen Rahmen berührt seine Bewegung die
+  Zeichenebene des Logos nicht. Der Rahmen baut denselben Satz nach
+  (Mitte, Platzhalter in den Maßen des Logos), damit der Hinweis genau
+  dort steht, wo er im Fluss unter dem Logo stünde.
+*/}
+<div class="starthinweis" data-starthinweis aria-hidden="true">
+  <div class="starthinweis__mitte">
+    <div class="starthinweis__platz" data-hinweisplatz></div>
+    <div class="scrollhinweis">
       <p class="scrollhinweis__text">
         Scrollen Sie, um mehr von unserer Praxis zu entdecken
       </p>
-      {/* Als Inline-SVG in `currentColor`, nicht als Hintergrundbild: So
-          blendet der Haken beim ersten Aufbau über die Farbe mit ein —
-          die einzige Animation, die hier keinen Saum um das Logo
-          erzeugt (styles/global.css, „Erster Seitenaufbau"). Dieselbe
+      {/* Als Inline-SVG in `currentColor`, nicht als Hintergrundbild. Dieselbe
           Zeichnung wie icons/ui/pfeil-runter.svg. */}
       <svg class="scrollhinweis__pfeil" viewBox="0 0 62 38" aria-hidden="true" focusable="false">
         <polyline fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" vector-effect="non-scaling-stroke" points="3.5 3.5 31 31 58.5 3.5" />
@@ -82,13 +100,59 @@ const { praxis } = seite;
     pointer-events: none;
   }
 
-  .startbereich__mitte {
+  /* Der Rahmen des Scroll-Hinweises: derselbe Satz wie der Startbereich
+     (siehe Markup), eine Ebene darüber, ohne Zeigerwirkung. Beide
+     verstecken sich gemeinsam, wenn das Logo aufgelöst ist (Skript). */
+  .starthinweis {
+    position: fixed;
+    inset: 0;
+    z-index: 11;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    pointer-events: none;
+  }
+
+  .startbereich__mitte,
+  .starthinweis__mitte {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
     height: 100%;
+    /* Die Maße des Logos stehen HIER, damit sie drei Kinder erreichen:
+       das Logo, den Platzhalter im Hinweis-Rahmen und den Hinweis selbst
+       (der seinen Abstand daraus rechnet). */
+    --logo-breite: 50vh;
+    --logo-hoehe: 40vh;
+    --logo-oben: -100px;
+    --verlauf-breite: 48vh;
+    --verlauf-hoehe: 32vh;
+    --verlauf-versatz: -36vh;
+  }
+
+  /* Das Gegenstück in der Logo-Spalte: so hoch wie der Hinweis
+     (`--hinweis-hoehe`, setzt das Skript; 72 px sind die zwei Zeilen
+     samt Haken auf allen Breiten) */
+  .startbereich__platz {
+    flex: none;
+    width: 1px;
+    height: var(--hinweis-hoehe, 72px);
+  }
+
+  /* Der Platzhalter nimmt senkrecht genau den Raum des Logos ein —
+     Höhe, Wachstum beim Scrollen (`--logo-groesse`, setzt das Skript
+     auf beide) und der negative Abstand. Waagerecht spielt er keine
+     Rolle: Die Spalte zentriert jedes Kind für sich. */
+  .starthinweis__platz {
+    flex: none;
+    width: 1px;
+    height: calc(var(--logo-hoehe) * var(--logo-groesse, 1));
+    margin-top: var(--logo-oben);
   }
 
   /* Auf Handys sitzt der Block etwas tiefer: Oben steht nur die schmale
@@ -96,7 +160,8 @@ const { praxis } = seite;
      dadurch nach oben gerutscht (Florian, 18. September 2026). Der
      Innenabstand verschiebt den mittig gesetzten Block um seine Hälfte. */
   @media (max-width: 991px) {
-    .startbereich__mitte { padding-top: 12vh; }
+    .startbereich__mitte,
+    .starthinweis__mitte { padding-top: 12vh; }
   }
 
   /* Logo — Aufbau und Maße wie in der Vorlage.
@@ -144,9 +209,9 @@ const { praxis } = seite;
        wächst von 1 auf 1,3 um seine Mitte, weil `.startbereich__mitte`
        es zentriert hält. Der Aufwand ist vertretbar, es geht um ein
        einzelnes Element. */
-    width: calc(var(--logo-breite, 50vh) * var(--logo-groesse, 1));
-    height: calc(var(--logo-hoehe, 40vh) * var(--logo-groesse, 1));
-    margin-top: -100px;
+    width: calc(var(--logo-breite) * var(--logo-groesse, 1));
+    height: calc(var(--logo-hoehe) * var(--logo-groesse, 1));
+    margin-top: var(--logo-oben);
     margin-left: -50px;
   }
 
@@ -164,9 +229,9 @@ const { praxis } = seite;
   .logo__verlauf {
     position: relative;
     z-index: 10;
-    width: calc(var(--verlauf-breite, 48vh) * var(--logo-groesse, 1));
-    height: calc(var(--verlauf-hoehe, 32vh) * var(--logo-groesse, 1));
-    margin-top: calc(var(--verlauf-versatz, -36vh) * var(--logo-groesse, 1));
+    width: calc(var(--verlauf-breite) * var(--logo-groesse, 1));
+    height: calc(var(--verlauf-hoehe) * var(--logo-groesse, 1));
+    margin-top: calc(var(--verlauf-versatz) * var(--logo-groesse, 1));
     flex: none;
     /* Wie in Webflow eingestellt: Cover, Position 50 % / 50 %, kein Tile.
 
@@ -199,28 +264,30 @@ const { praxis } = seite;
   }
 
   @media (max-width: 767px) {
-    .logo {
+    .startbereich__mitte,
+    .starthinweis__mitte {
       --logo-breite: 50vw;
       --logo-hoehe: 40vw;
       --verlauf-breite: 48vw;
       --verlauf-hoehe: 31vw;
       --verlauf-versatz: -35vw;
-      margin-left: -30px;
     }
+    .logo { margin-left: -30px; }
   }
 
   @media (max-width: 479px) {
-    .logo {
+    .startbereich__mitte,
+    .starthinweis__mitte {
       --logo-breite: 80vw;
       --logo-hoehe: 60vw;
+      --logo-oben: -180px;
       --verlauf-breite: 78vw;
       --verlauf-hoehe: 50vw;
       --verlauf-versatz: -53vw;
       /* `.lottie-animation-2 { height: auto }` der Vorlage */
       --kontur-hoehe: auto;
-      margin-top: -180px;
-      margin-left: -4px;
     }
+    .logo { margin-left: -4px; }
     .logo__kontur { aspect-ratio: 868 / 590; }
   }
 
@@ -260,15 +327,18 @@ const { praxis } = seite;
     color: var(--farbe-primaer);
     /* In der Vorlage folgt `.scroll2action` ohne Abstand direkt auf das
        Logo (live-webflow.css `.logo` / `.scroll2action`). Der Abstand
-       entsteht dort allein aus der Logohöhe — und war zu groß: Seit dem
-       27. September 2026 steht der Hinweis 100 px höher (Florian). Über
-       `top`, nicht über einen Abstand: Der würde die Mitte verschieben
-       und mit ihr das Logo. `top` ist auch der Weg, auf dem der Hinweis
-       beim ersten Aufbau von unten kommt (styles/global.css) — eine
-       Layout-Eigenschaft, kein `transform`, das um das Logo herum den
-       Saum zeichnet. */
+       entsteht dort allein aus der Logohöhe — und war zu groß (Florian,
+       27. September 2026: „100 px nach oben"). Ganz gehen 100 px nicht:
+       Die Zeichnung füllt ihren Kasten nicht aus (Seitenverhältnis
+       868 : 590 in einem 5 : 4-Kasten, dazu Luft unter den Buchstaben) —
+       der Hinweis läge dann über der Schrift. Er rückt deshalb so weit
+       hinauf, dass er rund 28 px unter den Buchstaben steht: Die leere
+       Zone unter der Schrift ist etwa 17 % der Kastenhöhe (bei 900 px
+       Fensterhöhe 61 px, der Hinweis rückt 33 px; bei 1120 px 76 / 48).
+       Über `top`, nicht über einen Abstand: Der würde die Mitte
+       verschieben und mit ihr das Logo. */
     position: relative;
-    top: -100px;
+    top: calc(28px - var(--logo-hoehe) * 0.17);
     margin-top: 0;
     opacity: var(--hinweis-deckkraft, 1);
     transform: scale(var(--hinweis-groesse, 1)) translateY(var(--hinweis-versatz, 0px));
@@ -312,7 +382,19 @@ const { praxis } = seite;
     const logo = document.querySelector<HTMLElement>('[data-logo]');
     const huelle = logo?.closest<HTMLElement>('.logo');
     if (!bereich || !logo || logo.dataset.bereit) return;
-    const hinweis = bereich.querySelector<HTMLElement>('.scrollhinweis');
+    const hinweisRahmen = document.querySelector<HTMLElement>('[data-starthinweis]');
+    const hinweis = hinweisRahmen?.querySelector<HTMLElement>('.scrollhinweis');
+    const hinweisPlatz = hinweisRahmen?.querySelector<HTMLElement>('[data-hinweisplatz]');
+    const startPlatz = bereich.querySelector<HTMLElement>('[data-startplatz]');
+
+    /* Die Höhe des Hinweises an sein Gegenstück in der Logo-Spalte
+       geben — beim Aufbau und wann immer sie sich ändert (Umbruch des
+       Texts bei anderer Breite) */
+    if (hinweis && startPlatz) {
+      const hoeheGeben = () => startPlatz.style.setProperty('--hinweis-hoehe', `${hinweis.offsetHeight}px`);
+      hoeheGeben();
+      if ('ResizeObserver' in window) new ResizeObserver(hoeheGeben).observe(hinweis);
+    }
     logo.dataset.bereit = 'ja';
 
     const wenigerBewegung = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -345,6 +427,8 @@ const { praxis } = seite;
       // Das Logo wächst nur — Versatz, Verkleinern und Ausblenden
       // gehören in der Vorlage zum Scroll-Hinweis, nicht zum Logo.
       huelle?.style.setProperty('--logo-groesse', String(1 + 0.3 * p));
+      // Der Platzhalter im Hinweis-Rahmen wächst mit dem Logo
+      hinweisPlatz?.style.setProperty('--logo-groesse', String(1 + 0.3 * p));
       hinweis?.style.setProperty('--hinweis-groesse', String(1 - 0.2 * p));
       hinweis?.style.setProperty('--hinweis-versatz', `${30 * p}px`);
       hinweis?.style.setProperty('--hinweis-deckkraft', String(1 - p));
@@ -356,6 +440,7 @@ const { praxis } = seite;
       }
       // Ist es ganz ausgeblendet, aus dem Weg nehmen (bei 10,0001 %)
       bereich.style.visibility = p >= 1 ? 'hidden' : '';
+      if (hinweisRahmen) hinweisRahmen.style.visibility = p >= 1 ? 'hidden' : '';
     };
 
     const beiScroll = () => {
@@ -419,7 +504,23 @@ const { praxis } = seite;
         const p = Math.min(1, (jetzt - start) / DAUER);
         // Weiche Kurve wie in der Vorlage
         const weich = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-        spieler.goToAndStop(letztes * (1 - weich), true);
+        const bild = letztes * (1 - weich);
+
+        /* Scrollt der Besucher, bevor das Logo fertig gezeichnet ist:
+           nicht zu Ende zeichnen und dann springen, sondern von dem
+           Bild, das gerade steht, am Scrollweg auflösen (Florian,
+           27. September 2026). Der Scrollstand dieses Moments ist der
+           Nullpunkt der Kopplung. */
+        if (window.scrollY > 2) {
+          freigeben();
+          anScrollKoppeln(spieler, () => fortschritt() / 0.1, ENDE, {
+            bild,
+            p: Math.min(0.9, Math.max(0, fortschritt() / 0.1)),
+          });
+          return;
+        }
+
+        spieler.goToAndStop(bild, true);
         // Halb gezeichnet: Der Rest der Seite darf kommen
         if (p >= 0.5) freigeben();
         if (p < 1) requestAnimationFrame(einblenden);
