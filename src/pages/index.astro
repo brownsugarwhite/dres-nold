@@ -1,4 +1,5 @@
 ---
+import { trennenHtml, trennenTitel } from '../lib/silben';
 /**
  * Startseite — One-Pager.
  *
@@ -69,7 +70,7 @@ const gruppen = (leistungen.kategorien ?? [])
     <section id="leistungen" class="leistungen bereich bereich--ohne-oben">
       <div class="bereich__inhalt">
         <div class="kicker" data-rein>Behandlung</div>
-        <h2 class="bereich__titel" data-rein>{startseite.leistungen.titel}</h2>
+        <h2 class="bereich__titel" data-rein>{trennenTitel(startseite.leistungen.titel)}</h2>
         {startseite.leistungen.text && (
           <p class="bereich__einleitung" data-rein>{startseite.leistungen.text}</p>
         )}
@@ -83,7 +84,7 @@ const gruppen = (leistungen.kategorien ?? [])
             </h3>
 
             {g.beschreibung && (
-              <div class="gruppe__text redaktionstext" data-rein set:html={g.beschreibung} />
+              <div class="gruppe__text redaktionstext" data-rein set:html={trennenHtml(g.beschreibung)} />
             )}
 
             <div class="kacheln">

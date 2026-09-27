@@ -126,12 +126,15 @@ p {
   aus, linksbündig wirken sie leicht). Dort sind die Zeilen zu kurz
   oder zu wenige, als dass Blocksatz gut aussähe.
 
-  Und NICHT auf Handys (bis 767 px): Mit rund 35 Zeichen je Zeile reißt
-  auch die Silbentrennung die Wortabstände auf — „genauer und
-  angenehmer macht — vom" mit fingerbreiten Löchern (Florian,
-  27. September 2026). Dort steht der Text linksbündig mit
-  Silbentrennung, und die Zeilen rücken enger zusammen (1,55 statt
-  1,68).
+  Auf Handys AUCH — ausdrücklich gewünscht (Florian, 27. September
+  2026). Mit rund 35 Zeichen je Zeile hängt dort alles an der
+  Silbentrennung: Wo sie ein langes Wort nicht bricht, reißt die Zeile
+  davor zu Löchern auf („genauer und angenehmer macht — vom", weil
+  „dreidimensionalen" ganz in die nächste Zeile rutschte). Deshalb sind
+  die Trennregeln bis 767 px großzügiger (ab fünf Buchstaben, zwei auf
+  jeder Seite) — und für Safari stehen die alten `-webkit-hyphenate-
+  limit-*`-Eigenschaften dazu, es kennt die Kurzform erst seit 17.4.
+  Die Zeilen rücken dort enger zusammen (1,55 statt 1,68).
 */
 .blocksatz,
 .redaktionstext p,
@@ -154,7 +157,10 @@ p {
   .textseite__inhalt p,
   .kachel__kurz,
   .beitrag__kurz {
-    text-align: left;
+    hyphenate-limit-chars: 5 2 2;
+    -webkit-hyphenate-limit-before: 2;
+    -webkit-hyphenate-limit-after: 2;
+    -webkit-hyphenate-limit-lines: no-limit;
   }
 
   .redaktionstext p,

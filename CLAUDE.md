@@ -88,6 +88,7 @@ Redaktion ──► dres-nold.de/login
 | Analytics | *(noch keins)* | Cloudflare Web Analytics wäre cookielos nachrüstbar, lädt aber ein Skript von Cloudflare — nur auf Wunsch der Praxis |
 | Veröffentlichen | **GitHub Actions → `wrangler pages deploy`** | Ein Workflow für Push, Redaktion und den täglichen Neubau (`.github/workflows/veroeffentlichen.yml`) |
 | Kontaktformular | **Resend** | Versand-API, kostenlos bis 3 000 Mails/Monat; `functions/api/kontakt.ts` |
+| Silbentrennung | **`hyphen` im Build** | Lesetexte bekommen beim Erzeugen weiche Trennstriche nach deutschen Mustern (`src/lib/silben.ts`) — der Blocksatz hängt so nicht am Wörterbuch des Browsers |
 
 ### Was bewusst NICHT verwendet wird
 
@@ -140,8 +141,10 @@ Versalien), Fließtext 400, Namen und Knöpfe 500, die große
 Telefonnummer im Kontakt 300. Überschriften stehen **linksbündig** —
 mittig stehen nur Startbereich, Begrüßung und Hinweis. **Lesetexte im
 linksbündigen Blocksatz mit Silbentrennung** (`global.css`, „Blocksatz";
-Kundenwunsch, 26. September 2026) — Kurztexte, Listen, Tabellen und
-Bedienelemente nicht.
+Kundenwunsch, 26. September 2026, ausdrücklich auch auf Handys) —
+Listen, Tabellen und Bedienelemente nicht. Die Trennstellen setzt der
+Build (`src/lib/silben.ts`), nicht der Browser: Wer Text ausgibt, den
+die Redaktion pflegt, zieht ihn durch `trennenHtml()` bzw. `trennen()`.
 
 ### Schrift
 
@@ -200,6 +203,7 @@ src/
   pages/        Seiten und Routen; pages/admin/ = Redaktionsoberfläche
   admin/        Feldbeschreibungen und Skript der Redaktion
   server/       Gemeinsamer Code der Functions (GitHub-API, Access-Prüfung)
+  lib/          Hilfen für den Build (Silbentrennung der Lesetexte)
   styles/       tokens.css (Gestaltungswerte) + globale Stile + Übergänge
   scripts/      Animationen, Übergänge, sanftes Scrollen, Bildlauf — ohne Bibliotheken
 public/

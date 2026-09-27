@@ -1,4 +1,5 @@
 ---
+import { trennenHtml } from '../lib/silben';
 /**
  * Stellenanzeigen — eigener Bereich, von der Praxis pflegbar.
  * Ist keine Stelle aktiv, erscheint der Bereich gar nicht.
@@ -80,7 +81,7 @@ const bewerbung = (titel: string) =>
             <div class="stelle__klappe" id={`stelle-${s.id}`} data-stellenklappe>
               <div class="stelle__innen">
                 <div class="stelle__spalten">
-                  <div class="stelle__text redaktionstext" set:html={s.beschreibung} />
+                  <div class="stelle__text redaktionstext" set:html={trennenHtml(s.beschreibung)} />
 
                   <div class="stelle__seite">
                     {s.ansprechpartner && (

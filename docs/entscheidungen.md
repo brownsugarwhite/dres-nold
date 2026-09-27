@@ -2255,8 +2255,27 @@ und die erste nutzte die Breite nicht („Digitale Abformung / statt
 Abformlöffel"). Jede Zeile wird jetzt so voll wie möglich; nur die
 mittige Begrüßung bleibt ausgeglichen. Bis 767 px dürfen h2 und h3
 sehr lange Wörter trennen (ab 14 Buchstaben, sechs auf jeder Seite) —
-„Kieferorthopädie" allein sprengte sonst die Zeile. Und bis 767 px
-gibt es keinen Blocksatz: Mit rund 35 Zeichen je Zeile riss auch die
-Silbentrennung die Wortabstände auf; dort steht der Text linksbündig
-mit Silbentrennung, Zeilenabstand 1,55 statt 1,68. Ab 768 px bleibt
-alles, wie die Praxis es wünscht.
+„Kieferorthopädie" allein sprengte sonst die Zeile. Der Blocksatz bleibt
+auch auf Handys — ausdrücklich gewünscht (Florian, gleich darauf; ein
+Zwischenstand hatte ihn dort linksbündig gesetzt). Der Zeilenabstand
+ist auf Handys 1,55 statt 1,68.
+
+**Die Löcher im Blocksatz kamen von fehlender Silbentrennung — und die
+setzt jetzt der Build.** Gemessen mit Playwright: Chromium trennt
+„Rönt-gen", WebKit lässt „Röntgen" und „dreidimensionalen" ganz
+stehen, obwohl es in einem Minimaltest beide trennt; Florians Browser
+trennte „dreidimensionalen" ebenfalls nicht. Die Trennung des Browsers
+(`hyphens: auto`) hängt am Wörterbuch des Geräts (Chrome lädt es erst
+nach, WebKit kennt manche Wörter nicht) — und jedes ungetrennte lange
+Wort reißt die Zeile davor auf. Deshalb bekommen alle Lesetexte beim
+Erzeugen der Seite weiche Trennstriche (U+00AD) nach den deutschen
+Trennmustern der Bibliothek `hyphen` (`src/lib/silben.ts`,
+`trennenHtml()` für Redaktions-HTML, `trennen()` für Kurztexte,
+`trennenTitel()` für Überschriften — dort nur Wörter ab 14 Buchstaben).
+Ein weicher Trennstrich ist unsichtbar, bis der Browser dort umbricht.
+Angewendet auf: Erklärtexte der Leistungskategorien, Leistungs- und
+Beitragsseiten, Kachel- und Beitragskurztexte, eigene Abschnitte,
+Stellen, Hinweis; Titel der Abschnitte, Kacheln und Leistungsseiten.
+Die Rechtsseiten (fester Text) bleiben bei der Browser-Trennung.
+`hyphens: auto` bleibt als Ergänzung; bis 767 px mit großzügigeren
+Grenzen (5 Buchstaben, 2 je Seite).

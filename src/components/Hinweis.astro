@@ -1,4 +1,5 @@
 ---
+import { trennenHtml } from '../lib/silben';
 /**
  * Hinweis-Sprechblase für Urlaub, Vertretung oder Notfälle.
  *
@@ -49,7 +50,7 @@ const kennung = `hinweis-${daten.von}-${daten.bis}-${daten.titel}`;
 
       <div class="kicker kicker--klein">Hinweis</div>
       <h2 class="hinweis__titel verlauf" id="hinweis-titel">{daten.titel}</h2>
-      <div class="hinweis__text redaktionstext" set:html={daten.text} />
+      <div class="hinweis__text redaktionstext" set:html={trennenHtml(daten.text)} />
 
       {daten.mehr_erfahren_ziel && (
         <div class="hinweis__mehr">

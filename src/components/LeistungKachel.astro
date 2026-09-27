@@ -1,4 +1,5 @@
 ---
+import { trennen, trennenTitel } from '../lib/silben';
 /**
  * Kachel einer Leistung auf der Startseite.
  *
@@ -28,8 +29,8 @@ const { id, titel, kurz, icon } = Astro.props;
 
 <a class="kachel" data-kachel data-karte href={`/leistungen/${id}/`} transition:name={`leistung-${id}`}>
   <img class="kachel__icon" src={icon} alt="" width="64" height="64" transition:name={`leistung-symbol-${id}`} />
-  <h3 class="kachel__titel" transition:name={`leistung-titel-${id}`}>{titel}</h3>
-  <p class="kachel__kurz">{kurz}</p>
+  <h3 class="kachel__titel" transition:name={`leistung-titel-${id}`}>{trennenTitel(titel)}</h3>
+  <p class="kachel__kurz">{trennen(kurz)}</p>
   <span class="kachel__mehr">
     <span class="tl">
       Mehr erfahren

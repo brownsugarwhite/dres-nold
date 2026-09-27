@@ -1,4 +1,5 @@
 ---
+import { trennenHtml } from '../../lib/silben';
 /**
  * Einzelseite eines Beitrags — eigene Adresse, mit Morph-Übergang
  * aus der Übersicht heraus.
@@ -56,7 +57,7 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
 
       {/* Kein eigener Übergangsname: gehört zur Karte und wächst mit ihr */}
       <div class="beitrag__rest">
-      <div class="beitrag__inhalt redaktionstext" set:html={beitrag.inhalt} />
+      <div class="beitrag__inhalt redaktionstext" set:html={trennenHtml(beitrag.inhalt)} />
 
       {anhaenge.length > 0 && (
         <section class="anhaenge">

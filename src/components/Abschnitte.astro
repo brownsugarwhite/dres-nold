@@ -1,4 +1,5 @@
 ---
+import { trennenHtml, trennenTitel } from '../lib/silben';
 /**
  * Freie Abschnitte im Praxis-Bereich — von der Praxis beliebig anlegbar,
  * ohne eigenen Menüeintrag (docs/entscheidungen.md).
@@ -48,7 +49,7 @@ const hoehe = (b: { bild_hoehe?: string }) => (b.bild_hoehe === 'voll' ? 'voll' 
         <section class="abschnitt" id={`abschnitt-${a.id}`}>
           <div class="abschnitt__inhalt">
             <div class="kicker" data-rein>Aus der Praxis</div>
-            <h2 class="bereich__titel" data-rein>{a.titel}</h2>
+            <h2 class="bereich__titel" data-rein>{trennenTitel(a.titel)}</h2>
 
             {bereiche.map((b, i) => (
               <div class="block" data-bild={seite(b)} data-hoehe={hoehe(b)} data-rein>
@@ -63,8 +64,8 @@ const hoehe = (b: { bild_hoehe?: string }) => (b.bild_hoehe === 'voll' ? 'voll' 
                 )}
 
                 <div class="block__text">
-                  {b.titel && <h3 class="block__titel">{b.titel}</h3>}
-                  <div class="redaktionstext" set:html={b.text} />
+                  {b.titel && <h3 class="block__titel">{trennenTitel(b.titel)}</h3>}
+                  <div class="redaktionstext" set:html={trennenHtml(b.text)} />
 
                   {i === bereiche.length - 1 && (
                     <Knopfzeile satz={a.knoepfe_text} linkText={a.link_text} linkZiel={a.link_ziel} pdfText={a.pdf_text} pdfDatei={a.pdf_datei} />

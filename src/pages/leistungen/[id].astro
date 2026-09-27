@@ -1,4 +1,5 @@
 ---
+import { trennenHtml, trennenTitel } from '../../lib/silben';
 /**
  * Einzelseite einer Leistung.
  *
@@ -58,14 +59,14 @@ const naechste = alle[i + 1];
           <span aria-hidden="true">←</span> Alle Leistungen
         </a>
         <img class="leistung__icon" src={leistung.icon} alt="" width="96" height="96" transition:name={`leistung-symbol-${leistung.id}`} />
-        <h1 class="leistung__titel" transition:name={`leistung-titel-${leistung.id}`}>{leistung.titel}</h1>
+        <h1 class="leistung__titel" transition:name={`leistung-titel-${leistung.id}`}>{trennenTitel(leistung.titel)}</h1>
       </header>
 
       {/* Kein eigener Übergangsname: So steckt der Fließtext in der
           Momentaufnahme der Karte und wächst mit ihr, statt separat
           hereinzugleiten (styles/uebergaenge.css). */}
       <div class="leistung__rest">
-        <div class="leistung__text redaktionstext" set:html={leistung.inhalt} />
+        <div class="leistung__text redaktionstext" set:html={trennenHtml(leistung.inhalt)} />
 
         {/* Satz und Knöpfe aus der Redaktion — ohne eigenen Übergangsnamen,
             sie gehören zur Karte und wachsen mit ihr */}
