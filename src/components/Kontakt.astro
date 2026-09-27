@@ -156,27 +156,16 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     background-repeat: no-repeat;
     background-size: var(--karte-mass, cover);
     background-position: var(--karte-lage, center);
-    /* Der Anflug: Beim Hereinscrollen zoomt die Zeichnung von weit
-       draußen (62 %) auf ihre Größe heran — am Scrollweg, nicht an der
-       Uhr; das Skript unten schreibt `--karte-zoom`. Der Bezugspunkt ist
-       die Marke: Die Praxis bleibt beim Anflug stehen, alles andere
-       kommt auf sie zu. Ohne Skript steht die Zeichnung still auf 100 %. */
+    /* Der Anflug: Beim Hereinscrollen zoomt die Zeichnung von ihrer
+       deckenden Größe (100 %) auf 150 % heran — am Scrollweg, nicht an
+       der Uhr; das Skript unten schreibt `--karte-zoom`. Der Bezugspunkt
+       ist die Marke: Die Praxis bleibt beim Anflug stehen, alles andere
+       kommt auf sie zu. Weil das Maß (unten) den Bereich schon bei 100 %
+       deckt und der Bezugspunkt darin liegt, bleibt er beim Vergrößern
+       in jeder Phase gedeckt — keine Kante, nie (Florian, 27. September
+       2026). Ohne Skript steht die Zeichnung still auf 100 %. */
     transform-origin: var(--marke-x, 50%) var(--marke-y, 50%);
     scale: var(--karte-zoom, 1);
-    /* Solange die Zeichnung kleiner ist als der Bereich, läuft sie über
-       eine Ellipse weich in den Grund aus (der Bereich hat denselben
-       Grundton) — auf allen Größen, seit der Anflug von weiter draußen
-       kommt (Florian, 27. September 2026). Bei voller Größe liegen nur
-       die äußersten Ecken im Verlauf. Maß und Lage sind die der
-       Zeichnung; die Maske skaliert mit ihr. */
-    -webkit-mask-image: radial-gradient(ellipse farthest-side at center, #000 60%, transparent 100%);
-    -webkit-mask-size: var(--karte-mass, cover);
-    -webkit-mask-position: var(--karte-lage, center);
-    -webkit-mask-repeat: no-repeat;
-    mask-image: radial-gradient(ellipse farthest-side at center, #000 60%, transparent 100%);
-    mask-size: var(--karte-mass, cover);
-    mask-position: var(--karte-lage, center);
-    mask-repeat: no-repeat;
   }
 
   /* Tönung in der Hausfarbe, 4,5 % (Handoff) */
@@ -508,11 +497,21 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
          Mit dem 16:9-Bild blieb unter dem Formular nur der leere Grund
          (Florian, 26. September 2026). */
       background-image: url('/bilder/deko/karte-bietigheim-hoch.svg');
-      /* Gestapelt reicht die Zeichnung unter der Marke bis zum unteren
-         Rand — der Verlauf beginnt hier früher, damit sie dort weich
-         ausläuft */
-      -webkit-mask-image: radial-gradient(ellipse farthest-side at center, #000 50%, transparent 100%);
-      mask-image: radial-gradient(ellipse farthest-side at center, #000 50%, transparent 100%);
+      /* Voll bis 75 % der Achsen (vorher 50): Seit der Anflug deckend
+         beginnt und das Startmaß gestapelt kleiner ist, läge die linke
+         Kante des Bereichs sonst schon im Verlauf (bei 375 px: 270 px
+         von der Mitte, der Verlauf begänne bei 185). Mit 75 % beginnt
+         er bei 278 — und unten, wo das Formular steht, bleibt die
+         Zeichnung am Ende des Anflugs fast satt statt halb (Florian,
+         27. September 2026). */
+      -webkit-mask-image: radial-gradient(ellipse farthest-side at center, #000 75%, transparent 100%);
+      -webkit-mask-size: var(--karte-mass, cover);
+      -webkit-mask-position: var(--karte-lage, center);
+      -webkit-mask-repeat: no-repeat;
+      mask-image: radial-gradient(ellipse farthest-side at center, #000 75%, transparent 100%);
+      mask-size: var(--karte-mass, cover);
+      mask-position: var(--karte-lage, center);
+      mask-repeat: no-repeat;
     }
   }
 
@@ -572,17 +571,20 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
    *
    * 2. Der Anflug
    *    Die Karte hängt am Scrollweg, nicht an der Uhr: Tritt die Spitze
-   *    der Marke unten ins Fenster, steht die Zeichnung auf 62 % — weit
-   *    draußen; bis die Spitze 15 % unter der Oberkante angekommen ist,
-   *    zoomt sie auf 100 % heran — sanft an- und auslaufend. Der
+   *    der Marke unten ins Fenster, steht die Zeichnung in ihrer
+   *    deckenden Größe — von weit draußen gesehen; bis die Spitze 15 %
+   *    unter der Oberkante angekommen ist, zoomt sie um die Marke auf
+   *    das Anderthalbfache heran (ZOOM_ENDE) — sanft an- und
+   *    auslaufend. Sie beginnt deckend und wird nur größer: So zeigt sie
+   *    in keiner Phase eine Kante (Florian, 27. September 2026). Der
    *    gezeichnete Wert läuft dem Scrollwert träge nach (`nachziehen`
    *    mit eigener Trägheit). Bei 60 % des Wegs fällt die Marke herein
    *    (`data-da`), einmal und endgültig; die Ringe folgen ihr. Wer
    *    zurückscrollt, sieht die Karte wieder wegfahren — die Marke
    *    bleibt. Das ist die Choreografie des `flyTo` im Entwurf, nur
    *    ohne Karten-Bibliothek und ohne Uhr. Bis zum 27. September 2026
-   *    kam sie von 125 %, also von zu nah, über einen kürzeren Weg
-   *    (Florian: „von deutlich weiter weg reinzoomen, smoother, länger").
+   *    kam sie von 125 % auf 100 % herunter, also von zu nah, über
+   *    einen kürzeren Weg.
    *
    *    Vorher lief der Anflug als Übergang von 2,2 s, ausgelöst, sobald
    *    ein knappes Drittel des Bereichs im Bild war, und die Marke
@@ -604,11 +606,19 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     /** Luft, die links und rechts der Marke frei bleiben soll. */
     const LUFT = 56;
 
-    /** Maß der Zeichnung, wenn Text und Formular gestapelt stehen —
-        als Anteil ihrer vollen Größe (hochkant: 1080 × 1646 → 788 × 1202).
-        Ist der Bereich höher, wächst das Maß, bis die Zeichnung unten
-        ankommt. */
-    const MASS_SCHMAL = 0.73;
+    /** Wie nah der Anflug endet: das Anderthalbfache der deckenden
+        Größe (Florian, 27. September 2026: „von deutlich weiter weg
+        reinzoomen" — und dabei nie eine Kante zeigen; also beginnt er
+        deckend und endet näher). */
+    const ZOOM_ENDE = 1.5;
+
+    /** Maß der Zeichnung am ANFANG des Anflugs, wenn Text und Formular
+        gestapelt stehen — als Anteil ihrer vollen Größe (hochkant:
+        1080 × 1646 → 540 × 823). Am Ende steht sie beim
+        ZOOM_ENDE-fachen, also etwa bei 0,75 — der Nähe, die vorher fest
+        stand (0,73: den Ort sehen, nicht den Häuserblock). Ist der
+        Bereich höher, wächst das Maß, bis die Zeichnung unten ankommt. */
+    const MASS_SCHMAL = 0.5;
 
     /* Die beiden Zeichnungen: nebeneinander das 16:9-Bild des Handoffs,
        gestapelt das hochkante aus scripts/karte-zeichnen.mjs (die CSS-
@@ -723,6 +733,15 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
         hinaus, fällt dieser Verlauf hinter die Unterkante, und die Karte
         bleibt bis unten satt. Was oben über den Rand hinausragt, deckt
         ohnehin der weiße Schleier.
+
+        Alle Maße gelten für den ANFANG des Anflugs (Zoom 1). Die
+        senkrechte Reichweite unter der Marke darf durch ZOOM_ENDE
+        geteilt werden: Der untere Teil des Bereichs (das Formular) kommt
+        erst ins Bild, wenn der Anflug längst zu Ende ist — und dann
+        steht die Zeichnung beim ZOOM_ENDE-fachen, um die Marke
+        vergrößert, also entsprechend weiter nach unten. Die waagerechte
+        Deckung dagegen ist vom ersten Bild an zu sehen und bleibt
+        ungeteilt.
       */
       const UEBERSTAND = 200;
       const z = nebeneinander ? ZEICHNUNG.breit : ZEICHNUNG.hoch;
@@ -736,7 +755,7 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
         : Math.max(
             MASS_SCHMAL,
             (2 * Math.max(x, b.width - x)) / z.breite,
-            (b.height + UEBERSTAND - y) / (z.hoehe - z.praxis.y),
+            (b.height + UEBERSTAND - y) / (z.hoehe - z.praxis.y) / ZOOM_ENDE,
           );
       const breit = Math.ceil(z.breite * mass);
       const hoch = Math.ceil(z.hoehe * mass);
@@ -753,11 +772,6 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     /** Ab diesem Anteil des Wegs fällt die Marke — die Zeichnung ist
         dann fast da und rollt nur noch aus. */
     const MARKE_BEI = 0.6;
-
-    /** Wo der Anflug beginnt: die Zeichnung auf 62 % ihrer Größe, also
-        von weit draußen (Florian, 27. September 2026; vorher 125 %,
-        also von zu nah). */
-    const ZOOM_START = 0.62;
 
     /** Länge des Anflugs in Fensterhöhen: von der Unterkante bis
         15 % unter der Oberkante (vorher bis 45 % — zu kurz). */
@@ -790,10 +804,11 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     let zuletzt = 0;
 
     const zeichnen = () => {
-      /* Von ZOOM_START auf 100 %, sanft an- und auslaufend (smoothstep)
-         — die Trägheit des Nachlaufs rundet das noch einmal ab */
+      /* Von der deckenden Größe (1) auf ZOOM_ENDE, sanft an- und
+         auslaufend (smoothstep) — die Trägheit des Nachlaufs rundet das
+         noch einmal ab */
       const s = wert * wert * (3 - 2 * wert);
-      const zoom = ZOOM_START + (1 - ZOOM_START) * s;
+      const zoom = 1 + (ZOOM_ENDE - 1) * s;
       bereich.style.setProperty('--karte-zoom', zoom.toFixed(4));
       if (wert >= MARKE_BEI && !bereich.dataset.da) bereich.dataset.da = 'ja';
     };

@@ -2036,18 +2036,37 @@ an `<html>`, wird aber ohnehin bei jedem Aufbau neu gemessen.)
 Bild kommt, fährt jetzt aus 32 px Tiefe und 96 % Größe in 1,1 s heran
 (vorher 18 px, 0,8 s, ohne Größe).
 
-**Der Anflug der Karte kommt von weit draußen** (`Kontakt.astro`): Die
-Zeichnung beginnt auf 62 % (vorher 125 % — von zu nah, ein Wegfahren
-statt ein Heranfliegen), der Weg ist länger (Spitze der Marke von der
-Unterkante bis 15 % unter der Oberkante statt bis 45 %), die Kurve ein
-sanftes An- und Auslaufen (smoothstep), und der Nachlauf ist träger
-(`nachziehen` mit Rest 0,86 statt 0,7 — dafür hat die Funktion jetzt
-einen Parameter). Die Marke fällt bei 60 %. Weil die Zeichnung
-anfangs kleiner ist als der Bereich, läuft sie auf ALLEN Größen über
-die Ellipsen-Maske weich in den Grund aus (bisher nur gestapelt);
-nebeneinander beginnt der Verlauf bei 60 % statt 50 %, damit bei voller
-Größe nur die äußersten Ecken darin liegen. Der Bereich hat den
-Grundton der Zeichnung, der Übergang ist unsichtbar.
+**Der Anflug der Karte kommt von weit draußen — und zeigt nie eine
+Kante** (`Kontakt.astro`): Die Zeichnung beginnt in ihrer DECKENDEN
+Größe und zoomt um die Marke auf das Anderthalbfache heran
+(`ZOOM_ENDE = 1,5`; vorher fuhr sie von 125 % auf 100 % herunter, also
+von zu nah). Ein erster Versuch am selben Tag ließ sie auf 62 %
+beginnen und auf 100 % wachsen — dann war sie anfangs kleiner als der
+Bereich, und man sah ihre Kanten (Florian: „das sieht nicht gut aus").
+Deshalb jetzt umgekehrt: Das Maß deckt den Bereich schon bei Zoom 1,
+der Bezugspunkt liegt darin, und beim Vergrößern bleibt alles gedeckt.
+Die Folge: Das Ende steht näher als vorher. Nebeneinander ist es das
+1,5-fache der bisherigen Nähe. Gestapelt (Handys) ist das Startmaß auf
+0,5 gesenkt (`MASS_SCHMAL`, vorher 0,73), sodass das Ende bei etwa 0,75
+steht — der bisherigen Nähe („den Ort sehen, nicht den Häuserblock");
+und die senkrechte Reichweite unter der Marke wird durch 1,5 geteilt,
+weil das Formular erst ins Bild kommt, wenn der Anflug zu Ende ist
+und die Zeichnung entsprechend weiter nach unten reicht. Die Ellipsen-
+Maske gibt es weiter nur gestapelt; ihr voller Teil reicht jetzt bis
+75 % der Achsen statt 50 — beim schmaleren Startmaß läge die linke
+Kante des Bereichs sonst im Verlauf (bei 375 px: 270 px von der Mitte,
+der Verlauf begänne bei 185, jetzt bei 278), und am unteren Rand, wo
+das Formular steht, bleibt die Zeichnung am Ende fast satt statt halb.
+Nachgerechnet bei 375 × 812: Startmaß 0,685 (die waagerechte Deckung
+gibt den Ausschlag), Zeichnung 740 × 1127 px, oben bleiben 302 px des
+Bereichs ohne Zeichnung — unter dem weißen Schleier, der dort auf 97 %
+steht, und mit dem Verlauf der Maske als weicher Oberkante.
+
+Der Weg ist länger (Spitze der Marke von der Unterkante bis 15 %
+unter der Oberkante statt bis 45 %), die Kurve ein sanftes An- und
+Auslaufen (smoothstep), der Nachlauf träger (`nachziehen` mit Rest
+0,86 statt 0,7 — dafür hat die Funktion jetzt einen Parameter). Die
+Marke fällt bei 60 %.
 
 **Alle Bilder wachsen über den Scrollweg** (`scripts/bildlauf.ts`, neu):
 Die Schleife aus Neuigkeiten.astro ist jetzt ein gemeinsames Skript
@@ -2090,7 +2109,8 @@ Fensterkante, fest, ohne Zeigerwirkung, unter den Leisten (z-index
 
 **Die Symbole der unteren Leiste** wachsen beim Zeigen um ihre Mitte
 (`scale(1.1)`, vorher 4 px angehoben plus 1,06), und die Beschriftung
-rückt 3 px nach unten.
+rückt 3 px nach unten — Farbe und Deckkraft behält sie (vorher
+blendete sie auf 65 %; Florian, 27. September 2026).
 
 **Die Leistungskachel morpht aus ihrer Zeige-Lage** — siehe den Eintrag
 davor (noch vom 26. September).

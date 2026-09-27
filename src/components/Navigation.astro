@@ -1266,15 +1266,14 @@ const kategorien = (leistungen.kategorien ?? [])
     transform: scale(1.1);
   }
 
+  /* Die Beschriftung behält Farbe und Deckkraft — sie rückt nur
+     (Florian, 27. September 2026; vorher blendete sie auf 65 %) */
   .fussknopf__text {
-    transition:
-      opacity 0.35s var(--verlauf),
-      transform 0.45s var(--verlauf-betont);
+    transition: transform 0.45s var(--verlauf-betont);
   }
 
   .fussknopf:hover .fussknopf__text,
   .fussknopf:focus-visible .fussknopf__text {
-    opacity: 0.65;
     transform: translateY(3px);
   }
 
