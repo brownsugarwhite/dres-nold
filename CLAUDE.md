@@ -217,7 +217,7 @@ functions/      Cloudflare Pages Functions:
   api/save.ts      speichert Redaktionsänderungen als Commit
   api/hochladen.ts Bilder und PDFs
   api/kontakt.ts   nimmt das Kontaktformular entgegen (Resend)
-scripts/        Prüfskripte für den Build
+scripts/        Prüf- und Vorbereitungsskripte für den Build (u. a. kleine Bildvarianten der Beitragskarten, läuft als `prebuild`)
 .github/workflows/veroeffentlichen.yml   Bauen und Aufspielen, täglich 03:00 UTC
 docs/
   betrieb.md    Konten, Secrets, Wiederherstellen, Störungen

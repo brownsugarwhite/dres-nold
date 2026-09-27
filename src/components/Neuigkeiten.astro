@@ -1,5 +1,16 @@
 ---
 import { trennen } from '../lib/silben';
+import { existsSync } from 'node:fs';
+
+/* Die 600-px-Variante der Karte (scripts/bilder-varianten.mjs) — wenn
+   sie da ist; sonst das Original (etwa im Entwicklungsmodus vor dem
+   ersten Build) */
+const bildKlein = (bild: string) => {
+  const m = /^(.*)\.(jpe?g|png)$/i.exec(bild);
+  if (!m) return bild;
+  const variante = `${m[1]}-600.${m[2]}`;
+  return existsSync(`public${variante}`) ? variante : bild;
+};
 /**
  * Neuigkeiten — Übersicht auf der Startseite.
  *
@@ -46,12 +57,14 @@ const alsDatum = (iso: string) =>
                       beim Zeigen. Zwei `transform` auf einem Element
                       ließen sich nicht getrennt überblenden. */}
                   <span class="beitrag__lauf" data-bildlauf>
-                    {/* `decoding="sync"`: Safari legt beim Seitenwechsel die Ebene des
-                        Bildes neu an und dekodierte es dabei asynchron — für ein
-                        Bild war die Fläche weiß, vor dem Morph und nach dem Rückweg
-                        (Florian, 27. September 2026). Synchron dekodiert gibt es
-                        dieses Bild nicht. */}
-                    <img class="beitrag__bild" src={b.bild} alt={b.bild_alt || ''} width="600" height="338" loading="lazy" decoding="sync" />
+                    {/* Die kleine Variante (600 px) und `decoding="sync"`: Safari
+                        dekodiert große Bilder asynchron und legt beim Seitenwechsel
+                        die Ebene des Bildes neu an — die Karte blitzte dabei für ein
+                        Bild weiß auf, vor dem Morph und nach dem Rückweg (Florian,
+                        27. September 2026). Klein und synchron dekodiert gibt es
+                        dieses Bild nicht; die Leistungskacheln mit ihren kleinen
+                        SVG-Symbolen kannten es nie. */}
+                    <img class="beitrag__bild" src={bildKlein(b.bild)} alt={b.bild_alt || ''} width="600" height="338" loading="lazy" decoding="sync" />
                   </span>
                 </span>
               )}
@@ -158,14 +171,7 @@ const alsDatum = (iso: string) =>
   }
 
   /* Die Gruppe „bild" (styles/uebergaenge.css: Abbild der Karte
-     entfällt, Zoom) bekommt NUR der Ausschnitt der morphenden Karte —
-     seit alle Karten ihre Namen behalten, träfe sie sonst auch den
-     Nachbarn, dessen Bild im Rückweg dann fehlte und erst danach kam
-     (Florian, 27. September 2026). Der Ausschnitt liegt außerdem
-     dauerhaft auf einer eigenen Ebene (`will-change`): Safari legte sie
-     sonst erst beim Erfassen für den Wechsel an — und das gab ein
-     weißes Bild direkt vor dem Morph. */
-  .beitrag__ausschnitt { will-change: transform; }
+     entfällt, Zoom) am Ausschnitt der morphenden Karte */
   .beitrag__link[data-morph] .beitrag__ausschnitt { view-transition-class: bild; }
 
   .beitrag__link:focus-visible .beitrag__bild {
@@ -176,16 +182,18 @@ const alsDatum = (iso: string) =>
     .beitrag__link:hover .beitrag__bild { transform: scale(1.07); }
   }
 
-  /* Nur der Beitrag, der gerade morpht, gehört zur Gruppe „karte" (und
-     liegt damit über den Nachbarn). Seine NAMEN behalten alle Beiträge
-     dauerhaft — anders als die Leistungskacheln (LeistungKachel.astro):
-     Bekäme die Karte ihren Namen erst beim Tipp, legte Safari in diesem
-     Moment eine eigene Ebene für sie an und rasterte das Bild neu — ein
-     weißes Bild direkt vor dem Morph (Florian, 27. September 2026). Bei
-     zwei, drei Beiträgen kosten die stehenden Ebenen nichts; die
-     übrigen Karten blenden im Wechsel schlicht mit der Seite aus. */
+  /* Nur der Beitrag, der gerade morpht, bekommt Übergangsebenen — alle
+     anderen geben ihre Namen ab, genau wie die Leistungskacheln
+     (LeistungKachel.astro). Ein Versuch mit dauerhaften Namen (27.
+     September 2026) brachte nichts gegen das Blitzen und ließ den
+     Nachbarn mit eigener Ebene statt mit der Seite erscheinen. */
   .beitrag__link[data-morph] {
     view-transition-class: karte;
+  }
+
+  .beitrag__link:not([data-morph]),
+  .beitrag__link:not([data-morph]) .beitrag__ausschnitt {
+    view-transition-name: none;
   }
 
   /* Beim Klick bleibt alles stehen, wie es steht: Der Ausschnitt trägt

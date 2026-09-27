@@ -2537,3 +2537,19 @@ die echte Kopfleiste ein. Die Mikroaufgabe war nur nötig, solange
 Begrüßung und Band auf Handys erst umsortiert wurden — das steht
 inzwischen im Markup. Das Zentrieren läuft wieder sofort im
 `after-swap`.
+
+**Nachtrag 4 — wie die Leistungen, plus kleines Bild:** Florian: Bei
+den Leistungen ist alles glatt — was ist der Unterschied? Drei Dinge,
+zwei davon waren meine Versuche von heute: dauerhafte Namen (zurück auf
+„nur die morphende Karte", wie die Kacheln; der Nachbar erscheint
+damit wieder mit der Seite) und die eigene Ebene (`will-change`, weg).
+Der dritte ist der eigentliche: Die Kachel morpht ein kleines SVG, die
+Karte ein 120 bis 170 KB großes JPEG — und Safari dekodiert so große
+Bilder asynchron, auch beim Erfassen für den Wechsel. Deshalb erzeugt
+`scripts/bilder-varianten.mjs` vor jedem Build (`prebuild`) für jedes
+Beitragsbild eine 600-px-Variante (rund 30 bis 50 KB, in .gitignore),
+die Karte zeigt sie (`bildKlein()` in Neuigkeiten.astro, mit Rückfall
+auf das Original), die Beitragsseite weiter das Original. Und weil
+Karte und Seite damit verschiedene Dateien zeigen, dekodiert
+`uebergaenge.ts` das Original der Zielseite vorab (im `loader`), bevor
+die neue Seite eingetauscht und aufgenommen wird.

@@ -27,3 +27,7 @@ Thumbs.db
 # (große ZIP-Dateien und CDN-Downloads)
 docs/referenz/*.zip
 docs/referenz/original/
+
+# Kleine Bildvarianten der Beitragskarten — entstehen vor jedem Build
+# (scripts/bilder-varianten.mjs)
+public/bilder/**/*-600.*

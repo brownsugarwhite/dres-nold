@@ -149,6 +149,17 @@ document.addEventListener('astro:before-preparation', (ereignis) => {
     const laden = e.loader;
     e.loader = async () => {
       await Promise.all([laden(), bild.decode().catch(() => undefined)]);
+      /* Und das Bild der ZIELSEITE (das Original, während die Karte die
+         kleine Variante zeigt): einmal laden und dekodieren, bevor die
+         neue Seite eingetauscht und aufgenommen wird — sonst stünde im
+         Abbild der Beitragsseite ein noch leeres Bild. */
+      const neu = (e as unknown as { newDocument?: Document }).newDocument?.querySelector<HTMLImageElement>('.beitrag__bild');
+      if (neu?.src) {
+        const vorab = new Image();
+        vorab.decoding = 'sync';
+        vorab.src = neu.src;
+        await vorab.decode().catch(() => undefined);
+      }
     };
   }
 
