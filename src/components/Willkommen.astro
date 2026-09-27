@@ -83,16 +83,20 @@ const klein = zeilen.slice(0, -1).join(' ');
     margin-inline: auto;
   }
 
+  /* Die beiden Zeilen rücken so weit auseinander, dass die Überschrift
+     die Höhe der rechten Spalte hat (Florian, 27. September 2026) */
   .willkommen__titel {
     display: flex;
     flex: none;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     margin: 0;
     line-height: 1.05;
   }
 
-  /* Die kleine Zeile in der Größe der übrigen Überschriften … */
+  /* Die kleine Zeile — genau so breit wie die große darunter; das
+     Skript unten misst sie ein. Die Größe der übrigen Überschriften ist
+     der Rückfall ohne Skript. */
   .willkommen__klein {
     display: block;
     font-size: var(--text-titel);
@@ -190,26 +194,44 @@ const klein = zeilen.slice(0, -1).join(' ');
 
 <script>
   /**
-   * Auf Handys füllen beide Zeilen der Überschrift genau die Breite:
-   * Jede wird bei 100 px gemessen und dann so weit verkleinert, dass
-   * sie eben hineinpasst — die längere Zeile wird dabei von selbst die
-   * kleinere. Auf breiten Fenstern gelten die Größen aus dem CSS.
-   * Läuft beim Aufbau, bei Größenänderung, nach dem Laden der Schrift
-   * und nach jedem Seitenwechsel.
+   * Die Zeilen der Überschrift einmessen (Florian, 27. September 2026):
+   *
+   *   Handys   — beide Zeilen füllen genau die Breite des Bildschirms.
+   *   Desktop  — die große Zeile behält ihre Größe aus dem CSS, die
+   *              kleine wird genau so breit wie die große.
+   *
+   * Eine Zeile wird bei 100 px gemessen und dann auf die Breite
+   * verkleinert, die sie füllen soll. Auf dem Desktop ist die
+   * Überschrift so breit wie ihre breiteste Zeile — die kleine wird
+   * deshalb vorher winzig gestellt, damit die Messung allein die große
+   * sieht. Läuft beim Aufbau, bei Größenänderung, nach dem Laden der
+   * Schrift und nach jedem Seitenwechsel.
    */
   function titelFuellen() {
     const titel = document.querySelector<HTMLElement>('[data-willkommentitel]');
     if (!titel) return;
     const zeilen = [...titel.querySelectorAll<HTMLElement>('[data-zeile]')];
     zeilen.forEach((z) => z.style.removeProperty('font-size'));
-    if (!window.matchMedia('(max-width: 767px)').matches) return;
-    const platz = titel.clientWidth;
-    if (!platz) return;
-    zeilen.forEach((z) => {
+    const handy = window.matchMedia('(max-width: 767px)').matches;
+
+    const einpassen = (z: HTMLElement, platz: number) => {
       z.style.fontSize = '100px';
       const noetig = z.scrollWidth;
       z.style.fontSize = noetig > 0 ? `${Math.floor(((100 * platz) / noetig) * 100) / 100}px` : '';
-    });
+    };
+
+    if (handy) {
+      const platz = titel.clientWidth;
+      if (platz) zeilen.forEach((z) => einpassen(z, platz));
+      return;
+    }
+
+    const klein = titel.querySelector<HTMLElement>('.willkommen__klein');
+    if (!klein) return;
+    klein.style.fontSize = '1px';
+    const platz = titel.clientWidth;
+    if (platz) einpassen(klein, platz);
+    else klein.style.removeProperty('font-size');
   }
 
   let angemeldet = false;
