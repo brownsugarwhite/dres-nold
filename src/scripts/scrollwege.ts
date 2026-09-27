@@ -29,21 +29,37 @@ import { ausStuetzstellen, type Stuetzstelle } from './easing';
  * (vorher 3,52 / 4,62). Wer eine der Zahlen ändert, rechnet die
  * andere nach (Skript in docs/entscheidungen.md, „Die Sprechstunden
  * kommen früher").
+ *
+ * Seit dem 27. September 2026 läuft der ganze Ablauf zusätzlich
+ * `OZ_VORLAUF` (150 px) früher. Gemessen erreicht die Karte die
+ * Unterkante des Logos dann 30 px (375 × 667) bis 330 px (1440 × 900)
+ * Scrollweg, nachdem es ganz fort ist — sie schiebt sich also weiter
+ * nie darüber.
  */
 export function ozWeg(): number {
   return window.matchMedia('(max-width: 991px)').matches ? 3.6 : 4.2;
+}
+
+/**
+ * Wie viele Bildpunkte früher der ganze Ablauf a-19 läuft, als der
+ * Streifen allein ergäbe — Hereinfahren, Rast, Schnalz und Freigabe
+ * rücken gemeinsam nach vorn (Florian, 27. September 2026: „150 px
+ * früher ins Bild — es ist zu lange weiß, wenn sich das Logo
+ * ausgezeichnet hat"). Geschwindigkeit und Wege bleiben, wie sie sind.
+ * Muss zu `--oz-vorlauf` in Oeffnungszeiten.astro passen.
+ */
+export const OZ_VORLAUF = 150;
+
+/** Fortschritt von Ablauf a-19 für einen Bereich, dessen Oberkante
+    `oben` Bildpunkte unter dem Fensteroberrand steht — samt Vorlauf. */
+export function ozFortschritt(oben: number): number {
+  return beimScrollenSichtbar(ozWeg(), oben - OZ_VORLAUF);
 }
 
 /** Bei diesem Anteil von Ablauf a-19 steht die Blase mit voll
     ausgefahrenem Zipfel; genau hier schnalzt er zurück und die Leisten
     tauschen. Muss zu `--oz-ende` in Oeffnungszeiten.astro passen. */
 export const OZ_RAST = 0.78;
-
-/** Kurz davor hat der Zipfel seine volle Länge erreicht und steht.
-    Das kleine Plateau ist Absicht: Der gezeichnete Wert läuft dem
-    Scrollwert nach (`nachziehen`) — ohne Plateau wäre der Zipfel beim
-    Schnalz je nach Scrolltempo noch ein Stück zu kurz. */
-export const OZ_ZIPFEL_VOLL = 0.74;
 
 /** Wie lange Schnalz und Leistenwechsel dauern. Ein Wert für beides:
     Der Zipfel zieht sich nicht mehr am Scrollweg ein, sondern schnalzt
@@ -61,7 +77,7 @@ export const SCHNALZ_DAUER = 300;
  * Ablauf a-19, umgerechnet in Scrolltiefe (siehe beimScrollenSichtbar).
  */
 export function schnalzWeg(): number {
-  return OZ_RAST * (ozWeg() + 1) - 1;
+  return OZ_RAST * (ozWeg() + 1) - 1 - OZ_VORLAUF / window.innerHeight;
 }
 
 /**
@@ -126,7 +142,7 @@ export function ozAnteilFuer(ziel: number, stellen: Stuetzstelle[]): number {
 
 /** Scrolltiefe in Bildpunkten, bei der der Ablauf den Anteil `p` hat. */
 export function ozTiefeAus(p: number): number {
-  return Math.max(0, Math.round((p * (ozWeg() + 1) - 1) * window.innerHeight));
+  return Math.max(0, Math.round((p * (ozWeg() + 1) - 1) * window.innerHeight - OZ_VORLAUF));
 }
 
 /**

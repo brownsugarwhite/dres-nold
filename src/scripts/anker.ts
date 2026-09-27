@@ -21,16 +21,16 @@
  * läuft in der Capture-Phase und ist damit vor ihm dran.
  */
 
-import { ozWeg, OZ_RAST, ozStuetzstellen, ozAnteilFuer, ozTiefeAus } from './scrollwege';
+import { OZ_RAST, ozStuetzstellen, ozAnteilFuer, ozTiefeAus } from './scrollwege';
 import { KURVEN } from './easing';
 
 /** Höhe der Kopfleiste — so viel Luft bleibt über dem Ziel */
 const KOPFLEISTE = 80;
 const LUFT = 16;
 
-/** Scrolltiefe, bei der die Blase mit Zipfel steht (in Fensterhöhen) —
+/** Scrolltiefe in Bildpunkten, bei der die Blase mit Zipfel steht —
     eine Spur vor dem Rastpunkt, damit die Leisten noch nicht tauschen */
-const ozRuhe = () => (OZ_RAST - 0.01) * (ozWeg() + 1) - 1;
+const ozRuhe = () => ozTiefeAus(OZ_RAST - 0.01);
 
 function zahl(stil: CSSStyleDeclaration, name: string): number {
   return parseFloat(stil.getPropertyValue(name));
@@ -115,7 +115,7 @@ export function zielTiefe(hash: string): number | null {
   if (!id || id === 'start') return 0;
 
   if (id === 'oz_anchor') {
-    return document.getElementById('oz_anchor') ? Math.round(ozRuhe() * window.innerHeight) : null;
+    return document.getElementById('oz_anchor') ? ozRuhe() : null;
   }
 
   const element = document.getElementById(id);

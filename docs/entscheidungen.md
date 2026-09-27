@@ -2657,3 +2657,44 @@ Anriss selbst blendet erst in deren zweiter Hälfte ein (0,65–1,15 s).
 Bezeichnung, Kreis und Nummer folgen der Klappe mit demselben Verzug.
 Die Werte stehen als `--klappen-dauer` / `--klappen-verzug` an der Liste
 und als `KLAPPEN` / `AUSBLENDEN` im Skript.
+
+### Wie die alte Seite: Logo und Zipfel stehen still, die Karte kommt 150 px früher (27. September 2026, abends)
+
+Florian verglich am iPhone mit dres-nold.de. Gemessen haben wir die alte
+Seite in Playwright (375 × 812, Handy-Profil).
+
+**Logo und Blase rutschten mit der Browserleiste.** Startbereich und
+Bühne der Sprechstunden waren `100dvh` hoch. `dvh` wächst, wenn die
+Bedienleiste von Safari und Chrome beim Scrollen einklappt — das mittig
+gesetzte Logo rutschte dabei ein paar Pixel nach unten, Blase und
+Zipfel ebenso. Die alte Seite nimmt für beides `100vh`
+(`.logo-container`, `.oz-container`), auf Handys die Höhe bei
+eingeklappter Leiste — sie steht still. Jetzt bei uns auch
+(`Startbereich.astro`, `.ozbereich__buehne`).
+
+**Die Spitze des Zipfels steht fest auf der Linie.** Auf der alten Seite
+steigt die Blase auf dem letzten Stück 150 px, während der Zipfel im
+selben Abschnitt 155 px wächst; gemessen steht die Spitze dabei
+zwischen 698 und 701,5 px, die Linie der Symbolleiste bei 702 — sie
+landet genau darauf. Bei uns liefen Blase und Zipfel mit eigenen
+Stützstellen und Kurven: Die Spitze tauchte beim Ausfahren bis 708 px
+(6 px unter die Linie) und stieg dann auf 690,5 px (11,5 px darüber).
+Jetzt wächst der Zipfel genau um das, was die Blase noch bis zur
+Ruhelage steigen muss (`zeichnen()`: Ausfahrgrad = 1 − Versatz ÷
+Zipfellänge). Gemessen: 702,0 px vom ersten Ausfahren bis zum Schnalz,
+auf dem Desktop 790,0 px bei einer Linie von 790. Die 10 px Luft vom
+18. September sind weg — sie brauchte es nur, weil die Spitze beim
+Ausfahren unter die Linie tauchte. Die eigenen Stützstellen des
+Zipfels und `OZ_ZIPFEL_VOLL` sind entfallen.
+
+**Die Sprechstunden kommen 150 px früher** (Florian: „es ist zu lange
+weiß, wenn sich das Logo ausgezeichnet hat"). Nicht der Weg ist kürzer,
+sondern der ganze Ablauf a-19 läuft um `OZ_VORLAUF` (150 px) früher —
+Hereinfahren, Rast, Schnalz, Leistenwechsel, Freigabe der Bühne und die
+Sprungmarken; Tempo und Wege bleiben. Eingerechnet in
+`ozFortschritt()`, `schnalzWeg()`, `ozTiefeAus()` (scripts/scrollwege.ts)
+und `--oz-vorlauf` / `--oz-ende` (Oeffnungszeiten.astro). Gemessen wird
+die Karte über der Leiste 140 bis 150 px früher sichtbar — auf Handys
+schon, während sich das Logo noch auflöst —, und sie erreicht die
+Unterkante des Logos 30 px (375 × 667) bis 330 px (1440 × 900)
+Scrollweg, nachdem es ganz fort ist.

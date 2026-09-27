@@ -170,7 +170,13 @@ const texte = startseite.sprechstunden;
      scrollt von da an mit dem Inhalt weiter (Florian, 14. September
      2026), statt bis zum Ende des Scrollwegs stehen zu bleiben. */
   .ozraum,
-  .ozbereich { --oz-ende: calc(0.78 * (var(--oz-weg) + 100vh)); }
+  .ozbereich {
+    /* Der ganze Ablauf läuft 150 px früher (`OZ_VORLAUF` in
+       scripts/scrollwege.ts) — damit endet auch der Bereich so viel
+       früher */
+    --oz-vorlauf: 150px;
+    --oz-ende: calc(0.78 * (var(--oz-weg) + 100vh) - var(--oz-vorlauf));
+  }
 
   /* Nimmt den Platz im Seitenfluss ein und deckt den grauen Grund ab.
      Höhe von `.trigger-oz-scroll` / `.oz` in der mobilen Vorlage. */
@@ -208,8 +214,13 @@ const texte = startseite.sprechstunden;
   .ozbereich__buehne {
     position: sticky;
     top: 0;
+    /* `100vh`, nicht `100dvh` — wie `.oz-container` der alten Seite.
+       `dvh` wächst mit der Bedienleiste des Browsers, die auf dem Handy
+       beim Scrollen einklappt, und schob Blase und Zipfel dabei ein
+       paar Pixel hinterher; `vh` ist auf Handys die Höhe bei
+       eingeklappter Leiste und steht still (Florian, 27. September
+       2026). */
     height: 100vh;
-    height: 100dvh;
     /* Wie `.oz-container` auf Mobile: schneidet ab, was noch unterhalb
        steht — sonst schöbe sich die Blase über die Symbolleiste.
        `clip` statt `hidden`: `hidden` machte die Bühne zum
@@ -536,10 +547,10 @@ const texte = startseite.sprechstunden;
 </noscript>
 
 <script>
-  import { ausStuetzstellen, KURVEN, type Stuetzstelle } from '../scripts/easing';
+  import { ausStuetzstellen, KURVEN } from '../scripts/easing';
   import {
-    ozWeg, beimScrollenSichtbar, nachziehen, ozStuetzstellen,
-    schnalzWeg, OZ_ZIPFEL_VOLL, SCHNALZ_DAUER,
+    ozFortschritt, nachziehen, ozStuetzstellen,
+    schnalzWeg, SCHNALZ_DAUER,
   } from '../scripts/scrollwege';
   import { zuSprungmarke, sanftScrollen } from '../scripts/anker';
 
@@ -631,11 +642,6 @@ const texte = startseite.sprechstunden;
   /** Höhe der Symbolleiste unten — `.fussleiste__inhalt` */
   const LEISTE = 110;
 
-  /** Luft zwischen der Spitze des Zipfels und der Oberkante der
-      Symbolleiste. Ohne sie endete die Spitze genau auf deren
-      Punktlinie und verschwand dahinter; sie soll knapp darüber stehen
-      (Florian, 18. September 2026). */
-  const LUFT = 10;
 
   /**
    * Die Fensterbreite OHNE Rollleiste als CSS-Wert. `100vw` zählt sie
@@ -715,9 +721,13 @@ const texte = startseite.sprechstunden;
          Versatz so wählen, dass der höchste Punkt 2 px darunter liegt. */
       versatzOben = Math.max(4, (breite / 2) * VORLAGE.neigung + 2);
 
-      /* Blase so hoch, dass die ausgefahrene Spitze knapp über der
-         Leiste endet */
-      ruhelage = LEISTE + LUFT + laenge + grundlinie(spitzeX);
+      /* Blase so hoch, dass die ausgefahrene Spitze genau auf der
+         Oberkante der Leiste steht — wie auf der alten Seite (dort
+         gemessen: 0,5 px darüber; Florian, 27. September 2026). Vom
+         18. bis 27. September standen hier 10 px Luft; die brauchte
+         es nur, weil die Spitze beim Ausfahren unter die Linie tauchte
+         — das tut sie nicht mehr (`zeichnen()`). */
+      ruhelage = LEISTE + laenge + grundlinie(spitzeX);
       document.documentElement.style.setProperty('--oz-ruhe', `${ruhelage}px`);
 
       const hoehe = versatzOben * 2 + laenge + 4;
@@ -778,22 +788,6 @@ const texte = startseite.sprechstunden;
       blase.style.setProperty('--oz-start', `${Math.round(start)}px`);
     };
 
-    /* Der Zipfel fährt aus, während die Blase einrastet — und bleibt
-       dann stehen. Das Einziehen hängt NICHT mehr am Scrollweg: Es ist
-       der Schnalz und läuft als eigene, schnelle Bewegung ab (unten).
-
-       Die Stellen sind dieselben wie in der Vorlage, nur auf den um
-       die Wartezeit verlängerten Weg umgerechnet: 50 % → 61 %,
-       71 % → 74 % (OZ_ZIPFEL_VOLL). Vorher standen hier noch die
-       ungerechneten Werte — deshalb passte der Schnalz nicht mehr
-       (Florian, 18. September 2026). */
-    const ZIPFEL: Stuetzstelle[] = [
-      { bei: 0.00, wert: 0, kurve: 'linear' },
-      { bei: 0.61, wert: 0, kurve: 'outCubic' },
-      { bei: OZ_ZIPFEL_VOLL, wert: 0.99, kurve: 'linear' },
-      { bei: 1.00, wert: 0.99 },
-    ];
-
     /* Erst messen (das setzt Zipfellänge und Ruhelage), dann den
        Startwert daraus bestimmen. */
     vermessen();
@@ -804,9 +798,9 @@ const texte = startseite.sprechstunden;
     let laeuft = false;
     let zuletzt = 0;
 
-    /** Scrollwert wie Webflows „while scrolling in view". */
+    /** Scrollwert wie Webflows „while scrolling in view" — samt Vorlauf */
     function ziel(): number {
-      return beimScrollenSichtbar(ozWeg(), bereich!.getBoundingClientRect().top);
+      return ozFortschritt(bereich!.getBoundingClientRect().top);
     }
 
     /* ---- Der Schnalz ----
@@ -903,9 +897,19 @@ const texte = startseite.sprechstunden;
       if (hatteFokus) kreuz.focus();
     };
 
+    /* Der Zipfel wächst genau um das, was die Blase noch bis zur
+       Ruhelage steigen muss: Die Spitze steht damit fest auf der Linie
+       der Symbolleiste, während die Blase einrastet — wie auf der alten
+       Seite, wo die Blase auf dem letzten Stück 150 px steigt und der
+       Zipfel im selben Abschnitt 155 px wächst. Vorher liefen beide mit
+       eigenen Stützstellen und Kurven: Die Spitze tauchte beim Ausfahren
+       6 px unter die Linie und stieg dann auf 11 px darüber (Florian,
+       27. September 2026). Das Einziehen hängt nicht am Scrollweg: Es
+       ist der Schnalz und läuft als eigene Bewegung ab (oben). */
     const zeichnen = () => {
-      blase.style.setProperty('--oz-versatz', `${ausStuetzstellen(p, BLASE)}px`);
-      zipfelZeichnen(ausStuetzstellen(p, ZIPFEL), schnalz);
+      const versatz = ausStuetzstellen(p, BLASE);
+      blase.style.setProperty('--oz-versatz', `${versatz}px`);
+      zipfelZeichnen(Math.min(1, Math.max(0, 1 - versatz / laenge)), schnalz);
       kreuzKleben();
     };
 

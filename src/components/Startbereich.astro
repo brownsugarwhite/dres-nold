@@ -87,6 +87,11 @@ const { praxis } = seite;
 */}
 
 <style>
+  /* `100vh`, nicht `100dvh` — wie `.logo-container` der alten Seite.
+     `dvh` wächst mit der Bedienleiste des Browsers, die auf dem Handy
+     beim Scrollen einklappt; das mittig gesetzte Logo rutschte dabei
+     ein paar Pixel nach unten. `vh` ist auf Handys die Höhe bei
+     eingeklappter Leiste und steht still (Florian, 27. September 2026). */
   .startbereich {
     position: fixed;
     inset: 0;
@@ -96,7 +101,6 @@ const { praxis } = seite;
     align-items: center;
     width: 100%;
     height: 100vh;
-    height: 100dvh;
     pointer-events: none;
   }
 
@@ -112,7 +116,6 @@ const { praxis } = seite;
     align-items: center;
     width: 100%;
     height: 100vh;
-    height: 100dvh;
     pointer-events: none;
   }
 
