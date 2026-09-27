@@ -2315,3 +2315,31 @@ Kieferorthopädie unter einem Dach." — Florian wollte den kürzeren Text
 aus dem Entwurf; der zweite Satz („Wir nehmen uns Zeit für Sie, …") ist
 aus `startseite.json` heraus. Das ist eine Inhaltsänderung; die Praxis
 kann ihn in der Redaktion jederzeit wieder ergänzen.
+
+### Stellenliste auf Handys: Anriss, Bezeichnung, Ansprechperson (27. September 2026, nachmittags)
+
+- **Der Anriss** unter der zugeklappten Bezeichnung ist auf höchstens
+  drei Zeilen begrenzt und sauber abgeschnitten (`-webkit-line-clamp`
+  setzt die Punkte); vorher kappte `max-height: 4em` mitten in der
+  dritten Zeile. Er steht im Blocksatz mit Trennstellen aus dem Build
+  (`trennen()`), wie die Lesetexte.
+- **Die Bezeichnung bricht zu genau so um wie offen.** Auf Handys
+  wächst sie beim Aufklappen; bisher entstanden dabei neue Umbrüche.
+  Jetzt ist die offene Größe die Bezugsgröße (`--titel-gross`), die
+  geschlossene ihr 1,165-tel — und zu darf die Bezeichnung nur
+  1/1,165 der Breite einnehmen (`max-width` am neuen `.stelle__titeltext`).
+  Breite und Schriftgrad wachsen im selben Verhältnis mit derselben
+  Kurve und Dauer; das Verhältnis Breite : Schrift bleibt in jedem
+  Moment gleich, und mit ihm die Umbrüche. Keine Trennstellen in der
+  Bezeichnung — „Fachan-gestellte" sähe in einer Stellenbezeichnung
+  nach nichts aus; sie bricht zwischen den Wörtern.
+- **Die klebende Ansprechperson bewegt sich nicht mehr** (vorher fuhr
+  sie 28 px von unten herauf und beim Zuklappen zurück): Sie steht,
+  sobald die Klappe offen ist, und geht mit ihr. Und sie lag unter dem
+  unteren Randverlauf und verblasste — der Inhalt hat seine eigene
+  Ebene (`.seiteninhalt`, z-index 5) unter den Verläufen (98), darüber
+  legen lässt sie sich nicht, ohne die Ebenen der ganzen Seite
+  umzubauen. Deshalb tritt der untere Verlauf auf Handys zurück,
+  solange eine Stelle offen ist: Stellen.astro beobachtet die Klappen
+  und setzt `data-stelle-offen` an <html>, global.css blendet den
+  Verlauf damit aus (300 ms).

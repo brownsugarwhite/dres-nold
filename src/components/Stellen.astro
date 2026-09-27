@@ -1,5 +1,5 @@
 ---
-import { trennenHtml } from '../lib/silben';
+import { trennen, trennenHtml } from '../lib/silben';
 /**
  * Stellenanzeigen — eigener Bereich, von der Praxis pflegbar.
  * Ist keine Stelle aktiv, erscheint der Bereich gar nicht.
@@ -66,10 +66,10 @@ const bewerbung = (titel: string) =>
               >
                 <span class="stelle__nummer" aria-hidden="true">{nummer(i)}</span>
                 <span class="stelle__titel">
-                  {s.titel}
+                  <span class="stelle__titeltext">{s.titel}</span>
                   {/* Nur zu sehen, solange die Zeile zu ist — sonst
                       stünde der Anriss über seinem eigenen Text. */}
-                  {s.beschreibung && <span class="stelle__anriss">{anriss(s.beschreibung)}</span>}
+                  {s.beschreibung && <span class="stelle__anriss">{trennen(anriss(s.beschreibung))}</span>}
                 </span>
                 {s.umfang && <span class="stelle__umfang">{s.umfang}</span>}
                 <span class="stelle__kreis" aria-hidden="true">
@@ -277,17 +277,28 @@ const bewerbung = (titel: string) =>
     wieder auftaucht (Florian, 18. September 2026). Vorher verschwand
     er hart.
   */
+  /* Höchstens drei Zeilen, sauber abgeschnitten (`line-clamp` setzt
+     die Punkte) — vorher kappte `max-height: 4em` mitten in der dritten
+     Zeile (Florian, 27. September 2026). Im Blocksatz wie die
+     Lesetexte; die Trennstellen setzt der Build. */
   .stelle__anriss {
-    display: block;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
     overflow: hidden;
     max-width: 52ch;
-    max-height: 4em;
+    max-height: 4.5em;
     margin-top: 6px;
     color: var(--farbe-text-gedeckt);
     font-size: 15px;
     font-weight: var(--gewicht-normal);
     line-height: 1.5;
+    text-align: justify;
+    -webkit-hyphens: auto;
+    hyphens: auto;
   }
+
+  .stelle__titeltext { display: block; }
 
   .stellen__liste[data-bereit] .stelle__anriss {
     transition:
@@ -462,18 +473,42 @@ const bewerbung = (titel: string) =>
   @media (max-width: 800px) {
     .stelle__spalten { display: block; }
 
+    /* Die offene Größe ist die Bezugsgröße, die geschlossene ihr
+       1,165-tel — und die Bezeichnung darf zu nur 1/1,165 der Breite
+       einnehmen. Breite und Schriftgrad wachsen im selben Verhältnis
+       (gleiche Kurve, gleiche Dauer), das Verhältnis Breite : Schrift
+       bleibt also in jedem Moment gleich — und mit ihm die Umbrüche:
+       Die Zeilen sind zu dieselben wie offen (Florian, 27. September
+       2026). */
+    .stelle__knopf {
+      --titel-gross: clamp(1.35rem, 1.15rem + 0.85vw, 1.85rem);
+      --titel-groesse: calc(var(--titel-gross) / 1.165);
+    }
+
     .stelle__knopf[aria-expanded='true'] {
-      --titel-groesse: clamp(1.35rem, 1.15rem + 0.85vw, 1.85rem);
+      --titel-groesse: var(--titel-gross);
+    }
+
+    .stelle__titeltext { max-width: calc(100% / 1.165); }
+    .stelle__knopf[aria-expanded='true'] .stelle__titeltext { max-width: 100%; }
+    .stellen__liste[data-bereit] .stelle__titeltext {
+      transition: max-width 0.45s var(--verlauf-betont);
     }
 
     .stellen__liste[data-bereit] .stelle__titel {
       transition: font-size 0.45s var(--verlauf-betont);
     }
 
-    /* Ruht 28 px tiefer und fährt beim Erscheinen von unten herauf —
-       sie klebt hier am unteren Rand, da kommt sie auch her. Beim
-       Zuklappen geht sie denselben Weg zurück. */
-    .stelle__seite {
+    /* Klebt am unteren Rand — ohne eigene Bewegung: Sie steht, sobald
+       die Klappe offen ist, und geht mit ihr (Florian, 27. September
+       2026; vorher fuhr sie 28 px von unten herauf). Solange sie steht,
+       tritt der untere Randverlauf zurück (styles/global.css,
+       `html[data-stelle-offen]`) — sonst läge sie unter ihm und
+       verblasste; über ihn legen lässt sie sich nicht, der Inhalt hat
+       seine eigene Ebene unter den Verläufen. */
+    .stelle__seite,
+    .stelle__klappe[data-offen] .stelle__seite,
+    .stelle__klappe[data-schliesst] .stelle__seite {
       position: sticky;
       top: auto;
       bottom: 0;
@@ -482,12 +517,12 @@ const bewerbung = (titel: string) =>
       padding-block: var(--abstand-s);
       border-top: 1px solid var(--farbe-linie-leise);
       background: var(--farbe-flaeche);
-      transform: translateY(28px);
+      transform: none;
     }
 
-    .stelle__klappe[data-offen] .stelle__seite { transform: translateY(0); }
-
-    .stelle__klappe[data-schliesst] .stelle__seite { transform: translateY(28px); }
+    .stellen__liste[data-bereit] .stelle__seite { transition: none; }
+    .stelle__klappe[data-offen] .stelle__seite,
+    .stelle__klappe[data-schliesst] .stelle__seite { opacity: 1; }
 
     /* Auf der ersten Zeile der Bezeichnung, wie Kreis und Umfang —
        12 px hoch (`--text-kicker` bei Zeilenhöhe 1). */
@@ -541,10 +576,27 @@ const bewerbung = (titel: string) =>
    * (`data-zu`). So sieht niemand, wie die Ansprechperson von ihrer
    * klebenden Lage zurück in die Zeile springt.
    */
+  /**
+   * Solange eine Stelle offen ist, steht `data-stelle-offen` an <html>:
+   * Auf Handys tritt dann der untere Randverlauf zurück, damit die
+   * klebende Ansprechperson nicht unter ihm verblasst (styles/global.css).
+   * Beobachtet die Klappen statt jeden Öffnungsweg einzeln.
+   */
+  function offenMelden(liste: HTMLElement) {
+    const melden = () => {
+      const html = document.documentElement;
+      if (liste.querySelector('.stelle__klappe[data-offen]')) html.dataset.stelleOffen = 'ja';
+      else delete html.dataset.stelleOffen;
+    };
+    new MutationObserver(melden).observe(liste, { subtree: true, attributes: true, attributeFilter: ['data-offen'] });
+    melden();
+  }
+
   function stellenAufbauen() {
     const liste = document.querySelector<HTMLElement>('[data-stellenliste]');
     if (!liste || liste.dataset.aufgebaut) return;
     liste.dataset.aufgebaut = 'ja';
+    offenMelden(liste);
 
     const knoepfe = [...liste.querySelectorAll<HTMLButtonElement>('[data-stellenknopf]')];
 

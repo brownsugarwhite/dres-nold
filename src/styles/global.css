@@ -970,6 +970,17 @@ main.seiteninhalt h2:not(.ohne-verlauf),
   z-index: calc(var(--ebene-navigation) - 2);
   height: 110px;
   pointer-events: none;
+  transition: opacity 300ms var(--verlauf);
+}
+
+/* Auf Handys klebt bei einer offenen Stellenanzeige die Ansprechperson
+   am unteren Rand (Stellen.astro). Sie läge unter dem Verlauf und
+   verblasste — der Inhalt hat seine eigene Ebene unter den Verläufen,
+   darüber legen lässt sie sich nicht. Solange eine Stelle offen ist
+   (`data-stelle-offen` an <html>, setzt Stellen.astro), tritt der untere
+   Verlauf deshalb zurück (Florian, 27. September 2026). */
+@media (max-width: 800px) {
+  html[data-stelle-offen] .randverlauf--unten { opacity: 0; }
 }
 
 .randverlauf--oben {
