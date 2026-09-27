@@ -167,10 +167,14 @@ const alsDatum = (iso: string) =>
     .beitrag__link:hover .beitrag__bild { transform: scale(1.07); }
   }
 
-  /* Nur der Beitrag, der gerade morpht, bekommt Übergangsebenen — alle
-     anderen geben ihre Namen ab. Ausführlich begründet in
-     LeistungKachel.astro; es geht um die Anzahl der Ebenen, die der
-     Browser während des Wechsels zusammensetzen muss. */
+  /* Nur der Beitrag, der gerade morpht, gehört zur Gruppe „karte" (und
+     liegt damit über den Nachbarn). Seine NAMEN behalten alle Beiträge
+     dauerhaft — anders als die Leistungskacheln (LeistungKachel.astro):
+     Bekäme die Karte ihren Namen erst beim Tipp, legte Safari in diesem
+     Moment eine eigene Ebene für sie an und rasterte das Bild neu — ein
+     weißes Bild direkt vor dem Morph (Florian, 27. September 2026). Bei
+     zwei, drei Beiträgen kosten die stehenden Ebenen nichts; die
+     übrigen Karten blenden im Wechsel schlicht mit der Seite aus. */
   .beitrag__link[data-morph] {
     view-transition-class: karte;
   }
@@ -186,11 +190,6 @@ const alsDatum = (iso: string) =>
   .beitrag__link[data-morph],
   .beitrag__link[data-morph] .beitrag__bild {
     transition: none;
-  }
-
-  .beitrag__link:not([data-morph]),
-  .beitrag__link:not([data-morph]) .beitrag__ausschnitt {
-    view-transition-name: none;
   }
 
   /* Ohne eigenen Übergangsnamen: Datum, Überschrift und Anriss gehören

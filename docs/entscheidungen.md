@@ -2505,3 +2505,15 @@ mit `loading="lazy"` ist. Deshalb:
 
 Ein Versuch, stattdessen beide Abbilder zu überblenden, hat in
 Chromium messbar verschlechtert und ist nicht drin.
+
+**Nachtrag — das weiße Bild VOR dem Morph:** Das Dekodieren hat das
+Aufblitzen nach dem Rückweg beseitigt, das vor dem Hinweg blieb
+(Florian). Dessen Auslöser ist der Übergangsname: Die Beitragskarten
+gaben ihre Namen in Ruhe ab (`view-transition-name: none`, wie die
+Leistungskacheln), erst der Tipp setzte ihn — und Safari legt für ein
+benanntes Element sofort eine eigene Ebene an und rastert das Bild
+neu: ein weißes Bild, bevor der Wechsel beginnt. Die Beitragskarten
+behalten ihre Namen jetzt dauerhaft; bei zwei, drei Beiträgen kostet
+das nichts, die übrigen Karten blenden im Wechsel schlicht mit der
+Seite aus. Die Leistungskacheln (zwölf, ohne Foto) bleiben beim alten
+Verfahren.
