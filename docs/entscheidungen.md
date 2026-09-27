@@ -2165,3 +2165,31 @@ Haarlinie — auch über der ersten, unter dem Hörer — und keine unter der
 letzten; die Kategorien zeigen ihre Linien nur auf ihrer Ebene, die
 Hauptzeilen nur auf der Hauptebene. So gibt es auch die Linie unter
 „Leistungen", die vorher fehlte.
+
+### Der Saum, zum dritten (27. September 2026, nachmittags)
+
+Mit dem Weichzeichner auf der ganzen Seite beim offenen Handy-Menü war
+der Saum um das Logo wieder da (Florians Screenshot: die weiße Fläche
+der Lottie-Grafik mit einem weichen Aubergine-Rand). Die Regel steht
+seit dem Vormittag in Startbereich.astro: Am Logo darf nichts
+weichgezeichnet, skaliert oder in der Deckkraft bewegt werden. Deshalb
+ist der Startbereich jetzt von `html[data-menue-unscharf]`
+ausgenommen — kein `filter`, kein `transform`, kein Übergang mehr an
+ihm. Damit das Logo hinter dem offenen Menü trotzdem unscharf steht,
+hat der Schleier seinen Rückseiten-Weichzeichner zurück (so war es bis
+zum Vormittag, ohne Saum). Der Inhalt darunter wird damit doppelt
+weichgezeichnet (eigener Filter plus Schleier) — das ist nicht zu
+sehen und kostet nur hinter dem offenen Menü.
+
+Dazu zwei Kleinigkeiten am Menü: Der Menüknopf schließt nach dem
+logischen Zustand (`menueGewollt`), nicht nach `data-menue-offen` —
+das Attribut kommt erst ein Bild später, und ein zweiter Tipp innerhalb
+dieses Bilds öffnete noch einmal, statt zu schließen; in dem Fall blieb
+auch die Unschärfe stehen.
+
+**Zurückscrollen zeichnet das Logo fertig.** Übernimmt die Kopplung an
+den Scrollweg mitten in der Einzeichnung (Eintrag darüber), läuft das
+Bild jetzt in beide Richtungen: nach unten vom übernommenen Bild bis
+zur Auflösung, nach oben vom übernommenen Bild bis zum fertigen Logo
+am Seitenanfang (`anScrollKoppeln`, Zweig `p < ab.p`). Vorher blieb es
+oben beim halbfertigen Bild stehen.

@@ -947,13 +947,15 @@ main.seiteninhalt h2:not(.ohne-verlauf),
   (`--zurueck-mitte`), sonst rückte ein langer Inhalt beim Schrumpfen
   um seine eigene Mitte weit weg.
 
-  Betroffen ist alles außer der Navigation selbst: der Inhalt, der
-  Startbereich (er liegt fest im Fenster), die Bühne der Einstiegskarte
-  (klebend — nicht `.ozbereich`, sonst verlöre das feste Kreuz seinen
-  Halt) und der Fußbereich.
+  Betroffen: der Inhalt, die Bühne der Einstiegskarte (klebend — nicht
+  `.ozbereich`, sonst verlöre das feste Kreuz seinen Halt) und der
+  Fußbereich. NICHT der Startbereich mit dem Logo: Weichzeichner und
+  Verkleinerung dort zeichneten den Saum um den Verlauf des Logos
+  (Startbereich.astro, `.logo`; Florian, 27. September 2026). Er wird
+  stattdessen vom Schleier des Menüs mit seinem Rückseiten-Weichzeichner
+  gedeckt (Navigation.astro, `.menue-schleier`).
 */
 .seiteninhalt,
-.startbereich,
 .ozbereich__buehne,
 .fuss {
   transform-origin: 50% var(--zurueck-mitte, 50%);
@@ -962,14 +964,13 @@ main.seiteninhalt h2:not(.ohne-verlauf),
     transform 420ms var(--verlauf-betont);
 }
 
-html[data-menue-unscharf] :is(.seiteninhalt, .startbereich, .ozbereich__buehne, .fuss) {
+html[data-menue-unscharf] :is(.seiteninhalt, .ozbereich__buehne, .fuss) {
   filter: blur(var(--weichzeichner-schleier));
   transform: scale(0.96);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .seiteninhalt,
-  .startbereich,
   .ozbereich__buehne,
   .fuss { transition: none; }
 }

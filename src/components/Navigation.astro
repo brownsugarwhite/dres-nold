@@ -922,9 +922,14 @@ const kategorien = (leistungen.kategorien ?? [])
     inset: 0;
     z-index: calc(var(--ebene-navigation) - 1);
     background: var(--farbe-schleier-hell);
-    /* Kein Weichzeichner mehr am Schleier: Die Seite dahinter wird
-       selbst unscharf und tritt zurück (styles/global.css,
-       `html[data-menue-unscharf]`; Florian, 27. September 2026) */
+    /* Die Seite dahinter wird selbst unscharf und tritt zurück
+       (styles/global.css, `html[data-menue-unscharf]`). Der Startbereich
+       mit dem Logo ist davon ausgenommen — ein Weichzeichner an ihm
+       zeichnete den Saum um den Verlauf. Für ihn bleibt der
+       Rückseiten-Weichzeichner am Schleier (Florian, 27. September
+       2026). */
+    backdrop-filter: blur(var(--weichzeichner-schleier));
+    -webkit-backdrop-filter: blur(var(--weichzeichner-schleier));
     opacity: 0;
     transition: opacity var(--dauer-normal) var(--verlauf);
   }
@@ -2070,7 +2075,7 @@ const kategorien = (leistungen.kategorien ?? [])
     const zuruecktreten = (zurueck: boolean) => {
       const html = document.documentElement;
       if (zurueck) {
-        for (const el of document.querySelectorAll<HTMLElement>('.seiteninhalt, .startbereich, .ozbereich__buehne, .fuss')) {
+        for (const el of document.querySelectorAll<HTMLElement>('.seiteninhalt, .ozbereich__buehne, .fuss')) {
           const r = el.getBoundingClientRect();
           el.style.setProperty('--zurueck-mitte', `${Math.round(window.innerHeight / 2 - r.top)}px`);
         }
@@ -2194,7 +2199,10 @@ const kategorien = (leistungen.kategorien ?? [])
       blase.schliessen(sofort);
     };
 
-    menueknopf.addEventListener('click', () => { if (istOffen()) menueSchliessen(); else oeffnen(); });
+    /* Nach dem logischen Zustand, nicht nach `data-menue-offen`: Das
+       Attribut kommt erst ein Bild später — ein zweiter Tipp innerhalb
+       dieses Bilds öffnete sonst noch einmal statt zu schließen */
+    menueknopf.addEventListener('click', () => { if (menueGewollt) menueSchliessen(); else oeffnen(); });
 
     /* Die Blase folgt der Höhe des Menüs Bild für Bild — beim
        Ebenenwechsel, bei Drehung des Geräts, beim Laden der Schrift. */
