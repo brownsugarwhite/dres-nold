@@ -2517,3 +2517,23 @@ behalten ihre Namen jetzt dauerhaft; bei zwei, drei Beiträgen kostet
 das nichts, die übrigen Karten blenden im Wechsel schlicht mit der
 Seite aus. Die Leistungskacheln (zwölf, ohne Foto) bleiben beim alten
 Verfahren.
+
+**Nachtrag 2:** Mit den dauerhaften Namen fehlte im Rückweg das Bild
+des NACHBAR-Beitrags und kam erst danach — die Regel, die im Rückweg
+das neue Abbild der Gruppe „bild" ausblendet, traf jetzt jeden
+Ausschnitt mit dieser Klasse. Die Klasse bekommt nur noch der
+Ausschnitt der morphenden Karte (`[data-morph]`). Und gegen das
+Blitzen vor dem Start liegt der Ausschnitt dauerhaft auf einer eigenen
+Ebene (`will-change: transform`): Safari muss sie beim Erfassen dann
+nicht mehr anlegen. Nicht am Gerät geprüft — Florian testet.
+
+**Nachtrag 3 — die Kopfleiste fuhr im Rückweg über ihr Abbild ein**
+(Leistungen wie Neuigkeiten): Das Zentrieren der Zielkachel lief seit
+dem Nachmittag als Mikroaufgabe nach dem Tausch; die Leisten prüfen
+ihren Zustand (`data-gescrollt`) ebenfalls in einer Mikroaufgabe, und
+je nach Reihenfolge sahen sie Scrolltiefe 0, stellten auf „nicht
+gescrollt", das Abbild wurde so aufgenommen, und nach dem Wechsel fuhr
+die echte Kopfleiste ein. Die Mikroaufgabe war nur nötig, solange
+Begrüßung und Band auf Handys erst umsortiert wurden — das steht
+inzwischen im Markup. Das Zentrieren läuft wieder sofort im
+`after-swap`.

@@ -157,7 +157,16 @@ const alsDatum = (iso: string) =>
     transition: transform 0.55s var(--verlauf-betont);
   }
 
-  .beitrag__ausschnitt { view-transition-class: bild; }
+  /* Die Gruppe „bild" (styles/uebergaenge.css: Abbild der Karte
+     entfällt, Zoom) bekommt NUR der Ausschnitt der morphenden Karte —
+     seit alle Karten ihre Namen behalten, träfe sie sonst auch den
+     Nachbarn, dessen Bild im Rückweg dann fehlte und erst danach kam
+     (Florian, 27. September 2026). Der Ausschnitt liegt außerdem
+     dauerhaft auf einer eigenen Ebene (`will-change`): Safari legte sie
+     sonst erst beim Erfassen für den Wechsel an — und das gab ein
+     weißes Bild direkt vor dem Morph. */
+  .beitrag__ausschnitt { will-change: transform; }
+  .beitrag__link[data-morph] .beitrag__ausschnitt { view-transition-class: bild; }
 
   .beitrag__link:focus-visible .beitrag__bild {
     transform: scale(1.07);
