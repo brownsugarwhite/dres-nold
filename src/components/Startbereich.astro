@@ -188,27 +188,16 @@ const { praxis } = seite;
     align-items: center;
     /* Das Logo wächst über seine MASSE, nicht über `transform`.
 
-       Die Vorlage nimmt hier `transform`. Bei uns zeigt sich damit ein
-       heller Saum um das Verlaufsbild — und zwar erst beim Scrollen,
-       nicht beim Laden. Gegenprobe, bei der ALLES gleich blieb (gleiches
-       Lottie-Bild, gleiches `cover`, gleiche Maße, gleiche Scrollstelle)
-       und nur der Skalierungsfaktor wechselte:
-
-           transform: scale(1.15)  →  Saum da
-           transform: scale(1)     →  Saum weg
-
-       Es liegt also nicht am Bild und nicht am Lottie-Bild, sondern an
-       der Vergrößerung: Der Browser rastert die Zeichenebene einmal und
-       skaliert dann das fertige Bild; die Kanten werden dabei
-       weichgezeichnet. Beim Laden steht der Faktor auf 1, es gibt keine
-       Skalierung — deshalb war es dort immer sauber. Dasselbe hatte
-       zuvor schon `will-change: transform` ausgelöst.
-
-       Über Breite und Höhe wird jedes Bild neu gezeichnet statt ein
-       fertiges Bild skaliert. Die Bewegung ist dieselbe — das Logo
-       wächst von 1 auf 1,3 um seine Mitte, weil `.startbereich__mitte`
-       es zentriert hält. Der Aufwand ist vertretbar, es geht um ein
-       einzelnes Element. */
+       Die Vorlage nimmt hier `transform`. Bei uns zeigte sich damit der
+       Saum um das Verlaufsbild (transform: scale(1.15) → Saum da,
+       scale(1) → weg; ebenso `will-change: transform`). Die eigentliche
+       Ursache steht seit dem 27. September 2026 bei `.logo__verlauf`
+       (Resampling-Filter über den Kasten hinaus) und ist dort mit
+       `clip-path` abgestellt — Skalierung und Ebenenwechsel waren nur
+       die Auslöser, die Chromium auf diesen Filterweg brachten. Das
+       Wachsen über Breite und Höhe bleibt trotzdem: Es zeichnet jedes
+       Bild neu statt ein fertiges zu skalieren, die Bewegung ist
+       dieselbe, und es geht um ein einzelnes Element. */
     width: calc(var(--logo-breite) * var(--logo-groesse, 1));
     height: calc(var(--logo-hoehe) * var(--logo-groesse, 1));
     margin-top: var(--logo-oben);
@@ -233,12 +222,30 @@ const { praxis } = seite;
     height: calc(var(--verlauf-hoehe) * var(--logo-groesse, 1));
     margin-top: calc(var(--verlauf-versatz) * var(--logo-groesse, 1));
     flex: none;
-    /* Wie in Webflow eingestellt: Cover, Position 50 % / 50 %, kein Tile.
-
-       Das GIF ist nur 20 × 10 px groß und wird hier rund 30-fach
-       vergrößert. Solange das Logo nicht über `transform` skaliert wird,
-       zeichnet der Browser es sauber bis an die Kante. */
+    /* Wie in Webflow eingestellt: Cover, Position 50 % / 50 %, kein Tile. */
     background: url('/bilder/deko/verlauf.gif') 50% 50% / cover no-repeat;
+    /* DER SAUM — Ursache und Abhilfe, ein für alle Mal (27. September 2026):
+
+       Das GIF ist nur 20 × 10 px groß und wird hier rund 25-fach
+       vergrößert. Chromium zeichnet ein so stark vergrößertes Bild mit
+       einem Resampling-Filter, dessen Kern über den Kasten HINAUSREICHT
+       — etwa eine halbe GIF-Pixelbreite, also 12 bis 16 px auf dem
+       Bildschirm. Der Verlauf ragt damit über seinen Kasten hinaus, und
+       weil die weiße Lottie-Fläche nur wenige Pixel größer ist als der
+       Kasten, steht rundherum ein weicher Aubergine-Rand. WebKit
+       (Safari) schneidet am Kasten ab und zeigt nichts davon.
+
+       Gemessen mit Playwright (Chromium 440 × 956, 2×): Saum da — auch
+       im Ruhezustand ohne Scrollen; Verlauf ausgeblendet → weg; Verlauf
+       auf 40 % → Saum schrumpft mit; `contain: paint` → bleibt;
+       `clip-path: inset(0)` → WEG. Ob Chromium diesen Filterweg nimmt,
+       hängt davon ab, wie die Ebene gerade gerastert wird — deshalb
+       kam der Saum über die Monate mit wechselnden Auslösern (transform,
+       will-change, Deckkraft-Animationen im Startbereich, Weichzeichner)
+       und verschwand mit wechselnden Umwegen. Der Clip macht die
+       Ursache unwirksam, egal welchen Weg der Browser nimmt: Was über
+       den Kasten hinaus gezeichnet würde, wird abgeschnitten. */
+    clip-path: inset(0);
     /* Ohne die Lottie-Grafik gibt es keine weiße Fläche, die ihn
        abdeckt — dann stünde hier ein farbiger Kasten hinter dem
        statischen Ersatzbild. */
@@ -499,24 +506,39 @@ const { praxis } = seite;
       const DAUER = 2500;
       let start: number | null = null;
 
+      /* Scrollt der Besucher, bevor das Logo fertig gezeichnet ist,
+         soll es sich danach GENAU so verhalten, als wäre die
+         Einzeichnung durchgelaufen: oben das fertige Logo, beim
+         Scrollen die normale Auflösung (Florian, 27. September 2026).
+         Also weder zu Ende zeichnen und dann springen, noch beim
+         halbfertigen Bild bleiben — sondern in 250 ms von dem Bild, das
+         gerade steht, auf das Bild gleiten, das der Scrollweg gerade
+         verlangt, und dann ganz normal an ihn koppeln. */
+      const UEBERGABE = 250;
+      let uebergabe: { seit: number; von: number } | null = null;
+      const scrollBild = () => Math.min(1, Math.max(0, fortschritt() / 0.1)) * letztes;
+
       const einblenden = (jetzt: number) => {
         if (start === null) start = jetzt;
+
+        if (uebergabe) {
+          const t = Math.min(1, (jetzt - uebergabe.seit) / UEBERGABE);
+          const glatt = 1 - Math.pow(1 - t, 3);
+          spieler.goToAndStop(uebergabe.von + (scrollBild() - uebergabe.von) * glatt, true);
+          if (t < 1) { requestAnimationFrame(einblenden); return; }
+          anScrollKoppeln(spieler, () => fortschritt() / 0.1, ENDE);
+          return;
+        }
+
         const p = Math.min(1, (jetzt - start) / DAUER);
         // Weiche Kurve wie in der Vorlage
         const weich = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
         const bild = letztes * (1 - weich);
 
-        /* Scrollt der Besucher, bevor das Logo fertig gezeichnet ist:
-           nicht zu Ende zeichnen und dann springen, sondern von dem
-           Bild, das gerade steht, am Scrollweg auflösen (Florian,
-           27. September 2026). Der Scrollstand dieses Moments ist der
-           Nullpunkt der Kopplung. */
         if (window.scrollY > 2) {
           freigeben();
-          anScrollKoppeln(spieler, () => fortschritt() / 0.1, ENDE, {
-            bild,
-            p: Math.min(0.9, Math.max(0, fortschritt() / 0.1)),
-          });
+          uebergabe = { seit: jetzt, von: bild };
+          requestAnimationFrame(einblenden);
           return;
         }
 

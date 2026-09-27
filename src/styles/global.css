@@ -38,7 +38,25 @@ h1, h2, h3, h4 {
   font-family: var(--schrift-titel);
   line-height: var(--zeilenhoehe-eng);
   font-weight: var(--gewicht-titel);
-  text-wrap: balance;
+  /* Kein `text-wrap: balance` mehr: Es verteilte die Wörter auf gleich
+     lange Zeilen, und die erste Zeile nutzte die Breite nicht aus —
+     „Digitale Abformung / statt Abformlöffel" statt „Digitale Abformung
+     statt / Abformlöffel" (Florian, 27. September 2026). Jede Zeile
+     wird so voll wie möglich; nur die mittige Begrüßung bleibt
+     ausgeglichen (Willkommen.astro). */
+  text-wrap: wrap;
+}
+
+/* Auf Handys dürfen lange Wortzusammensetzungen in Überschriften
+   trennen — „Kieferorthopädie" allein sprengte sonst die Zeile und ließ
+   die davor halb leer. Nur sehr lange Wörter (ab 14 Buchstaben),
+   mindestens sechs auf jeder Seite. */
+@media (max-width: 767px) {
+  h2, h3 {
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    hyphenate-limit-chars: 14 6 6;
+  }
 }
 
 /*
@@ -107,6 +125,13 @@ p {
   unter einer breiten Überschrift: als Block sähen sie abgeschnitten
   aus, linksbündig wirken sie leicht). Dort sind die Zeilen zu kurz
   oder zu wenige, als dass Blocksatz gut aussähe.
+
+  Und NICHT auf Handys (bis 767 px): Mit rund 35 Zeichen je Zeile reißt
+  auch die Silbentrennung die Wortabstände auf — „genauer und
+  angenehmer macht — vom" mit fingerbreiten Löchern (Florian,
+  27. September 2026). Dort steht der Text linksbündig mit
+  Silbentrennung, und die Zeilen rücken enger zusammen (1,55 statt
+  1,68).
 */
 .blocksatz,
 .redaktionstext p,
@@ -119,6 +144,24 @@ p {
   -webkit-hyphens: auto;
   hyphens: auto;
   hyphenate-limit-chars: 6 3 3;
+  text-wrap: pretty;
+}
+
+@media (max-width: 767px) {
+  .blocksatz,
+  .redaktionstext p,
+  .gruppe__text p,
+  .textseite__inhalt p,
+  .kachel__kurz,
+  .beitrag__kurz {
+    text-align: left;
+  }
+
+  .redaktionstext p,
+  .gruppe__text p,
+  .textseite__inhalt p {
+    line-height: 1.55;
+  }
 }
 
 /* Aufzählungen laufen wie Fließtext */
@@ -877,7 +920,6 @@ main.seiteninhalt h2:not(.ohne-verlauf),
      sind die Stämme breiter, große Grade liefen sonst zu dicht. */
   letter-spacing: -0.010em;
   text-align: left;
-  text-wrap: balance;
 }
 
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {

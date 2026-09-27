@@ -2193,3 +2193,70 @@ Bild jetzt in beide Richtungen: nach unten vom übernommenen Bild bis
 zur Auflösung, nach oben vom übernommenen Bild bis zum fertigen Logo
 am Seitenanfang (`anScrollKoppeln`, Zweig `p < ab.p`). Vorher blieb es
 oben beim halbfertigen Bild stehen.
+
+### Der Saum — Ursache gefunden, ein für alle Mal (27. September 2026, nachmittags)
+
+Der Saum um das Logo war nach dem letzten Umbau immer noch da
+(Florian). Diesmal nicht geraten, sondern gemessen — mit Playwright in
+Chromium und WebKit (440 × 956, 2×), Bildschirmfotos der Logo-Region
+im Ruhezustand und mitten in der Auflösung, Verdächtige einzeln
+abgeschaltet:
+
+| Variante | Saum |
+|---|---|
+| Grundzustand, Chromium, gescrollt | da |
+| Grundzustand, Chromium, NICHT gescrollt | da |
+| Grundzustand, WebKit | weg |
+| Hinweis-Rahmen ausgeblendet | da |
+| Randverläufe ausgeblendet | da |
+| Wachstum des Logos eingefroren | da |
+| alle Animationen und Übergänge aus | da |
+| Leisten ohne Rückseiten-Weichzeichner | da |
+| Verlauf ausgeblendet | weg |
+| Verlauf auf 40 % verkleinert | schrumpft mit |
+| `contain: paint` am Verlauf | da |
+| `clip-path: inset(0)` am Verlauf | **weg** |
+
+**Die Ursache:** Der Verlauf ist ein 20 × 10 px großes GIF, das rund
+25-fach vergrößert wird. Chromium zeichnet ein so stark vergrößertes
+Bild mit einem Resampling-Filter, dessen Kern über den Kasten
+hinausreicht — etwa eine halbe GIF-Pixelbreite, 12 bis 16 px auf dem
+Bildschirm. Der Verlauf ragt damit über seinen Kasten hinaus; die
+weiße Lottie-Fläche ist nur wenige Pixel größer als der Kasten, also
+steht rundherum ein weicher Aubergine-Rand. WebKit schneidet am
+Kasten ab. Ob Chromium diesen Filterweg nimmt, hängt davon ab, wie die
+Ebene gerade gerastert wird — deshalb kam der Saum seit September mit
+wechselnden Auslösern (transform, will-change, Deckkraft- und
+Weichzeichner-Animationen im Startbereich) und ging mit wechselnden
+Umwegen (Wachsen über Maße, Farb- statt Deckkraft-Animation).
+Ebenen-Liste aus Chromium: Der Startbereich ist eine eigene Ebene
+(Grund „Overlap"), die Lottie-SVG eine zweite darüber; der Verlauf
+selbst hat keine.
+
+**Die Abhilfe:** `clip-path: inset(0)` am Verlauf (`.logo__verlauf`,
+Startbereich.astro). Was über den Kasten hinaus gezeichnet würde, wird
+abgeschnitten — egal welchen Weg der Browser nimmt. Die alte Regel
+„Im Startbereich nichts über opacity, filter oder transform animieren"
+ist damit keine Notwendigkeit mehr, nur noch Vorsicht; das Wachsen über
+Breite und Höhe bleibt, es schadet nicht.
+
+**Zurückscrollen und Übergabe** (Florian: „als wäre die Animation ganz
+abgespielt worden"): Scrollt der Besucher, bevor das Logo fertig
+gezeichnet ist, gleitet es in 250 ms von dem Bild, das gerade steht,
+auf das Bild, das der Scrollweg verlangt, und hängt dann ganz normal am
+Scrollweg — oben das fertige Logo, beim Scrollen die normale Auflösung.
+Die Zwischenlösung vom Mittag (Kopplung ab dem halbfertigen Bild) ist
+zurückgenommen, `anScrollKoppeln` hat den Parameter `ab` wieder
+verloren.
+
+**Typografie auf Handys** (Florian): Überschriften ohne
+`text-wrap: balance` — es verteilte die Wörter auf gleich lange Zeilen,
+und die erste nutzte die Breite nicht („Digitale Abformung / statt
+Abformlöffel"). Jede Zeile wird jetzt so voll wie möglich; nur die
+mittige Begrüßung bleibt ausgeglichen. Bis 767 px dürfen h2 und h3
+sehr lange Wörter trennen (ab 14 Buchstaben, sechs auf jeder Seite) —
+„Kieferorthopädie" allein sprengte sonst die Zeile. Und bis 767 px
+gibt es keinen Blocksatz: Mit rund 35 Zeichen je Zeile riss auch die
+Silbentrennung die Wortabstände auf; dort steht der Text linksbündig
+mit Silbentrennung, Zeilenabstand 1,55 statt 1,68. Ab 768 px bleibt
+alles, wie die Praxis es wünscht.

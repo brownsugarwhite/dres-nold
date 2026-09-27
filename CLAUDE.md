@@ -125,6 +125,13 @@ Weiß nur 3,75:1 (Vorgabe: 4,5:1).
 
 *Vorsicht:* Im Webflow-CSS existieren Beinahe-Duplikate (`#6b1a51`, `#6a2051`). Das sind Ungenauigkeiten der Vorlage — im Neubau gilt durchgängig `#6c1a51`.
 
+**Der Saum um das Logo** ist ein Chromium-Artefakt beim Vergrößern des
+20 × 10 px großen Verlauf-GIFs (Resampling-Filter über den Kasten
+hinaus) und seit dem 27. September 2026 mit `clip-path: inset(0)` am
+Verlauf abgestellt — nicht durch Verzicht auf Animationen. Wer am
+Startbereich arbeitet, prüft mit Playwright in Chromium (siehe
+`docs/entscheidungen.md`, „Der Saum — Ursache gefunden").
+
 **Gewichte:** Überschriften kräftig — `--gewicht-titel: 580`, eine Spur
 leichter als die 600/700 der alten Webflow-Seite und leichter als die
 Labels (Florian, 26. September 2026; der leichte Schnitt 300 des

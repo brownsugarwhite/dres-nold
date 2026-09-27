@@ -84,32 +84,13 @@ export function anScrollKoppeln(
   /** Anteil der Bildfolge, der am Ende erreicht wird (Vorgabe: alles).
       Webflow trägt hier Prozentwerte ein — meist 99, nicht 100. */
   bis = 1,
-  /** Wird die Kopplung mitten in der Einzeichnung übernommen, geht es
-      von dem Bild aus, das gerade steht, und von dem Scrollstand, an dem
-      übernommen wurde: Von dort bis zum Ende des Wegs läuft die Folge
-      bis `bis` — ohne Sprung. Und zurück nach oben zeichnet sie sich
-      fertig: Zwischen dem Übernahmepunkt und dem Seitenanfang läuft
-      das Bild von dort auf 0, das fertige Logo (Florian, 27. September
-      2026 — nicht beim halbfertigen Bild stehen bleiben). */
-  ab?: { bild: number; p: number },
 ): () => void {
   let geplant = false;
 
   const aktualisieren = () => {
     geplant = false;
     const p = Math.min(1, Math.max(0, fortschritt()));
-    const ende = bis * (spieler.totalFrames - 1);
-    if (ab) {
-      if (p < ab.p) {
-        // Zurück nach oben: vom übernommenen Bild fertig zeichnen
-        spieler.goToAndStop(ab.p > 0 ? ab.bild * (p / ab.p) : 0, true);
-      } else {
-        const q = Math.min(1, Math.max(0, (p - ab.p) / (1 - ab.p)));
-        spieler.goToAndStop(ab.bild + (ende - ab.bild) * q, true);
-      }
-    } else {
-      spieler.goToAndStop(p * ende, true);
-    }
+    spieler.goToAndStop(p * bis * (spieler.totalFrames - 1), true);
   };
 
   const beiScroll = () => {
