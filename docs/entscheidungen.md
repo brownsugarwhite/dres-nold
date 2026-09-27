@@ -2419,3 +2419,22 @@ Handys immer voll sichtbar (`opacity: 1` in allen Zuständen).
   bleibt bei 110.
 - **Die Zeilen des Handy-Menüs skalieren vom linken Rand, senkrecht
   mittig** (`transform-origin: 0 50%`; vorher die linke obere Ecke).
+
+### Randverläufe im Seitenwechsel; Stellen-Breite abgesichert (27. September 2026, abends)
+
+- **Die Randverläufe stehen während des Morphs still**, über der
+  wachsenden Karte: Sie haben eigene Übergangsnamen (`rand-oben`,
+  `rand-unten`) und wie die Leisten `animation: none` auf Gruppe,
+  altem und neuem Abbild, Ebene 95 (Karte 90, Kopfleiste 100). Vorher
+  blendeten sie als Teil der Seitenaufnahme aus und erst nach dem
+  Morph wieder ein (Florian).
+- **Stellenliste, Breite:** Auf Florians iPhone laufen die Texte einer
+  offenen Stelle in einer Zeile nach rechts hinaus und die Seite rollt
+  waagerecht. Im WebKit von Playwright (iPhone-Profil) lässt sich das
+  nicht nachstellen — die Zelle ist 351 px breit, der Text bricht in
+  sechs Zeilen, nichts ragt über 390 px hinaus, auch nicht auf der
+  ganzen Seite. Deshalb vorsorglich: `contain: inline-size` und
+  `min-width: 0` an der Zelle (ihre Breite hängt nie am Inhalt),
+  `overflow-x: clip` am Abschnitt und an `<body>` (nichts kann die
+  Seite waagerecht rollen lassen). Bleibt es auf dem iPhone, braucht es
+  ein Bildschirmfoto des offenen Zustands mit der iOS-Version.

@@ -124,6 +124,10 @@ const bewerbung = (titel: string) =>
   .stellen {
     position: relative;
     background: var(--farbe-flaeche);
+    /* Nichts im Abschnitt darf die Seite waagerecht rollen lassen —
+       auf Florians iPhone rollte sie bei offener Stelle (27. September
+       2026); `clip` lässt das Kleben der Ansprechperson unberührt */
+    overflow-x: clip;
   }
 
   /* Wie weit die Nummer nach links aus der Spalte ragt. Sie braucht
@@ -268,6 +272,10 @@ const bewerbung = (titel: string) =>
     /* Etwas Luft für Fokusringe an den Rändern */
     overflow-clip-margin: 8px;
     min-height: 0;
+    min-width: 0;
+    /* Die Breite der Zelle richtet sich allein nach der Spalte, nie
+       nach dem Inhalt — der Inhalt bricht in ihr um, auf jeder Größe */
+    contain: inline-size;
   }
 
   /* Auch offen bleibt die Zelle beschnitten: `clip` stört das Kleben

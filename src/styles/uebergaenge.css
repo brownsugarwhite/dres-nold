@@ -328,6 +328,31 @@ html[data-rueckmorph]::view-transition-old(.bild) {
   animation: none;
 }
 
+/* --- Die Randverläufe: stehen still, über der Karte ----------------
+   Beide Seiten haben sie (layouts/Basis.astro); als eigene Ebenen
+   bleiben sie während des Wechsels einfach stehen, über der wachsenden
+   Karte (90) und unter den Leisten (Florian, 27. September 2026 —
+   vorher blendeten sie mit dem Rest der Seite aus und erst nach dem
+   Morph wieder ein). */
+::view-transition-group(rand-oben),
+::view-transition-group(rand-unten),
+::view-transition-old(rand-oben),
+::view-transition-old(rand-unten),
+::view-transition-new(rand-oben),
+::view-transition-new(rand-unten) {
+  animation: none;
+}
+
+::view-transition-group(rand-oben),
+::view-transition-group(rand-unten) {
+  z-index: 95;
+}
+
+::view-transition-old(rand-oben):only-child,
+::view-transition-old(rand-unten):only-child {
+  animation: none;
+}
+
 /*
   ACHTUNG, SELEKTOREN OHNE LEERZEICHEN
   ------------------------------------------------------------------

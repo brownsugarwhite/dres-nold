@@ -18,7 +18,8 @@
    überlanges Wort aus der Redaktion auf einem schmalen Handy. `clip`
    statt `hidden`, damit klebende Elemente (position: sticky) weiter
    funktionieren. */
-html {
+html,
+body {
   overflow-x: clip;
   /* iOS Safari vergrößert Text sonst von sich aus („text autosizing"),
      etwa in Blöcken mit begrenzter Höhe oder nach dem Drehen — auf
@@ -988,6 +989,11 @@ main.seiteninhalt h2:not(.ohne-verlauf),
   top: 0;
   height: 80px;
   background: linear-gradient(to bottom, var(--farbe-flaeche), rgb(255 255 255 / 0));
+  /* Eigene Ebene im Seitenwechsel wie die Leisten (styles/uebergaenge.css):
+     Die Verläufe stehen während des Morphs still und über der
+     wachsenden Karte, statt mit der Seite aus- und wieder einzublenden
+     (Florian, 27. September 2026). */
+  view-transition-name: rand-oben;
 }
 
 @media (max-width: 991px) {
@@ -997,6 +1003,7 @@ main.seiteninhalt h2:not(.ohne-verlauf),
 .randverlauf--unten {
   bottom: 0;
   background: linear-gradient(to top, var(--farbe-flaeche), rgb(255 255 255 / 0));
+  view-transition-name: rand-unten;
 }
 
 @media print {
