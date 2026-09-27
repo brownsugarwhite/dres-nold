@@ -1,103 +1,214 @@
 ---
 /**
- * Begrüßung — der erste Abschnitt, der sich über das Logo schiebt.
+ * Begrüßung — der erste Abschnitt nach der Einstiegskarte.
  *
- * Als einziger Abschnitt steht er mittig: Er nimmt die Zentrierung des
- * Logos darüber auf. Alles Weitere auf der Seite ist linksbündig.
+ * Aufbau nach Florians Entwurf (27. September 2026), auf breiten
+ * Fenstern zwei Spalten: links die Überschrift in zwei Zeilen — oben
+ * „Willkommen in unserer" in der Größe der übrigen Überschriften,
+ * darunter „Praxis Dres. Nold" groß —, rechts, durch eine Haarlinie
+ * getrennt, der kurze Text und darunter die beiden Knöpfe. Die rechte
+ * Spalte ist genau so breit wie die beiden Knöpfe nebeneinander (der
+ * Text bricht in dieser Breite um) und genau so hoch wie die
+ * Überschrift: Text oben, Knöpfe unten. Der Block steht linksbündig in
+ * der Inhaltsbreite.
  *
- * Der Entwurf zeigte darüber noch ein kleines Echo des Logos. Das ist
- * wieder heraus (Florian, 17. September 2026): Das große Logo steht
- * unmittelbar davor, ein zweites daneben wäre eine Wiederholung.
+ * Auf Handys (bis 767 px) steht alles untereinander: Beide Zeilen der
+ * Überschrift füllen genau die Breite des Bildschirms (das Skript unten
+ * misst sie ein), darunter der Text, darunter die beiden Knöpfe
+ * nebeneinander mit kürzeren Beschriftungen.
  *
- * Überschrift und Beschreibungstext kommen aus der Redaktion
- * (src/content/startseite.json). Die beiden Knöpfe darunter führen an
- * feste Stellen derselben Seite und stehen deshalb hier im Code, nicht
- * in der Redaktion.
+ * Bis zum 27. September stand die Begrüßung mittig und — auf breiten
+ * Fenstern — in der Einstiegskarte vor den Sprechstunden. Jetzt folgt
+ * sie auf allen Größen der Karte (src/pages/index.astro).
+ *
+ * Überschrift und Text kommen aus der Redaktion
+ * (src/content/startseite.json): Ein Zeilenumbruch im Titel trennt die
+ * kleine von der großen Zeile. Die beiden Knöpfe führen an feste
+ * Stellen derselben Seite und stehen deshalb hier im Code.
  */
 import startseite from '../content/startseite.json';
+import { trennen } from '../lib/silben';
 
 const texte = startseite.willkommen;
 
-/* Die Überschrift darf in der Redaktion umbrechen, wo es passt: ein
-   doppelter Zeilenumbruch im Feld wird zu einem Zeilenumbruch auf der
-   Seite. Ohne Umbruch bricht sie von selbst (`text-wrap: balance`). */
-const zeilen = texte.titel.split('\n').filter((z) => z.trim() !== '');
+const zeilen = texte.titel.split('\n').map((z) => z.trim()).filter(Boolean);
+/* Die letzte Zeile ist die große; alles davor die kleine. Ohne Umbruch
+   gibt es nur die große. */
+const gross = zeilen.length ? zeilen[zeilen.length - 1] : texte.titel;
+const klein = zeilen.slice(0, -1).join(' ');
 ---
 
 <section class="willkommen" id="praxis">
-  <h1 class="willkommen__titel" data-rein>
-    {zeilen.map((zeile, i) => (
-      <>
-        {i > 0 && <br />}
-        {zeile}
-      </>
-    ))}
-  </h1>
+  <div class="willkommen__inhalt">
+    <h1 class="willkommen__titel" data-rein data-willkommentitel>
+      {klein && <span class="willkommen__klein" data-zeile>{klein}</span>}
+      <span class="willkommen__gross" data-zeile>{gross}</span>
+    </h1>
 
-  {texte.text && <p class="willkommen__text" data-rein>{texte.text}</p>}
-
-  <div class="willkommen__knoepfe" data-rein>
-    <a class="kn kn--voll" href="#contact"><span class="kn__f" aria-hidden="true"></span>Termin vereinbaren</a>
-    <a class="kn" href="#leistungen"><span class="kn__f" aria-hidden="true"></span>Unsere Leistungen</a>
+    <div class="willkommen__rechts" data-rein>
+      {texte.text && <p class="willkommen__text">{trennen(texte.text)}</p>}
+      <div class="willkommen__knoepfe">
+        <a class="kn kn--voll" href="#contact">
+          <span class="kn__f" aria-hidden="true"></span>
+          <span class="willkommen__lang">Termin vereinbaren</span><span class="willkommen__kurz" aria-hidden="true">Termin</span>
+        </a>
+        <a class="kn" href="#leistungen">
+          <span class="kn__f" aria-hidden="true"></span>
+          <span class="willkommen__lang">Unsere Leistungen</span><span class="willkommen__kurz" aria-hidden="true">Leistungen</span>
+        </a>
+      </div>
+    </div>
   </div>
 </section>
 
 <style>
   .willkommen {
     --oben: clamp(72px, 9vw, 124px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    /* Die Begrüßung folgt der Einstiegskarte. Oben so viel Luft, dass
+       der Zipfel der Karte in Ruhelage über leerem Weiß steht und die
+       Überschrift noch unter der Symbolleiste liegt — die fährt beim
+       Schnalz weg und gibt sie frei. Als Außenabstand, damit die
+       Sprungmarke „Praxis" den Titel wie überall unter die Kopfleiste
+       setzt. */
+    margin-top: calc(var(--zipfel-laenge, 154px) + var(--abstand-s) - var(--oben));
     padding-block: var(--oben) clamp(56px, 7vw, 96px);
     padding-inline: var(--abstand-seitenrand);
-    /* Keine eigene Fläche: Die Begrüßung steht auf der weißen Karte des
-       Einstiegs (`.ozblase__flaeche`). Die doppelte Fläche brachte
-       nichts und machte nur schwerer nachvollziehbar, wer das Weiß
-       setzt (Florian, 18. September 2026). */
-    text-align: center;
   }
 
-  /* Handys: Die Begrüßung steht NACH der Einstiegskarte
-     (Oeffnungszeiten.astro verschiebt sie, `vorspannAnordnen`). Oben so
-     viel Luft, dass der Zipfel in Ruhelage über leerem Weiß steht und die
-     Überschrift noch unter der Symbolleiste liegt — die fährt beim
-     Schnalz weg und gibt sie frei. Als Außenabstand, damit die
-     Sprungmarke „Praxis" den Titel wie überall unter die Kopfleiste
-     setzt. Nach dem Schnalz bleibt dadurch etwas mehr Weiß zwischen
-     Karte und Begrüßung als sonst zwischen zwei Abschnitten — auf Handys
-     unvermeidlich (Florian, 26. September 2026). */
-  .willkommen[data-nach-karte] {
-    margin-top: calc(var(--zipfel-laenge, 154px) + var(--abstand-s) - var(--oben));
+  /* Zwei Spalten, gleich hoch; linksbündig in der Inhaltsbreite */
+  .willkommen__inhalt {
+    display: flex;
+    align-items: stretch;
+    width: min(100%, var(--breite-inhalt));
+    margin-inline: auto;
   }
 
-  /* Eine Stufe größer als `--text-titel` (die übrigen Überschriften),
-     im Gewicht aller Überschriften (`--gewicht-titel`) und eng
-     gesperrt. */
   .willkommen__titel {
-    max-width: 19ch;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    justify-content: center;
     margin: 0;
+    line-height: 1.05;
+  }
+
+  /* Die kleine Zeile in der Größe der übrigen Überschriften … */
+  .willkommen__klein {
+    display: block;
+    font-size: var(--text-titel);
+    font-weight: var(--gewicht-titel);
+    letter-spacing: -0.010em;
+    white-space: nowrap;
+  }
+
+  /* … die große eine Stufe darüber */
+  .willkommen__gross {
+    display: block;
     font-size: var(--text-willkommen);
     font-weight: var(--gewicht-titel);
-    line-height: 1.07;
-    letter-spacing: -0.010em;
-    text-wrap: balance;
+    letter-spacing: -0.012em;
+    white-space: nowrap;
+  }
+
+  /* Rechts: Text oben, Knöpfe unten, dazwischen so viel Raum, dass die
+     Spalte die Höhe der Überschrift hat. Ihre Breite ist die der Knöpfe
+     nebeneinander (`max-content`); der Text zählt dafür nicht mit
+     (`width: 0; min-width: 100%`) und bricht in eben dieser Breite um. */
+  .willkommen__rechts {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: max-content;
+    margin-left: clamp(24px, 3vw, 48px);
+    padding-left: clamp(24px, 3vw, 48px);
+    border-left: 1px solid var(--farbe-linie);
   }
 
   .willkommen__text {
-    max-width: var(--breite-absatz);
-    margin: 26px 0 0;
+    width: 0;
+    min-width: 100%;
+    margin: 0 0 20px;
     color: var(--farbe-text);
     font-size: var(--text-lead);
     font-weight: var(--gewicht-normal);
-    line-height: 1.6;
+    line-height: 1.5;
     text-wrap: pretty;
   }
 
   .willkommen__knoepfe {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
     gap: 12px;
-    margin-top: 36px;
+    white-space: nowrap;
+  }
+
+  .willkommen__kurz { display: none; }
+
+  /* Handys: untereinander. Beide Zeilen der Überschrift füllen die
+     Breite (Skript); die Knöpfe teilen sich eine Zeile und tragen die
+     kurzen Beschriftungen. */
+  @media (max-width: 767px) {
+    .willkommen__inhalt { flex-direction: column; }
+
+    .willkommen__titel { line-height: 1.02; }
+
+    .willkommen__rechts {
+      width: auto;
+      margin: 28px 0 0;
+      padding: 0;
+      border-left: 0;
+    }
+
+    .willkommen__text {
+      width: auto;
+      min-width: 0;
+      margin-bottom: 24px;
+    }
+
+    .willkommen__knoepfe :global(.kn) {
+      flex: 1 1 0;
+      justify-content: center;
+      padding-inline: 14px;
+    }
+
+    .willkommen__lang { display: none; }
+    .willkommen__kurz { display: inline; }
   }
 </style>
+
+<script>
+  /**
+   * Auf Handys füllen beide Zeilen der Überschrift genau die Breite:
+   * Jede wird bei 100 px gemessen und dann so weit verkleinert, dass
+   * sie eben hineinpasst — die längere Zeile wird dabei von selbst die
+   * kleinere. Auf breiten Fenstern gelten die Größen aus dem CSS.
+   * Läuft beim Aufbau, bei Größenänderung, nach dem Laden der Schrift
+   * und nach jedem Seitenwechsel.
+   */
+  function titelFuellen() {
+    const titel = document.querySelector<HTMLElement>('[data-willkommentitel]');
+    if (!titel) return;
+    const zeilen = [...titel.querySelectorAll<HTMLElement>('[data-zeile]')];
+    zeilen.forEach((z) => z.style.removeProperty('font-size'));
+    if (!window.matchMedia('(max-width: 767px)').matches) return;
+    const platz = titel.clientWidth;
+    if (!platz) return;
+    zeilen.forEach((z) => {
+      z.style.fontSize = '100px';
+      const noetig = z.scrollWidth;
+      z.style.fontSize = noetig > 0 ? `${Math.floor(((100 * platz) / noetig) * 100) / 100}px` : '';
+    });
+  }
+
+  let angemeldet = false;
+  function willkommenAufbauen() {
+    titelFuellen();
+    if (angemeldet) return;
+    angemeldet = true;
+    window.addEventListener('resize', titelFuellen, { passive: true });
+    document.fonts?.ready.then(titelFuellen);
+  }
+
+  willkommenAufbauen();
+  document.addEventListener('astro:page-load', willkommenAufbauen);
+</script>

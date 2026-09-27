@@ -16,6 +16,8 @@ import { trennenHtml, trennenTitel } from '../lib/silben';
  * gemeinsam herein und die Reihenfolge stimmt.
  */
 import Startbereich from '../components/Startbereich.astro';
+import Willkommen from '../components/Willkommen.astro';
+import Galerie from '../components/Galerie.astro';
 import Oeffnungszeiten from '../components/Oeffnungszeiten.astro';
 import Abschnitte from '../components/Abschnitte.astro';
 import Stellen from '../components/Stellen.astro';
@@ -65,6 +67,13 @@ const gruppen = (leistungen.kategorien ?? [])
   <Navigation />
 
   <main id="inhalt" class="seiteninhalt">
+    {/* Begrüßung und Bilderband folgen der Sprechstunden-Karte — auf
+        allen Größen (Florian, 27. September 2026; Oeffnungszeiten.astro) */}
+    <Willkommen />
+    <div class="ozband">
+      <Galerie />
+    </div>
+
     <Abschnitte />
 
     <section id="leistungen" class="leistungen bereich bereich--ohne-oben">
@@ -104,11 +113,24 @@ const gruppen = (leistungen.kategorien ?? [])
 </Basis>
 
 <style>
-  /* Handys: Steht das Bilderband vor den Leistungen (keine aktiven
+  /* Das Bilderband läuft über die volle Fensterbreite. `--fensterbreite`
+     setzt Oeffnungszeiten.astro aus `clientWidth` — `100vw` ginge nicht,
+     weil es die Rollleiste mitzählt und die Seite dann waagerecht
+     überliefe. Ohne JavaScript bleibt es bei der Inhaltsbreite. */
+  .ozband {
+    width: var(--fensterbreite, 100%);
+    /* Direkt unter der Begrüßung — deren unterer Innenabstand ist der
+       ganze Abstand (Entwurf, 27. September 2026) */
+    margin-top: 0;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Steht das Bilderband direkt vor den Leistungen (keine aktiven
      freien Abschnitte), braucht der Abschnitt seinen oberen Abstand
      wieder — er ist sonst „ohne oben", weil die Abschnitte davor ihn
      mitbringen. */
-  :global(.ozband[data-nach-karte]) + .leistungen { padding-top: var(--abstand-abschnitt); }
+  .ozband + .leistungen { padding-top: var(--abstand-abschnitt); }
 
   /* Der Inhalt schiebt sich über den fixierten Startbereich */
   .seiteninhalt {

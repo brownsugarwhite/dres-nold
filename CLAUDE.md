@@ -17,13 +17,12 @@ Website der Zahnarzt- und Kieferorthopädie-Praxis **Dres. Nold**, Rosenstraße 
 > - **Öffnungszeiten** verwenden auf allen Größen die mobile Lösung
 >   (Blase mit Zipfel). **Nicht** die zwei Kästen der Desktop-Vorlage
 >   und **nicht** die drei Kästen des Gestaltungs-Entwurfs.
-> - **Der ganze Einstieg steckt in dieser Blase**: Begrüßung,
->   Bilderband und Sprechstunden sind EINE Karte, die gemeinsam über
->   das Logo hereinfährt (`Oeffnungszeiten.astro`, 17. September 2026).
->   Begrüßung und Band gehören also **nicht** als eigene Abschnitte in
->   `main` — **außer auf Handys** (bis 991 px): Dort stellt das Skript
->   sie hinter die Karte, die dann nur die Sprechstunden ist
->   (Reihenfolge der mobilen Vorlage, 26. September 2026).
+> - **Die Blase ist die Sprechstunden-Karte** — auf allen Größen. Sie
+>   fährt über das Logo herein; Begrüßung und Bilderband folgen ihr als
+>   gewöhnliche Abschnitte am Anfang von `main` (`src/pages/index.astro`,
+>   27. September 2026). Die Begrüßung ist ein zweispaltiger Block nach
+>   Florians Entwurf: links die zweizeilige Überschrift, rechts Text und
+>   Knöpfe, dazwischen eine Haarlinie.
 > - **Kein Briefumschlag** im Kontakt.
 
 > - **Gar keine eingebettete Google-Karte mehr.** Der Kontaktbereich
@@ -139,7 +138,7 @@ Labels (Florian, 26. September 2026; der leichte Schnitt 300 des
 Handoffs ist zurückgenommen). Labels halbfett und gesperrt (600,
 Versalien), Fließtext 400, Namen und Knöpfe 500, die große
 Telefonnummer im Kontakt 300. Überschriften stehen **linksbündig** —
-mittig stehen nur Startbereich, Begrüßung und Hinweis. **Lesetexte im
+mittig stehen nur Startbereich und Hinweis. **Lesetexte im
 linksbündigen Blocksatz mit Silbentrennung** (`global.css`, „Blocksatz";
 Kundenwunsch, 26. September 2026, ausdrücklich auch auf Handys) —
 Listen, Tabellen und Bedienelemente nicht. Die Trennstellen setzt der
@@ -234,7 +233,7 @@ docs/
 
 `#start` · `#praxis` (Begrüßung) · `#galerie` · `#oz_anchor` (Sprechstunden) · `#abschnitte` · `#leistungen` (Kachelübersicht) · `#neuigkeiten` · `#team` · `#stellen` · `#contact` · `#information` (Hinweis)
 
-Die ersten drei Marken liegen auf dem Desktop alle **in der Einstiegskarte**, die scrollgesteuert hereinfährt. Sie stehen damit nicht an einer festen Stelle im Dokument — `scripts/anker.ts` rechnet sie in eine Scrolltiefe um (`tiefeInKarte`), statt sie zu messen. Auf Handys stehen `#praxis` und `#galerie` als gewöhnliche Abschnitte hinter der Karte und werden normal gemessen.
+`#oz_anchor` ist die Einstiegskarte, die scrollgesteuert hereinfährt; sie steht nicht an einer festen Stelle im Dokument — `scripts/anker.ts` rechnet Marken in ihr in eine Scrolltiefe um (`tiefeInKarte`), statt sie zu messen. `#praxis` und `#galerie` folgen der Karte als gewöhnliche Abschnitte und werden normal gemessen.
 
 **Unterseiten** — von der Startseite aus als Vollbild geöffnet, aber mit eigener Adresse:
 

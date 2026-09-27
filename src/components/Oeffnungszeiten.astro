@@ -3,30 +3,20 @@
  * Der Einstieg der Startseite — eine große weiße Karte, die beim
  * Scrollen von unten hereinfährt und mit dem Zipfel einrastet.
  *
- * SIE ENTHÄLT DEN GANZEN ERSTEN ABSCHNITT (Florian, 17. September 2026):
+ * SIE IST DIE SPRECHSTUNDEN-KARTE — auf allen Größen (Florian,
+ * 27. September 2026):
  *
- *   Begrüßung  →  Bilderband  →  Sprechstunden  →  Zipfel
+ *   Logo → Sprechstunden-Karte schnalzt herein → Begrüßung → Bilderband
  *
- * Vorher waren Begrüßung und Band eigene Abschnitte im Seitenfluss und
- * nur die Sprechstunden-Blase fuhr herein. Das ließ sich nicht
- * zusammenbringen: Die Blase lebt davon, über das fest stehende Logo zu
- * fahren, also musste sie oben stehen — und stand damit vor der
- * Begrüßung. Jetzt fährt alles gemeinsam herein, und die Reihenfolge
- * stimmt wieder.
- *
- * Weil die Karte höher ist als das Fenster, sieht man beim Hereinfahren
- * zuerst ihren Kopf (die Begrüßung) und zuletzt ihren Fuß (die Zeiten) —
- * die Leserichtung stimmt also. In der Ruhelage steht ihr Fuß knapp
- * über der Symbolleiste; was darüber liegt, ist dann schon vorbei-
- * gezogen.
- *
- * AUF HANDYS (bis 991 px) IST DIE REIHENFOLGE DIE DER MOBILEN VORLAGE
- * (Florian, 26. September 2026): Logo → Sprechstunden-Blase schnalzt
- * herein → Begrüßung → Bilderband. Das Skript nimmt Begrüßung und Band
- * dafür aus der Karte und stellt sie an den Anfang von <main>
- * (`vorspannAnordnen`); die Karte ist dann nur die Sprechstunden, und
- * die ganze Bewegungsrechnung bleibt unverändert. Auf breiten Fenstern
- * fährt weiter alles gemeinsam herein.
+ * Begrüßung und Bilderband folgen ihr als gewöhnliche Abschnitte am
+ * Anfang von <main> (src/pages/index.astro). Zwischen dem 17. und dem
+ * 27. September steckte auf breiten Fenstern der ganze erste Abschnitt
+ * in der Karte (Begrüßung → Band → Sprechstunden); auf Handys galt seit
+ * dem 26. schon die heutige Reihenfolge, die das Skript damals durch
+ * Umsortieren herstellte. Jetzt steht sie im Markup, für alle Größen —
+ * nichts wird mehr verschoben. In der Ruhelage steht der Fuß der Karte
+ * knapp über der Symbolleiste, der Zipfel zeigt auf den
+ * Sprechstunden-Knopf.
  *
  * Aufbau wie in der Vorlage (`.oz` / `.oz-container` / `.div-block-28`):
  *   • Ein 350vh hoher Bereich ganz am Seitenanfang (Handys: 450vh —
@@ -75,8 +65,6 @@
  * nach links ab) werden proportional zur eingestellten Länge skaliert.
  */
 import OeffnungszeitenListen from './OeffnungszeitenListen.astro';
-import Willkommen from './Willkommen.astro';
-import Galerie from './Galerie.astro';
 import startseite from '../content/startseite.json';
 
 const texte = startseite.sprechstunden;
@@ -99,12 +87,6 @@ const texte = startseite.sprechstunden;
   <div class="ozbereich__buehne">
     <div class="ozblase" data-ozblase>
       <div class="ozblase__flaeche">
-        <Willkommen />
-
-        <div class="ozband" data-ozband>
-          <Galerie />
-        </div>
-
         <div class="ozsprechstunden" aria-labelledby="oz-titel">
           {/* Wie in der mobilen Vorlage ein Kreuz oben rechts. Weil die
               Karte scrollgesteuert ist, „schließt" es sie, indem es sanft
@@ -257,24 +239,6 @@ const texte = startseite.sprechstunden;
     background: var(--farbe-flaeche);
   }
 
-  /* Abstände wie im Entwurf: eine kleine Fuge zwischen Begrüßung und
-     Band, dann der volle Abschnittsabstand vor den Sprechstunden.
-
-     Das Band bricht aus der Karte aus und läuft über die volle
-     Fensterbreite (Florian, 17. September 2026). `--fensterbreite`
-     setzt das Skript unten aus `clientWidth` — `100vw` ginge nicht,
-     weil es die Rollleiste mitzählt und die Seite dann waagerecht
-     überliefe. Ohne JavaScript bleibt es bei der Kartenbreite; das ist
-     der ruhige Rückfall. */
-  .ozband {
-    width: var(--fensterbreite, 100%);
-    /* Derselbe Abstand wie zwischen Band und Sprechstunden — innerhalb
-       der Karte hat alles denselben Rhythmus (Florian, 17. September
-       2026). */
-    margin-top: var(--abstand-gruppe);
-    margin-left: 50%;
-    transform: translateX(-50%);
-  }
 
   /* Seitlich derselbe Rand wie die Fortschrittsleiste des Bands — so
      stehen Zeiten und Leiste auf einer Fluchtlinie. Unten deutlich mehr
@@ -500,39 +464,10 @@ const texte = startseite.sprechstunden;
   const HANDY = '(max-width: 991px)';
 
   /**
-   * Handys: Begrüßung und Band stehen NACH der Karte — die Reihenfolge
-   * der mobilen Vorlage (Logo → Blase → Willkommen → Galerie). Sie
-   * wandern an den Anfang von <main>; die Karte ist dann nur die
-   * Sprechstunden, und die ganze Bewegungsrechnung bleibt unverändert
-   * (Florian, 26. September 2026). Auf dem Desktop kommen sie zurück in
-   * die Karte. `scripts/anker.ts` misst Sprungmarken außerhalb der Karte
-   * ganz normal.
-   */
-  function vorspannAnordnen() {
-    const willkommen = document.getElementById('praxis');
-    const band = document.querySelector<HTMLElement>('[data-ozband]');
-    const sprechstunden = document.querySelector<HTMLElement>('.ozsprechstunden');
-    const inhalt = document.getElementById('inhalt');
-    if (!willkommen || !band || !sprechstunden || !inhalt) return;
-    const handy = window.matchMedia(HANDY).matches;
-    const draussen = willkommen.parentElement === inhalt;
-    if (handy && !draussen) {
-      inhalt.prepend(willkommen, band);
-      willkommen.dataset.nachKarte = 'ja';
-      band.dataset.nachKarte = 'ja';
-    } else if (!handy && draussen) {
-      sprechstunden.before(willkommen, band);
-      delete willkommen.dataset.nachKarte;
-      delete band.dataset.nachKarte;
-    }
-  }
-
-  /**
    * Die Kreuze in der Karte (das in der Zeile und der klebende
    * Zwilling): Sie hängt am Scrollweg, lässt sich also nicht
    * „wegklicken". Stattdessen gleitet die Seite dorthin, wo der Einstieg
-   * vorbei ist — auf dem Desktop ans Ende des Bereichs, auf Handys zur
-   * Begrüßung, die dort als Nächstes folgt.
+   * vorbei ist: zur Begrüßung, die als Nächstes folgt.
    */
   function ozSchliessenAufbauen() {
     const raum = document.querySelector<HTMLElement>('.ozraum');
@@ -540,7 +475,7 @@ const texte = startseite.sprechstunden;
       if (!raum || knopf.dataset.bereit) return;
       knopf.dataset.bereit = 'ja';
       knopf.addEventListener('click', () => {
-        if (window.matchMedia(HANDY).matches && zuSprungmarke('#praxis')) return;
+        if (zuSprungmarke('#praxis')) return;
         const unten = window.scrollY + raum.getBoundingClientRect().bottom - 96;
         sanftScrollen(Math.max(0, Math.round(unten)));
       });
@@ -605,9 +540,6 @@ const texte = startseite.sprechstunden;
        braucht sie deshalb als Zahl — auch dann, wenn die Karte selbst
        sich nicht bewegt. */
     fensterbreiteMerken();
-
-    /* Eine Reihenfolge je Fensterbreite — auch ohne Bewegung */
-    vorspannAnordnen();
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -827,7 +759,6 @@ const texte = startseite.sprechstunden;
       /* Zuerst die Reihenfolge — sie ändert die Kartenhöhe, die alle
          folgenden Maße brauchen. (Nicht per `matchMedia('change')`:
          das feuert nach `resize`, die Messung wäre veraltet.) */
-      vorspannAnordnen();
       vermessen();
       startBestimmen();
       zeichnen();
@@ -842,13 +773,6 @@ const texte = startseite.sprechstunden;
 
   ozAufbauen();
   ozSchliessenAufbauen();
-  /* Beim Rückweg von einer Leistung stellt scripts/uebergaenge.ts die
-     Zielkachel mittig — NACH allen `after-swap`-Zuhörern. Bis dahin
-     muss die Handy-Reihenfolge (Begrüßung und Band hinter der Karte)
-     schon stehen, sonst rückt die Kachel danach um deren Höhe nach
-     unten und der Morph endet außerhalb des Fensters (Florian,
-     27. September 2026). */
-  document.addEventListener('astro:after-swap', vorspannAnordnen);
   document.addEventListener('astro:page-load', () => {
     ozAufbauen();
     ozSchliessenAufbauen();

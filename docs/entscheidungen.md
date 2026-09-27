@@ -2279,3 +2279,39 @@ Stellen, Hinweis; Titel der Abschnitte, Kacheln und Leistungsseiten.
 Die Rechtsseiten (fester Text) bleiben bei der Browser-Trennung.
 `hyphens: auto` bleibt als Ergänzung; bis 767 px mit großzügigeren
 Grenzen (5 Buchstaben, 2 je Seite).
+
+### Die Begrüßung nach Florians Entwurf; die Karte ist nur noch die Sprechstunden (27. September 2026, nachmittags)
+
+**Reihenfolge auf allen Größen:** Logo → Sprechstunden-Karte → Begrüßung
+→ Bilderband. Die Karte enthält nur noch die Sprechstunden (Florian:
+„die Öffnungszeiten wieder über das Willkommen"); Begrüßung und Band
+stehen im Markup am Anfang von `main` (`index.astro`), nichts wird mehr
+per Skript umsortiert (`vorspannAnordnen` ist weg, ebenso die
+`data-nach-karte`-Zustände). Das Kreuz der Karte gleitet auf allen
+Größen zur Begrüßung. Die Bewegungsrechnung der Karte bleibt; die
+Karte ist jetzt auch auf breiten Fenstern etwa 800 statt 1 760 px hoch
+und erreicht das Logo entsprechend später — die Tabelle vom 26. gilt
+als sichere Obergrenze.
+
+**Die Begrüßung** (`Willkommen.astro`) nach Florians Entwurf: auf
+breiten Fenstern zwei Spalten, linksbündig in der Inhaltsbreite. Links
+die Überschrift in zwei Zeilen — „Willkommen in unserer" in
+`--text-titel`, der Größe der übrigen Überschriften, darunter „Praxis
+Dres. Nold" in `--text-willkommen`. Rechts, hinter einer Haarlinie, der
+kurze Text und darunter die beiden Knöpfe. Die rechte Spalte ist genau
+so breit wie die beiden Knöpfe nebeneinander (`width: max-content`; der
+Text zählt mit `width: 0; min-width: 100 %` nicht mit und bricht in
+dieser Breite um) und genau so hoch wie die Überschrift (`align-items:
+stretch`, Text oben, Knöpfe unten per `space-between`). Auf Handys
+(bis 767 px) alles untereinander: Beide Zeilen der Überschrift füllen
+genau die Bildschirmbreite — das Skript misst jede Zeile bei 100 px und
+verkleinert sie passend, die längere wird dabei von selbst die
+kleinere —, darunter der Text, darunter die Knöpfe nebeneinander mit
+den kurzen Beschriftungen „Termin" und „Leistungen" (die langen
+bleiben für Vorleser im Markup, die kurzen sind `aria-hidden`).
+
+**Der Begrüßungstext ist gekürzt** auf „Zahnmedizin und
+Kieferorthopädie unter einem Dach." — Florian wollte den kürzeren Text
+aus dem Entwurf; der zweite Satz („Wir nehmen uns Zeit für Sie, …") ist
+aus `startseite.json` heraus. Das ist eine Inhaltsänderung; die Praxis
+kann ihn in der Redaktion jederzeit wieder ergänzen.
