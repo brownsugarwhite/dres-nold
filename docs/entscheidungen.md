@@ -2364,3 +2364,13 @@ echtes iOS zeigt:
 
 Falls es danach noch springt: Bildschirmfoto mit iOS-Version, dann
 lässt es sich eingrenzen.
+
+**Nachtrag, Ansprechperson:** Sie kam „aus dem Nichts" — weil die
+Klappe während des Öffnens mit `overflow: hidden` abschnitt, und ein
+solcher Kasten ist der Bezug für `position: sticky`: Die Leiste klebte
+an der Zelle statt am Fenster, stand beim Aufklappen unsichtbar am Ende
+des Inhalts und sprang erst mit dem fertigen Öffnen ans Fenster. Jetzt
+schneidet die Zelle mit `overflow: clip` ab (kein Rollbereich), das
+Fenster bleibt der Bezug: Die Leiste wird beim Wachsen der Klappe
+freigelegt und klebt sofort unten — ohne eigene Blende, sie ist auf
+Handys immer voll sichtbar (`opacity: 1` in allen Zuständen).

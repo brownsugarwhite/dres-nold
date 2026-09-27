@@ -251,8 +251,15 @@ const bewerbung = (titel: string) =>
 
   .stelle__klappe[data-zu] { grid-template-rows: 0fr; }
 
+  /* `clip`, nicht `hidden`: Beides schneidet ab, aber `hidden` macht
+     die Zelle zum Rollbereich — und damit zum Bezug für die klebende
+     Ansprechperson (Handys, unten). Die klebte dann an der Zelle statt
+     am Fenster, stand beim Aufklappen unsichtbar am Ende des Inhalts
+     und sprang erst mit dem Öffnen ans Fenster. Mit `clip` bleibt das
+     Fenster der Bezug: Die Leiste wird beim Wachsen freigelegt und
+     klebt sofort (Florian, 27. September 2026). */
   .stelle__innen {
-    overflow: hidden;
+    overflow: clip;
     min-height: 0;
   }
 
@@ -520,9 +527,13 @@ const bewerbung = (titel: string) =>
       transform: none;
     }
 
+    /* Immer sichtbar — die Klappe legt sie frei und nimmt sie wieder
+       mit; keine eigene Blende, kein eigener Weg */
     .stellen__liste[data-bereit] .stelle__seite { transition: none; }
+    .stelle__seite,
     .stelle__klappe[data-offen] .stelle__seite,
-    .stelle__klappe[data-schliesst] .stelle__seite { opacity: 1; }
+    .stelle__klappe[data-schliesst] .stelle__seite,
+    .stelle__klappe[data-zu] .stelle__seite { opacity: 1; }
 
     /* Auf der ersten Zeile der Bezeichnung, wie Kreis und Umfang —
        12 px hoch (`--text-kicker` bei Zeilenhöhe 1). */
