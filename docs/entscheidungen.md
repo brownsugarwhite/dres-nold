@@ -2343,3 +2343,24 @@ kann ihn in der Redaktion jederzeit wieder ergänzen.
   solange eine Stelle offen ist: Stellen.astro beobachtet die Klappen
   und setzt `data-stelle-offen` an <html>, global.css blendet den
   Verlauf damit aus (300 ms).
+
+### iPhone: Text bläht sich auf, Akkordeon springt (27. September 2026, abends)
+
+Auf Florians iPhone wurden die Texte einer geöffneten Stellenanzeige
+sehr groß, und die Liste sprang nach dem Öffnen. Im WebKit von
+Playwright (iPhone-Profil) ließ sich beides nicht nachstellen — die
+Schriftgrößen blieben, wie das CSS sie setzt. Zwei Dinge, die nur ein
+echtes iOS zeigt:
+
+- **`-webkit-text-size-adjust: 100 %`** steht jetzt an `<html>`. iOS
+  Safari vergrößert Text sonst von sich aus („text autosizing"), unter
+  anderem in Blöcken mit begrenzter Höhe und nach dem Drehen; die
+  Zeile fehlte hier bisher.
+- **Das Nachrücken des Titels** unter die Kopfleiste beim Öffnen läuft
+  über das sanfte Scrollen der Seite (`sanftScrollen`, scripts/anker.ts)
+  statt über `scrollTo({ behavior: 'smooth' })` — das Gleiten des
+  Browsers begann auf iOS, während die Klappe noch aufging, und wirkte
+  als Sprung.
+
+Falls es danach noch springt: Bildschirmfoto mit iOS-Version, dann
+lässt es sich eingrenzen.

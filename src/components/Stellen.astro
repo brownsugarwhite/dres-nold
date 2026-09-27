@@ -558,6 +558,7 @@ const bewerbung = (titel: string) =>
 </style>
 
 <script>
+  import { sanftScrollen } from '../scripts/anker';
   /**
    * Stellen auf- und zuklappen — nur eine gleichzeitig offen.
    *
@@ -738,10 +739,10 @@ const bewerbung = (titel: string) =>
       }
 
       if (oben >= KOPF) return;
-      window.scrollTo({
-        top: window.scrollY + oben - KOPF,
-        behavior: wenigerBewegung ? 'instant' as ScrollBehavior : 'smooth',
-      });
+      /* Mit dem sanften Scrollen der Seite (scripts/anker.ts) statt dem
+         des Browsers — auf iOS sprang das Gleiten des Browsers, während
+         die Klappe noch aufging (Florian, 27. September 2026) */
+      sanftScrollen(Math.max(0, Math.round(window.scrollY + oben - KOPF)));
     };
 
     knoepfe.forEach((knopf) => {

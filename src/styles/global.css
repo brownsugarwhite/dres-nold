@@ -20,6 +20,13 @@
    funktionieren. */
 html {
   overflow-x: clip;
+  /* iOS Safari vergrößert Text sonst von sich aus („text autosizing"),
+     etwa in Blöcken mit begrenzter Höhe oder nach dem Drehen — auf
+     Florians iPhone wurden die Texte einer geöffneten Stellenanzeige
+     plötzlich sehr groß (27. September 2026). 100 % heißt: die Größen
+     aus dem CSS gelten, nichts wird nachträglich aufgeblasen. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
