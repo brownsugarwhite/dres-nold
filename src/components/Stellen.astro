@@ -117,9 +117,12 @@ const bewerbung = (titel: string) =>
 )}
 
 <style>
+  /* Kein eigener Stapel (kein z-index): Die klebende Ansprechperson
+     muss über den Randverläufen der Seite liegen können — und das
+     geht nur, wenn zwischen ihr und der Wurzel kein Stapelkontext
+     liegt (Florian, 27. September 2026; siehe `.stelle__seite`). */
   .stellen {
     position: relative;
-    z-index: 40;
     background: var(--farbe-flaeche);
   }
 
@@ -224,11 +227,11 @@ const bewerbung = (titel: string) =>
   .stellen__liste[data-bereit] .stelle__kreis {
     transition:
       border-color 0.4s var(--verlauf-betont),
-      margin-top 0.45s var(--verlauf-betont);
+      margin-top 0.6s var(--verlauf-betont);
   }
 
   .stellen__liste[data-bereit] .stelle__umfang {
-    transition: margin-top 0.45s var(--verlauf-betont);
+    transition: margin-top 0.6s var(--verlauf-betont);
   }
 
   .stelle__knopf:hover .stelle__kreis,
@@ -246,7 +249,9 @@ const bewerbung = (titel: string) =>
      zugeklappt hat — sonst sähe man beim Laden, wie alle Stellen
      zusammenfahren. */
   .stellen__liste[data-bereit] .stelle__klappe {
-    transition: grid-template-rows 0.5s var(--verlauf-betont);
+    /* 0,7 s — etwas gemächlicher (Florian, 27. September 2026; vorher
+       0,5). Muss mit `KLAPPEN` im Skript übereinstimmen. */
+    transition: grid-template-rows 0.7s var(--verlauf-betont);
   }
 
   .stelle__klappe[data-zu] { grid-template-rows: 0fr; }
@@ -260,14 +265,16 @@ const bewerbung = (titel: string) =>
      klebt sofort (Florian, 27. September 2026). */
   .stelle__innen {
     overflow: clip;
+    /* Etwas Luft für Fokusringe an den Rändern */
+    overflow-clip-margin: 8px;
     min-height: 0;
   }
 
-  /* Steht die Zeile offen und ruht die Bewegung, darf der Überlauf
-     wieder sichtbar sein — sonst könnte die Ansprechperson daneben
-     nicht kleben: Ein beschnittener Vorfahre wird selbst zum
-     Bezugsrahmen, und `sticky` bliebe wirkungslos. */
-  .stelle__klappe[data-offen] .stelle__innen { overflow: visible; }
+  /* Auch offen bleibt die Zelle beschnitten: `clip` stört das Kleben
+     nicht, und nichts in der Klappe kann die Seite breiter machen — auf
+     Florians iPhone rollte die Seite bei offener Stelle waagerecht
+     (27. September 2026). Bis dahin stand hier `overflow: visible` für
+     die offene Zeile. */
 
   .stelle__spalten {
     display: grid;
@@ -309,8 +316,8 @@ const bewerbung = (titel: string) =>
 
   .stellen__liste[data-bereit] .stelle__anriss {
     transition:
-      max-height 0.45s var(--verlauf-betont),
-      margin-top 0.45s var(--verlauf-betont),
+      max-height 0.6s var(--verlauf-betont),
+      margin-top 0.6s var(--verlauf-betont),
       opacity 0.26s var(--verlauf);
   }
 
@@ -333,8 +340,8 @@ const bewerbung = (titel: string) =>
 
   .stellen__liste[data-bereit] .stelle__text {
     transition:
-      opacity 0.5s var(--verlauf-betont),
-      transform 0.5s var(--verlauf-betont);
+      opacity 0.7s var(--verlauf-betont),
+      transform 0.7s var(--verlauf-betont);
   }
 
   .stellen__liste[data-bereit] .stelle__seite {
@@ -422,6 +429,10 @@ const bewerbung = (titel: string) =>
   .stelle__seite {
     position: sticky;
     top: calc(80px + var(--abstand-m));
+    /* Über den Randverläufen (styles/global.css: --ebene-navigation − 3),
+       unter Schleier und Leisten. Wirkt nur, weil weder `.stellen` noch
+       `.seiteninhalt` einen eigenen Stapel aufmachen. */
+    z-index: calc(var(--ebene-navigation) - 2);
     display: flex;
     flex-direction: column;
     gap: 22px;
@@ -499,27 +510,23 @@ const bewerbung = (titel: string) =>
     .stelle__titeltext { max-width: calc(100% / 1.165); }
     .stelle__knopf[aria-expanded='true'] .stelle__titeltext { max-width: 100%; }
     .stellen__liste[data-bereit] .stelle__titeltext {
-      transition: max-width 0.45s var(--verlauf-betont);
+      transition: max-width 0.6s var(--verlauf-betont);
     }
 
     .stellen__liste[data-bereit] .stelle__titel {
-      transition: font-size 0.45s var(--verlauf-betont);
+      transition: font-size 0.6s var(--verlauf-betont);
     }
 
-    /* Klebt am unteren Rand — ohne eigene Bewegung: Sie steht, sobald
-       die Klappe offen ist, und geht mit ihr (Florian, 27. September
-       2026; vorher fuhr sie 28 px von unten herauf). Solange sie steht,
-       tritt der untere Randverlauf zurück (styles/global.css,
-       `html[data-stelle-offen]`) — sonst läge sie unter ihm und
-       verblasste; über ihn legen lässt sie sich nicht, der Inhalt hat
-       seine eigene Ebene unter den Verläufen. */
+    /* Klebt am unteren Rand — ohne eigene Bewegung: Die Klappe legt sie
+       beim Wachsen frei und nimmt sie wieder mit (Florian, 27. September
+       2026; vorher fuhr sie 28 px von unten herauf). Sie liegt über dem
+       unteren Randverlauf (z-index oben). */
     .stelle__seite,
     .stelle__klappe[data-offen] .stelle__seite,
     .stelle__klappe[data-schliesst] .stelle__seite {
       position: sticky;
       top: auto;
       bottom: 0;
-      z-index: 2;
       margin-top: var(--abstand-m);
       padding-block: var(--abstand-s);
       border-top: 1px solid var(--farbe-linie-leise);
@@ -544,7 +551,7 @@ const bewerbung = (titel: string) =>
     }
 
     .stellen__liste[data-bereit] .stelle__nummer {
-      transition: margin-top 0.45s var(--verlauf-betont);
+      transition: margin-top 0.6s var(--verlauf-betont);
     }
   }
 
@@ -588,27 +595,10 @@ const bewerbung = (titel: string) =>
    * (`data-zu`). So sieht niemand, wie die Ansprechperson von ihrer
    * klebenden Lage zurück in die Zeile springt.
    */
-  /**
-   * Solange eine Stelle offen ist, steht `data-stelle-offen` an <html>:
-   * Auf Handys tritt dann der untere Randverlauf zurück, damit die
-   * klebende Ansprechperson nicht unter ihm verblasst (styles/global.css).
-   * Beobachtet die Klappen statt jeden Öffnungsweg einzeln.
-   */
-  function offenMelden(liste: HTMLElement) {
-    const melden = () => {
-      const html = document.documentElement;
-      if (liste.querySelector('.stelle__klappe[data-offen]')) html.dataset.stelleOffen = 'ja';
-      else delete html.dataset.stelleOffen;
-    };
-    new MutationObserver(melden).observe(liste, { subtree: true, attributes: true, attributeFilter: ['data-offen'] });
-    melden();
-  }
-
   function stellenAufbauen() {
     const liste = document.querySelector<HTMLElement>('[data-stellenliste]');
     if (!liste || liste.dataset.aufgebaut) return;
     liste.dataset.aufgebaut = 'ja';
-    offenMelden(liste);
 
     const knoepfe = [...liste.querySelectorAll<HTMLButtonElement>('[data-stellenknopf]')];
 
@@ -616,7 +606,7 @@ const bewerbung = (titel: string) =>
 
     /* Dauern in Millisekunden — müssen mit den Übergängen im CSS oben
        übereinstimmen: */
-    const KLAPPEN = 500;     // die Höhe der Klappe (`grid-template-rows`)
+    const KLAPPEN = 700;     // die Höhe der Klappe (`grid-template-rows`)
     const AUSBLENDEN = 200;  // Text und Ansprechperson beim Zuklappen
 
     /* Kopfleiste (80 px) plus Luft — dieselben Werte wie in

@@ -132,10 +132,14 @@ const gruppen = (leistungen.kategorien ?? [])
      mitbringen. */
   .ozband + .leistungen { padding-top: var(--abstand-abschnitt); }
 
-  /* Der Inhalt schiebt sich über den fixierten Startbereich */
+  /* Der Inhalt schiebt sich über den fixierten Startbereich. Ohne
+     eigenen z-index — er machte den Inhalt zu einem Stapel, in dem
+     nichts über die Randverläufe der Seite hinauskam; die klebende
+     Ansprechperson der Stellenliste muss das (27. September 2026).
+     Die Reihenfolge bleibt dieselbe: positioniert, später im Baum, also
+     über allem Unpositionierten und unter allem mit eigenem z-index. */
   .seiteninhalt {
     position: relative;
-    z-index: 5;
     background: var(--farbe-flaeche);
   }
 

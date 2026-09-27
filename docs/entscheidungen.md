@@ -2374,3 +2374,28 @@ schneidet die Zelle mit `overflow: clip` ab (kein Rollbereich), das
 Fenster bleibt der Bezug: Die Leiste wird beim Wachsen der Klappe
 freigelegt und klebt sofort unten — ohne eigene Blende, sie ist auf
 Handys immer voll sichtbar (`opacity: 1` in allen Zuständen).
+
+### Stellenliste, dritter Durchgang: Ebenen, Tempo, Breite (27. September 2026, abends)
+
+- **Die Ansprechperson liegt jetzt wirklich über dem unteren
+  Randverlauf** — ohne Ein- und Ausblenden (Florian: „wenn du es
+  hinbekommst"). Dafür sind zwei Stapelkontexte weg: `.seiteninhalt`
+  hatte `z-index: 5`, `.stellen` `z-index: 40`; beide deckelten alles
+  darin unter den Verläufen (98). Die Leiste steht mit
+  `--ebene-navigation − 2` (98), die Verläufe rücken auf −3 (97), der
+  Schleier des Handy-Menüs bleibt bei −1 (99), die Leisten bei 100.
+  Die Reihenfolge des Inhalts zum Startbereich (10) ändert sich nicht:
+  positioniert ohne z-index liegt der Inhalt weiter unter ihm, wie mit
+  5. Die Abschnitte mit `z-index: 40` (Team, Neuigkeiten, Kontakt)
+  stehen nun im Wurzelstapel — sie liegen nie mit dem Startbereich im
+  Bild. Der Mechanismus vom Nachmittag (`data-stelle-offen`, Verlauf
+  ausblenden) ist wieder ausgebaut.
+- **Die Klappe bleibt auch offen beschnitten** (`overflow: clip`, mit
+  8 px Luft für Fokusringe). Auf Florians iPhone rollte die Seite bei
+  offener Stelle waagerecht; im WebKit von Playwright ragte nichts
+  über den Rand — der Verdacht ist das `overflow: visible`, auf das die
+  Zelle offen bisher umschaltete. Seit `clip` das Kleben nicht mehr
+  stört, ist es nicht mehr nötig.
+- **Gemächlicher:** Die Klappe läuft 0,7 s statt 0,5 (`KLAPPEN` im
+  Skript ebenso), Bezeichnung, Anriss und Innenabstände 0,6 s statt
+  0,45, Text und Ansprechperson blenden 0,7 s.
