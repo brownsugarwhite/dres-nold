@@ -4,8 +4,8 @@ import { trennenHtml } from '../../lib/silben';
  * Einzelseite eines Beitrags — eigene Adresse, mit Morph-Übergang
  * aus der Übersicht heraus.
  *
- * Zum Übergang: Das Bild trägt denselben Namen wie in der
- * Vorschaukarte und wandert dadurch wirklich an seinen Platz. Datum,
+ * Zum Übergang: Der Ausschnitt um das Bild trägt denselben Namen wie in
+ * der Vorschaukarte und wandert dadurch wirklich an seinen Platz. Datum,
  * Überschrift und Text tragen bewusst KEINEN eigenen Namen — sie
  * gehören zur Karte und machen deren Bewegung und Skalierung mit,
  * während sie einblenden. Weil sie hier über dem Bild stehen und in
@@ -51,8 +51,16 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
       )}
       <h1 class="beitrag__titel">{beitrag.titel}</h1>
 
+      {/* Den Übergangsnamen trägt der Ausschnitt, nicht das Bild — wie
+          auf der Karte. Ein nacktes <img> als eigene Übergangsebene legt
+          WebKit als reine Bildebene an, und auf dem iPhone kam deren
+          Inhalt erst ein Bild später: Das Bild war zu Beginn des Morphs
+          für ein Bild weiß (Florian, 27. September 2026). Im Ausschnitt
+          wird es wie jeder andere Inhalt gezeichnet. */}
       {beitrag.bild && (
-        <img class="beitrag__bild" src={beitrag.bild} alt={beitrag.bild_alt || ''} width="900" height="500" decoding="sync" fetchpriority="high" transition:name={`beitrag-bild-${beitrag.id}`} />
+        <span class="beitrag__ausschnitt" transition:name={`beitrag-bild-${beitrag.id}`}>
+          <img class="beitrag__bild" src={beitrag.bild} alt={beitrag.bild_alt || ''} width="900" height="500" decoding="sync" fetchpriority="high" />
+        </span>
       )}
 
       {/* Kein eigener Übergangsname: gehört zur Karte und wächst mit ihr */}
@@ -142,11 +150,15 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
 
   .beitrag__titel { margin-bottom: var(--abstand-m); }
 
+  .beitrag__ausschnitt {
+    display: block;
+    margin-bottom: var(--abstand-m);
+    view-transition-class: bild;
+  }
+
   .beitrag__bild {
     width: 100%;
     height: auto;
-    margin-bottom: var(--abstand-m);
-    view-transition-class: bild;
   }
 
   /* Vom Redaktionssystem geliefertes HTML */

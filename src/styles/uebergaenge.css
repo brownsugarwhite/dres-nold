@@ -40,12 +40,15 @@
     beitrag-<id>             Hülle des Neuigkeiten-Beitrags
     beitrag-bild-<id>        sein Bild — EIN Bild, das von einem
                              Rahmen in den anderen wandert, ohne zu
-                             kreuzblenden. Auf der Übersicht trägt den
-                             Namen der AUSSCHNITT, nicht das Bild
-                             darin: Der Ausschnitt steht still,
-                             während das Bild beim Zeigen und beim
-                             Scrollen skaliert wird (Florian,
-                             18. September 2026).
+                             kreuzblenden. Den Namen trägt der
+                             AUSSCHNITT, nicht das Bild darin: Auf
+                             der Übersicht steht er still, während
+                             das Bild beim Zeigen und beim Scrollen
+                             skaliert wird (Florian, 18. September
+                             2026); auf der Beitragsseite erspart er
+                             dem iPhone eine reine Bildebene, deren
+                             Inhalt ein Bild zu spät kam (27.
+                             September 2026).
     nav-oben / nav-unten     die Leisten — bleiben unbewegt und scharf
                              (gesetzt per CSS in Navigation.astro)
 
@@ -222,7 +225,8 @@ html[data-rueckmorph]::view-transition-old(.symbol) { animation: none; opacity: 
 
    Möglich wird das dadurch, dass immer dieselbe Aufnahme gezeigt wird:
    die der BEITRAGSSEITE. Auf dem Hinweg ist das die neue, auf dem
-   Rückweg die alte; die Aufnahme der Karte entfällt jeweils. Was man
+   Rückweg die alte; die Aufnahme der Karte ist jeweils nicht zu sehen
+   (auf dem Hinweg liegt sie verdeckt darunter, siehe unten). Was man
    sieht, ist also durchgehend ein und dasselbe Bild, das sich mit
    seiner Hülle bewegt und wächst.
 
@@ -263,11 +267,20 @@ html[data-rueckmorph]::view-transition-old(.symbol) { animation: none; opacity: 
   to { transform: scale(var(--morph-zoom, 1)); }
 }
 
-/* Hinweg: Die Aufnahme der Karte entfällt, die der Beitragsseite
-   beginnt im Rahmen der Karte — vergrößert wie dort — und fährt auf
-   ihr eigenes Maß, während die Hülle sie an ihren Platz trägt. */
+/* Hinweg: Die Aufnahme der Beitragsseite beginnt im Rahmen der Karte
+   — vergrößert wie dort — und fährt auf ihr eigenes Maß, während die
+   Hülle sie an ihren Platz trägt.
+
+   Die Aufnahme der Karte bleibt darunter als stille Unterlage stehen,
+   ohne Blende. Zu sehen ist sie nie: Die Aufnahme der Beitragsseite ist
+   ein deckendes Foto und liegt ganz über ihr. Sie fängt nur den Fall
+   ab, dass diese im ersten Bild noch leer ist — auf dem iPhone war das
+   Bild dann für ein Bild weiß (Florian, 27. September 2026). Die
+   Aufnahme der Karte ist dagegen fertig, bevor der Wechsel beginnt,
+   und zeigt genau das, was eben noch zu sehen war. */
 html:not([data-rueckmorph])::view-transition-old(.bild) {
-  display: none;
+  animation: none;
+  opacity: 1;
 }
 
 html:not([data-rueckmorph])::view-transition-new(.bild) {

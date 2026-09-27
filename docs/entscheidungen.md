@@ -2553,3 +2553,41 @@ auf das Original), die Beitragsseite weiter das Original. Und weil
 Karte und Seite damit verschiedene Dateien zeigen, dekodiert
 `uebergaenge.ts` das Original der Zielseite vorab (im `loader`), bevor
 die neue Seite eingetauscht und aufgenommen wird.
+
+**Nachtrag 5 — das Bild, das im ersten Bild noch fehlt:** Das weiße
+Bild vor dem Hinweg blieb auf dem iPhone, in Safari wie in Chrome (dort
+ebenfalls WebKit); in Chrome auf dem Desktop war alles richtig
+(Florian). Das Nachbarbild blendet übrigens korrekt mit der Seite aus
+und ein — das war falsch gesehen und ist nicht geändert.
+
+Die Ursache liegt im ersten Bild des Übergangs: Auf der Bildfläche ist
+dort nur die NEUE Aufnahme zu sehen, also das live gezeichnete Bild der
+Beitragsseite; die Aufnahme der Karte stand auf `display: none`, und
+die Karte selbst spart das Bild aus (es hat ja einen eigenen Namen).
+Das Bild der Beitragsseite war bis jetzt ein nacktes `<img>` mit
+Übergangsnamen — WebKit legt dafür eine reine Bildebene an, und auf
+iOS kommt deren Inhalt erst ein Bild später an. Bei den Leistungen
+wandert an dieser Stelle ein SVG-Symbol, das sofort gezeichnet wird;
+deshalb war es dort nie zu sehen. Zwei Änderungen:
+
+- **Den Namen trägt auf der Beitragsseite der Ausschnitt um das Bild**
+  (`.beitrag__ausschnitt`, wie auf der Karte), nicht mehr das `<img>`.
+  Das Bild wird darin wie jeder andere Inhalt gezeichnet. Maße und Lage
+  sind unverändert (nachgemessen: 342 × 271 px, Text darunter an
+  derselben Stelle).
+- **Auf dem Hinweg bleibt die Aufnahme der Karte als stille Unterlage
+  stehen** (`animation: none; opacity: 1` statt `display: none`). Zu
+  sehen ist sie nie — die Aufnahme der Beitragsseite ist ein deckendes
+  Foto und liegt ganz über ihr. Sie fängt nur den Fall ab, dass diese
+  im ersten Bild noch leer ist: Dann steht dort das Kartenbild, also
+  genau das, was eben noch zu sehen war, statt Weiß. Die Aufnahme der
+  Karte ist fertig, bevor der Wechsel beginnt. „Ein Bild wandert, kein
+  Überblenden" (18. September) gilt weiter.
+
+Nachgeprüft: In Chromium ist jedes Bild des Übergangs, hin wie zurück,
+pixelgleich mit dem Stand davor (bis auf den Unterstrich von „Beitrag
+lesen", der beim Tippen wächst und je Lauf anders erwischt wird). In
+WebKit (Playwright) stimmen die berechneten Stile der Ebenen, und die
+Aufzeichnung zeigt ein wanderndes Bild ohne Doppelbild. Das Aufblitzen
+selbst lässt sich dort nicht nachstellen — es tritt nur auf dem iPhone
+auf; Florian prüft am Gerät.
