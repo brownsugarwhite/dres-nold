@@ -2438,3 +2438,48 @@ Handys immer voll sichtbar (`opacity: 1` in allen Zuständen).
   `overflow-x: clip` am Abschnitt und an `<body>` (nichts kann die
   Seite waagerecht rollen lassen). Bleibt es auf dem iPhone, braucht es
   ein Bildschirmfoto des offenen Zustands mit der iOS-Version.
+
+### Stellenliste: Bezeichnung wächst ohne Ruckeln, die Zeile gleitet geführt nach oben; Team-Kicker links (27. September 2026, abends)
+
+- **Die Bezeichnung wächst über `transform: scale`, nicht mehr über
+  den Schriftgrad.** Ein wachsender Schriftgrad ist eine
+  Layout-Animation: Bei jedem Bild setzt der Browser die ganze Liste
+  neu, samt Blocksatz und Trennung des offenen Texts — auf dem Handy
+  ruckelte das (Florian). Jetzt steht die Bezeichnung im Layout immer
+  in der offenen Größe und ist zu nur optisch auf 1/1,165 verkleinert
+  (aus der linken oberen Ecke, 0,6 s). Die Umbrüche sind zu und offen
+  damit von selbst dieselben; die `max-width`-Rechnung vom Nachmittag
+  ist wieder weg. Zu bleibt unter der verkleinerten Schrift etwas Luft
+  (die Höhe des größeren Kastens). Kreis und Nummer richten sich
+  weiter über `--titel-zeile` auf die erste Zeile aus.
+- **Die geöffnete Stelle gleitet geführt unter die Kopfleiste** —
+  immer, nicht nur, wenn sie sonst darüber läge (Florian: „perfekt
+  getimt an den oberen Rand"). Nicht mehr vorausberechnet und dann
+  gescrollt (das lief gegen die einklappende Stelle darüber an: hoch
+  und wieder herunter), sondern Bild für Bild: Die Zeile bekommt in
+  jedem Bild die Fensterposition, die sie auf ihrem Weg von jetzt zur
+  Kopfleiste (96 px) gerade haben soll, die Seite wird entsprechend
+  gestellt (`titelFuehren`). Dauer und Kurve sind die der Klappen
+  (0,7 s; 0,9 s, wenn darüber eine schließt) — die Zeile kommt oben
+  an, wenn die Bewegung vorbei ist. Wer selbst scrollt, übernimmt.
+- **Team:** Kicker „Unser Team" und Titel stehen auf Handys links wie
+  in allen Abschnitten; die Karten bleiben mittig.
+
+### Verläufe im Wechsel nur einmal; kein Hover auf Touch (27. September 2026, abends)
+
+- **Die Randverläufe standen im Seitenwechsel doppelt** — altes und
+  neues Abbild übereinander, beide stehend, also ein doppelt starker
+  Verlauf, der am Ende auf einen zurückfiel: das Flackern unten
+  (Florian). Jetzt bleibt das alte Abbild aus (`display: none`), nur
+  das neue steht; ohne Gegenstück steht das alte allein.
+- **Zeige-Zustände von Kacheln und Beitragskarten gelten nur noch mit
+  Zeiger** (`@media (hover: hover)`). Auf dem Handy löst der Tipp Hover
+  und Klick zugleich aus: Die Karte begann ihre Anhebung, das Bild sein
+  Wachsen, und der Wechsel schaltete im selben Moment die Überblendung
+  ab — ein Sprung vor dem Morph; nach dem Rückweg hing der Hover noch
+  am Ziel und löste sich später — ein Sprung danach. Auf dem Desktop
+  war der Hover beim Klick längst durch, dort lief es glatt. Der
+  Tastaturfokus behält seine Zustände.
+- Beim Umbau der Stellenliste (Eintrag darüber) war kurzzeitig die
+  Funktion `setzen` mit entfernt worden — die Liste stand ohne Skript.
+  Wieder da; das Skript ist gegen den Stand im Repo abgeglichen.

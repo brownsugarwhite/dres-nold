@@ -499,13 +499,19 @@ const bewerbung = (titel: string) =>
   @media (max-width: 800px) {
     .stelle__spalten { display: block; }
 
-    /* Die offene Größe ist die Bezugsgröße, die geschlossene ihr
-       1,165-tel — und die Bezeichnung darf zu nur 1/1,165 der Breite
-       einnehmen. Breite und Schriftgrad wachsen im selben Verhältnis
-       (gleiche Kurve, gleiche Dauer), das Verhältnis Breite : Schrift
-       bleibt also in jedem Moment gleich — und mit ihm die Umbrüche:
-       Die Zeilen sind zu dieselben wie offen (Florian, 27. September
-       2026). */
+    /* Die Bezeichnung wächst über `transform`, nicht über den
+       Schriftgrad: Ein wachsender Schriftgrad ist eine Layout-Animation,
+       die bei jedem Bild die ganze Liste neu setzt — auf dem Handy
+       ruckelte das (Florian, 27. September 2026). Deshalb liegt sie im
+       LAYOUT immer in der offenen Größe (`--titel-gross`) und ist zu nur
+       optisch auf 1/1,165 verkleinert, aus der linken oberen Ecke; die
+       Umbrüche sind damit zu und offen von selbst dieselben. Zu bleibt
+       unter der verkleinerten Schrift etwas Luft — die Höhe des
+       größeren Kastens.
+
+       `--titel-groesse` (klein zu, groß offen) bleibt für die
+       Ausrichtung von Kreis und Nummer auf die erste Zeile
+       (`--titel-zeile`); die läuft weiter über den Außenabstand mit. */
     .stelle__knopf {
       --titel-gross: clamp(1.35rem, 1.15rem + 0.85vw, 1.85rem);
       --titel-groesse: calc(var(--titel-gross) / 1.165);
@@ -515,14 +521,17 @@ const bewerbung = (titel: string) =>
       --titel-groesse: var(--titel-gross);
     }
 
-    .stelle__titeltext { max-width: calc(100% / 1.165); }
-    .stelle__knopf[aria-expanded='true'] .stelle__titeltext { max-width: 100%; }
-    .stellen__liste[data-bereit] .stelle__titeltext {
-      transition: max-width 0.6s var(--verlauf-betont);
+    .stelle__titel { font-size: var(--titel-gross); }
+
+    .stelle__titeltext {
+      transform: scale(0.8584);
+      transform-origin: 0 0;
     }
 
-    .stellen__liste[data-bereit] .stelle__titel {
-      transition: font-size 0.6s var(--verlauf-betont);
+    .stelle__knopf[aria-expanded='true'] .stelle__titeltext { transform: none; }
+
+    .stellen__liste[data-bereit] .stelle__titeltext {
+      transition: transform 0.6s var(--verlauf-betont);
     }
 
     /* Klebt am unteren Rand — ohne eigene Bewegung: Die Klappe legt sie
@@ -571,6 +580,7 @@ const bewerbung = (titel: string) =>
     .stelle__kreis,
     .stellen__liste[data-bereit] .stelle__klappe,
     .stellen__liste[data-bereit] .stelle__titel,
+    .stellen__liste[data-bereit] .stelle__titeltext,
     .stellen__liste[data-bereit] .stelle__kreis,
     .stellen__liste[data-bereit] .stelle__umfang,
     .stellen__liste[data-bereit] .stelle__nummer,
@@ -584,7 +594,7 @@ const bewerbung = (titel: string) =>
 </style>
 
 <script>
-  import { sanftScrollen } from '../scripts/anker';
+  import { KURVEN } from '../scripts/easing';
   /**
    * Stellen auf- und zuklappen — nur eine gleichzeitig offen.
    *
@@ -729,29 +739,44 @@ const bewerbung = (titel: string) =>
       Anriss unter der Bezeichnung kommt wieder zum Vorschein. Steht die
       Zeile ohnehin tief genug, passiert nichts.
     */
-    const ANRISS_ABSTAND = 6;  // `margin-top` des Anrisses im CSS oben
 
-    const titelInsBild = (knopf: HTMLButtonElement, vorher?: HTMLButtonElement) => {
+    /**
+     * Beim Öffnen gleitet die Zeile der Stelle unter die Kopfleiste —
+     * geführt, Bild für Bild: Der Weg wird nicht vorausberechnet und
+     * dann gescrollt, sondern die Zeile bekommt in jedem Bild die
+     * Fensterposition, die sie auf ihrem Weg von jetzt zur Kopfleiste
+     * gerade haben soll, und die Seite wird entsprechend gestellt. Was
+     * sich währenddessen über oder unter ihr ändert — die eigene Klappe
+     * wächst, eine andere darüber schließt —, fängt das ab; vorher
+     * liefen Scrollen und Klappen gegeneinander, und es ging hoch und
+     * wieder herunter (Florian, 27. September 2026). Dauer und Kurve
+     * sind die der Klappen: Die Zeile kommt oben an, wenn die Bewegung
+     * vorbei ist. Wer währenddessen selbst scrollt, übernimmt.
+     */
+    let fuehrung = 0;
+    const titelFuehren = (knopf: HTMLButtonElement, dauer: number) => {
       const zeile = knopf.closest<HTMLElement>('.stelle__kopf') ?? knopf;
-      let oben = zeile.getBoundingClientRect().top;
-
-      if (vorher) {
-        const klappeVorher = document.getElementById(vorher.getAttribute('aria-controls') || '');
-        const liegtDarueber = vorher.compareDocumentPosition(knopf) & Node.DOCUMENT_POSITION_FOLLOWING;
-        if (klappeVorher && liegtDarueber) {
-          oben -= klappeVorher.offsetHeight;
-          /* Der Anriss ist zusammengezogen (`max-height: 0`), sein Inhalt
-             aber gesetzt — `scrollHeight` misst ihn. */
-          const anriss = vorher.querySelector<HTMLElement>('.stelle__anriss');
-          if (anriss) oben += anriss.scrollHeight + ANRISS_ABSTAND;
-        }
+      if (wenigerBewegung) {
+        window.scrollTo(0, Math.max(0, window.scrollY + zeile.getBoundingClientRect().top - KOPF));
+        return;
       }
-
-      if (oben >= KOPF) return;
-      /* Mit dem sanften Scrollen der Seite (scripts/anker.ts) statt dem
-         des Browsers — auf iOS sprang das Gleiten des Browsers, während
-         die Klappe noch aufging (Florian, 27. September 2026) */
-      sanftScrollen(Math.max(0, Math.round(window.scrollY + oben - KOPF)));
+      const kennung = ++fuehrung;
+      const von = zeile.getBoundingClientRect().top;
+      const start = performance.now();
+      const ereignisse = ['wheel', 'touchstart', 'keydown'];
+      const abbrechen = () => { fuehrung++; };
+      ereignisse.forEach((e) => window.addEventListener(e, abbrechen, { passive: true }));
+      const aufraeumen = () => ereignisse.forEach((e) => window.removeEventListener(e, abbrechen));
+      const schritt = (jetzt: number) => {
+        if (kennung !== fuehrung) { aufraeumen(); return; }
+        const t = Math.min(1, (jetzt - start) / dauer);
+        const soll = von + (KOPF - von) * KURVEN.betont(t);
+        const ist = zeile.getBoundingClientRect().top;
+        window.scrollTo(0, Math.max(0, window.scrollY + ist - soll));
+        if (t < 1) requestAnimationFrame(schritt);
+        else aufraeumen();
+      };
+      requestAnimationFrame(schritt);
     };
 
     knoepfe.forEach((knopf) => {
@@ -761,7 +786,9 @@ const bewerbung = (titel: string) =>
         const vorher = knoepfe.find((k) => k !== knopf && k.getAttribute('aria-expanded') === 'true');
         knoepfe.forEach((k) => { if (k !== knopf) setzen(k, false); });
         setzen(knopf, !offen);
-        if (!offen) titelInsBild(knopf, vorher);
+        /* Schließt eine andere darüber, dauert die Bewegung länger:
+           erst das Ausblenden, dann die Klappe */
+        if (!offen) titelFuehren(knopf, vorher ? AUSBLENDEN + KLAPPEN : KLAPPEN);
       });
     });
 

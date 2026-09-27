@@ -569,8 +569,11 @@ const foto = (p: { foto?: string }) => p.foto || '/bilder/team/platzhalter.svg';
        Liste darunter — die zweispaltigen Reihen wirken linksbündig
        ausgefranst, weil die Karte breiter ist als ihr Text. Auf
        breiten Fenstern bleibt es beim Handoff: alles links. */
+    /* Kicker und Titel links wie in allen Abschnitten; die Karten
+       darunter bleiben mittig (Florian, 27. September 2026 — vorher
+       stand hier alles mittig) */
     .team__kicker,
-    .team__titel { text-align: center; }
+    .team__titel { text-align: left; }
 
     /* Immer in einer Zeile, so groß wie die Zeile erlaubt: Das Skript
        misst und verkleinert bei Bedarf (`titelEinpassen`). Ohne Skript

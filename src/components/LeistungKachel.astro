@@ -79,15 +79,28 @@ const { id, titel, kurz, icon } = Astro.props;
       transform var(--dauer-schnell) var(--verlauf);
   }
 
-  .kachel:hover,
+  /* Zeige-Zustände nur, wo es einen Zeiger gibt — auf Touch-Geräten
+     löste der Tipp sie mit dem Klick zugleich aus, und der Morph begann
+     mit einem Sprung (siehe Neuigkeiten.astro; Florian, 27. September
+     2026). */
   .kachel:focus-visible {
     border-color: var(--farbe-primaer);
     transform: scale(var(--kachel-groesse, 1)) translateY(-3px);
   }
 
-  .kachel:hover .kachel__icon,
   .kachel:focus-visible .kachel__icon {
     transform: scale(1.07);
+  }
+
+  @media (hover: hover) {
+    .kachel:hover {
+      border-color: var(--farbe-primaer);
+      transform: scale(var(--kachel-groesse, 1)) translateY(-3px);
+    }
+
+    .kachel:hover .kachel__icon {
+      transform: scale(1.07);
+    }
   }
 
   /*

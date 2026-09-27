@@ -109,9 +109,18 @@ const alsDatum = (iso: string) =>
     transition: transform 0.45s var(--verlauf-betont);
   }
 
-  .beitrag__link:hover,
+  /* Zeige-Zustände nur, wo es einen Zeiger gibt. Auf Touch-Geräten löst
+     der Tipp Hover UND Klick zugleich aus: Die Karte begann ihre
+     Anhebung, das Bild sein Wachsen, und der Seitenwechsel schaltete im
+     selben Moment die Überblendung ab — ein Sprung vor dem Morph; nach
+     dem Rückweg hing der Hover noch am Ziel und löste sich später — ein
+     Sprung danach (Florian, 27. September 2026). */
   .beitrag__link:focus-visible {
     transform: translateY(-3px);
+  }
+
+  @media (hover: hover) {
+    .beitrag__link:hover { transform: translateY(-3px); }
   }
 
   /* Der Ausschnitt steht still, das Bild darin wächst.
@@ -145,9 +154,12 @@ const alsDatum = (iso: string) =>
 
   .beitrag__ausschnitt { view-transition-class: bild; }
 
-  .beitrag__link:hover .beitrag__bild,
   .beitrag__link:focus-visible .beitrag__bild {
     transform: scale(1.07);
+  }
+
+  @media (hover: hover) {
+    .beitrag__link:hover .beitrag__bild { transform: scale(1.07); }
   }
 
   /* Nur der Beitrag, der gerade morpht, bekommt Übergangsebenen — alle

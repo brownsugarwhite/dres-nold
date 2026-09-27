@@ -336,8 +336,6 @@ html[data-rueckmorph]::view-transition-old(.bild) {
    Morph wieder ein). */
 ::view-transition-group(rand-oben),
 ::view-transition-group(rand-unten),
-::view-transition-old(rand-oben),
-::view-transition-old(rand-unten),
 ::view-transition-new(rand-oben),
 ::view-transition-new(rand-unten) {
   animation: none;
@@ -348,8 +346,19 @@ html[data-rueckmorph]::view-transition-old(.bild) {
   z-index: 95;
 }
 
+/* Nur EIN Abbild: Beide Seiten haben den Verlauf, und zwei stehende
+   Abbilder übereinander ergäben einen doppelt so starken Verlauf, der
+   am Ende auf einen zurückfällt — ein Flackern (Florian, 27. September
+   2026). Das alte Abbild bleibt deshalb aus; nur wenn es kein neues
+   gibt, steht es allein. */
+::view-transition-old(rand-oben),
+::view-transition-old(rand-unten) {
+  display: none;
+}
+
 ::view-transition-old(rand-oben):only-child,
 ::view-transition-old(rand-unten):only-child {
+  display: block;
   animation: none;
 }
 
