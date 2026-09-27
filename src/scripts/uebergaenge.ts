@@ -140,6 +140,18 @@ document.addEventListener('astro:before-preparation', (ereignis) => {
   const karte = quelle?.closest?.('[data-karte]');
   karte?.setAttribute('data-morph', '');
 
+  /* Das Bild der Karte vor dem Wechsel fertig dekodieren lassen: Safari
+     zeigte es sonst für ein Bild weiß, wenn es die Ebene für die
+     Aufnahme neu anlegte (Florian, 27. September 2026). Der Wechsel
+     wartet darauf — bei einem längst gezeigten Bild ist das sofort. */
+  const bild = karte?.querySelector<HTMLImageElement>('img');
+  if (bild && typeof bild.decode === 'function') {
+    const laden = e.loader;
+    e.loader = async () => {
+      await Promise.all([laden(), bild.decode().catch(() => undefined)]);
+    };
+  }
+
   /* Hinweg: Die Aufnahme der Beitragsseite zeigt das Bild unvergrößert
      — sie beginnt deshalb bei der Vergrößerung der Karte. */
   zoomMerken(document.documentElement, Math.max(1, bildZoom(karte)));
@@ -176,6 +188,16 @@ document.addEventListener('astro:after-swap', () => {
      liegen. Dieses Kennzeichen wird noch vor der neuen Momentaufnahme
      gesetzt — `astro:after-swap` läuft innerhalb des Übergangs. */
   karte.setAttribute('data-morph', '');
+
+  /* Das Bild der Zielkarte sofort und fertig laden: Es ist `lazy`, und
+     nach dem Tausch ist es ein neues Element — Safari zeigte es nach
+     dem Ende des Wechsels für ein Bild weiß, weil es noch nicht
+     dekodiert war (Florian, 27. September 2026). */
+  const bild = karte.querySelector<HTMLImageElement>('img');
+  if (bild) {
+    bild.loading = 'eager';
+    if (typeof bild.decode === 'function') bild.decode().catch(() => undefined);
+  }
 
   /* Mittig stellen — als Mikroaufgabe, also NACH allen anderen
      `after-swap`-Zuhörern, aber noch vor der neuen Momentaufnahme. Auf

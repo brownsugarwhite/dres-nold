@@ -52,7 +52,7 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
       <h1 class="beitrag__titel">{beitrag.titel}</h1>
 
       {beitrag.bild && (
-        <img class="beitrag__bild" src={beitrag.bild} alt={beitrag.bild_alt || ''} width="900" height="500" transition:name={`beitrag-bild-${beitrag.id}`} />
+        <img class="beitrag__bild" src={beitrag.bild} alt={beitrag.bild_alt || ''} width="900" height="500" decoding="sync" fetchpriority="high" transition:name={`beitrag-bild-${beitrag.id}`} />
       )}
 
       {/* Kein eigener Übergangsname: gehört zur Karte und wächst mit ihr */}

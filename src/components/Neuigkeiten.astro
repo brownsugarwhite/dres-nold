@@ -46,7 +46,12 @@ const alsDatum = (iso: string) =>
                       beim Zeigen. Zwei `transform` auf einem Element
                       ließen sich nicht getrennt überblenden. */}
                   <span class="beitrag__lauf" data-bildlauf>
-                    <img class="beitrag__bild" src={b.bild} alt={b.bild_alt || ''} width="600" height="338" loading="lazy" />
+                    {/* `decoding="sync"`: Safari legt beim Seitenwechsel die Ebene des
+                        Bildes neu an und dekodierte es dabei asynchron — für ein
+                        Bild war die Fläche weiß, vor dem Morph und nach dem Rückweg
+                        (Florian, 27. September 2026). Synchron dekodiert gibt es
+                        dieses Bild nicht. */}
+                    <img class="beitrag__bild" src={b.bild} alt={b.bild_alt || ''} width="600" height="338" loading="lazy" decoding="sync" />
                   </span>
                 </span>
               )}

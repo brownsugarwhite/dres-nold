@@ -2483,3 +2483,25 @@ Handys immer voll sichtbar (`opacity: 1` in allen Zuständen).
 - Beim Umbau der Stellenliste (Eintrag darüber) war kurzzeitig die
   Funktion `setzen` mit entfernt worden — die Liste stand ohne Skript.
   Wieder da; das Skript ist gegen den Stand im Repo abgeglichen.
+
+### Das weiße Bild um den Beitrags-Morph (27. September 2026, abends)
+
+Florian: Auf dem iPhone wird das Bild der Beitragskarte für genau ein
+Bild weiß — direkt bevor der Morph beginnt und nachdem er ganz fertig
+ist. Das ist kein Geometriefehler (die Maße stimmen in Chromium und
+WebKit in jedem Bild), sondern Safaris Dekodieren: Beim Umschalten
+zwischen echtem Element und Abbild legt es die Ebene des Bildes neu
+an und dekodiert das `<img>` asynchron — für ein Bild ist die Fläche
+weiß. Nach dem Rückweg kommt dazu, dass die Karte ein neues Element
+mit `loading="lazy"` ist. Deshalb:
+
+- `decoding="sync"` an beiden Bildern (Karte und Beitragsseite; die
+  Beitragsseite außerdem `fetchpriority="high"`).
+- Vor dem Wechsel dekodiert `uebergaenge.ts` das Bild der Karte
+  (`img.decode()`) und lässt den Wechsel darauf warten (`loader` in
+  `astro:before-preparation`; bei einem längst gezeigten Bild sofort).
+- Beim Rückweg wird das Bild der Zielkarte `eager` und dekodiert, noch
+  vor der neuen Aufnahme (`astro:after-swap`).
+
+Ein Versuch, stattdessen beide Abbilder zu überblenden, hat in
+Chromium messbar verschlechtert und ist nicht drin.
