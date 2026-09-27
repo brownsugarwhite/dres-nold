@@ -136,6 +136,15 @@ const bewerbung = (titel: string) =>
   .stellen__liste { --nummer-versatz: 40px; }
 
   .stellen__liste {
+    /* Der Takt der Klappen (Florian, 27. September 2026: „langsamer
+       und smoother", beim Schließen soll der Inhalt länger stehen und
+       erst später wieder zum Anriss werden). Beide Werte stehen auch im
+       Skript (`KLAPPEN`, `AUSBLENDEN`) — dort mitziehen.
+         --klappen-dauer  wie lange die Höhe fährt, auf wie zu
+         --klappen-verzug wie lange die Klappe beim Zuklappen noch offen
+                          steht, bevor sie zufährt */
+    --klappen-dauer: 0.9s;
+    --klappen-verzug: 0.25s;
     margin-top: 44px;
     border-top: 1px solid var(--farbe-linie);
   }
@@ -231,12 +240,17 @@ const bewerbung = (titel: string) =>
   .stellen__liste[data-bereit] .stelle__kreis {
     transition:
       border-color 0.4s var(--verlauf-betont),
-      margin-top 0.6s var(--verlauf-betont);
+      margin-top var(--klappen-dauer) var(--verlauf-weich) var(--klappen-verzug);
   }
 
   .stellen__liste[data-bereit] .stelle__umfang {
-    transition: margin-top 0.6s var(--verlauf-betont);
+    transition: margin-top var(--klappen-dauer) var(--verlauf-weich) var(--klappen-verzug);
   }
+
+  /* Beim Öffnen ohne Verzug — der Verzug gilt nur fürs Zuklappen, wenn
+     die Klappe erst noch offen steht */
+  .stellen__liste[data-bereit] .stelle__knopf[aria-expanded='true'] .stelle__kreis { transition-delay: 0s; }
+  .stellen__liste[data-bereit] .stelle__knopf[aria-expanded='true'] .stelle__umfang { transition-delay: 0s; }
 
   .stelle__knopf:hover .stelle__kreis,
   .stelle__knopf:focus-visible .stelle__kreis { border-color: var(--farbe-primaer); }
@@ -253,9 +267,9 @@ const bewerbung = (titel: string) =>
      zugeklappt hat — sonst sähe man beim Laden, wie alle Stellen
      zusammenfahren. */
   .stellen__liste[data-bereit] .stelle__klappe {
-    /* 0,7 s — etwas gemächlicher (Florian, 27. September 2026; vorher
-       0,5). Muss mit `KLAPPEN` im Skript übereinstimmen. */
-    transition: grid-template-rows 0.7s var(--verlauf-betont);
+    /* 0,9 s mit weichem Anlauf (Florian, 27. September 2026; vorher
+       0,7 s mit `--verlauf-betont`, das sofort voll anzieht). */
+    transition: grid-template-rows var(--klappen-dauer) var(--verlauf-weich);
   }
 
   .stelle__klappe[data-zu] { grid-template-rows: 0fr; }
@@ -322,11 +336,25 @@ const bewerbung = (titel: string) =>
 
   .stelle__titeltext { display: block; }
 
+  /* Zuklappen: Der Platz für den Anriss wächst im Takt der Klappe, die
+     zufährt — so läuft die Höhe der Zeile in einem Zug —, sichtbar wird
+     er aber erst in ihrer zweiten Hälfte (Florian, 27. September 2026:
+     „soll später wieder zum Vorschautext werden"; vorher war er sofort
+     da). */
   .stellen__liste[data-bereit] .stelle__anriss {
     transition:
-      max-height 0.6s var(--verlauf-betont),
-      margin-top 0.6s var(--verlauf-betont),
-      opacity 0.26s var(--verlauf);
+      max-height var(--klappen-dauer) var(--verlauf-weich) var(--klappen-verzug),
+      margin-top var(--klappen-dauer) var(--verlauf-weich) var(--klappen-verzug),
+      opacity 0.5s var(--verlauf) calc(var(--klappen-verzug) + var(--klappen-dauer) - 0.5s);
+  }
+
+  /* Aufklappen: Er zieht sich im Takt der Klappe zusammen und blendet
+     rasch aus, während derselbe Satz darunter groß auftaucht */
+  .stellen__liste[data-bereit] .stelle__knopf[aria-expanded='true'] .stelle__anriss {
+    transition:
+      max-height var(--klappen-dauer) var(--verlauf-weich),
+      margin-top var(--klappen-dauer) var(--verlauf-weich),
+      opacity 0.3s var(--verlauf);
   }
 
   .stelle__knopf[aria-expanded='true'] .stelle__anriss {
@@ -348,8 +376,8 @@ const bewerbung = (titel: string) =>
 
   .stellen__liste[data-bereit] .stelle__text {
     transition:
-      opacity 0.7s var(--verlauf-betont),
-      transform 0.7s var(--verlauf-betont);
+      opacity 0.8s var(--verlauf-betont),
+      transform 0.8s var(--verlauf-betont);
   }
 
   .stellen__liste[data-bereit] .stelle__seite {
@@ -361,7 +389,7 @@ const bewerbung = (titel: string) =>
   .stelle__klappe:not([data-zu]) .stelle__text {
     opacity: 1;
     transform: none;
-    transition-delay: 0.1s;
+    transition-delay: 0.2s;
   }
 
   /*
@@ -383,12 +411,16 @@ const bewerbung = (titel: string) =>
   }
 
   /*
-    Zuklappen in zwei Schritten (26. September 2026): Erst blenden Text
-    und Ansprechperson aus (`data-schliesst`, 0,2 s) — die Klappe steht
-    dabei noch in voller Höhe, die Ansprechperson klebt noch. Erst dann
-    nimmt das Skript den Überlauf zurück und fährt die Höhe zu. Vorher
-    geschah beides zugleich, und die Ansprechperson sprang sichtbar von
-    ihrer klebenden Lage zurück in die Zeile.
+    Zuklappen in zwei Schritten (26. September 2026): Erst blendet die
+    Ansprechperson aus (`data-schliesst`, `--klappen-verzug`) — die
+    Klappe steht dabei noch in voller Höhe, die Ansprechperson klebt
+    noch. Erst dann fährt das Skript die Höhe zu. Vorher geschah beides
+    zugleich, und die Ansprechperson sprang sichtbar von ihrer klebenden
+    Lage zurück in die Zeile.
+
+    Der Text dagegen blendet langsam aus, 0,7 s, bis weit in das
+    Zufahren hinein — er verschwand vorher in 0,2 s, bevor sich
+    überhaupt etwas bewegte (Florian, 27. September 2026).
 
     Die Regeln stehen NACH denen für `[data-offen]` und
     `:not([data-zu])`: gleiche Spezifität, die spätere gewinnt — und
@@ -398,9 +430,11 @@ const bewerbung = (titel: string) =>
   .stelle__klappe[data-schliesst] .stelle__seite {
     opacity: 0;
     transform: translateY(16px);
-    transition-duration: 0.2s;
+    transition-duration: var(--klappen-verzug);
     transition-delay: 0s;
   }
+
+  .stelle__klappe[data-schliesst] .stelle__text { transition-duration: 0.7s; }
 
   /* Fällt die Klappe zu, ohne dass sie je ganz offen stand (schnelles
      Hin und Her, oder ohne Bewegung), geht der Inhalt gleich mit —
@@ -530,9 +564,12 @@ const bewerbung = (titel: string) =>
 
     .stelle__knopf[aria-expanded='true'] .stelle__titeltext { transform: none; }
 
+    /* Im Takt der Klappe; beim Zuklappen erst, wenn sie zufährt */
     .stellen__liste[data-bereit] .stelle__titeltext {
-      transition: transform 0.6s var(--verlauf-betont);
+      transition: transform var(--klappen-dauer) var(--verlauf-weich) var(--klappen-verzug);
     }
+
+    .stellen__liste[data-bereit] .stelle__knopf[aria-expanded='true'] .stelle__titeltext { transition-delay: 0s; }
 
     /* Klebt am unteren Rand — ohne eigene Bewegung: Die Klappe legt sie
        beim Wachsen frei und nimmt sie wieder mit (Florian, 27. September
@@ -568,8 +605,10 @@ const bewerbung = (titel: string) =>
     }
 
     .stellen__liste[data-bereit] .stelle__nummer {
-      transition: margin-top 0.6s var(--verlauf-betont);
+      transition: margin-top var(--klappen-dauer) var(--verlauf-weich) var(--klappen-verzug);
     }
+
+    .stellen__liste[data-bereit] .stelle__knopf[aria-expanded='true'] .stelle__nummer { transition-delay: 0s; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -585,6 +624,7 @@ const bewerbung = (titel: string) =>
     .stellen__liste[data-bereit] .stelle__umfang,
     .stellen__liste[data-bereit] .stelle__nummer,
     .stellen__liste[data-bereit] .stelle__anriss,
+    .stellen__liste[data-bereit] .stelle__knopf[aria-expanded='true'] .stelle__anriss,
     .stellen__liste[data-bereit] .stelle__text,
     .stellen__liste[data-bereit] .stelle__seite { transition: none; }
 
@@ -624,8 +664,8 @@ const bewerbung = (titel: string) =>
 
     /* Dauern in Millisekunden — müssen mit den Übergängen im CSS oben
        übereinstimmen: */
-    const KLAPPEN = 700;     // die Höhe der Klappe (`grid-template-rows`)
-    const AUSBLENDEN = 200;  // Text und Ansprechperson beim Zuklappen
+    const KLAPPEN = 900;     // die Höhe der Klappe (`--klappen-dauer`)
+    const AUSBLENDEN = 250;  // so lange steht sie beim Zuklappen noch offen (`--klappen-verzug`)
 
     /* Kopfleiste (80 px) plus Luft — dieselben Werte wie in
        scripts/anker.ts. So tief unter den oberen Rand kommt die
@@ -770,7 +810,7 @@ const bewerbung = (titel: string) =>
       const schritt = (jetzt: number) => {
         if (kennung !== fuehrung) { aufraeumen(); return; }
         const t = Math.min(1, (jetzt - start) / dauer);
-        const soll = von + (KOPF - von) * KURVEN.betont(t);
+        const soll = von + (KOPF - von) * KURVEN.weich(t);
         const ist = zeile.getBoundingClientRect().top;
         window.scrollTo(0, Math.max(0, window.scrollY + ist - soll));
         if (t < 1) requestAnimationFrame(schritt);

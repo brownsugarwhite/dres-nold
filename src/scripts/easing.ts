@@ -42,6 +42,9 @@ export const KURVEN: Record<string, (x: number) => number> = {
      mitziehen, wenn sie sich ändert. Für Bewegungen, die das Skript
      Bild für Bild rechnet (die Blase der Navigation). */
   betont: bezier(0.22, 0.61, 0.24, 1),
+  /* Dieselbe Kurve wie `--verlauf-weich` — für die Stellenliste, deren
+     Zeile beim Öffnen im Takt der Klappe unter die Kopfleiste gleitet. */
+  weich: bezier(0.4, 0, 0.2, 1),
 };
 
 export type Stuetzstelle = {

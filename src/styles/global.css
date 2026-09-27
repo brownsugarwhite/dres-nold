@@ -722,7 +722,9 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
      2026). */
   transition:
     transform 300ms var(--verlauf),
-    background-color 500ms var(--verlauf-betont);
+    background-color 500ms var(--verlauf-betont),
+    backdrop-filter 500ms var(--verlauf-betont),
+    -webkit-backdrop-filter 500ms var(--verlauf-betont);
 }
 
 .schliessen:hover,
@@ -750,11 +752,15 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
 /* Klebt das Kreuz beim Scrollen oben, bekommt es einen milchigen Grund
    und der Kreis zeichnet sich ein. `data-klebt` setzt das Skript — auf
    den Unterseiten am Halter (`scripts/uebergaenge.ts`), in der
-   Einstiegskarte auf Handys am Kreuz selbst (Oeffnungszeiten.astro). */
+   Einstiegskarte auf Handys am Kreuz selbst (Oeffnungszeiten.astro).
+   Der Grund zeichnet weich, was darunter durchläuft — mit demselben
+   Radius wie die Kopfleiste (Florian, 27. September 2026). */
 [data-klebt] .schliessen,
 .schliessen[data-klebt] {
   background-color: rgb(255 255 255 / 85%);
   border-radius: var(--radius-rund);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
 }
 
 [data-klebt] .schliessen__kreis,

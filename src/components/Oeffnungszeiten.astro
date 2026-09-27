@@ -91,12 +91,14 @@ const texte = startseite.sprechstunden;
           {/* Wie in der mobilen Vorlage ein Kreuz oben rechts. Weil die
               Karte scrollgesteuert ist, „schließt" es sie, indem es sanft
               an den Bereich darunter scrollt. */}
-          <div class="ozblase__kicker kicker">Sprechstunden</div>
-
-          {/* Überschrift und Kreuz stehen in einer Zeile — so sitzt das
-              Kreuz auf der Höhe von „Wann Sie uns antreffen" statt
-              darüber zu schweben (Florian, 18. September 2026). */}
-          <div class="ozblase__zeile">
+          {/* Kicker, Überschrift und Kreuz in einem Raster: Auf dem
+              Desktop steht das Kreuz in der Zeile der Überschrift, auf
+              der Höhe von „Wann Sie uns antreffen" (Florian,
+              18. September 2026); auf Handys in der Zeile des Kickers,
+              mit seiner Unterkante auf dessen Grundlinie (27. September
+              2026). */}
+          <div class="ozblase__kopf">
+            <div class="ozblase__kicker kicker">Sprechstunden</div>
             <h2 class="ozblase__titel ohne-verlauf" id="oz-titel">{texte.titel}</h2>
             <button class="schliessen schliessen--fest ozschliessen" type="button" data-ozschliessen aria-label="Einstieg überspringen">
               <svg class="schliessen__kreis" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" /></svg>
@@ -104,7 +106,9 @@ const texte = startseite.sprechstunden;
           </div>
           {texte.text && <p class="ozblase__einleitung">{texte.text}</p>}
 
-          <div class="ozblase__spalten">
+          {/* Drei, zwei oder eine Spalte — je nachdem, was ohne Umbruch
+              passt; das Skript misst und setzt `data-spalten` */}
+          <div class="ozblase__spalten" data-ozspalten>
             <OeffnungszeitenListen />
           </div>
         </div>
@@ -122,11 +126,15 @@ const texte = startseite.sprechstunden;
       Leistungsseiten (erst das nackte Kreuz, dann Grund und Kreis).
       Weil die Karte transformiert und beschnitten ist, übernimmt ab der
       Kopfzeile dieser Zwilling außerhalb der Bühne; das Skript setzt
-      `data-klebt` und die Lage. Kein `hidden`: Aus `display: none`
-      heraus liefe der Kreis-Übergang nicht an. */}
-  <button class="schliessen ozschliessen-klebend" type="button" data-ozschliessen data-ozklebend aria-label="Einstieg überspringen" tabindex="-1">
-    <svg class="schliessen__kreis" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" /></svg>
-  </button>
+      `data-klebt`. Er klebt mit echtem `sticky` in seiner Bahn, und die
+      Bahn endet dort, wo die letzte Zeile der Zeiten endet: Dort fährt
+      er von selbst mit dem Inhalt hinaus. Kein `hidden`: Aus
+      `display: none` heraus liefe der Kreis-Übergang nicht an. */}
+  <div class="ozkreuzbahn" data-ozkreuzbahn>
+    <button class="schliessen ozschliessen-klebend" type="button" data-ozschliessen data-ozklebend aria-label="Einstieg überspringen" tabindex="-1">
+      <svg class="schliessen__kreis" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" /></svg>
+    </button>
+  </div>
 </section>
 
 <style>
@@ -285,19 +293,27 @@ const texte = startseite.sprechstunden;
   /* Kicker und Überschrift wie in jedem anderen Abschnitt — nur eine
      Spur kleiner, weil sie in der Blase stehen. */
 
-  /* Überschrift links, Schließen-Kreuz rechts, beide auf einer Mitte.
-     Der Abstand zum Kicker steht an der Zeile, nicht an der Überschrift:
-     Läge er an ihr, zählte er zu ihrem Rand und das Kreuz säße um die
-     halbe Höhe des Abstands zu hoch. */
-  .ozblase__zeile {
-    display: flex;
+  /* Kicker oben, darunter Überschrift links und Schließen-Kreuz rechts,
+     beide auf einer Mitte. Die Zeile der Überschrift ist mindestens so
+     hoch wie das Kreuz — so steht die Überschrift auf Handys, wo das
+     Kreuz eine Zeile höher sitzt (unten), genau dort, wo sie neben ihm
+     stand. */
+  .ozblase__kopf {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(48px, auto);
+    grid-template-areas:
+      "kicker kicker"
+      "titel  kreuz";
+    column-gap: var(--abstand-m);
+    row-gap: 20px;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--abstand-m);
-    margin-top: 20px;
   }
 
+  .ozblase__kicker { grid-area: kicker; }
+
   .ozblase__titel {
+    grid-area: titel;
     margin: 0;
     color: var(--farbe-primaer);
     font-size: clamp(1.75rem, 1.2rem + 1.8vw, 2.75rem);
@@ -312,61 +328,98 @@ const texte = startseite.sprechstunden;
      könnte, die Karte fährt ja schon herein (Florian, 17. September
      2026).
 
-     Es steht in der Zeile der Überschrift und darf darin nicht
-     schrumpfen. */
-  .ozschliessen { flex: none; }
-
-  .ozschliessen:hover,
-  .ozschliessen:focus-visible {
-    background-color: var(--farbe-flaeche-gedeckt);
-  }
+     Beim Zeigen dreht es sich nur — ohne grauen Grund (Florian,
+     27. September 2026). */
+  .ozschliessen { grid-area: kreuz; }
 
   /* ---- Das klebende Kreuz auf Handys (Florian, 26. September 2026) ----
-     Exakt wie auf den Leistungsseiten: In der Zeile steht erst das
-     nackte Kreuz ohne Kreis; sobald es beim Scrollen die Kopfleiste
-     erreicht, übernimmt der Zwilling (Markup ganz unten) fest im
-     Fenster — mit milchigem Grund, und der Kreis zeichnet sich ein
-     (die geteilten Regeln stehen in styles/global.css, `[data-klebt]`).
-     Lage und Zustand setzt `kreuzKleben()` im Skript, weil `sticky` in
-     der transformierten, beschnittenen Karte nichts ausrichten kann. */
-  .ozschliessen-klebend {
-    position: fixed;
-    top: var(--kreuz-oben, 96px);
-    right: var(--kreuz-rechts, 34px);
+     Wie auf den Leistungsseiten: In der Zeile steht erst das nackte
+     Kreuz ohne Kreis; sobald es beim Scrollen die Kopfleiste erreicht,
+     übernimmt der Zwilling (Markup ganz unten) — mit milchigem Grund,
+     und der Kreis zeichnet sich ein (die geteilten Regeln stehen in
+     styles/global.css, `[data-klebt]`). Den Wechsel setzt
+     `kreuzKleben()` im Skript, weil `sticky` in der transformierten,
+     beschnittenen Karte nichts ausrichten kann.
+
+     Der Zwilling selbst klebt mit echtem `sticky` in einer Bahn über
+     dem ganzen Bereich. Das Skript gibt ihr die Höhe bis zur Unterkante
+     der letzten Zeitenzeile (`--kreuz-bahn`): Dort gibt `sticky` ihn frei,
+     und er fährt mit dem Inhalt hinaus — früher als zuvor, wo er bis
+     zur Unterkante der Karte stand, und ohne dass ein Skript ihn Bild
+     für Bild verschiebt. Das lief auf dem iPhone dem Scrollen hinterher
+     (Florian, 27. September 2026). */
+  .ozkreuzbahn {
+    position: absolute;
+    top: 0;
+    left: 0;
     z-index: 1;
+    width: 100%;
+    height: var(--kreuz-bahn, 0px);
+    pointer-events: none;
   }
 
-  /* Löst sich das Kreuz wieder, laufen Grund und Kreis 500 ms rückwärts
-     — der Zwilling verschwindet erst danach, und das Kreuz in der Zeile
-     kommt erst dann zurück (Florian, 26. September 2026). Beim Kleben
-     wechseln beide sofort. */
-  .ozschliessen-klebend:not([data-klebt]) {
-    visibility: hidden;
+  .ozschliessen-klebend {
+    position: sticky;
+    top: 96px;
+    margin-left: auto;
+    margin-right: var(--kreuz-rechts, 34px);
+    pointer-events: auto;
+  }
+
+  /* Beide wechseln sofort — ohne Warten, damit nie das eine an einer
+     Stelle stehen bleibt, während das andere längst weitergescrollt ist.
+     Löst sich das Kreuz beim Zurückscrollen, übernimmt das Kreuz in der
+     Zeile mit Grund und Kreis und radiert beides in 500 ms aus, während
+     es mit den Sprechstunden nach unten fährt (Florian, 27. September
+     2026; vorher blieb der Zwilling 500 ms oben stehen). */
+  .ozschliessen-klebend:not([data-klebt]) { visibility: hidden; }
+
+  .ozbereich[data-kreuz='klebt'] .ozschliessen { visibility: hidden; }
+
+  .ozschliessen,
+  .ozschliessen-klebend {
     transition:
       transform 300ms var(--verlauf),
       background-color 500ms var(--verlauf-betont),
-      visibility 0s linear 500ms;
+      backdrop-filter 500ms var(--verlauf-betont),
+      -webkit-backdrop-filter 500ms var(--verlauf-betont);
   }
 
-  .ozschliessen {
-    transition:
-      transform 300ms var(--verlauf),
-      background-color 500ms var(--verlauf-betont),
-      visibility 0s linear 500ms;
-  }
-
-  .ozbereich[data-kreuz='klebt'] .ozschliessen {
-    visibility: hidden;
-    transition-delay: 0s;
-  }
+  /* Übernahme ohne Übergang (Skript): Das Kreuz steht sofort so da, wie
+     das andere eben aussah */
+  .ozschliessen[data-sofort],
+  .ozschliessen[data-sofort] .schliessen__kreis,
+  .ozschliessen-klebend[data-sofort],
+  .ozschliessen-klebend[data-sofort] .schliessen__kreis { transition: none; }
 
   @media (max-width: 991px) {
     /* Erst das nackte Kreuz — der Kreis kommt mit dem Kleben */
     .ozschliessen.schliessen--fest .schliessen__kreis { stroke-dashoffset: 139; }
+    .ozschliessen.schliessen--fest[data-klebt] .schliessen__kreis { stroke-dashoffset: 0; }
+
+    /* Im Fluss steht das Kreuz in der Zeile des Kickers, die Unterkante
+       des X auf dessen Grundlinie (Florian, 27. September 2026). Das X
+       füllt die mittleren 24 px des 48-px-Knopfs; der Knopf hängt also
+       12 px tiefer als der Kicker, abzüglich dessen Unterlänge (bei
+       Zeilenhöhe 1 rund 0,19 der Schriftgröße). Der negative Rand oben
+       hält die Zeile des Kickers so niedrig wie ohne Kreuz. */
+    .ozblase__kopf {
+      grid-template-areas:
+        "kicker kreuz"
+        "titel  titel";
+    }
+
+    .ozblase__kicker { align-self: end; }
+
+    .ozschliessen {
+      align-self: end;
+      margin-top: -48px;
+      top: calc(12px - 0.19 * var(--text-kicker));
+    }
   }
 
   @media (min-width: 62rem) {
-    .ozschliessen-klebend { display: none; }
+    .ozkreuzbahn { display: none; }
   }
 
   /* Über die volle Breite der Blase statt auf Lesebreite: In der Blase
@@ -380,28 +433,57 @@ const texte = startseite.sprechstunden;
     line-height: var(--zeilenhoehe-lese);
   }
 
-  /* Drei Listen nebeneinander — auf kleinen Bildschirmen untereinander */
+  /* Die drei Listen — nebeneinander, zu zweit oder untereinander.
+
+     Keine Zeitangabe darf umbrechen (Florian, 27. September 2026). Das
+     Skript misst deshalb, wie breit jede Liste unumbrochen ist, und
+     setzt `data-spalten` (`spaltenWaehlen()`):
+
+       3  nebeneinander. Jede Spalte ist mindestens so breit wie ihr
+          Inhalt (`max-content`) und bekommt vom übrigen Platz ihr
+          Drittel — auf breiten Schirmen stehen sie also in gleichen
+          Dritteln; wird es enger, schrumpft zuerst nur der Raum
+          zwischen ihnen, bis zum Mindestabstand.
+       2  die beiden Sprechstunden untereinander links, die telefonische
+          Erreichbarkeit rechts
+       1  alle untereinander, wie auf Handys
+
+     Ohne Skript gilt: drei Spalten, unter 68 rem eine (Regel unten). */
   .ozblase__spalten {
+    --oz-spaltenabstand: clamp(28px, 4vw, 88px);
     display: grid;
-    /* Drei gleich breite Spalten. Die Zeilen darin laufen über die
-       volle Spaltenbreite — Wochentag links, Zeit rechts, Haarlinie
-       dazwischen. `minmax(0, 1fr)` statt `1fr`, damit lange Zeiten die
-       Spalte nicht auseinanderdrücken. */
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(40px, 5vw, 88px);
+    grid-template-columns: repeat(3, minmax(max-content, 1fr));
+    gap: var(--abstand-m) var(--oz-spaltenabstand);
     align-items: start;
   }
 
-  /* Handys: Listen untereinander. Die Blase darf höher sein als der
-     Platz über der Leiste — sie ist kein Rollkasten; was oben hinaus-
-     steht, kommt beim Weiterscrollen zum Vorschein. */
-  /* Die drei Listen brauchen nebeneinander rund 840 px; darunter
-     stehen sie untereinander. Vorher lag die Grenze bei 60 rem — dort
-     passten sie schon nicht mehr und liefen seitlich heraus. */
+  .ozblase__spalten[data-spalten='3'] {
+    grid-template-columns: repeat(3, minmax(max-content, 1fr));
+    column-gap: var(--oz-spaltenabstand);
+  }
+
+  .ozblase__spalten[data-spalten='2'] {
+    grid-template-columns: repeat(2, minmax(max-content, 1fr));
+    gap: var(--abstand-l) var(--oz-spaltenabstand);
+  }
+
+  .ozblase__spalten[data-spalten='2'] > :global(*) { grid-column: 1; }
+  .ozblase__spalten[data-spalten='2'] > :global(:last-child) { grid-column: 2; grid-row: 1 / span 2; }
+
+  .ozblase__spalten[data-spalten='1'] { grid-template-columns: minmax(0, 1fr); }
+
+  /* Zum Messen stehen die Listen kurz unumbrochen nebeneinander */
+  .ozblase__spalten[data-messen] { display: flex; align-items: flex-start; }
+  .ozblase__spalten[data-messen] > :global(*) { flex: none; width: max-content; }
+
+  /* Schmaler: Die Blase darf höher sein als der Platz über der Leiste —
+     sie ist kein Rollkasten; was oben hinaussteht, kommt beim
+     Weiterscrollen zum Vorschein. Die Spalten wählt das Skript; ohne
+     Skript stehen die Listen hier untereinander. */
   @media (max-width: 68rem) {
     .ozblase { width: calc(100% - 2 * var(--abstand-s)); }
     .ozsprechstunden { padding: var(--abstand-gruppe) var(--abstand-m) var(--abstand-xl); }
-    .ozblase__spalten { grid-template-columns: 1fr; gap: var(--abstand-m); }
+    .ozblase__spalten { grid-template-columns: minmax(0, 1fr); gap: var(--abstand-m); }
   }
 
   /* Handys: Die drei Listen stehen untereinander und machen den
@@ -417,9 +499,9 @@ const texte = startseite.sprechstunden;
        Die Karte ist auf Handys nur noch die Sprechstunden und soll
        möglichst ganz ins Fenster passen. */
     .ozsprechstunden { padding: var(--abstand-m) var(--abstand-seitenrand) var(--abstand-l); }
-    .ozblase__zeile { margin-top: var(--abstand-2xs); }
-    /* In einer Zeile neben dem Kreuz (Florian, 26. September 2026): so
-       groß, wie die Fensterbreite es zulässt — bei 375 px 21,8 px. */
+    .ozblase__kopf { row-gap: var(--abstand-2xs); }
+    /* In einer Zeile (Florian, 26. September 2026): so groß, wie die
+       Fensterbreite es zulässt — bei 375 px 21,8 px. */
     .ozblase__titel { font-size: min(1.5rem, 5.8vw); white-space: nowrap; }
     .ozblase__einleitung { margin: 10px 0 0; font-size: 15px; line-height: var(--zeilenhoehe-mittel); }
     .ozblase__spalten { gap: calc(var(--abstand-m) + var(--abstand-2xs)); margin-top: var(--abstand-m); }
@@ -430,7 +512,7 @@ const texte = startseite.sprechstunden;
      entfällt dabei: Es gibt nichts zu schließen, wenn nichts einfährt. */
   @media (prefers-reduced-motion: reduce) {
     .ozschliessen,
-    .ozschliessen-klebend { display: none; }
+    .ozkreuzbahn { display: none; }
     .ozraum { display: none; }
     .ozbereich { position: static; height: auto; padding-bottom: var(--abstand-abschnitt); }
     .ozbereich__buehne { position: static; height: auto; }
@@ -443,7 +525,8 @@ const texte = startseite.sprechstunden;
     sonst stünde die Karte unsichtbar unter der Bühne. */}
 <noscript>
   <style is:inline>
-    .ozschliessen { display: none; }
+    .ozschliessen,
+    .ozkreuzbahn { display: none; }
     .ozraum { display: none; }
     .ozbereich { position: static; height: auto; padding-bottom: var(--abstand-abschnitt); }
     .ozbereich__buehne { position: static; height: auto; }
@@ -480,6 +563,69 @@ const texte = startseite.sprechstunden;
         sanftScrollen(Math.max(0, Math.round(unten)));
       });
     });
+  }
+
+  /**
+   * Drei, zwei oder eine Spalte — was ohne Umbruch passt (Florian,
+   * 27. September 2026). Keine Zeitangabe darf umbrechen; also wird
+   * gemessen, wie breit jede Liste unumbrochen ist:
+   *
+   *   3  alle nebeneinander, solange sie samt Mindestabstand passen
+   *   2  die ersten untereinander links, die letzte (telefonische
+   *      Erreichbarkeit) rechts
+   *   1  alle untereinander, wie auf Handys
+   *
+   * Reicht auch einspaltig die Breite nicht (sehr schmale Handys),
+   * werden die Zeilen verkleinert, bis sie passen — höchstens auf 80 %
+   * (`--oz-zeilen-faktor`, OeffnungszeitenListen.astro). Gibt zurück, ob
+   * sich etwas geändert hat: Dann ist die Karte anders hoch, und die
+   * Bewegung muss neu vermessen.
+   */
+  function spaltenWaehlen(): boolean {
+    const spalten = document.querySelector<HTMLElement>('[data-ozspalten]');
+    const listen = spalten ? [...spalten.children] as HTMLElement[] : [];
+    if (!spalten || listen.length < 2) return false;
+    const vorher = `${spalten.dataset.spalten}|${spalten.style.getPropertyValue('--oz-zeilen-faktor')}`;
+
+    spalten.style.removeProperty('--oz-zeilen-faktor');
+    spalten.dataset.messen = 'ja';
+    const breiten = listen.map((l) => Math.ceil(l.getBoundingClientRect().width));
+    const tabellen = listen.map((l) => Math.ceil(l.querySelector('table')?.getBoundingClientRect().width ?? 0));
+    delete spalten.dataset.messen;
+
+    const platz = spalten.clientWidth;
+    const abstand = parseFloat(getComputedStyle(spalten).columnGap) || 0;
+    const letzte = breiten[breiten.length - 1];
+    const links = Math.max(...breiten.slice(0, -1));
+    const alle = breiten.reduce((a, b) => a + b, 0) + (breiten.length - 1) * abstand;
+
+    let anzahl = 1;
+    if (alle <= platz) anzahl = 3;
+    else if (links + abstand + letzte <= platz) anzahl = 2;
+    spalten.dataset.spalten = String(anzahl);
+
+    if (anzahl === 1) {
+      const faktor = platz / Math.max(...tabellen);
+      if (faktor < 1) spalten.style.setProperty('--oz-zeilen-faktor', Math.max(0.8, faktor).toFixed(3));
+    }
+
+    return vorher !== `${spalten.dataset.spalten}|${spalten.style.getPropertyValue('--oz-zeilen-faktor')}`;
+  }
+
+  /** Vermisst die Bewegung neu, wenn sich die Spalten geändert haben —
+      gesetzt von `ozAufbauen()` */
+  let nachSpalten: (() => void) | null = null;
+
+  let spaltenAngemeldet = false;
+  function spaltenAufbauen() {
+    spaltenWaehlen();
+    if (spaltenAngemeldet) return;
+    spaltenAngemeldet = true;
+    /* Vor dem Zuhörer der Bewegung angemeldet und damit vor ihm dran:
+       Deren Vermessen sieht schon die neue Kartenhöhe. */
+    window.addEventListener('resize', () => { spaltenWaehlen(); }, { passive: true });
+    /* Die Schrift kommt womöglich erst nach dem ersten Messen */
+    document.fonts?.ready.then(() => { if (spaltenWaehlen()) nachSpalten?.(); });
   }
 
   /** Höhe der Symbolleiste unten — `.fussleiste__inhalt` */
@@ -695,31 +841,66 @@ const texte = startseite.sprechstunden;
     /* ---- Das klebende Kreuz (Handys) ----
        Wie auf den Leistungsseiten, nur von Hand: `sticky` kann in der
        transformierten, beschnittenen Karte nichts ausrichten. Also wird
-       je Bild gemessen, wo das Kreuz der Zeile steht — während der Fahrt
-       und, nach der Freigabe, bei jedem Scrollen. Erreicht es die
-       Kopfleiste, übernimmt der Zwilling fest im Fenster; beide stehen
-       in diesem Moment deckungsgleich, Grund und Kreis laufen ab da an.
-       Fährt die Karte oben hinaus, nimmt er das Kreuz mit. */
-    const KOPF = 96;   // wie `.schliessen-halter { top }` der Unterseiten
+       bei jedem Bild der Fahrt und, nach der Freigabe, bei jedem
+       Scrollen geprüft, ob das Kreuz der Zeile die Kopfleiste erreicht
+       hat. Dann übernimmt der Zwilling, der dort mit `sticky` steht —
+       beide in diesem Moment deckungsgleich —, und Grund und Kreis
+       laufen an. Bewegt wird hier nichts: Der Zwilling klebt und fährt
+       unten von selbst hinaus (`bahnMessen()`), das Kreuz der Zeile
+       fährt mit der Karte. */
+    const KOPF = 96;   // wie `.schliessen-halter { top }` der Unterseiten und `top` des Zwillings
     const kreuz = blase.querySelector<HTMLElement>('.ozschliessen');
     const klebend = bereich.querySelector<HTMLElement>('[data-ozklebend]');
-    const kreuzLoesen = () => {
-      if (klebend) delete klebend.dataset.klebt;
-      delete bereich.dataset.kreuz;
+    const bahn = bereich.querySelector<HTMLElement>('[data-ozkreuzbahn]');
+    const zeiten = blase.querySelector<HTMLElement>('[data-ozspalten]');
+
+    /**
+     * Die Bahn des Zwillings reicht vom Anfang des Bereichs bis zur
+     * Unterkante der letzten Zeitenzeile — gemessen dort, wo die Karte
+     * nach der Fahrt steht: Die Bühne liegt dann am Ende des Bereichs,
+     * die Karte `ruhelage` über deren Unterkante, und die Zeiten enden
+     * um den Innenabstand der Karte über deren Unterkante. Dort gibt
+     * `sticky` den Zwilling frei (Florian: „soll früher wieder mit dem
+     * Flow mitfahren", 27. September 2026). Seitlich steht er, wo das
+     * Kreuz der Zeile steht.
+     */
+    const bahnMessen = () => {
+      if (!bahn || !kreuz || !zeiten) return;
+      const unterZeiten = blase.getBoundingClientRect().bottom - zeiten.getBoundingClientRect().bottom;
+      bahn.style.setProperty('--kreuz-bahn', `${Math.max(0, Math.round(bereich.clientHeight - ruhelage - unterZeiten))}px`);
+      bahn.style.setProperty('--kreuz-rechts', `${Math.round(document.documentElement.clientWidth - kreuz.getBoundingClientRect().right)}px`);
     };
+
+    let klebt = false;
     const kreuzKleben = () => {
       if (!kreuz || !klebend) return;
-      if (!window.matchMedia(HANDY).matches) { kreuzLoesen(); return; }
-      const k = kreuz.getBoundingClientRect();
-      const karte = blase.getBoundingClientRect();
-      if (!(k.top < KOPF && karte.bottom > 0)) { kreuzLoesen(); return; }
-      klebend.style.setProperty('--kreuz-oben', `${Math.round(Math.min(KOPF, karte.bottom - 48))}px`);
-      klebend.style.setProperty('--kreuz-rechts', `${Math.round(document.documentElement.clientWidth - k.right)}px`);
-      if (!klebend.dataset.klebt) {
+      const handy = window.matchMedia(HANDY).matches;
+      const soll = handy && kreuz.getBoundingClientRect().top < KOPF;
+      if (soll === klebt) return;
+      klebt = soll;
+
+      if (soll) {
         if (document.activeElement === kreuz) klebend.focus();
         klebend.dataset.klebt = 'ja';
         bereich.dataset.kreuz = 'klebt';
+        return;
       }
+
+      const hatteFokus = document.activeElement === klebend;
+      delete klebend.dataset.klebt;
+      delete bereich.dataset.kreuz;
+      if (!handy) return;
+      /* Zurück in die Zeile: Das Kreuz dort steht erst so da, wie der
+         Zwilling eben aussah — mit Grund und Kreis —, und radiert beides
+         dann aus, während es mit den Sprechstunden nach unten fährt.
+         `offsetWidth` schreibt den Stand dazwischen fest, sonst sähe der
+         Browser nur Anfang und Ende und liefe keinen Übergang. */
+      kreuz.dataset.sofort = 'ja';
+      kreuz.dataset.klebt = 'ja';
+      void kreuz.offsetWidth;
+      delete kreuz.dataset.sofort;
+      delete kreuz.dataset.klebt;
+      if (hatteFokus) kreuz.focus();
     };
 
     const zeichnen = () => {
@@ -755,25 +936,34 @@ const texte = startseite.sprechstunden;
     };
 
     window.addEventListener('scroll', anstossen, { passive: true });
-    window.addEventListener('resize', () => {
-      /* Zuerst die Reihenfolge — sie ändert die Kartenhöhe, die alle
-         folgenden Maße brauchen. (Nicht per `matchMedia('change')`:
-         das feuert nach `resize`, die Messung wäre veraltet.) */
+    /* Alles, was an Kartenhöhe und Fensterbreite hängt. Die Spalten
+       sind dann schon gewählt (`spaltenAufbauen()`: eigener Zuhörer,
+       vorher angemeldet — nicht per `matchMedia('change')`, das feuerte
+       nach `resize`, die Messung wäre veraltet). */
+    const neuVermessen = () => {
       vermessen();
       startBestimmen();
+      bahnMessen();
       zeichnen();
       anstossen();
-    }, { passive: true });
+    };
+    window.addEventListener('resize', neuVermessen, { passive: true });
+    nachSpalten = neuVermessen;
 
     /* Die Symbolleiste könnte ihre Schrift erst nach dem ersten Bild
        gesetzt haben — einmal kurz danach nachmessen. */
-    requestAnimationFrame(() => { vermessen(); zeichnen(); });
+    requestAnimationFrame(() => { vermessen(); bahnMessen(); zeichnen(); });
+    bahnMessen();
     zeichnen();
   }
 
+  /* Die Spalten zuerst: Sie bestimmen die Höhe der Karte, an der die
+     ganze Bewegung hängt */
+  spaltenAufbauen();
   ozAufbauen();
   ozSchliessenAufbauen();
   document.addEventListener('astro:page-load', () => {
+    spaltenAufbauen();
     ozAufbauen();
     ozSchliessenAufbauen();
   });

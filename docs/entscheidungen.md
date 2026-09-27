@@ -2591,3 +2591,69 @@ WebKit (Playwright) stimmen die berechneten Stile der Ebenen, und die
 Aufzeichnung zeigt ein wanderndes Bild ohne Doppelbild. Das Aufblitzen
 selbst lässt sich dort nicht nachstellen — es tritt nur auf dem iPhone
 auf; Florian prüft am Gerät.
+
+### Sprechstunden-Kreuz, Spalten ohne Umbruch, Stellenliste weicher (27. September 2026, abends)
+
+**Das Kreuz der Sprechstunden (Handys) fährt nie mehr per Skript mit.**
+Der klebende Zwilling stand fest im Fenster und wurde, sobald die Karte
+oben hinausfuhr, Bild für Bild nachgeschoben (`--kreuz-oben`). Auf dem
+iPhone lief das dem Scrollen hinterher; beim Zurückscrollen blieb er
+außerdem 500 ms oben stehen, während das Kreuz der Zeile erst danach
+wieder auftauchte — schon ein Stück tiefer (Florian: „springt an die
+falsche Stelle und bleibt fixed on top"). Jetzt:
+
+- Der Zwilling klebt mit echtem `sticky` in einer Bahn
+  (`.ozkreuzbahn`) über dem Bereich. Ihre Höhe (`--kreuz-bahn`, aus
+  `bahnMessen()`) reicht bis zur Unterkante der letzten Zeitenzeile an
+  der Stelle, wo die Karte nach der Fahrt steht: Dort gibt `sticky` ihn
+  frei, und er fährt mit dem Inhalt hinaus — früher als vorher (dort
+  erst mit der Unterkante der Karte, also 40 px später auf Handys) und
+  ohne Skript. Nachgemessen: Unterkante Zwilling 140,0 px gegen
+  Unterkante Zeiten 140,1 px, beim Durchscrollen keine Abweichung.
+- Das Skript entscheidet nur noch, WER zu sehen ist: Erreicht das
+  Kreuz der Zeile die Kopfleiste (96 px), übernimmt der Zwilling und
+  zeichnet Grund und Kreis ein. Scrollt man zurück, übernimmt sofort
+  wieder das Kreuz der Zeile — erst mit Grund und Kreis, die es dann in
+  500 ms ausradiert, während es mit den Sprechstunden nach unten fährt.
+- Der Grund des geklebten Kreuzes ist mit `backdrop-filter: blur(20px)`
+  weichgezeichnet wie die Kopfleiste (styles/global.css, gilt auch auf
+  Leistungs- und Beitragsseiten). Der Weiß-Anteil bleibt 85 %.
+- Kein grauer Grund mehr beim Zeigen (Desktop und Handys); das Kreuz
+  dreht sich nur.
+- Auf Handys steht das Kreuz im Fluss in der Zeile des **Kickers**, die
+  Unterkante des X auf dessen Grundlinie (nachgemessen: 0,4 px
+  Abweichung — die Strichstärke). Kicker, Überschrift und Kreuz stehen
+  dafür in einem Raster (`.ozblase__kopf`); die Zeile der Überschrift
+  bleibt mindestens 48 px hoch, damit Überschrift und Einleitung genau
+  dort bleiben, wo sie waren (nachgemessen: unverändert). Auf dem
+  Desktop steht das Kreuz weiter neben der Überschrift.
+
+**Die Sprechzeiten brechen nie mehr um.** Vor- und Nachmittag standen
+als zwei Stücke mit `flex-wrap` nebeneinander; wurde eine Spalte zu
+schmal, rutschte der Nachmittag darunter (Florian: „dürfen NIE so
+umbrechen"). Jetzt stehen sie immer in einer Zeile, und
+`spaltenWaehlen()` misst die unumbrochene Breite jeder Liste:
+drei Spalten, solange alle samt Mindestabstand (28 px, bis 88 px auf
+breiten Schirmen) passen — jede Spalte mindestens so breit wie ihr
+Inhalt, sonst gleiche Drittel, sodass beim Schmälerwerden zuerst nur
+der Raum dazwischen schrumpft —; dann zwei (die Sprechstunden
+untereinander links, die telefonische Erreichbarkeit rechts); dann eine.
+Gemessen: drei ab etwa 1 300 px Fensterbreite, zwei von 768 bis 1 200,
+darunter eine. Reicht selbst einspaltig die Breite nicht (unter
+375 px), werden die Zeilen verkleinert statt umbrochen — bei 360 px auf
+98 %, bei 320 px auf 84 % (Untergrenze 80 %). Die Abstände in den Zeilen
+stehen dafür in `em`. Die Kartenhöhe ändert sich mit den Spalten; die
+Bewegung wird danach neu vermessen (auch, wenn die Schrift nachlädt).
+
+**Stellenliste langsamer und weicher.** Die Klappe fährt 0,9 s statt
+0,7 s mit einer neuen, an beiden Enden weichen Kurve (`--verlauf-weich`,
+`cubic-bezier(0.4, 0, 0.2, 1)`, in tokens.css und als `KURVEN.weich`
+für das Mitführen der Zeile). Beim Zuklappen verschwand der Text in
+0,2 s, bevor sich etwas bewegte, und der Anriss war sofort wieder da.
+Jetzt blendet der Text 0,7 s aus, bis weit ins Zufahren hinein; die
+Klappe fährt nach 0,25 s zu (die Zeit, in der die Ansprechperson
+ausblendet); der Platz für den Anriss wächst im Takt der Klappe, der
+Anriss selbst blendet erst in deren zweiter Hälfte ein (0,65–1,15 s).
+Bezeichnung, Kreis und Nummer folgen der Klappe mit demselben Verzug.
+Die Werte stehen als `--klappen-dauer` / `--klappen-verzug` an der Liste
+und als `KLAPPEN` / `AUSBLENDEN` im Skript.

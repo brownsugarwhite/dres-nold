@@ -2,14 +2,14 @@
 /**
  * Die drei Sprechstunden-Listen — der Inhalt der scrollgesteuerten Blase
  * in Oeffnungszeiten.astro. Auf allen Bildschirmgrößen dieselbe Blase
- * (docs/entscheidungen.md); auf dem Desktop stehen die Listen
- * nebeneinander, auf Handys untereinander.
+ * (docs/entscheidungen.md); nebeneinander, zu zweit oder untereinander —
+ * je nach Platz (Oeffnungszeiten.astro, `spaltenWaehlen()`).
  *
  * Gestaltung: Die Spaltentitel als gesperrte Versalien in der Hausfarbe
  * (Handoff vom 17. September 2026); die Zeilen darunter wie auf der
  * alten Seite (Florian, 26. September 2026) — der Wochentag rechtsbündig
  * in leichtem Schnitt, daneben Vor- und Nachmittag als zwei Angaben
- * nebeneinander, alles in der Hausfarbe, ohne Linien. „…und nach
+ * nebeneinander (nie untereinander), alles in der Hausfarbe, ohne Linien. „…und nach
  * Vereinbarung" steht in der Zeitspalte. Die Haarlinien und der graue
  * Wochentag des Handoffs sind zurückgenommen.
  */
@@ -17,9 +17,10 @@ import oz from '../content/oeffnungszeiten.json';
 
 const listen = [oz.zahnaerztlich, oz.kieferorthopaedisch, oz.telefonisch];
 
-/** Vor- und Nachmittag, leere Hälften fallen weg. Als zwei Stücke,
-    damit auf schmalen Handys zwischen ihnen umbrochen werden kann —
-    innerhalb einer Zeitangabe aber nie. */
+/** Vor- und Nachmittag, leere Hälften fallen weg. Zwei Stücke
+    nebeneinander, die nie umbrechen — weder in sich noch zwischen
+    einander (Florian, 27. September 2026). Wo der Platz nicht reicht,
+    wählt Oeffnungszeiten.astro weniger Spalten. */
 const zeiten = (z: { vormittag?: string; nachmittag?: string }) =>
   [z.vormittag, z.nachmittag].filter(Boolean) as string[];
 ---
@@ -35,8 +36,7 @@ const zeiten = (z: { vormittag?: string; nachmittag?: string }) =>
             <tr>
               <th scope="row">{z.tag}</th>
               <td>
-                {/* Zwei Angaben nebeneinander; auf schmalen Handys rückt
-                    der Nachmittag unter den Vormittag */}
+                {/* Zwei Angaben nebeneinander, nie untereinander */}
                 <span class="ozzeiten__angaben">
                   {zeiten(z).map((t) => <span class="ozzeiten__stueck">{t}</span>)}
                 </span>
@@ -68,10 +68,14 @@ const zeiten = (z: { vormittag?: string; nachmittag?: string }) =>
     text-transform: uppercase;
   }
 
+  /* `--oz-zeilen-faktor` setzt Oeffnungszeiten.astro nur, wenn selbst
+     einspaltig die Breite nicht reicht (sehr schmale Handys) — dann
+     werden die Zeilen verkleinert, statt umzubrechen. Die Abstände darin
+     stehen deshalb in `em`: Sie schrumpfen mit. */
   .ozzeiten {
     border-collapse: collapse;
     color: var(--farbe-primaer);
-    font-size: 16px;
+    font-size: calc(16px * var(--oz-zeilen-faktor, 1));
   }
 
   /* Wie die alte Seite: keine Linien, alles in der Hausfarbe, enge
@@ -88,7 +92,7 @@ const zeiten = (z: { vormittag?: string; nachmittag?: string }) =>
   /* `width: 1%`: die Spalte so schmal wie ihr längster Wochentag */
   .ozzeiten th {
     width: 1%;
-    padding-right: 15px;
+    padding-right: 1em;
     font-weight: var(--gewicht-leicht);
     text-align: right;
     white-space: nowrap;
@@ -96,8 +100,8 @@ const zeiten = (z: { vormittag?: string; nachmittag?: string }) =>
 
   .ozzeiten__angaben {
     display: flex;
-    flex-wrap: wrap;
-    column-gap: 14px;
+    flex-wrap: nowrap;
+    column-gap: 0.875em;
   }
 
   .ozzeiten__stueck { white-space: nowrap; }
@@ -108,6 +112,6 @@ const zeiten = (z: { vormittag?: string; nachmittag?: string }) =>
      nebeneinander stehen (bei 375 px reichen die 339 px dafür) */
   @media (max-width: 48rem) {
     .ozliste__titel { margin-bottom: var(--abstand-xs); }
-    .ozzeiten { font-size: 15px; }
+    .ozzeiten { font-size: calc(15px * var(--oz-zeilen-faktor, 1)); }
   }
 </style>
