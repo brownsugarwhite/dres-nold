@@ -376,7 +376,9 @@ const kategorien = (leistungen.kategorien ?? [])
      und Blase. Werte setzt das Skript (`--blase-hoehe`, `--blase-form`). */
   .navigation,
   .fussleiste-huelle {
-    background: rgb(255 255 255 / 80%);
+    /* 74 % statt 80: Die Randverläufe darunter (styles/global.css)
+       sollen eine Spur durchscheinen (Florian, 27. September 2026) */
+    background: rgb(255 255 255 / 74%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
   }
@@ -720,13 +722,16 @@ const kategorien = (leistungen.kategorien ?? [])
 
   /* Die Zelle trägt Inhalt und Haarlinie — beides verschwindet mit der
      Zeile, statt dass die Linie als Doppelstrich stehen bliebe. Beim
-     Schrumpfen zieht sie sich zusätzlich von oben her zusammen (scaleY)
+     Schrumpfen zieht sie sich zusätzlich in die linke obere Ecke zusammen
      und blendet aus; `visibility` nimmt die Verweise dabei aus der
      Tab-Reihenfolge, sobald sie unsichtbar sind. */
   .mobilmenue__zelle {
     min-height: 0;
     overflow: hidden;
-    transform-origin: 50% 0;
+    /* Aus der linken oberen Ecke: Die Zeile schrumpft in Höhe UND
+       Breite auf nichts und wächst von dort wieder (Florian,
+       27. September 2026; vorher nur die Höhe, `scaleY`) */
+    transform-origin: 0 0;
     transition-property: opacity, transform, visibility, border-color;
     transition-duration: 320ms, 320ms, 0s, 320ms;
     transition-timing-function: var(--verlauf-betont), var(--verlauf-betont), linear, var(--verlauf-betont);
@@ -755,7 +760,7 @@ const kategorien = (leistungen.kategorien ?? [])
 
   .mobilmenue__zeile--unter .mobilmenue__zelle {
     opacity: 0;
-    transform: scaleY(0);
+    transform: scale(0);
     visibility: hidden;
     transition-duration: 260ms, 260ms, 0s, 260ms;
     transition-delay: 0ms, 0ms, 260ms, 0ms;
@@ -768,7 +773,7 @@ const kategorien = (leistungen.kategorien ?? [])
 
   .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile:not(.mobilmenue__zeile--leistungen):not(.mobilmenue__zeile--unter) .mobilmenue__zelle {
     opacity: 0;
-    transform: scaleY(0);
+    transform: scale(0);
     visibility: hidden;
     transition-delay: 0ms, 0ms, 320ms, 0ms;
   }
@@ -891,8 +896,9 @@ const kategorien = (leistungen.kategorien ?? [])
     inset: 0;
     z-index: calc(var(--ebene-navigation) - 1);
     background: var(--farbe-schleier-hell);
-    backdrop-filter: blur(var(--weichzeichner-schleier));
-    -webkit-backdrop-filter: blur(var(--weichzeichner-schleier));
+    /* Kein Weichzeichner mehr am Schleier: Die Seite dahinter wird
+       selbst unscharf und tritt zurück (styles/global.css,
+       `html[data-menue-unscharf]`; Florian, 27. September 2026) */
     opacity: 0;
     transition: opacity var(--dauer-normal) var(--verlauf);
   }
@@ -923,7 +929,8 @@ const kategorien = (leistungen.kategorien ?? [])
     .fussknopf__text { transition: none; }
     .menuepunkt__pfeil { transition: none; }
     .logo:hover img,
-    .fussknopf:hover .fussknopf__symbol { transform: none; }
+    .fussknopf:hover .fussknopf__symbol,
+    .fussknopf:hover .fussknopf__text { transform: none; }
   }
 
   /* ---------- Menüpunkte mit Text-Roll ----------
@@ -1246,22 +1253,30 @@ const kategorien = (leistungen.kategorien ?? [])
     text-decoration: none;
   }
 
-  /* Beim Zeigen hebt sich das Symbol eine Spur an */
+  /* Beim Zeigen wächst das Symbol um seine Mitte, die Beschriftung
+     darunter rückt ein paar Bildpunkte nach unten (Florian,
+     27. September 2026; vorher hob sich das Symbol um 4 px) */
   .fussknopf__symbol {
+    transform-origin: 50% 50%;
     transition: transform 0.45s var(--verlauf-betont);
   }
 
   .fussknopf:hover .fussknopf__symbol,
   .fussknopf:focus-visible .fussknopf__symbol {
-    transform: translateY(-4px) scale(1.06);
+    transform: scale(1.1);
   }
 
   .fussknopf__text {
-    transition: opacity 0.35s var(--verlauf);
+    transition:
+      opacity 0.35s var(--verlauf),
+      transform 0.45s var(--verlauf-betont);
   }
 
   .fussknopf:hover .fussknopf__text,
-  .fussknopf:focus-visible .fussknopf__text { opacity: 0.65; }
+  .fussknopf:focus-visible .fussknopf__text {
+    opacity: 0.65;
+    transform: translateY(3px);
+  }
 
   /* .nav-bottom-button-txt: 14 px, Gewicht 400 */
   .fussknopf__text {
@@ -2021,6 +2036,25 @@ const kategorien = (leistungen.kategorien ?? [])
       else document.removeEventListener('touchmove', beiTouch);
     };
 
+    /* ---- Die Seite tritt zurück ----
+       Solange das Menü offen ist, wird alles außer der Navigation
+       unscharf und eine Spur kleiner (styles/global.css). Der
+       Bezugspunkt der Verkleinerung ist die Fenstermitte — je Element
+       als Abstand von seiner Oberkante, sonst schrumpfte ein langer
+       Inhalt um seine eigene, weit entfernte Mitte. */
+    const zuruecktreten = (zurueck: boolean) => {
+      const html = document.documentElement;
+      if (zurueck) {
+        for (const el of document.querySelectorAll<HTMLElement>('.seiteninhalt, .startbereich, .ozbereich__buehne, .fuss')) {
+          const r = el.getBoundingClientRect();
+          el.style.setProperty('--zurueck-mitte', `${Math.round(window.innerHeight / 2 - r.top)}px`);
+        }
+        html.dataset.menueUnscharf = 'ja';
+      } else {
+        delete html.dataset.menueUnscharf;
+      }
+    };
+
     const blase = blaseAnlegen({
       leiste: kopfleiste, linienTraeger: navigation, hoch: false, geometrie,
       beimZu: () => {
@@ -2045,6 +2079,7 @@ const kategorien = (leistungen.kategorien ?? [])
       knopfSpieler?.playSegments([0, letztesBild], true);
       schleierZeigen();
       seiteSperren(true);
+      zuruecktreten(true);
       blase.oeffnen(menue.getBoundingClientRect().height);
     };
 
@@ -2056,6 +2091,7 @@ const kategorien = (leistungen.kategorien ?? [])
       knopfSpieler?.playSegments([letztesBild, 0], true);
       schleierAusblenden();
       seiteSperren(false);
+      zuruecktreten(false);
       blase.schliessen(sofort);
     };
 

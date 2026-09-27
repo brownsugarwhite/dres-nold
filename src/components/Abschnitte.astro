@@ -54,7 +54,11 @@ const hoehe = (b: { bild_hoehe?: string }) => (b.bild_hoehe === 'voll' ? 'voll' 
               <div class="block" data-bild={seite(b)} data-hoehe={hoehe(b)} data-rein>
                 {b.bild && (
                   <div class="block__bild">
-                    <img src={b.bild} alt={b.bild_alt} width="900" height="675" loading="lazy" />
+                    {/* Der Läufer wächst über den Scrollweg (scripts/bildlauf.ts),
+                        der Rahmen darum schneidet ab — wie die Beitragsbilder */}
+                    <span class="block__lauf" data-bildlauf>
+                      <img src={b.bild} alt={b.bild_alt} width="900" height="675" loading="lazy" />
+                    </span>
                   </div>
                 )}
 
@@ -125,6 +129,15 @@ const hoehe = (b: { bild_hoehe?: string }) => (b.bild_hoehe === 'voll' ? 'voll' 
     overflow: hidden;
   }
 
+  /* Ablauf a-3 wie bei den Beitragsbildern: Über den Scrollweg wächst
+     das Bild; den Wert setzt scripts/bildlauf.ts, er läuft dort schon
+     weich nach — deshalb hier keine Überblendung. */
+  .block__lauf {
+    display: block;
+    height: 100%;
+    transform: scale(var(--bild-groesse, 1));
+  }
+
   .block__bild img {
     display: block;
     width: 100%;
@@ -186,4 +199,12 @@ const hoehe = (b: { bild_hoehe?: string }) => (b.bild_hoehe === 'voll' ? 'voll' 
       grid-row: auto;
     }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .block__lauf { transform: none; }
+  }
 </style>
+
+<script>
+  import '../scripts/bildlauf';
+</script>

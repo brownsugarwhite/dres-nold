@@ -156,13 +156,27 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     background-repeat: no-repeat;
     background-size: var(--karte-mass, cover);
     background-position: var(--karte-lage, center);
-    /* Der Anflug: Beim Hereinscrollen fährt die Zeichnung von 125 % auf
-       ihre Größe herunter — am Scrollweg, nicht an der Uhr; das Skript
-       unten schreibt `--karte-zoom`. Der Bezugspunkt ist die Marke:
-       Die Praxis bleibt beim Anflug stehen, alles andere kommt auf sie
-       zu. Ohne Skript steht die Zeichnung still auf 100 %. */
+    /* Der Anflug: Beim Hereinscrollen zoomt die Zeichnung von weit
+       draußen (62 %) auf ihre Größe heran — am Scrollweg, nicht an der
+       Uhr; das Skript unten schreibt `--karte-zoom`. Der Bezugspunkt ist
+       die Marke: Die Praxis bleibt beim Anflug stehen, alles andere
+       kommt auf sie zu. Ohne Skript steht die Zeichnung still auf 100 %. */
     transform-origin: var(--marke-x, 50%) var(--marke-y, 50%);
     scale: var(--karte-zoom, 1);
+    /* Solange die Zeichnung kleiner ist als der Bereich, läuft sie über
+       eine Ellipse weich in den Grund aus (der Bereich hat denselben
+       Grundton) — auf allen Größen, seit der Anflug von weiter draußen
+       kommt (Florian, 27. September 2026). Bei voller Größe liegen nur
+       die äußersten Ecken im Verlauf. Maß und Lage sind die der
+       Zeichnung; die Maske skaliert mit ihr. */
+    -webkit-mask-image: radial-gradient(ellipse farthest-side at center, #000 60%, transparent 100%);
+    -webkit-mask-size: var(--karte-mass, cover);
+    -webkit-mask-position: var(--karte-lage, center);
+    -webkit-mask-repeat: no-repeat;
+    mask-image: radial-gradient(ellipse farthest-side at center, #000 60%, transparent 100%);
+    mask-size: var(--karte-mass, cover);
+    mask-position: var(--karte-lage, center);
+    mask-repeat: no-repeat;
   }
 
   /* Tönung in der Hausfarbe, 4,5 % (Handoff) */
@@ -494,14 +508,11 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
          Mit dem 16:9-Bild blieb unter dem Formular nur der leere Grund
          (Florian, 26. September 2026). */
       background-image: url('/bilder/deko/karte-bietigheim-hoch.svg');
+      /* Gestapelt reicht die Zeichnung unter der Marke bis zum unteren
+         Rand — der Verlauf beginnt hier früher, damit sie dort weich
+         ausläuft */
       -webkit-mask-image: radial-gradient(ellipse farthest-side at center, #000 50%, transparent 100%);
-      -webkit-mask-size: var(--karte-mass, cover);
-      -webkit-mask-position: var(--karte-lage, center);
-      -webkit-mask-repeat: no-repeat;
       mask-image: radial-gradient(ellipse farthest-side at center, #000 50%, transparent 100%);
-      mask-size: var(--karte-mass, cover);
-      mask-position: var(--karte-lage, center);
-      mask-repeat: no-repeat;
     }
   }
 
@@ -561,15 +572,17 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
    *
    * 2. Der Anflug
    *    Die Karte hängt am Scrollweg, nicht an der Uhr: Tritt die Spitze
-   *    der Marke unten ins Fenster, steht die Zeichnung auf 125 %; bis
-   *    die Spitze bei 45 % der Fensterhöhe angekommen ist, fährt sie
-   *    auf 100 % herunter — quadratisch auslaufend, erst zügig, dann
-   *    immer sanfter. Der gezeichnete Wert läuft dem Scrollwert nach
-   *    (`nachziehen`, wie beim Gruppenfoto). Bei 55 % des Wegs fällt
-   *    die Marke herein (`data-da`), einmal und endgültig; die Ringe
-   *    folgen ihr. Wer zurückscrollt, sieht die Karte wieder
-   *    heranfahren — die Marke bleibt. Das ist die Choreografie des
-   *    `flyTo` im Entwurf, nur ohne Karten-Bibliothek und ohne Uhr.
+   *    der Marke unten ins Fenster, steht die Zeichnung auf 62 % — weit
+   *    draußen; bis die Spitze 15 % unter der Oberkante angekommen ist,
+   *    zoomt sie auf 100 % heran — sanft an- und auslaufend. Der
+   *    gezeichnete Wert läuft dem Scrollwert träge nach (`nachziehen`
+   *    mit eigener Trägheit). Bei 60 % des Wegs fällt die Marke herein
+   *    (`data-da`), einmal und endgültig; die Ringe folgen ihr. Wer
+   *    zurückscrollt, sieht die Karte wieder wegfahren — die Marke
+   *    bleibt. Das ist die Choreografie des `flyTo` im Entwurf, nur
+   *    ohne Karten-Bibliothek und ohne Uhr. Bis zum 27. September 2026
+   *    kam sie von 125 %, also von zu nah, über einen kürzeren Weg
+   *    (Florian: „von deutlich weiter weg reinzoomen, smoother, länger").
    *
    *    Vorher lief der Anflug als Übergang von 2,2 s, ausgelöst, sobald
    *    ein knappes Drittel des Bereichs im Bild war, und die Marke
@@ -738,12 +751,26 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     const reduziert = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /** Ab diesem Anteil des Wegs fällt die Marke — die Zeichnung ist
-        dann auf 105 % und rollt nur noch aus. */
-    const MARKE_BEI = 0.55;
+        dann fast da und rollt nur noch aus. */
+    const MARKE_BEI = 0.6;
+
+    /** Wo der Anflug beginnt: die Zeichnung auf 62 % ihrer Größe, also
+        von weit draußen (Florian, 27. September 2026; vorher 125 %,
+        also von zu nah). */
+    const ZOOM_START = 0.62;
+
+    /** Länge des Anflugs in Fensterhöhen: von der Unterkante bis
+        15 % unter der Oberkante (vorher bis 45 % — zu kurz). */
+    const ANFLUG_WEG = 0.85;
+
+    /** Trägheit des Nachlaufs: je näher an 1, desto weicher und länger
+        läuft die Zeichnung dem Scrollwert nach (Grundwert 0,7 in
+        scrollwege.ts; hier bewusst träger). */
+    const TRAEGHEIT = 0.86;
 
     /**
      * Wie weit der Anflug ist (0 … 1): 0, wenn die Spitze der Marke
-     * unten ins Fenster tritt; 1, wenn sie bei 45 % der Fensterhöhe
+     * unten ins Fenster tritt; 1, wenn sie 15 % unter der Oberkante
      * steht. Gemessen wird die Marke selbst, nicht der Bereich — der
      * ist auf Handys so hoch, dass sein Anteil im Bild wenig über die
      * Karte sagt.
@@ -752,7 +779,7 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
       if (!marke) return 1;
       const spitze = marke.getBoundingClientRect().bottom;
       const fenster = window.innerHeight;
-      return Math.min(1, Math.max(0, (fenster - spitze) / (0.55 * fenster)));
+      return Math.min(1, Math.max(0, (fenster - spitze) / (ANFLUG_WEG * fenster)));
     };
 
     /* Der gezeichnete Wert läuft dem Scrollwert nach — wie beim
@@ -763,8 +790,10 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     let zuletzt = 0;
 
     const zeichnen = () => {
-      /* Von 125 % auf 100 %, quadratisch auslaufend */
-      const zoom = 1 + 0.25 * (1 - wert) * (1 - wert);
+      /* Von ZOOM_START auf 100 %, sanft an- und auslaufend (smoothstep)
+         — die Trägheit des Nachlaufs rundet das noch einmal ab */
+      const s = wert * wert * (3 - 2 * wert);
+      const zoom = ZOOM_START + (1 - ZOOM_START) * s;
       bereich.style.setProperty('--karte-zoom', zoom.toFixed(4));
       if (wert >= MARKE_BEI && !bereich.dataset.da) bereich.dataset.da = 'ja';
     };
@@ -774,7 +803,7 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
       zuletzt = jetzt;
 
       const ziel = fortschritt();
-      wert = nachziehen(wert, ziel, dt);
+      wert = nachziehen(wert, ziel, dt, TRAEGHEIT);
       if (Math.abs(ziel - wert) < 0.0005) wert = ziel;
       zeichnen();
 

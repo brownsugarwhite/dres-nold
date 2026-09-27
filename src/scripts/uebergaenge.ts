@@ -159,6 +159,13 @@ document.addEventListener('astro:before-preparation', (ereignis) => {
 /* Nach dem Tausch: die Karte der zuletzt offenen Leistung mittig
    stellen — noch bevor der Browser das neue Bild aufnimmt, damit der
    Morph dort endet, wo die Karte dann steht. */
+/** Die Karte mittig ins Fenster stellen — ohne Bewegung. */
+function karteMittigStellen(karte: HTMLElement) {
+  const r = karte.getBoundingClientRect();
+  const oben = window.scrollY + r.top - (window.innerHeight - r.height) / 2;
+  window.scrollTo({ top: Math.max(0, oben), behavior: 'instant' as ScrollBehavior });
+}
+
 document.addEventListener('astro:after-swap', () => {
   let ziel = '';
   try { ziel = sessionStorage.getItem(MERKER) || ''; sessionStorage.removeItem(MERKER); } catch { /* egal */ }
@@ -169,14 +176,20 @@ document.addEventListener('astro:after-swap', () => {
      liegen. Dieses Kennzeichen wird noch vor der neuen Momentaufnahme
      gesetzt — `astro:after-swap` läuft innerhalb des Übergangs. */
   karte.setAttribute('data-morph', '');
-  const r = karte.getBoundingClientRect();
-  const oben = window.scrollY + r.top - (window.innerHeight - r.height) / 2;
-  window.scrollTo({ top: Math.max(0, oben), behavior: 'instant' as ScrollBehavior });
 
-  /* Ein erster Wert, falls der Wechsel hier schon endet. Der genaue
-     folgt in `astro:page-load` — dann steht das Bild an seinem Platz
-     und die Seite hat sich gesetzt. */
-  zoomMerken(document.documentElement, Math.max(1, bildZoomDanach(karte)));
+  /* Mittig stellen — als Mikroaufgabe, also NACH allen anderen
+     `after-swap`-Zuhörern, aber noch vor der neuen Momentaufnahme. Auf
+     Handys sortiert Oeffnungszeiten.astro in seinem Zuhörer Begrüßung
+     und Band aus der Karte hinter sie in den Inhalt; wer vorher misst,
+     stellt die Kachel um deren Höhe zu hoch, und der Morph endet
+     außerhalb des Fensters (Florian, 27. September 2026). */
+  queueMicrotask(() => {
+    karteMittigStellen(karte);
+    /* Ein erster Wert, falls der Wechsel hier schon endet. Der genaue
+       folgt in `astro:page-load` — dann steht das Bild an seinem Platz
+       und die Seite hat sich gesetzt. */
+    zoomMerken(document.documentElement, Math.max(1, bildZoomDanach(karte)));
+  });
 });
 
 /* Astro tauscht beim Wechsel das ganze Dokument aus — die Richtung des
@@ -214,8 +227,16 @@ document.addEventListener('astro:page-load', () => {
      und die Vergrößerung des Bildes lässt sich genau bestimmen. Auf
      dem Rückweg ist das der Wert, der den Sprung verhindert. */
   if (uebergangLaeuft && document.documentElement.dataset.rueckmorph) {
-    const karte = document.querySelector('[data-karte][data-morph]');
-    if (karte) zoomMerken(document.documentElement, Math.max(1, bildZoomDanach(karte)));
+    const karte = document.querySelector<HTMLElement>('[data-karte][data-morph]');
+    if (karte) {
+      zoomMerken(document.documentElement, Math.max(1, bildZoomDanach(karte)));
+      /* Hat ein Komponentenskript die Seite seither noch verschoben
+         (Schriften, Nachmessen), sitzt die Kachel nicht mehr mittig —
+         dann nachstellen, aber nur bei echtem Versatz */
+      const r = karte.getBoundingClientRect();
+      const mitte = (window.innerHeight - r.height) / 2;
+      if (Math.abs(r.top - mitte) > 4) karteMittigStellen(karte);
+    }
   }
 
   /* Ohne echten Übergang (ältere Browser, reduzierte Bewegung) gibt es

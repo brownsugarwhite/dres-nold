@@ -260,7 +260,15 @@ const { praxis } = seite;
     color: var(--farbe-primaer);
     /* In der Vorlage folgt `.scroll2action` ohne Abstand direkt auf das
        Logo (live-webflow.css `.logo` / `.scroll2action`). Der Abstand
-       entsteht dort allein aus der Logohöhe. */
+       entsteht dort allein aus der Logohöhe — und war zu groß: Seit dem
+       27. September 2026 steht der Hinweis 100 px höher (Florian). Über
+       `top`, nicht über einen Abstand: Der würde die Mitte verschieben
+       und mit ihr das Logo. `top` ist auch der Weg, auf dem der Hinweis
+       beim ersten Aufbau von unten kommt (styles/global.css) — eine
+       Layout-Eigenschaft, kein `transform`, das um das Logo herum den
+       Saum zeichnet. */
+    position: relative;
+    top: -100px;
     margin-top: 0;
     opacity: var(--hinweis-deckkraft, 1);
     transform: scale(var(--hinweis-groesse, 1)) translateY(var(--hinweis-versatz, 0px));

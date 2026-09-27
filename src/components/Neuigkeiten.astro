@@ -44,7 +44,7 @@ const alsDatum = (iso: string) =>
                       trägt die Skalierung beim Scrollen, das Bild die
                       beim Zeigen. Zwei `transform` auf einem Element
                       ließen sich nicht getrennt überblenden. */}
-                  <span class="beitrag__lauf" data-beitragsbild>
+                  <span class="beitrag__lauf" data-bildlauf>
                     <img class="beitrag__bild" src={b.bild} alt={b.bild_alt || ''} width="600" height="338" loading="lazy" />
                   </span>
                 </span>
@@ -224,74 +224,8 @@ const alsDatum = (iso: string) =>
 </style>
 
 <script>
-  import { nachziehen, durchlauf, A3_ZUWACHS } from '../scripts/scrollwege';
-
-  /**
-   * Ablauf a-3 auf den Beitragsbildern — dieselbe Bewegung wie beim
-   * Gruppenfoto im Team-Abschnitt: Über den Scrollweg wächst das Bild
-   * von 1 auf 1,1.
-   *
-   * Der Fortschritt zählt wie Webflows „while scrolling in view": 0 %
-   * wenn die Oberkante unten ins Fenster tritt, 100 % wenn die
-   * Unterkante oben hinausläuft. Der gezeichnete Wert läuft dem
-   * Scrollwert nach (Webflow „smoothing 70"), sonst wirkt die
-   * Vergrößerung hart am Scrollrad festgeschraubt.
-   */
-  function beitragsbilderAufbauen() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const bilder = [...document.querySelectorAll<HTMLElement>('[data-beitragsbild]')];
-    if (!bilder.length || bilder[0].dataset.bereit) return;
-    bilder.forEach((b) => { b.dataset.bereit = 'ja'; });
-
-    /* Die Formel steht in scripts/scrollwege.ts — der Seitenwechsel
-       rechnet mit derselben (siehe dort). */
-    const anteil = durchlauf;
-
-    const werte = new Map<HTMLElement, number>();
-    bilder.forEach((el) => werte.set(el, anteil(el)));
-
-    const zeichnen = () => {
-      bilder.forEach((el) => {
-        const p = werte.get(el) ?? 0;
-        el.style.setProperty('--bild-groesse', (1 + A3_ZUWACHS * p).toFixed(4));
-      });
-    };
-
-    let laeuft = false;
-    let zuletzt = 0;
-
-    const schritt = (jetzt: number) => {
-      const dt = zuletzt ? Math.min(100, jetzt - zuletzt) : 16.7;
-      zuletzt = jetzt;
-
-      let fertig = true;
-      bilder.forEach((el) => {
-        const z = anteil(el);
-        let w = nachziehen(werte.get(el) ?? z, z, dt);
-        if (Math.abs(z - w) < 0.0005) w = z;
-        else fertig = false;
-        werte.set(el, w);
-      });
-
-      zeichnen();
-
-      if (!fertig) requestAnimationFrame(schritt);
-      else laeuft = false;
-    };
-
-    const anstossen = () => {
-      if (laeuft) return;
-      laeuft = true;
-      zuletzt = 0;
-      requestAnimationFrame(schritt);
-    };
-
-    window.addEventListener('scroll', anstossen, { passive: true });
-    window.addEventListener('resize', anstossen, { passive: true });
-    zeichnen();
-  }
-
-  beitragsbilderAufbauen();
-  document.addEventListener('astro:page-load', beitragsbilderAufbauen);
+  /* Ablauf a-3 auf den Beitragsbildern: das gemeinsame Skript
+     scripts/bildlauf.ts (seit dem 27. September 2026 auch für die
+     Bilder der eigenen Abschnitte). */
+  import '../scripts/bildlauf';
 </script>

@@ -2007,3 +2007,90 @@ vergrößerten Symbol. Ein grauer Grund (Kachel am Rand des Scrollwegs)
 blendet im Kreuzen der Abbilder nach Weiß, statt vorher zu springen.
 Auf dem Rückweg steht die Zielkachel mittig — dort ist die Skalierung
 ohnehin 1.
+
+## Florians Durchgang am Handy (27. September 2026)
+
+Elf Punkte, alle umgesetzt.
+
+**Der Rückweg landet wieder in der Mitte** (`scripts/uebergaenge.ts`,
+`Oeffnungszeiten.astro`). Auf Handys endete der Morph von einer
+Leistung zurück außerhalb des Fensters. Der Grund war die Reihenfolge:
+`uebergaenge.ts` stellte die Zielkachel in `astro:after-swap` mittig —
+danach sortierte `Oeffnungszeiten.astro` (in `astro:page-load`)
+Begrüßung und Band aus der Karte hinter sie in den Inhalt, und die
+Kachel rückte um deren Höhe nach unten. Jetzt läuft das Umsortieren
+schon in `after-swap`, und das Zentrieren ist eine Mikroaufgabe: Sie
+läuft nach ALLEN `after-swap`-Zuhörern, aber noch vor der neuen
+Momentaufnahme (Astro nimmt sie erst nach dem Tausch-Rückruf auf).
+In `page-load` wird bei mehr als 4 px Versatz einmal nachgestellt.
+
+**Das Band nahm nach einem Seitenwechsel nicht mehr die volle Breite
+ein.** `--fensterbreite` steht als Stil an `<html>` — und Astro tauscht
+beim Wechsel die Attribute von `<html>` gegen die des neuen Dokuments.
+Der Wert war fort, das Band fiel auf die Kartenbreite zurück. Jetzt
+setzt `fensterbreiteMerken()` ihn bei jedem Aufbau neu; nur der
+`resize`-Zuhörer wird einmal angemeldet. (`--oz-ruhe` steht ebenfalls
+an `<html>`, wird aber ohnehin bei jedem Aufbau neu gemessen.)
+
+**Einblenden wie bei Apple** (`global.css`): Was mit `data-rein` ins
+Bild kommt, fährt jetzt aus 32 px Tiefe und 96 % Größe in 1,1 s heran
+(vorher 18 px, 0,8 s, ohne Größe).
+
+**Der Anflug der Karte kommt von weit draußen** (`Kontakt.astro`): Die
+Zeichnung beginnt auf 62 % (vorher 125 % — von zu nah, ein Wegfahren
+statt ein Heranfliegen), der Weg ist länger (Spitze der Marke von der
+Unterkante bis 15 % unter der Oberkante statt bis 45 %), die Kurve ein
+sanftes An- und Auslaufen (smoothstep), und der Nachlauf ist träger
+(`nachziehen` mit Rest 0,86 statt 0,7 — dafür hat die Funktion jetzt
+einen Parameter). Die Marke fällt bei 60 %. Weil die Zeichnung
+anfangs kleiner ist als der Bereich, läuft sie auf ALLEN Größen über
+die Ellipsen-Maske weich in den Grund aus (bisher nur gestapelt);
+nebeneinander beginnt der Verlauf bei 60 % statt 50 %, damit bei voller
+Größe nur die äußersten Ecken darin liegen. Der Bereich hat den
+Grundton der Zeichnung, der Übergang ist unsichtbar.
+
+**Alle Bilder wachsen über den Scrollweg** (`scripts/bildlauf.ts`, neu):
+Die Schleife aus Neuigkeiten.astro ist jetzt ein gemeinsames Skript
+für alles mit `data-bildlauf` — Beitragsbilder und die Bilder der
+eigenen Abschnitte (`.block__lauf`, mit `overflow: hidden` am Rahmen
+wie gehabt). Der Zuwachs `A3_ZUWACHS` ist 0,15 statt 0,1 („alle
+Animationen etwas verstärken"). Das Gruppenfoto im Team hat seine
+eigene Schleife behalten.
+
+**Der Scroll-Hinweis unter dem Logo** (`Startbereich.astro`,
+`global.css`) steht 100 px höher — über `top: -100px`, nicht über einen
+Abstand, der die Mitte und damit das Logo verschöbe — und kommt beim
+ersten Aufbau von unten (48 px über `top`, 700 ms ab 100 ms) statt nur
+über die Farbe einzublenden (600 ms ab 100 ms; vorher 800 ab 240).
+`top` ist eine Layout-Eigenschaft, kein `transform`: Compositor-
+Bewegungen um das Logo herum zeichneten den Saum (siehe „Erster
+Seitenaufbau"). Am Gerät gegenprüfen.
+
+**Das Handy-Menü macht die Seite wirklich unscharf** (`global.css`,
+`Navigation.astro`): Statt eines Schleiers mit Weichzeichner davor
+bekommen Inhalt, Startbereich, Bühne der Einstiegskarte und Fußbereich
+selbst `filter: blur` und `scale(0.96)` (420 ms), sobald das Menü
+offen ist (`html[data-menue-unscharf]`). Der Bezugspunkt ist die
+Fenstermitte, je Element als `--zurueck-mitte` gesetzt — sonst
+schrumpfte der lange Inhalt um seine eigene, weit entfernte Mitte.
+Die Bühne statt `.ozbereich`, weil ein `transform` dort dem festen
+Kreuz-Zwilling den Halt nähme. Der weiße Schleier bleibt, sein
+`backdrop-filter` ist weg. Am Gerät prüfen: den Aufwand des
+Weichzeichners auf dem langen Inhalt und den Saum um das Logo, wenn das
+Menü ganz oben geöffnet wird.
+
+**Die Menüzeilen schrumpfen in Höhe UND Breite**: `scale(0)` aus der
+linken oberen Ecke statt `scaleY(0)` von oben.
+
+**Randverläufe** (`layouts/Basis.astro`, `global.css`): Oben und unten
+liegt je ein 110 px hoher Verlauf von Weiß nach durchsichtig an der
+Fensterkante, fest, ohne Zeigerwirkung, unter den Leisten (z-index
+98 gegenüber 100) und über allem anderen. Die Leisten sind dafür auf
+74 % Weiß (vorher 80). Beim Druck sind die Verläufe aus.
+
+**Die Symbole der unteren Leiste** wachsen beim Zeigen um ihre Mitte
+(`scale(1.1)`, vorher 4 px angehoben plus 1,06), und die Beschriftung
+rückt 3 px nach unten.
+
+**Die Leistungskachel morpht aus ihrer Zeige-Lage** — siehe den Eintrag
+davor (noch vom 26. September).

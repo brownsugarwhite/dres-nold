@@ -180,11 +180,13 @@ export function durchlauf(el: Element): number {
   return Math.min(1, Math.max(0, (window.innerHeight - r.top) / weg));
 }
 
-/** Ablauf a-3: Über den Scrollweg wächst das Bild um diesen Anteil. */
-export const A3_ZUWACHS = 0.1;
+/** Ablauf a-3: Über den Scrollweg wächst das Bild um diesen Anteil.
+    Die Vorlage hat 0,1; seit dem 27. September 2026 etwas kräftiger
+    (Florian: „alle Animationen etwas verstärken"). */
+export const A3_ZUWACHS = 0.15;
 
 /** Rückt `wert` um einen Zeitschritt in Richtung `ziel`. */
-export function nachziehen(wert: number, ziel: number, dt: number): number {
-  const schritt = 1 - Math.pow(REST, dt / (1000 / 60));
+export function nachziehen(wert: number, ziel: number, dt: number, rest = REST): number {
+  const schritt = 1 - Math.pow(rest, dt / (1000 / 60));
   return wert + (ziel - wert) * schritt;
 }

@@ -563,11 +563,16 @@ const texte = startseite.sprechstunden;
    */
   let breiteGemerkt = false;
   function fensterbreiteMerken() {
-    if (breiteGemerkt) return;
-    breiteGemerkt = true;
     const setzen = () =>
       document.documentElement.style.setProperty('--fensterbreite', `${document.documentElement.clientWidth}px`);
+    /* Bei JEDEM Aufbau neu setzen: Astro tauscht beim Seitenwechsel die
+       Attribute von <html> gegen die des neuen Dokuments — und mit dem
+       `style` war der Wert fort. Das Band fiel dann auf die Kartenbreite
+       zurück und nahm nicht mehr die volle Fensterbreite ein (Florian,
+       27. September 2026). Nur der Zuhörer wird einmal angemeldet. */
     setzen();
+    if (breiteGemerkt) return;
+    breiteGemerkt = true;
     window.addEventListener('resize', setzen, { passive: true });
   }
 
@@ -837,6 +842,13 @@ const texte = startseite.sprechstunden;
 
   ozAufbauen();
   ozSchliessenAufbauen();
+  /* Beim Rückweg von einer Leistung stellt scripts/uebergaenge.ts die
+     Zielkachel mittig — NACH allen `after-swap`-Zuhörern. Bis dahin
+     muss die Handy-Reihenfolge (Begrüßung und Band hinter der Karte)
+     schon stehen, sonst rückt die Kachel danach um deren Höhe nach
+     unten und der Morph endet außerhalb des Fensters (Florian,
+     27. September 2026). */
+  document.addEventListener('astro:after-swap', vorspannAnordnen);
   document.addEventListener('astro:page-load', () => {
     ozAufbauen();
     ozSchliessenAufbauen();

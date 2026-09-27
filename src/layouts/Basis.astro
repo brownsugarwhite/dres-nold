@@ -69,6 +69,10 @@ const { titel = seite.titel, beschreibung = seite.beschreibung } = Astro.props;
   <body>
     <a class="sprungmarke" href="#inhalt">Zum Inhalt springen</a>
     <slot />
+    {/* Oben und unten läuft die Seite in Weiß aus — unter den Leisten,
+        über allem anderen (styles/global.css, „Randverläufe") */}
+    <div class="randverlauf randverlauf--oben" aria-hidden="true"></div>
+    <div class="randverlauf randverlauf--unten" aria-hidden="true"></div>
     <script>
       import '../scripts/uebergaenge';
       import '../scripts/anker';

@@ -194,7 +194,7 @@ src/
   admin/        Feldbeschreibungen und Skript der Redaktion
   server/       Gemeinsamer Code der Functions (GitHub-API, Access-Prüfung)
   styles/       tokens.css (Gestaltungswerte) + globale Stile + Übergänge
-  scripts/      Animationen, Übergänge, sanftes Scrollen — ohne Bibliotheken
+  scripts/      Animationen, Übergänge, sanftes Scrollen, Bildlauf — ohne Bibliotheken
 public/
   bilder/       Fotos (werden beim Build automatisch optimiert)
   dokumente/    PDFs zum Download

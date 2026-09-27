@@ -775,7 +775,7 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
     filter: blur(10px);
   }
 
-  html[data-laden='wartet'] body:not([data-gescrollt]) .scrollhinweis { color: transparent; }
+  html[data-laden='wartet'] body:not([data-gescrollt]) .scrollhinweis { color: transparent; top: -52px; }
   html[data-laden='wartet'] body:not([data-gescrollt]) .logo__bild { visibility: hidden; }
 
   @keyframes laden-ein {
@@ -791,7 +791,16 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
   }
 
   html[data-laden='da'] .fussleiste-huelle { animation-delay: 120ms; }
-  html[data-laden='da'] .scrollhinweis { animation: laden-farbe 800ms var(--verlauf-betont) 240ms backwards; }
+  /* Der Hinweis kommt von unten (48 px, über `top` — keine
+     Compositor-Eigenschaft, siehe Startbereich.astro) und blendet über
+     die Farbe ein; flotter als zuvor (Florian, 27. September 2026:
+     600 ms ab 100 ms statt 800 ab 240). */
+  @keyframes laden-hoch { from { top: -52px; } }
+  html[data-laden='da'] .scrollhinweis {
+    animation:
+      laden-farbe 600ms var(--verlauf-betont) 100ms backwards,
+      laden-hoch 700ms var(--verlauf-betont) 100ms backwards;
+  }
 }
 
 /*
@@ -804,13 +813,15 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
 */
 [data-rein='warten'] {
   opacity: 0;
-  transform: translateY(18px);
+  /* Von unten und eine Spur kleiner — wie bei Apple (Florian,
+     27. September 2026; vorher nur 18 px, 0,8 s) */
+  transform: translateY(32px) scale(0.96);
 }
 
 [data-rein] {
   transition:
-    opacity 0.8s var(--verlauf-betont),
-    transform 0.8s var(--verlauf-betont);
+    opacity 1.1s var(--verlauf-betont),
+    transform 1.1s var(--verlauf-betont);
 }
 
 [data-rein='da'] {
@@ -902,4 +913,71 @@ main.seiteninhalt h2:not(.ohne-verlauf),
     -webkit-text-fill-color: currentColor;
     color: CanvasText;
   }
+}
+
+/*
+  Randverläufe.
+  Oben und unten liegt je ein 110 px hoher Verlauf von Weiß nach
+  durchsichtig direkt an der Fensterkante — unter den Leisten (die
+  sind dafür eine Spur durchsichtiger), über allem anderen. So sieht es
+  aus, als blendete die Seite an beiden Kanten ein und aus (Florian,
+  27. September 2026). Die Elemente stehen in layouts/Basis.astro.
+*/
+.randverlauf {
+  position: fixed;
+  right: 0;
+  left: 0;
+  z-index: calc(var(--ebene-navigation) - 2);
+  height: 110px;
+  pointer-events: none;
+}
+
+.randverlauf--oben {
+  top: 0;
+  background: linear-gradient(to bottom, var(--farbe-flaeche), rgb(255 255 255 / 0));
+}
+
+.randverlauf--unten {
+  bottom: 0;
+  background: linear-gradient(to top, var(--farbe-flaeche), rgb(255 255 255 / 0));
+}
+
+@media print {
+  .randverlauf { display: none; }
+}
+
+/*
+  Offenes Handy-Menü: Die Seite dahinter wird WIRKLICH unscharf und
+  tritt eine Spur zurück — nicht nur ein Schleier mit Weichzeichner
+  davor (Florian, 27. September 2026). Das Kennzeichen setzt
+  Navigation.astro an <html>; der Bezugspunkt der Verkleinerung ist
+  die Fenstermitte, das Skript schreibt ihn je Element
+  (`--zurueck-mitte`), sonst rückte ein langer Inhalt beim Schrumpfen
+  um seine eigene Mitte weit weg.
+
+  Betroffen ist alles außer der Navigation selbst: der Inhalt, der
+  Startbereich (er liegt fest im Fenster), die Bühne der Einstiegskarte
+  (klebend — nicht `.ozbereich`, sonst verlöre das feste Kreuz seinen
+  Halt) und der Fußbereich.
+*/
+.seiteninhalt,
+.startbereich,
+.ozbereich__buehne,
+.fuss {
+  transform-origin: 50% var(--zurueck-mitte, 50%);
+  transition:
+    filter 420ms var(--verlauf-betont),
+    transform 420ms var(--verlauf-betont);
+}
+
+html[data-menue-unscharf] :is(.seiteninhalt, .startbereich, .ozbereich__buehne, .fuss) {
+  filter: blur(var(--weichzeichner-schleier));
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seiteninhalt,
+  .startbereich,
+  .ozbereich__buehne,
+  .fuss { transition: none; }
 }
