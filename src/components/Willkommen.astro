@@ -125,6 +125,8 @@ const klein = zeilen.slice(0, -1).join(' ');
     border-left: 1px solid var(--farbe-linie);
   }
 
+  /* Im Blocksatz wie die Lesetexte (Trennstellen setzt der Build,
+     src/lib/silben.ts); die letzte Zeile bleibt linksbündig */
   .willkommen__text {
     width: 0;
     min-width: 100%;
@@ -133,7 +135,10 @@ const klein = zeilen.slice(0, -1).join(' ');
     font-size: var(--text-lead);
     font-weight: var(--gewicht-normal);
     line-height: 1.5;
-    text-wrap: pretty;
+    text-align: justify;
+    text-align-last: left;
+    -webkit-hyphens: auto;
+    hyphens: auto;
   }
 
   .willkommen__knoepfe {
@@ -152,9 +157,14 @@ const klein = zeilen.slice(0, -1).join(' ');
 
     .willkommen__titel { line-height: 1.02; }
 
+    /* Über und unter dem Satz derselbe Abstand (Florian, 27. September
+       2026); der Satz eine Stufe größer und über die ganze Breite */
     .willkommen__rechts {
       width: auto;
-      margin: 28px 0 0;
+      /* 16 statt 22: Die Überschrift hat unter „Praxis Dres. Nold" noch
+         ihren Durchschuss — so stehen über und unter dem Satz sichtbar
+         gleiche Lücken */
+      margin: 16px 0 0;
       padding: 0;
       border-left: 0;
     }
@@ -162,7 +172,9 @@ const klein = zeilen.slice(0, -1).join(' ');
     .willkommen__text {
       width: auto;
       min-width: 0;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
+      font-size: 1.2rem;
+      line-height: 1.45;
     }
 
     .willkommen__knoepfe :global(.kn) {
