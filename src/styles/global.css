@@ -982,9 +982,16 @@ main.seiteninhalt h2:not(.ohne-verlauf),
   pointer-events: none;
 }
 
+/* Oben so hoch wie die Kopfleiste (80 px; Handys 72), nicht 110 —
+   der Verlauf soll hinter der Leiste enden (Florian, 27. September 2026) */
 .randverlauf--oben {
   top: 0;
+  height: 80px;
   background: linear-gradient(to bottom, var(--farbe-flaeche), rgb(255 255 255 / 0));
+}
+
+@media (max-width: 991px) {
+  .randverlauf--oben { height: 72px; }
 }
 
 .randverlauf--unten {

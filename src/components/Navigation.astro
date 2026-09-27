@@ -628,14 +628,21 @@ const kategorien = (leistungen.kategorien ?? [])
      Logo ganz links, Menüknopf ganz rechts — und weil die Zeile so breit
      ist wie die Liste im Aufklappmenü, steht das Logo genau über deren
      Symbolen (Florian, 18. September 2026). */
+  /* 72 px hoch, das Logo 68 (Florian, 27. September 2026; vorher 80
+     und 80 wie auf dem Desktop) */
   .kopfleiste__mobil {
     position: relative;
     display: none;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    height: 80px;
+    height: 72px;
     overflow: hidden;
+  }
+
+  .kopfleiste__mobil .logo img {
+    width: 68px;
+    height: 68px;
   }
 
   /* .lottie-animation-3: 50 × 50 */
@@ -684,10 +691,14 @@ const kategorien = (leistungen.kategorien ?? [])
     z-index: var(--ebene-menue);
     display: flex;
     flex-direction: column;
-    /* Links an der Wand der Blase (`--menue-wand`, vom Skript gemessen:
-       rechte Logokante plus Luft), rechts der Seitenrand */
+    /* Links beginnt die Spalte genau unter dem Hörer in der Kopfleiste
+       (`--menue-spalte`, vom Skript gemessen: der Hörer steht mit der
+       Nummer mittig zwischen Logo und Kreuz, die Symbole der Zeilen
+       bündig darunter — Florians Entwurf, 27. September 2026); ohne
+       Messung an der Wand der Blase (`--menue-wand`) plus Luft. Rechts
+       der Seitenrand. */
     padding: var(--abstand-2xs) var(--abstand-seitenrand) var(--abstand-s)
-             calc(var(--menue-wand, var(--abstand-seitenrand)) + var(--abstand-m));
+             var(--menue-spalte, calc(var(--menue-wand, var(--abstand-seitenrand)) + var(--abstand-m)));
   }
 
   .mobilmenue[hidden] { display: none; }
@@ -739,10 +750,11 @@ const kategorien = (leistungen.kategorien ?? [])
   .mobilmenue__zelle {
     min-height: 0;
     overflow: hidden;
-    /* Aus der linken oberen Ecke: Die Zeile schrumpft in Höhe UND
-       Breite auf nichts und wächst von dort wieder (Florian,
-       27. September 2026; vorher nur die Höhe, `scaleY`) */
-    transform-origin: 0 0;
+    /* Vom linken Rand, senkrecht mittig: Die Zeile schrumpft in Höhe
+       UND Breite auf nichts und wächst von dort wieder (Florian,
+       27. September 2026; vorher nur die Höhe, dann die linke obere
+       Ecke) */
+    transform-origin: 0 50%;
     transition-property: opacity, transform, visibility, border-color;
     transition-duration: 320ms, 320ms, 0s, 320ms;
     transition-timing-function: var(--verlauf-betont), var(--verlauf-betont), linear, var(--verlauf-betont);
@@ -2124,12 +2136,15 @@ const kategorien = (leistungen.kategorien ?? [])
       const luft = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--abstand-xs')) * 16 || 12;
       const abstand = parseFloat(getComputedStyle(kopfleisteMobil.querySelector('.kopfleiste__handyrechts') as Element).columnGap) || 16;
       let x: number;
-      if (menueGewollt && !menue.hidden) {
-        const s = menue.querySelector<HTMLElement>('.mobilmenue__symbol')?.getBoundingClientRect();
-        x = s ? s.left - (knopfBreite - s.width) / 2 - k.left : k.width / 2;
-      } else if (telefonOffen) {
+      if (telefonOffen || menueGewollt) {
+        /* Geöffnet — allein wie mit Menü — steht die Gruppe mittig
+           zwischen Logo und Menüknopf; mit Menü rückt die Symbolspalte
+           des Menüs unter das Symbol des Hörers (Florians Entwurf,
+           27. September 2026). Der Hörer-Knopf ist 44 px, sein Symbol
+           40: die Spalte beginnt 2 px innerhalb des Knopfs. */
         const breite = knopfBreite + luft + (nummer?.scrollWidth ?? 0);
         x = (logo.getBoundingClientRect().right + b.left) / 2 - breite / 2 - k.left;
+        menue.style.setProperty('--menue-spalte', `${Math.round(k.left + x + (knopfBreite - 40) / 2)}px`);
       } else {
         const p = punkt?.getBoundingClientRect();
         x = (p && p.width ? p.left : b.left) - abstand - knopfBreite - k.left;

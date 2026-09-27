@@ -2399,3 +2399,23 @@ Handys immer voll sichtbar (`opacity: 1` in allen Zuständen).
 - **Gemächlicher:** Die Klappe läuft 0,7 s statt 0,5 (`KLAPPEN` im
   Skript ebenso), Bezeichnung, Anriss und Innenabstände 0,6 s statt
   0,45, Text und Ansprechperson blenden 0,7 s.
+
+### Handy-Kopfleiste und Menü, Feinschliff (27. September 2026, abends)
+
+- **Das offene Menü ist ausgerichtet wie in Florians Bildschirmfoto:**
+  Der Hörer steht mit der Nummer mittig zwischen Logo und Kreuz —
+  gleicher Abstand zu beiden, derselbe Platz wie allein geöffnet —, und
+  die Symbolspalte des Menüs beginnt genau unter seinem Symbol. Das
+  Skript misst den Platz (`telefonStellen`) und gibt ihn dem Menü als
+  `--menue-spalte` (linker Innenabstand); die Wand der Blase bleibt an
+  der Logokante plus 12 px. Vorher war es umgekehrt: Der Hörer rückte
+  an die Spalte des Menüs.
+- **Die Kopfleiste ist auf Handys 72 px hoch, das Logo 68 px** (vorher
+  80 / 80). Die Skripte rechnen weiter mit 80 px Kopfleiste plus Luft
+  (`anker.ts`, `kreuzKleben`, Stellenliste) — 8 px mehr Abstand, das
+  fällt nicht auf und hält die Werte an einer Stelle.
+- **Der obere Randverlauf ist so hoch wie die Kopfleiste** (80 px,
+  Handys 72) statt 110 px — er endet hinter der Leiste. Der untere
+  bleibt bei 110.
+- **Die Zeilen des Handy-Menüs skalieren vom linken Rand, senkrecht
+  mittig** (`transform-origin: 0 50%`; vorher die linke obere Ecke).
