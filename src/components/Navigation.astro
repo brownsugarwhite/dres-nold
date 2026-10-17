@@ -1005,8 +1005,8 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     margin-left: -6px;
     background: url('/icons/ui/pfeil-runter.svg') center / contain no-repeat;
     transition:
-      opacity 220ms var(--verlauf),
-      transform 220ms var(--verlauf);
+      opacity 320ms var(--verlauf-ruhig),
+      transform 320ms var(--verlauf-ruhig);
   }
 
   /*
@@ -1039,10 +1039,11 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     font-weight: var(--gewicht-normal);
   }
 
-  /* Einmal hoch, kein Zurückrollen — etwas länger und weicher als die
-     300 ms easeInOut der Vorlage */
+  /* Einmal hoch, kein Zurückrollen. Ruhig an- und auslaufend und
+     gemächlicher als die 300 ms der Vorlage (Florian, 17. Oktober 2026:
+     420 ms mit der betonten Kurve waren zu hektisch) */
   .menuepunkt[data-rollt] .menuepunkt__rolle {
-    animation: menue-rolle 420ms var(--verlauf-betont);
+    animation: menue-rolle 750ms var(--verlauf-ruhig);
   }
 
   /* Solange das Aufklappmenü offen ist, steht der Text still oben —
@@ -1157,6 +1158,13 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     transform: translateY(0);
   }
 
+  /* Kommt die Blase von einem anderen Menüpunkt herüber, ist sie schon
+     offen — die Unterpunkte laufen früher und dichter ein, während die
+     Form noch wandert */
+  .aufklapp[data-uebergabe] .oberpunkt {
+    transition-delay: calc(60ms + var(--stufe, 0) * 60ms), calc(60ms + var(--stufe, 0) * 60ms), 0ms;
+  }
+
   /* Beim Schließen sofort weg, ohne Staffelung */
   .aufklapp:not([data-offen]) .oberpunkt { transition-delay: 0ms; transition-duration: 120ms; }
 
@@ -1186,8 +1194,10 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     text-decoration: none;
   }
 
+  /* Ein leises Grau — Weiß war auf dem milchigen Grund nicht zu sehen
+     (Florian, 17. Oktober 2026) */
   .oberpunkt:hover,
-  .oberpunkt:focus-visible { background: rgb(255 255 255 / 60%); }
+  .oberpunkt:focus-visible { background: var(--farbe-flaeche-gedeckt); }
 
 
   .oberpunkt__text {
@@ -1375,6 +1385,12 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
 
     /* Auf Handys auch die Telefonnummer unten */
     .fussleiste__inhalt > .fusspunkt--handy { display: flex; }
+
+    /* Gleich breite Zellen: So stehen die äußeren Symbole gleich weit vom
+       Rand und die Punkte genau dazwischen (Florian, 17. Oktober 2026 —
+       „Leistungen" war breiter als „Sprechstunden" schmal) */
+    .fussleiste__inhalt > .fusspunkt:not([data-weg]) { flex: 1 1 0; min-width: 0; }
+    .fussleiste__inhalt > .aufklapp.fusspunkt { display: flex; justify-content: center; }
     .fussleiste__inhalt > .punkt--fuss:has(+ .fusspunkt--handy) { display: block; }
 
     /* Ohne Telefonnummer — die steht als Pille in der Kopfleiste und
@@ -1429,8 +1445,10 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     if (!leistenwechselBereit) {
       leistenwechselBereit = true;
       leistenwechselAufbauen();
-      leisteEinpassenAufbauen();
     }
+    /* Die Symbolleiste wird mit jeder Seite neu gebaut (sie steht
+       außerhalb der mitgenommenen `.navigation`) — also je Seite einpassen */
+    leisteEinpassenAufbauen();
     aufklappmenuesAufbauen();
     rollenAufbauen();
     mobilmenueAufbauen();
@@ -1451,10 +1469,16 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
    */
   function leisteEinpassenAufbauen() {
     const inhalt = document.querySelector<HTMLElement>('[data-fussinhalt]');
-    if (!inhalt) return;
+    if (!inhalt || inhalt.dataset.bereit) return;
+    inhalt.dataset.bereit = 'ja';
     const LUFT = 22;
     const kinder = [...inhalt.children] as HTMLElement[];
     const punkte = kinder.filter((k) => k.hasAttribute('data-fusspunkt'));
+    /* Die natürliche Breite eines Punkts: Symbol oder Beschriftung, was
+       breiter ist — nicht die seiner Zelle, die auf Handys gleich breit
+       verteilt wird (siehe CSS „gleich breite Zellen") */
+    const natur = (p: HTMLElement) => Math.max(0, ...[...p.querySelectorAll<HTMLElement>('.fussknopf__symbol, .fussknopf__text')].map((e) => e.getBoundingClientRect().width));
+    const gleicheZellen = () => window.matchMedia('(max-width: 991px)').matches;
 
     const einpassen = () => {
       for (const k of kinder) k.removeAttribute('data-weg');
@@ -1462,9 +1486,13 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       if (!verfuegbar) return;
       /* Was das CSS ohnehin verbirgt (Telefon auf dem Desktop), zählt nicht */
       const da = punkte.filter((p) => getComputedStyle(p).display !== 'none');
-      const breite = new Map(da.map((p) => [p, p.getBoundingClientRect().width]));
+      const breite = new Map(da.map((p) => [p, natur(p)]));
       const trenner = 3 + 2 * LUFT;
-      const bedarf = (liste: HTMLElement[]) => liste.reduce((n, p) => n + (breite.get(p) ?? 0), 0) + Math.max(0, liste.length - 1) * trenner;
+      /* Gleich breite Zellen brauchen für jeden Punkt so viel Platz wie
+         für den breitesten */
+      const bedarf = (liste: HTMLElement[]) => gleicheZellen()
+        ? liste.length * (Math.max(0, ...liste.map((p) => breite.get(p) ?? 0)) + 2 * LUFT) + Math.max(0, liste.length - 1) * 3
+        : liste.reduce((n, p) => n + (breite.get(p) ?? 0), 0) + Math.max(0, liste.length - 1) * trenner;
       const sichtbar = [...da];
       while (bedarf(sichtbar) > verfuegbar) {
         const weg = [...sichtbar].reverse().find((p) => !p.hasAttribute('data-immer'));
@@ -1541,12 +1569,20 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     window.addEventListener('resize', beiScroll, { passive: true });
     pruefen();
 
-    // Beim Seitenwechsel tauscht Astro den <body> samt Attributen aus —
-    // die Markierung wäre weg, die Kopfleiste würde in ihrer 300-ms-
-    // Bewegung kurz auf Höhe 0 fallen und während des Übergangs
-    // aufblitzen. Deshalb bekommt schon das NEUE Dokument die
-    // Markierung, bevor es eingetauscht wird: Der Zustand steht dann
-    // vom ersten Bild an fest, nichts bewegt sich.
+    /*
+      Beim Seitenwechsel tauscht Astro den <body> samt Attributen aus.
+
+      Das NEUE Dokument beginnt im Zustand des alten — die Leisten stehen
+      im ersten Bild also genau so wie eben. Erst nach dem Tausch fahren
+      sie mit ihrem gewöhnlichen 300-ms-Wechsel in den richtigen Zustand,
+      im lebenden Abbild des Übergangs (styles/uebergaenge.css blendet das
+      stehende alte Abbild der Leisten aus). Bis zum 17. Oktober 2026
+      bekam das neue Dokument gleich den Zielzustand: Dann lagen altes
+      und neues Abbild übereinander, und das alte verschwand am Ende
+      schlagartig (Florian).
+    */
+    let vorhersage = gescrollt;
+    let durchVerlauf = false;
     document.addEventListener('astro:before-swap', (ereignis) => {
       const e = ereignis as Event & { newDocument: Document; to: URL; navigationType: string };
       const startseite = !!e.newDocument.querySelector('.ozbereich');
@@ -1566,15 +1602,34 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
         // Öffnungszeiten liegen oben, alles andere ist gescrollt.
         soll = !!e.to.hash && !['#start', '#oz_anchor', '#inhalt'].includes(e.to.hash);
       }
-      if (soll) e.newDocument.body.dataset.gescrollt = 'ja';
+      vorhersage = soll;
+      durchVerlauf = e.navigationType === 'traverse';
+      const jetzt = document.body.hasAttribute('data-gescrollt');
+      if (jetzt) e.newDocument.body.dataset.gescrollt = 'ja';
       else delete e.newDocument.body.dataset.gescrollt;
-      gescrollt = soll;
+      gescrollt = jetzt;
     });
 
-    // Nach dem Tausch (noch vor dem ersten Bild) gegenprüfen — die
-    // Scrollposition steht dann fest.
+    const zustandSetzen = (soll: boolean) => {
+      if (soll === gescrollt) return;
+      gescrollt = soll;
+      if (soll) document.body.dataset.gescrollt = 'ja';
+      else delete document.body.dataset.gescrollt;
+    };
+
+    // Nach dem Tausch: die Leisten einmal im alten Zustand messen — erst
+    // dann hat die neue Symbolleiste einen Ausgangswert, von dem ihr
+    // Übergang losläuft —, dann umschalten. Die Scrollposition steht da
+    // schon fest (die Zielkarte wird synchron mittig gestellt); beim
+    // Blättern im Verlauf gilt die Vorhersage aus der gemerkten Tiefe.
     document.addEventListener('astro:after-swap', () => {
-      queueMicrotask(pruefen);
+      document.querySelector('.fussleiste-huelle')?.getBoundingClientRect();
+      document.querySelector('.kopfleiste')?.getBoundingClientRect();
+      queueMicrotask(() => {
+        if (durchVerlauf) zustandSetzen(vorhersage);
+        else pruefen();
+        requestAnimationFrame(pruefen);
+      });
     });
 
   }
@@ -1595,6 +1650,9 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
      26. September 2026 (ein kleiner Sinus-Zusatz); es ist weg — Florian
      wollte es glatter. */
 
+  /** Lage und Breite einer offenen Desktop-Blase — für die Übergabe */
+  type BlasenLage = { links: number; boxBreite: number; knopfX: number };
+
   type Geometrie = (k: {
     breite: number;                // Fensterbreite
     h: number;                     // aktuelle Höhe der Wölbung
@@ -1603,6 +1661,8 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     s: number;                     // Richtung: 1 nach unten, -1 nach oben
     k: number;                     // Kreiskonstante der Viertelbögen
     f: (n: number) => string;
+    /** Übergabe von einer anderen Blase: deren Lage und der Fortschritt */
+    von?: { lage: BlasenLage; t: number };
   }) => {
     /** Die Wölbung ab dem linken Rand bis zum rechten Rand, in
         Leserichtung — um `dy` verschoben und um `auf` nach außen geweitet */
@@ -1611,6 +1671,8 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     rueckwaerts: (dy: number, auf: number) => string;
     /** Kleiner Pfeil an der Grundlinie, wenn die Form einen hat */
     pfeil?: { d: string; sicht: number };
+    /** Die gezeichnete Lage — nur Formen, die übergeben können */
+    lage?: BlasenLage;
   };
 
   /** Weiche Kurve (ease-in-out quad) für das Breiterwerden der Blase */
@@ -1625,7 +1687,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     ihrer Bewegung den Zustand der neuen mit ab, und die Punktlinie lag
     quer über der offenen Blase (Florian, 17. Oktober 2026).
   */
-  const blasenJeTraeger = new WeakMap<HTMLElement, Set<{ beenden: () => void }>>();
+  const blasenJeTraeger = new WeakMap<HTMLElement, Set<{ beenden: () => void; vorlage: () => { lage: BlasenLage; h: number } | null }>>();
   const blasenBesitzer = new WeakMap<HTMLElement, object>();
 
   function blaseAnlegen(opt: {
@@ -1659,6 +1721,14 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     let lauf = 0;          // zählt Bewegungen; eine abgebrochene läuft nicht weiter
     let hoehe = 0;         // Höhe der Wölbung in px
     let start = 0, von = 0, dauer = 520;
+    /* Übergabe: Geht diese Blase auf, während eine andere derselben
+       Leiste offen ist, wandert die Form von dort hierher und nimmt
+       dabei ihre Höhe an, statt zu und neu aufzugehen (Florian,
+       17. Oktober 2026) */
+    const UEBERGABE = 450;
+    let uebergabe: { lage: BlasenLage; h: number; start: number } | null = null;
+    let letzteLage: BlasenLage | undefined;
+    let letzteH = 0;
     const s = hoch ? -1 : 1;   // Richtung: nach oben oder unten
     const k = 0.5523;          // Viertelkreis als Bézier
     const rand = 4;            // Luft in der Zeichnung ober- und unterhalb
@@ -1670,11 +1740,21 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
 
     const zeichnen = () => {
       const breite = document.documentElement.clientWidth;
-      const h = Math.max(0, hoehe * anteil);
+      let h = Math.max(0, hoehe * anteil);
+      let vonLage: { lage: BlasenLage; t: number } | undefined;
+      let rahmen = hoehe;
+      if (uebergabe) {
+        const t = KURVEN.betont(Math.min(1, (performance.now() - uebergabe.start) / UEBERGABE));
+        h = uebergabe.h + (hoehe - uebergabe.h) * t;
+        rahmen = Math.max(hoehe, uebergabe.h);
+        vonLage = { lage: uebergabe.lage, t };
+        if (t >= 1) uebergabe = null;
+      }
+      letzteH = h;
       /* Grundlinie im SVG — auf halbe Pixel gelegt, damit der 1-px-Strich
          genau auf der Punktreihe der Leiste liegt und nicht verschmiert */
-      const y0 = hoch ? hoehe + rand + 0.5 : rand - 0.5;
-      const gesamt = hoehe + 2 * rand;
+      const y0 = hoch ? rahmen + rand + 0.5 : rand - 0.5;
+      const gesamt = rahmen + 2 * rand;
 
       svg.style.width = `${breite}px`;
       svg.style.height = `${gesamt}px`;
@@ -1682,7 +1762,8 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       svg.setAttribute('viewBox', `0 0 ${breite} ${gesamt}`);
 
       const f = (n: number) => n.toFixed(2);
-      const form = geometrie({ breite, h, anteil: Math.min(1, anteil), y0, s, k, f });
+      const form = geometrie({ breite, h, anteil: Math.min(1, anteil), y0, s, k, f, von: vonLage });
+      letzteLage = form.lage;
 
       /* Bei (fast) null Höhe eine reine Linie: Die Bögen hätten sonst
          Punkte, die um Bruchteile eines Pixels wackeln, und aus den
@@ -1738,6 +1819,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       if (t < 1) { requestAnimationFrame((n) => schritt(n, mein)); return; }
       laeuft = false;
       anteil = ziel;
+      if (uebergabe) { uebergabe = null; zeichnen(); }
       if (ziel === 0) {
         svg.style.display = 'none';
         zustandRaeumen();
@@ -1762,25 +1844,44 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       laeuft = false;
       anteil = 0;
       ziel = 0;
+      uebergabe = null;
       svg.style.display = 'none';
       zustandRaeumen();
       beimZu();
     };
     const geschwister = blasenJeTraeger.get(linienTraeger) ?? new Set();
     blasenJeTraeger.set(linienTraeger, geschwister);
-    const eintrag = { beenden };
+    /* Was eine neue Blase von dieser übernimmt: Lage und gerade
+       gezeichnete Höhe — nur solange sie sichtbar aufgewölbt ist */
+    const vorlage = () => (svg.style.display !== 'none' && anteil > 0.02 && letzteLage ? { lage: letzteLage, h: letzteH } : null);
+    const eintrag = { beenden, vorlage };
     geschwister.add(eintrag);
 
     return {
       /** Aufwölben auf die gegebene Inhaltshöhe */
       oeffnen(h: number) {
-        for (const andere of geschwister) if (andere !== eintrag) andere.beenden();
+        let vorher: { lage: BlasenLage; h: number } | null = null;
+        for (const andere of geschwister) {
+          if (andere === eintrag) continue;
+          vorher ??= andere.vorlage();
+          andere.beenden();
+        }
         blasenBesitzer.set(linienTraeger, ich);
         hoehe = h;
         linienTraeger.dataset.ohneLinie = 'ja';
         svg.style.display = 'block';
+        if (vorher && !wenigerBewegung) {
+          /* Übergabe: voll offen von Anfang an, die Form wandert */
+          uebergabe = { ...vorher, start: performance.now() };
+          anteil = 1; von = 1; ziel = 1;
+          start = uebergabe.start; dauer = UEBERGABE;
+          zeichnen();
+          if (!laeuft) { laeuft = true; const mein = ++lauf; requestAnimationFrame((n) => schritt(n, mein)); }
+          return true;
+        }
         zeichnen();
         animieren(1);
+        return false;
       },
       schliessen(sofort = false) { animieren(0, sofort); },
       /** Der Inhalt ist anders hoch geworden — die Blase folgt sofort */
@@ -1794,7 +1895,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
   }
 
   /** Die gerade offene Blase je Leiste — zum Schließen, wenn eine andere aufgeht */
-  const offeneJeLeiste = new Map<HTMLElement, { huelle: HTMLElement; zu: () => void }>();
+  const offeneJeLeiste = new Map<HTMLElement, { huelle: HTMLElement; abgeben: () => void }>();
 
   /**
    * Zum Ziel eines Menüpunkts: Liegt es auf dieser Seite, gleitet sie
@@ -1835,7 +1936,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
 
       const ECKE = 40;             // Rundung am Ende — wie im Entwurf
 
-      const geometrie: Geometrie = ({ breite, h, anteil, y0, s, k, f }) => {
+      const geometrie: Geometrie = ({ breite, h, anteil, y0, s, k, f, von }) => {
         const boxBreite = Math.min(inhalt.offsetWidth || 400, breite - 32);
         const kr = knopf.getBoundingClientRect();
         const knopfX = kr.left + kr.width / 2;
@@ -1852,8 +1953,14 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
         */
         const wort = knopf.querySelector<HTMLElement>('.menuepunkt__text, .fussknopf__text');
         const textLinks = wort ? wort.getBoundingClientRect().left : knopfX;
-        const links = Math.max(16, Math.min(breite - boxBreite - 16, textLinks - 36));
-        const mitte = links + boxBreite / 2;
+        const zielLinks = Math.max(16, Math.min(breite - boxBreite - 16, textLinks - 36));
+        /* Bei der Übergabe von einer anderen Blase gleiten Lage, Breite
+           und Pfeil von dort hierher */
+        const zwischen = (a: number, b: number) => (von ? a + (b - a) * von.t : b);
+        const links = zwischen(von?.lage.links ?? 0, zielLinks);
+        const bBreite = zwischen(von?.lage.boxBreite ?? 0, boxBreite);
+        const pfeilX = zwischen(von?.lage.knopfX ?? 0, knopfX);
+        const mitte = links + bBreite / 2;
 
         /* Sie wächst in Höhe UND Breite — die Linie fließt auf, statt
            eine fertige Form hochzuschieben. Die Rundung ist nie größer
@@ -1862,12 +1969,12 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
            nur der Scheitel weitet sich mit der Höhe, die Bögen werden
            dadurch von breit-flach zu 40-px-Kreisen und die Seiten steiler.
            So gibt es in keiner Phase eine Ecke. */
-        const aussen = boxBreite / 2 + ECKE;                   // halbe Fußbreite, fest
+        const aussen = bBreite / 2 + ECKE;                     // halbe Fußbreite, fest
         /* Scheitelbreite: beginnt bei der halben Fußbreite — dann sind die
            Bögen genau so breit wie der halbe Scheitel und stoßen in der
            Mitte aneinander (reiner Hügel ohne Plateau). Breiter dürfen
            die Bögen nie sein, sonst liefe die Linie über sich zurück. */
-        const w = aussen + (boxBreite - aussen) * weich(anteil);
+        const w = aussen + (bBreite - aussen) * weich(anteil);
         const fa = Math.min(ECKE, h / 2);                       // Höhe der Bögen
         const aB = Math.min(w / 2, Math.max(fa, aussen - w / 2)); // Breite der Bögen
 
@@ -1919,38 +2026,67 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
         const sicht = Math.min(1, Math.max(0, (anteil - 0.6) / 0.4));
         const arm = 9;
         const pfeil = {
-          d: `M${f(knopfX - arm)} ${f(py + s * -arm)} L${f(knopfX)} ${f(py)} L${f(knopfX + arm)} ${f(py + s * -arm)}`,
+          d: `M${f(pfeilX - arm)} ${f(py + s * -arm)} L${f(pfeilX)} ${f(py)} L${f(pfeilX + arm)} ${f(py + s * -arm)}`,
           sicht,
         };
 
         /* Der Inhalt liegt in der voll aufgewölbten Blase */
         const hr = huelle.getBoundingClientRect();
-        inhalt.style.left = `${links - hr.left}px`;
+        inhalt.style.left = `${zielLinks - hr.left}px`;
 
-        return { woelbung, rueckwaerts, pfeil };
+        return { woelbung, rueckwaerts, pfeil, lage: { links, boxBreite: bBreite, knopfX: pfeilX } };
       };
 
       const blase = blaseAnlegen({
         leiste, linienTraeger, hoch, geometrie,
         beimZu: () => {
+          /* Bei einer Übergabe blenden die Unterpunkte noch aus — sie
+             verschwinden dann selbst (`abgeben`) */
+          if (huelle.dataset.ausblenden) return;
           delete huelle.dataset.aktiv;
           if (knopf.getAttribute('aria-expanded') !== 'true') inhalt.hidden = true;
         },
       });
+
+      /* Eine andere Blase dieser Leiste geht auf: Die Unterpunkte blenden
+         aus (120 ms, CSS), dann erst verschwinden sie. Die Form übernimmt
+         die andere Blase. */
+      let ausblendTimer = 0;
+      const abgeben = () => {
+        window.clearTimeout(schliessTimer);
+        if (offeneJeLeiste.get(linienTraeger)?.huelle === huelle) offeneJeLeiste.delete(linienTraeger);
+        knopf.setAttribute('aria-expanded', 'false');
+        delete huelle.dataset.offen;
+        delete huelle.dataset.uebergabe;
+        huelle.dataset.ausblenden = 'ja';
+        window.clearTimeout(ausblendTimer);
+        ausblendTimer = window.setTimeout(() => {
+          delete huelle.dataset.ausblenden;
+          if (knopf.getAttribute('aria-expanded') === 'true') return;
+          inhalt.hidden = true;
+          if (!blase.aktiv) delete huelle.dataset.aktiv;
+        }, 160);
+      };
 
       const setzen = (offen: boolean, sofort = false) => {
         if ((knopf.getAttribute('aria-expanded') === 'true') === offen) return;
         knopf.setAttribute('aria-expanded', String(offen));
         if (offen) {
           /* Je Leiste ist nur eine Blase offen: Alle teilen sich die Maske
-             des Leistenumschlags (`--blase-form`). Die andere schließt
-             sofort, ohne Bewegung — die neue wächst an ihrer Stelle. */
+             des Leistenumschlags (`--blase-form`). Ist schon eine offen,
+             gibt sie ab: Ihre Unterpunkte blenden aus, und die Form
+             wandert hierher (`blaseAnlegen`, Übergabe). */
           const andere = offeneJeLeiste.get(linienTraeger);
-          if (andere && andere.huelle !== huelle) andere.zu();
-          offeneJeLeiste.set(linienTraeger, { huelle, zu: () => { window.clearTimeout(schliessTimer); setzen(false, true); } });
+          if (andere && andere.huelle !== huelle) andere.abgeben();
+          offeneJeLeiste.set(linienTraeger, { huelle, abgeben });
+          window.clearTimeout(ausblendTimer);
+          delete huelle.dataset.ausblenden;
           inhalt.hidden = false;
           huelle.dataset.aktiv = 'ja';
-          blase.oeffnen(inhalt.getBoundingClientRect().height);
+          const uebergeben = blase.oeffnen(inhalt.getBoundingClientRect().height);
+          /* Kommt die Form von nebenan, laufen die Unterpunkte früher ein */
+          if (uebergeben) huelle.dataset.uebergabe = 'ja';
+          else delete huelle.dataset.uebergabe;
           requestAnimationFrame(() => { huelle.dataset.offen = 'ja'; });
         } else {
           if (offeneJeLeiste.get(linienTraeger)?.huelle === huelle) offeneJeLeiste.delete(linienTraeger);
@@ -2104,11 +2240,15 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     const LOGO_ABSTAND = 12;    // Luft zwischen Logo und Wand
     const ECKE = 40;            // Rundung am Ende — wie bei der Desktop-Blase
     const HUEGEL = 150;         // Breite der Bögen am Anfang: so flach beginnt der Hügel
+    const WAND_LUFT = 32;       // Luft zwischen Wand und Symbolspalte
 
     const geometrie: Geometrie = ({ breite, h, anteil, y0, k, f }) => {
       /* `.navigation` liegt bei left 0 — Fensterkoordinaten sind
          Zeichnungskoordinaten */
-      const xL = logo.getBoundingClientRect().right + LOGO_ABSTAND;   // die Wand am Ende
+      /* Die Wand steht 32 px links der Symbolspalte — die Blase rückt an
+         die Knöpfe heran, nicht umgekehrt (Florian, 17. Oktober 2026).
+         Nie aber näher ans Logo als 12 px. */
+      const xL = Math.max(logo.getBoundingClientRect().right + LOGO_ABSTAND, spalteBerechnen() - WAND_LUFT);
       const xF = xL - ECKE;                                             // der Fuß, fest
       const fa = Math.min(ECKE, h / 2);                                 // Höhe der Bögen
       /* Breite der Bögen: vom flachen Hügel zur Rundung, nie flacher
@@ -2256,6 +2396,19 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     const punkt = navigation.querySelector<HTMLElement>('[data-kopfpunkt]');
     let telefonOffen = false;
 
+    /* Die Symbolspalte des Menüs: Hörer samt Nummer mittig zwischen Logo
+       und Menüknopf, die Symbole der Zeilen bündig darunter (Florians
+       Entwurf, 27. September 2026). Die Wand der Blase richtet sich
+       danach (siehe `geometrie` oben). Der Hörer-Knopf ist 44 px, sein
+       Symbol 40: die Spalte beginnt 2 px innerhalb des Knopfs. */
+    function spalteBerechnen(): number {
+      const b = menueknopf.getBoundingClientRect();
+      const knopfBreite = telefonKnopf?.getBoundingClientRect().width || 44;
+      const luft = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--abstand-xs')) * 16 || 12;
+      const gruppe = knopfBreite + luft + (nummer?.scrollWidth ?? 0);
+      return (logo.getBoundingClientRect().right + b.left) / 2 - gruppe / 2 + (knopfBreite - 40) / 2;
+    }
+
     const telefonStellen = () => {
       if (!kopfleisteMobil || !telefon || !telefonKnopf) return;
       const k = kopfleisteMobil.getBoundingClientRect();
@@ -2264,16 +2417,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       const knopfBreite = telefonKnopf.getBoundingClientRect().width || 44;
       const luft = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--abstand-xs')) * 16 || 12;
       const abstand = parseFloat(getComputedStyle(kopfleisteMobil.querySelector('.kopfleiste__handyrechts') as Element).columnGap) || 16;
-      /* Die Symbolspalte des Menüs: mittig zwischen Logo und Menüknopf,
-         aber nie weiter als 40 px (`--abstand-l`) von der Wand der Blase.
-         Auf breiten Handys stand sie sonst weit in der Mitte, mit viel
-         leerer Blase links davon (Florian, 17. Oktober 2026). Bis etwa
-         400 px bleibt alles, wie es war. */
-      const wand = parseFloat(menue.style.getPropertyValue('--menue-wand')) || logo.getBoundingClientRect().right + 12;
-      const randL = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--abstand-l')) * 16 || 40;
-      const gruppe = knopfBreite + luft + (nummer?.scrollWidth ?? 0);
-      const mittig = (logo.getBoundingClientRect().right + b.left) / 2 - gruppe / 2 + (knopfBreite - 40) / 2;
-      const spalte = Math.min(mittig, wand + randL);
+      const spalte = spalteBerechnen();
       menue.style.setProperty('--menue-spalte', `${Math.round(spalte)}px`);
 
       let x: number;

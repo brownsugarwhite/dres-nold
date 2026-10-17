@@ -166,10 +166,36 @@ for (const breite of [375, 600, 800]) {
     const wand = parseFloat(menue.style.getPropertyValue('--menue-wand'));
     const symbol = document.querySelector('.mobilmenue__punkt img, .mobilmenue__punkt .symbol-leer')?.getBoundingClientRect().left ?? 0;
     const hoerer = document.querySelector('[data-kopftelefonknopf]').getBoundingClientRect().left + 2;
-    return { abstand: symbol - wand, versatz: hoerer - symbol };
+    const logo = document.querySelector('.kopfleiste__mobil .logo').getBoundingClientRect().right;
+    const kreuz = document.querySelector('[data-menueknopf]').getBoundingClientRect().left;
+    const gruppe = 44 + 12 + document.querySelector('.kopftelefon__nummer').scrollWidth;
+    const mittig = (logo + kreuz) / 2 - gruppe / 2 + 2;
+    return { abstand: symbol - wand, versatz: hoerer - symbol, mitte: symbol - mittig, logoLuft: wand - logo };
   });
-  pruefen(m.abstand <= 41, `Handy-Menü bei ${breite} px: Spalte nah an der Wand`, `${Math.round(m.abstand)} px`);
+  pruefen(Math.abs(m.mitte) <= 2, `Handy-Menü bei ${breite} px: Symbole mittig zwischen Logo und Kreuz`, `${m.mitte.toFixed(1)} px`);
+  pruefen(m.abstand <= 33 && m.logoLuft >= 11.5, `Handy-Menü bei ${breite} px: Wand nah an den Symbolen`, `${Math.round(m.abstand)} px`);
   pruefen(Math.abs(m.versatz) <= 2, `Handy-Menü bei ${breite} px: Hörer bündig mit den Symbolen`, `${m.versatz.toFixed(1)} px`);
+  await seite.context().close();
+}
+
+/* ---------- Safari-Leiste ausgefahren: Zipfel bleibt auf der Leiste ----------
+   Auf dem iPhone ist `100vh` die Höhe bei EINGEklappter Leiste; fährt sie
+   beim Hochscrollen aus, ist das Fenster kürzer. Nachgestellt, indem die
+   Bühne 80 px höher als das Fenster wird. Die Spitze muss trotzdem auf
+   der Linie der Symbolleiste stehen. */
+{
+  const seite = await seiteOeffnen(browser, 'handy');
+  await seite.goto(`${adresse}/`, { waitUntil: 'networkidle' });
+  await seite.waitForTimeout(500);
+  await seite.addStyleTag({ content: '.ozbereich__buehne { height: calc(100vh + 80px) !important; }' });
+  await seite.locator('.fussknopf[data-punkt="zeiten"]:visible').first().click();
+  await seite.waitForTimeout(2600);
+  const dy = await seite.evaluate(() => {
+    const svg = document.querySelector('[data-ozzipfel]').getBoundingClientRect();
+    const z = document.querySelector('[data-ozkontur]').getAttribute('d').match(/-?\d+(\.\d+)?/g).map(Number);
+    return svg.top + z[5] - document.querySelector('.fussleiste-huelle').getBoundingClientRect().top;
+  });
+  pruefen(Math.abs(dy) <= 1.5, 'Ausgefahrene Safari-Leiste: Zipfel bleibt auf der Symbolleiste', `dy ${dy.toFixed(1)}`);
   await seite.context().close();
 }
 
@@ -195,6 +221,8 @@ for (const breite of [360, 414, 600, 768, 991, 992, 1024, 1280, 1920]) {
   await seite.goto(`${adresse}/`, { waitUntil: 'networkidle' });
   await seite.waitForTimeout(500);
   await seite.locator('.fussknopf[data-punkt="zeiten"]:visible').first().click();
+  // Weg vom Knopf — sonst misst man das beim Zeigen vergrößerte Symbol
+  await seite.mouse.move(1, 1);
   await seite.waitForTimeout(2600);
   const m = await seite.evaluate(() => {
     const svg = document.querySelector('[data-ozzipfel]').getBoundingClientRect();
@@ -202,15 +230,29 @@ for (const breite of [360, 414, 600, 768, 991, 992, 1024, 1280, 1920]) {
     const k = [...document.querySelectorAll('.fussknopf[data-punkt="zeiten"]')].map((x) => x.getBoundingClientRect()).find((r) => r.width);
     const leiste = document.querySelector('.fussleiste-huelle').getBoundingClientRect();
     const sichtbar = [...document.querySelector('[data-fussinhalt]').children].filter((x) => getComputedStyle(x).display !== 'none');
-    const r = sichtbar.map((x) => x.getBoundingClientRect());
+    /* Gemessen wird der Inhalt (Symbol und Beschriftung), nicht die Zelle —
+       auf Handys sind die Zellen gleich breit und stoßen aneinander */
+    const r = sichtbar.map((x) => {
+      const teile = [...x.querySelectorAll('.fussknopf__symbol, .fussknopf__text')].map((t) => t.getBoundingClientRect());
+      if (!teile.length) return x.getBoundingClientRect();
+      return { left: Math.min(...teile.map((t) => t.left)), right: Math.max(...teile.map((t) => t.right)) };
+    });
     let luft = 1e9; for (let i = 1; i < r.length; i++) luft = Math.min(luft, r[i].left - r[i - 1].right);
+    const symbole = sichtbar.filter((x) => x.dataset.fusspunkt).map((x) => x.querySelector('.fussknopf__symbol').getBoundingClientRect());
+    const randLinks = symbole[0].left;
+    const randRechts = document.documentElement.clientWidth - symbole.at(-1).right;
     return {
       dx: svg.left + z[4] - (k.left + k.width / 2), dy: svg.top + z[5] - leiste.top, gespiegelt: z[2] > z[4],
       letzter: sichtbar.at(-1)?.dataset.fusspunkt, luft, ueber: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      randUnterschied: randLinks - randRechts,
+      anzahl: symbole.length,
     };
   });
+  if (breite < 992) pruefen(Math.abs(m.randUnterschied) <= 1, `Leiste bei ${breite} px: äußere Symbole gleich weit vom Rand`, `${m.randUnterschied.toFixed(1)} px`);
   pruefen(Math.abs(m.dx) <= 1 && Math.abs(m.dy) <= 1.5 && !m.gespiegelt, `Zipfel bei ${breite} px auf dem Knopf, nach rechts`, `dx ${m.dx.toFixed(1)}, dy ${m.dy.toFixed(1)}`);
-  pruefen(m.letzter === 'zeiten' && m.luft >= 20 && m.ueber <= 0, `Leiste bei ${breite} px: Sprechstunden rechts, nicht gequetscht`, `Luft ${Math.round(m.luft)} px`);
+  /* Die drei Punkte, die immer bleiben, müssen auch aufs schmalste Handy —
+     dort genügt weniger Luft */
+  pruefen(m.letzter === 'zeiten' && m.luft >= (m.anzahl <= 3 ? 8 : 20) && m.ueber <= 0, `Leiste bei ${breite} px: Sprechstunden rechts, nicht gequetscht`, `Luft ${Math.round(m.luft)} px`);
   await seite.context().close();
 }
 

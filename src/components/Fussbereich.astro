@@ -16,10 +16,13 @@ import seite from '../content/seite.json';
 
 const { praxis } = seite;
 const jahr = new Date().getFullYear();
+/* „Dres. Nold – Zahnarztpraxis und Kieferorthopädie": vorn der Name,
+   der Rest steht auf Handys nicht (Florian, 17. Oktober 2026) */
+const [kurzname, ...zusatz] = praxis.name.split('–').map((t) => t.trim());
 ---
 <footer class="fuss">
   <div class="fuss__inhalt">
-    <p class="fuss__marke">© {jahr} {praxis.name.replace('–', '·')} · {praxis.ort}</p>
+    <p class="fuss__marke">© {jahr} {kurzname}<span class="fuss__zusatz">{zusatz.map((t) => ` · ${t}`).join('')} · {praxis.ort}</span></p>
 
     <nav class="fuss__links" aria-label="Rechtliches">
       <a href="/datenschutz/">Datenschutz</a>
@@ -96,9 +99,12 @@ const jahr = new Date().getFullYear();
     text-underline-offset: 0.22em;
   }
 
+  /* Handys: nur „© 2026 Dres. Nold", alles linksbündig (Florian,
+     17. Oktober 2026; vorher mittig) */
   @media (max-width: 560px) {
-    .fuss__inhalt { justify-content: center; text-align: center; }
-    .fuss__links { justify-content: center; width: 100%; row-gap: var(--abstand-2xs); }
+    .fuss__inhalt { justify-content: flex-start; text-align: left; }
+    .fuss__links { justify-content: flex-start; width: 100%; row-gap: var(--abstand-2xs); }
+    .fuss__zusatz { display: none; }
   }
 </style>
 

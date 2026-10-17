@@ -358,11 +358,22 @@ html::view-transition-new(.bild):only-child {
   -webkit-backdrop-filter: blur(20px);
 }
 
-/* Ohne Gegenstück (etwa die weggefahrene Symbolleiste) würde das alte
-   Abbild sonst noch bis zum Ende stehen — es soll einfach da sein oder
-   nicht, ohne Bewegung. */
+/* Das stehende alte Abbild der Leisten wird nicht gezeigt: Die neuen
+   Leisten beginnen im Zustand der alten und fahren dann sichtbar — im
+   lebenden neuen Abbild — in ihren richtigen Zustand (Navigation.astro,
+   „Beim Seitenwechsel"). Läge das alte darunter, sähe man beide
+   übereinander, bis es am Ende schlagartig verschwindet (Florian,
+   17. Oktober 2026). */
+::view-transition-old(nav-oben),
+::view-transition-old(nav-unten) {
+  display: none;
+}
+
+/* Ohne Gegenstück (etwa die weggefahrene Symbolleiste) steht das alte
+   Abbild einfach da, ohne Bewegung */
 ::view-transition-old(nav-oben):only-child,
 ::view-transition-old(nav-unten):only-child {
+  display: block;
   animation: none;
 }
 

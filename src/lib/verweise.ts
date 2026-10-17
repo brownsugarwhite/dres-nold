@@ -32,5 +32,15 @@ export function verweiseAufbereiten(html: string): string {
   });
 }
 
-/** Redaktionstext fertig für die Seite: Silbentrennung und Verweise */
-export const redaktionsHtml = (html: string) => verweiseAufbereiten(trennenHtml(html));
+/**
+ * Jede Tabelle in eine eigene Hülle (`.tabelle`): Ist sie breiter als
+ * der Platz (auf Handys), rollt nur sie seitlich — nicht der ganze
+ * Abschnitt (Florian, 17. Oktober 2026). Die Redaktion liefert Tabellen
+ * ohne Attribute (lib/richtext-pruefen.ts), daher genügt das Muster.
+ */
+export function tabellenEinhuellen(html: string): string {
+  return html.replace(/<table>[\s\S]*?<\/table>/g, (t) => `<div class="tabelle">${t}</div>`);
+}
+
+/** Redaktionstext fertig für die Seite: Silbentrennung, Verweise, Tabellen */
+export const redaktionsHtml = (html: string) => tabellenEinhuellen(verweiseAufbereiten(trennenHtml(html)));

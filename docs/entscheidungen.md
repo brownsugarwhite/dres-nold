@@ -2920,3 +2920,67 @@ Symbolen ist entfallen.
   hatte. Jetzt gehört er der zuletzt geöffneten Blase, und nur sie räumt
   ihn ab. Geht eine Blase auf, verschwindet jede andere derselben Leiste
   sofort, auch eine, die gerade zuklappt.
+
+## Zweiter Durchgang am selben Tag (17. Oktober 2026, spät)
+
+- **Handy-Menü:** Die Knöpfe stehen wieder mittig zwischen Logo und
+  Menüknopf. Die **Wand der Blase** rückt an sie heran:
+  `max(Logo + 12 px, Spalte − 32 px)` (`spalteBerechnen` und `geometrie`
+  in Navigation.astro). Nachmittags war es umgekehrt umgesetzt, die
+  Knöpfe wanderten zur Wand — falsch verstanden.
+- **Aufklappblase wandert:** Geht beim Überfahren eine andere Blase
+  derselben Leiste auf, wandert die offene Form dorthin, statt zu- und
+  neu aufzugehen.
+  - **Form:** Lage, Breite, Pfeil und Höhe gleiten in 450 ms
+    (`KURVEN.betont`) vom alten zum neuen Wert (`uebergabe` in
+    `blaseAnlegen`, `lage` aus der Geometrie).
+  - **Unterpunkte:** Die alten blenden in 120 ms aus (`abgeben`), die
+    neuen laufen mit kürzerem Vorlauf ein (`data-uebergabe`, 60 statt
+    160 ms).
+  - **Auch beim langsamen Wechsel:** Die gerade zuklappende Blase übergibt
+    ihre halb geschlossene Form.
+  - **Hover der Unterpunkte:** `--farbe-flaeche-gedeckt` statt Weiß.
+- **Leisten im Seitenwechsel:**
+  - **Ausgangszustand:** Das neue Dokument beginnt mit `data-gescrollt`
+    wie das alte.
+  - **Nach dem Tausch:** Die Leisten werden einmal gemessen und fahren
+    dann mit ihrem gewöhnlichen 300-ms-Wechsel in den richtigen Zustand,
+    im lebenden Abbild.
+  - **Altes Abbild:** Das stehende alte Abbild der Leisten ist
+    ausgeblendet (`uebergaenge.css`). Vorher lagen beide übereinander, das
+    alte verschwand am Ende schlagartig.
+  - **Symbolleiste je Seite:** Sie wird jetzt auf jeder Seite eingepasst.
+    Sie entsteht mit jeder Seite neu, das Einpassen hing bisher an der
+    ersten.
+- **Hover der Kopfleiste ruhiger:** Die Text-Rolle läuft 750 ms statt
+  420 ms auf dem neuen Token `--verlauf-ruhig`
+  (`cubic-bezier(0.45, 0, 0.2, 1)`). Der kleine Haken braucht 320 ms.
+- **Kontakt auf Tablets (Art `oben`):**
+  - **Marke:** rechts oben neben Telefon, Anschrift und Knöpfen.
+  - **Formular:** über die ganze Breite.
+  - **Schleier:** läuft hier nach rechts aus statt nach unten.
+  - **Entscheidung über die Art:** Sie rechnet mit der gewöhnlichen
+    Formularbreite (480 px), sonst kippte sie beim zweiten Messen.
+- **Inhaltsseiten:**
+  - **Titelbild:** im Format 2 : 1 (Seiten und Beiträge).
+  - **Breite:** Darunter steht alles so breit wie das Bild. Die
+    46-rem-Lesebreiten gelten nur noch auf der Startseite.
+  - **Tabellen:** Sie bekommen beim Bauen eine eigene Hülle
+    (`tabellenEinhuellen` in `lib/verweise.ts`). Nur die Tabelle rollt
+    seitlich, nicht der ganze Abschnitt.
+- **Fußbereich auf Handys:** nur „© 2026 Dres. Nold", alles linksbündig.
+- **Kartenvermerk:** mit `--abstand-s` Abstand zur Ecke, rundum gerundet.
+- **Sprechstunden-Bühne klebt unten**, wie `.oz-container` der alten
+  Seite. **Überholt** damit den Teil der Notiz vom 27. September, der die
+  Bühne oben verankert ließ (`100vh` bleibt).
+  - **Der Fehler:** Auf dem iPhone fuhr beim Hochscrollen Safaris Leiste
+    aus, das Fenster wurde kürzer. Die feste Symbolleiste rückte mit,
+    die oben klebende Bühne nicht, und der Zipfel stach in die Leiste.
+  - **Die Lösung:** `.ozbereich` stellt die Bühne ans Ende
+    (`justify-content: flex-end`), sie klebt mit `bottom: 0`.
+  - **Test:** `tests/verhalten.mjs` stellt die ausgefahrene Leiste nach
+    (Bühne 80 px höher als das Fenster). Die Spitze bleibt auf der Linie.
+- **Untere Leiste:** Bis 991 px sind die Zellen gleich breit
+  (`flex: 1 1 0`). Die äußeren Symbole stehen damit gleich weit vom
+  Rand, gemessen auf ±1 px. `leisteEinpassen` misst dafür die
+  natürliche Breite von Symbol und Beschriftung.

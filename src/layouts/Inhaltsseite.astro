@@ -202,12 +202,21 @@ const anhaenge = dateien.filter((d) => d.datei);
     height: auto;
   }
 
-  /* Auf einer breiten Seite stünde das Titelbild sonst fast fensterhoch —
-     es bekommt das Format der Ankündigungskarte (16 : 9), aus der es
-     morpht */
-  .beitrag--breit .beitrag__bild {
-    aspect-ratio: 16 / 9;
+  /* Das Titelbild steht flach im Format 2 : 1 — auf Seiten wie in
+     Beiträgen (Florian, 17. Oktober 2026; vorher 16 : 9 bzw. das Format
+     des Fotos). Der Morph aus der 16 : 9-Karte passt die Form an. */
+  .beitrag__bild {
+    aspect-ratio: 2 / 1;
     object-fit: cover;
+  }
+
+  /* Darunter steht alles genau so breit wie das Titelbild: Die
+     Lesebreiten der Abschnitte (46 rem) gelten auf der Startseite,
+     hier nicht (Florian, 17. Oktober 2026) */
+  .beitrag__rest :global(.block[data-bild='ohne'] .block__text),
+  .beitrag__rest :global(.kapitel__text),
+  .beitrag__rest :global(.kachelblock__einleitung) {
+    max-width: none;
   }
 
   /* Vom Redaktionssystem geliefertes HTML */

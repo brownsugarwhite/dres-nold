@@ -202,6 +202,10 @@
      ein Aufreißen wirkte. */
   --dauer-uebergang: 640ms;
   --verlauf-betont: cubic-bezier(0.22, 0.61, 0.24, 1);
+  /* Ruhig an- und auslaufend — für Bewegungen, die man beim Zeigen
+     sieht, etwa die Text-Rolle im Menü (Florian, 17. Oktober 2026:
+     „etwas langsamer und gediegener") */
+  --verlauf-ruhig: cubic-bezier(0.45, 0, 0.2, 1);
   /* Weich an beiden Enden: setzt ohne Ruck an und läuft lange aus.
      Für Klappen, die sich öffnen und schließen (Stellenliste; Florian,
      27. September 2026: „langsamer und smoother"). */

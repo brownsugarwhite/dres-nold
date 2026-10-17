@@ -318,15 +318,17 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
     100% { opacity: 0; transform: scale(4.5); }
   }
 
+  /* Mit etwas Abstand zur Ecke, nicht hineingepresst (Florian,
+     17. Oktober 2026) */
   .kontakt__herkunft {
     position: absolute;
-    right: 0;
-    bottom: 0;
+    right: var(--abstand-s);
+    bottom: var(--abstand-s);
     z-index: 1;
     max-width: none;
     margin: 0;
     padding: 3px 10px;
-    border-radius: var(--radius-s) 0 0 0;
+    border-radius: var(--radius-s);
     background: rgb(255 255 255 / 80%);
     color: var(--farbe-text-gedeckt);
     font-size: 11px;
@@ -527,7 +529,21 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
   /* … und die Formularkarte nimmt dann die ganze Breite: Sie steht
      unter der Marke, nicht neben ihr — das feste Maß von 480 px ließe
      rechts nur einen leeren Streifen (Florian, 26. September 2026). */
-  .kontakt[data-marke='unten'] .kontakt__formular { max-width: none; }
+  .kontakt[data-marke='unten'] .kontakt__formular,
+  .kontakt[data-marke='oben'] .kontakt__formular { max-width: none; }
+
+  /* Steht die Marke rechts oben neben dem Kontakt, muss dort Karte zu
+     sehen sein: Der Schleier liegt dann links hinter dem Text und läuft
+     nach rechts aus, statt oben alles weiß zu decken */
+  .kontakt[data-marke='oben'] .kontakt__schleier {
+    background: linear-gradient(
+      to right,
+      #ffffff 0,
+      rgb(255 255 255 / 94%) 36%,
+      rgb(255 255 255 / 60%) 54%,
+      rgb(255 255 255 / 0) 76%
+    );
+  }
 
   @media (max-width: 560px) {
     .kontakt__knoepfe .kn { flex: 1; justify-content: center; white-space: nowrap; }
@@ -602,6 +618,7 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
 
     /** Breite und Höhe der Marke (CSS) — sie darf nirgends anstoßen. */
     const MARKE = { breit: 52, hoch: 72 };
+    const FORMULAR_BREITE = 480;   // `max-width` der Formularkarte (CSS)
 
     /** Luft, die links und rechts der Marke frei bleiben soll. */
     const LUFT = 56;
@@ -670,8 +687,19 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
 
       /* Stehen die beiden Spalten nebeneinander? */
       const nebeneinander = f.left > t.right + 24;
-      /* Bleibt neben dem Formular genug frei für die Marke? */
-      const platzRechts = b.right - f.right;
+      /* Bleibt neben dem Formular genug frei für die Marke? Gerechnet mit
+         seiner gewöhnlichen Breite (480 px) — in den Arten „oben" und
+         „unten" läuft es über die ganze Breite, und beim zweiten Messen
+         (`messen()`) kippte sonst die Entscheidung */
+      const platzRechts = b.right - (f.left + Math.min(f.width, FORMULAR_BREITE));
+      /* Der Block von der Telefonnummer bis zur Notiz unter den Knöpfen —
+         ohne Überschrift und Einleitung, die breiter laufen */
+      const teile = [...text.querySelectorAll<HTMLElement>('.kontakt__telefon, .kontakt__anschrift, .kontakt__zusatz, .kontakt__knoepfe, .kontakt__notiz')];
+      const kontaktblock = teile.length ? {
+        rechts: Math.max(...teile.map(inhaltRechts)),
+        oben: teile[0].getBoundingClientRect().top,
+        unten: (knoepfe ?? teile[teile.length - 1]).getBoundingClientRect().bottom,
+      } : null;
 
       let x: number;
       let y: number;
@@ -690,10 +718,14 @@ const routenZiel = 'https://www.google.com/maps/dir/?api=1&destination=' + encod
         const kn = (knoepfe ?? text).getBoundingClientRect();
         x = (kn.left + kn.right) / 2 - b.left;
         y = t.bottom - b.top + MARKE.hoch + 24;
-      } else if (platzRechts > MARKE.breit + 64) {
-        art = 'seite';
-        x = (f.right + b.right) / 2 - b.left;
-        y = f.top + f.height * 0.4 - b.top;
+      } else if (platzRechts > MARKE.breit + 64 && kontaktblock && b.right - kontaktblock.rechts >= MARKE.breit + 2 * LUFT) {
+        /* Tablets: die Marke rechts oben neben Telefon, Anschrift und
+           Knöpfen, das Formular darunter über die ganze Breite (Florian,
+           17. Oktober 2026; vorher stand das Formular schmal links und
+           die Marke rechts daneben, weit unten). */
+        art = 'oben';
+        x = (kontaktblock.rechts + b.right) / 2 - b.left;
+        y = (kontaktblock.oben + kontaktblock.unten) / 2 + MARKE.hoch / 2 - b.top;
       } else {
         art = 'unten';
         x = b.width * 0.72;

@@ -212,14 +212,28 @@ const texte = startseite.sprechstunden;
     z-index: 30;
     width: 100%;
     height: var(--oz-ende);
+    /* Die Bühne steht am ENDE des Bereichs und klebt unten — siehe dort */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
   }
 
   /* Bleibt stehen, während der Bereich durchläuft.
-     Oben klebend statt unten — bottom-sticky greift nur, wenn kein
-     Vorfahre den Überlauf beschneidet, und ist damit brüchiger. */
+
+     UNTEN klebend, wie `.oz-container` der alten Seite (am Ende von
+     `.oz`, `bottom: 0`). Bis zum 17. Oktober 2026 klebte sie oben: Fuhr
+     auf dem iPhone beim Hochscrollen Safaris Leiste wieder aus, wurde
+     das Fenster kürzer — die feste Symbolleiste rückte mit dem unteren
+     Rand nach oben, die Bühne nicht, und der Zipfel stach in die Leiste
+     (Florian). Unten klebend schiebt der Browser Bühne und Leiste im
+     selben Schritt. Kein Vorfahre beschneidet den Überlauf (`html` und
+     `body` nur mit `clip`, das keinen Scroll-Container macht) — sonst
+     griffe `bottom` nicht. Ohne `top`: Bei einem Widerspruch gewänne
+     es, und der Fehler wäre zurück. */
   .ozbereich__buehne {
     position: sticky;
-    top: 0;
+    bottom: 0;
+    flex: none;
     /* `100vh`, nicht `100dvh` — wie `.oz-container` der alten Seite.
        `dvh` wächst mit der Bedienleiste des Browsers, die auf dem Handy
        beim Scrollen einklappt, und schob Blase und Zipfel dabei ein
@@ -531,7 +545,7 @@ const texte = startseite.sprechstunden;
     .ozschliessen,
     .ozkreuzbahn { display: none; }
     .ozraum { display: none; }
-    .ozbereich { position: static; height: auto; padding-bottom: var(--abstand-abschnitt); }
+    .ozbereich { position: static; display: block; height: auto; padding-bottom: var(--abstand-abschnitt); }
     .ozbereich__buehne { position: static; height: auto; }
     .ozblase { position: static; transform: none; margin-inline: auto; }
     .ozzipfel { display: none; }
@@ -545,7 +559,7 @@ const texte = startseite.sprechstunden;
     .ozschliessen,
     .ozkreuzbahn { display: none; }
     .ozraum { display: none; }
-    .ozbereich { position: static; height: auto; padding-bottom: var(--abstand-abschnitt); }
+    .ozbereich { position: static; display: block; height: auto; padding-bottom: var(--abstand-abschnitt); }
     .ozbereich__buehne { position: static; height: auto; }
     .ozblase { position: static; transform: none; margin-inline: auto; }
     .ozzipfel { display: none; }
