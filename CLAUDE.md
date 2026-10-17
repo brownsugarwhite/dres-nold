@@ -357,7 +357,7 @@ Wenn Sie diese Seite mit einem KI-Assistenten erweitern wollen, geben Sie ihm di
 
 1. **Beschreiben Sie das Ziel, nicht die Technik.** „Ich möchte, dass Patienten ein Formular für die Anmeldung herunterladen können" ist besser als „Bau einen Download-Button".
 2. **Immer einen neuen Zweig anlegen**, nie direkt auf `main` arbeiten. So bleibt die laufende Seite unberührt, bis die Änderung geprüft ist.
-3. **Vorschau prüfen, bevor veröffentlicht wird.** Cloudflare Pages erzeugt für jeden Zweig automatisch eine Testadresse.
+3. **Vorschau prüfen, bevor veröffentlicht wird.** Der Workflow spielt nur `main` auf (`dres-nold.pages.dev`); einen anderen Zweig lokal ansehen (`npm run build && npm run preview`, Redaktion: `npm run redaktion -- --kopie`).
 4. **Die vier Grundregeln nennen:** keine externen Ressourcen nachladen, Farben und Schriften nur über Tokens, Barrierefreiheit einhalten, Inhalte gehören nach `src/content/`.
 5. **Bei Unsicherheit nichts überschreiben.** Jede Änderung ist über den Verlauf im Repo wiederherstellbar — aber es ist einfacher, vorher zu fragen.
 

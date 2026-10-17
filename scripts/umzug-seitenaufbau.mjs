@@ -13,10 +13,9 @@
   Außerdem werden in leistungen.json die Knopfzeilen zur Knopfliste und
   die Kategorie-Symbole fallen weg.
 
-  Das Skript ist wiederholbar: Ein zweiter Lauf ändert nichts. Gedacht
-  ist es für genau einen Moment — kurz vor dem Zusammenführen mit `main`
-  läuft es noch einmal auf dem dann aktuellen Stand der Redaktion
-  (docs/betrieb.md, „Die Umstellung auf den Seitenplan nach `main` bringen"). Danach kann es weg.
+  Das Skript ist wiederholbar: Ein zweiter Lauf ändert nichts. Es ist am
+  17. Oktober 2026 gelaufen; die Inhalte unter src/content sind umgezogen.
+  Es bleibt nur zum Nachvollziehen und kann weg.
 
   Die Inhaltsänderungen (Abschnitt „Inhalte" unten) sind die Wünsche der
   Praxis vom Oktober 2026; mit --ohne-inhalte lässt sich prüfen, dass der

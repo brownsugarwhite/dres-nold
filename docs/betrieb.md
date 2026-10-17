@@ -79,7 +79,7 @@ Jede Änderung ist ein Commit im GitHub-Repo. Auf github.com unter
 |---|---|---|
 | Redaktion meldet „Inzwischen hat jemand anderes dasselbe geändert" (409) | Seit dem Laden wurde **dieselbe** Inhaltsdatei geändert — von einer anderen Person oder direkt im Repo. Uploads und andere Dateien lösen das nicht aus | eigene Texte kopieren, Seite neu laden, Änderung erneut vornehmen |
 | Redaktion meldet „Die Anmeldung ist abgelaufen" | Access-Sitzung abgelaufen | in einem neuen Tab `/login` öffnen, anmelden, in der Redaktion noch einmal „Veröffentlichen" — die Eingaben stehen noch da |
-| Redaktion meldet „Redaktion wurde erneuert – bitte neu laden" (410) | ein alter Tab von vor der Umstellung (Oktober 2026) | Seite neu laden |
+| Redaktion meldet „Redaktion wurde erneuert – bitte neu laden" (410) | ein Tab mit der Redaktion von vor Oktober 2026 | Seite neu laden |
 | „Online ✓" kommt nicht, obwohl der Workflow grün ist | `/stand.json` wird zwischengespeichert | `public/_headers` muss für `/stand.json` `no-store` setzen |
 | Nach dem Anmelden wirft der erste Klick zurück auf den Anmeldebildschirm | Ein Verweis auf `/cdn-cgi/access/logout` wird vorgeholt und meldet dabei ab | Alle Verweise der Redaktion brauchen `data-astro-prefetch="false"` (siehe `src/layouts/Redaktion.astro`) |
 | Speichern schlägt mit „GitHub: … (401)" fehl | `GITHUB_TOKEN` abgelaufen | Token erneuern (oben) |
@@ -93,33 +93,6 @@ Jede Änderung ist ein Commit im GitHub-Repo. Auf github.com unter
   (Dependabot) vorschlägt — Pull Request öffnen, prüfen, mergen.
 - **Jährlich:** GitHub-Token erneuern (siehe oben); Resend-Konto und
   Domain-Rechnung im Blick behalten.
-
-## Die Umstellung auf den Seitenplan nach `main` bringen (einmalig)
-
-Die Arbeit vom Oktober 2026 (Zweig `claude/keen-galileo-qn7mvi`) ersetzt
-`navigation.json`, `neuigkeiten.json` und `abschnitte.json` durch
-`seitenaufbau.json` und `bereiche.json`. Bis sie zusammengeführt ist,
-pflegt die Praxis mit der alten Redaktion auf `main` weiter. Deshalb:
-
-1. Die Praxis pausiert die Pflege für etwa eine halbe Stunde.
-2. Auf dem Zweig die beiden neuen Dateien entfernen und den aktuellen
-   Inhalt von `main` holen — **nur die JSON-Dateien**, sonst kämen auch
-   `schema.ts` und `laden.ts` in der alten Fassung mit:
-   ```bash
-   git fetch origin main
-   rm src/content/seitenaufbau.json src/content/bereiche.json
-   git checkout origin/main -- 'src/content/*.json' public/bilder public/dokumente
-   ```
-3. `node scripts/umzug-seitenaufbau.mjs` — baut die beiden Dateien neu
-   aus dem Stand von `main` und setzt die Inhaltsänderungen der Kundin
-   (Dentosophie, Schnarchen, Kieferorthopädie-Text …). Ein zweiter Lauf
-   ändert nichts mehr. (Am 17. Oktober 2026 probeweise durchgespielt:
-   ergibt Byte für Byte den Stand des Zweigs.)
-4. `npm run build && npm run pruefen && npm test`, dazu
-   `node tests/verhalten.mjs` und `node tests/redaktion.mjs`.
-5. Commit „Umzug der Inhalte", dann zusammenführen.
-6. Nach dem Aufspielen einmal live in der Redaktion etwas speichern —
-   damit sind Anmeldung, GitHub-Token und „Online ✓" geprüft.
 
 ## Lokal arbeiten (für Technik-Helfer)
 
