@@ -31,3 +31,4 @@ docs/referenz/original/
 # Kleine Bildvarianten der Beitragskarten — entstehen vor jedem Build
 # (scripts/bilder-varianten.mjs)
 public/bilder/**/*-600.*
+tests/aufnahmen/
