@@ -219,25 +219,25 @@
       "foto_alt": ""
     },
     {
-      "id": "heidi",
-      "aktiv": true,
-      "position": 17,
-      "gruppe": "team",
-      "name": "Rebecca",
-      "funktion": "Zahnmedizinische Fachangestellte",
-      "taetigkeiten": [],
-      "foto": "/bilder/team/rebecca.jpg",
-      "foto_alt": ""
-    },
-    {
       "id": "rosa",
       "aktiv": true,
-      "position": 18,
+      "position": 17,
       "gruppe": "team",
       "name": "Rosa",
       "funktion": "Zahnmedizinische Fachangestellte",
       "taetigkeiten": [],
       "foto": "/bilder/team/rosa.jpg",
+      "foto_alt": ""
+    },
+    {
+      "id": "rebecca",
+      "aktiv": true,
+      "position": 18,
+      "gruppe": "team",
+      "name": "Rebecca",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "taetigkeiten": [],
+      "foto": "/bilder/team/rebecca.jpg",
       "foto_alt": ""
     }
   ]
