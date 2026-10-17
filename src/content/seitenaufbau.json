@@ -48,12 +48,12 @@
       "id": "dentosophie",
       "art": "bereich",
       "aktiv": true,
-      "ziel": "",
       "menue": {
         "titel": "Dentosophie",
-        "symbol": "/icons/navigation/dentosophie.svg",
+        "symbol": "/icons/eigene/dentosophie.svg",
         "unterpunkte": []
-      }
+      },
+      "ziel": ""
     },
     {
       "id": "neuigkeiten",
