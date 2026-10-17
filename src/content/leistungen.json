@@ -7,8 +7,7 @@
       "position": 1,
       "aktiv": true,
       "kurz": "Vorsorge, Zahnerhalt und Zahnersatz",
-      "beschreibung": "<p>Von der Vorsorge über den Zahnerhalt bis zum Zahnersatz — wir behandeln so schonend wie möglich und erhalten Ihre eigenen Zähne so lange wie es geht.</p>",
-      "icon": "/icons/kategorien/zahnaerztlich.svg"
+      "beschreibung": "<p>Von der Vorsorge über den Zahnerhalt bis zum Zahnersatz — wir behandeln so schonend wie möglich und erhalten Ihre eigenen Zähne so lange wie es geht.</p>"
     },
     {
       "id": "kieferorthopaedie",
@@ -16,8 +15,7 @@
       "position": 2,
       "aktiv": true,
       "kurz": "Zahnspangen für Kinder und Erwachsene",
-      "beschreibung": "<p>An unsere Zahnarztpraxis ist eine Fachpraxis für Kieferorthopädie angeschlossen — für Kinder, Jugendliche und Erwachsene, von der klassischen Spange bis zu nahezu unsichtbaren Alignern.</p>",
-      "icon": "/icons/kategorien/kieferorthopaedie.svg"
+      "beschreibung": "<p>An unsere Zahnarztpraxis ist eine Fachpraxis für Kieferorthopädie angeschlossen — für Kinder, Jugendliche und Erwachsene, von der klassischen Spange bis zu nahezu unsichtbaren Alignern.</p>"
     },
     {
       "id": "sonstige",
@@ -25,17 +23,15 @@
       "position": 3,
       "aktiv": true,
       "kurz": "Digitale Diagnostik und Ästhetik",
-      "beschreibung": "<p>Moderne Technik, die Diagnose und Behandlung genauer und angenehmer macht — vom dreidimensionalen Röntgen bis zur Abformung ohne Abformlöffel.</p>",
-      "icon": "/icons/kategorien/sonstige.svg"
+      "beschreibung": "<p>Moderne Technik, die Diagnose und Behandlung genauer und angenehmer macht — vom dreidimensionalen Röntgen bis zur Abformung ohne Abformlöffel.</p>"
     },
     {
       "id": "test",
       "titel": "Test",
       "position": 4,
-      "aktiv": true,
+      "aktiv": false,
       "kurz": "test test",
-      "beschreibung": "bla bla",
-      "icon": ""
+      "beschreibung": "bla bla"
     }
   ],
   "eintraege": [
@@ -47,7 +43,9 @@
       "titel": "Prophylaxe & Professionelle Zahnreinigung",
       "kurz": "Unserem Anspruch des maximalen Zahnerhaltes entsprechend ist unser wichtigstes Behandlungsziel Ihre eigenen Zähne zu erhalten.",
       "icon": "/icons/prophylaxe.svg",
-      "inhalt": "<p>Unserem Anspruch des maximalen Zahnerhaltes entsprechend ist unser wichtigstes Behandlungsziel Ihre eigenen Zähne zu erhalten.</p><p>Schon von klein an tragen Prophylaxe und regelmäßige Vorsorge entscheidend zur langfristigen Zahngesundheit bei.</p><p>Durch den regelmäßigen Prophylaxebesuch werden die ersten Ansätze von Parodontitis und Karies frühzeitig erkannt. Die notwendigen Therapien können rechtzeitig eingeleitet werden. Gleichermaßen hängt der Langzeiterfolg zahnärztlicher Behandlungsmaßnahmen von einer regelmäßigen professionellen Zahnreinigung ab.</p><p>Dazu gehören:</p><ul><li>Zahnsteinentfernung</li><li>Bei Bedarf Reinigung der Zähne mit einem Pulverstrahlgerät</li><li>Reinigung der Zahnzwischenräume</li><li>Instruktionen zur richtigen Mundhygiene</li><li>Politur der Zähne</li><li>Fluoridierung der Zähne</li></ul>"
+      "inhalt": "<p>Unserem Anspruch des maximalen Zahnerhaltes entsprechend ist unser wichtigstes Behandlungsziel Ihre eigenen Zähne zu erhalten.</p><p>Schon von klein an tragen Prophylaxe und regelmäßige Vorsorge entscheidend zur langfristigen Zahngesundheit bei.</p><p>Durch den regelmäßigen Prophylaxebesuch werden die ersten Ansätze von Parodontitis und Karies frühzeitig erkannt. Die notwendigen Therapien können rechtzeitig eingeleitet werden. Gleichermaßen hängt der Langzeiterfolg zahnärztlicher Behandlungsmaßnahmen von einer regelmäßigen professionellen Zahnreinigung ab.</p><p>Dazu gehören:</p><ul><li>Zahnsteinentfernung</li><li>Bei Bedarf Reinigung der Zähne mit einem Pulverstrahlgerät</li><li>Reinigung der Zahnzwischenräume</li><li>Instruktionen zur richtigen Mundhygiene</li><li>Politur der Zähne</li><li>Fluoridierung der Zähne</li></ul>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "zahnerhaltung",
@@ -57,7 +55,9 @@
       "titel": "Zahnerhaltung - Füllung & Inlays",
       "kurz": "Wurde an einem Zahn Karies diagnostiziert, muss die erkrankte Zahnsubstanz entfernt werden, damit sich der Defekt nicht weiter ausbreitet und zu …",
       "icon": "/icons/zahnerhaltung.svg",
-      "inhalt": "<p>Wurde an einem Zahn Karies diagnostiziert, muss die erkrankte Zahnsubstanz entfernt werden, damit sich der Defekt nicht weiter ausbreitet und zu einer Entzündung des Zahnnervs führt.</p><p>Nach Entfernung aller Karies befallenen Substanz wird der gereinigte Zahn mit einer Füllung dicht verschlossen.</p><p>Dafür verwenden wir in unserer Praxis hochwertiges zahnfarbenes Füllungs-material.</p>"
+      "inhalt": "<p>Wurde an einem Zahn Karies diagnostiziert, muss die erkrankte Zahnsubstanz entfernt werden, damit sich der Defekt nicht weiter ausbreitet und zu einer Entzündung des Zahnnervs führt.</p><p>Nach Entfernung aller Karies befallenen Substanz wird der gereinigte Zahn mit einer Füllung dicht verschlossen.</p><p>Dafür verwenden wir in unserer Praxis hochwertiges zahnfarbenes Füllungs-material.</p>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "wurzelkanalbehandlung",
@@ -67,7 +67,9 @@
       "titel": "Endodontologie - Wurzelkanalbehandlung",
       "kurz": "Ein Schwerpunkt in unserer Praxis stellt die Wurzelkanalbehandlung (Endodontie) als letzte Maßnahme vor einem möglichen Zahnverlust dar.",
       "icon": "/icons/wurzelkanalbehandlung.svg",
-      "inhalt": "<p>Ein Schwerpunkt in unserer Praxis stellt die Wurzelkanalbehandlung (Endodontie) als letzte Maßnahme vor einem möglichen Zahnverlust dar.</p><p>Im Inneren der Wurzeln befindet sich ein Hohlraum, der sogenannte Wurzelkanal. In diesem befindet sich das Zahnmark (Pulpa). Erkrankt der Zahn an einer tiefen Karies, können Bakterien in die Pulpa eindringen und führen zu einer Entzündung im Zahninnern, die sich bis in den umliegenden Knochen ausbreiten kann.</p><p>Bei einer Wurzelbehandlung wird das entzündliche Zahnmark entfernt. Der Hohlraum in der Wurzel wird gereinigt, desinfiziert, erweitert und mit einem bakteriendichten Material verschlossen.</p><p>Wurzelbehandlungen werden in örtlicher Betäubung durchgeführt und sind daher in der Regel nicht schmerzhaft.</p>"
+      "inhalt": "<p>Ein Schwerpunkt in unserer Praxis stellt die Wurzelkanalbehandlung (Endodontie) als letzte Maßnahme vor einem möglichen Zahnverlust dar.</p><p>Im Inneren der Wurzeln befindet sich ein Hohlraum, der sogenannte Wurzelkanal. In diesem befindet sich das Zahnmark (Pulpa). Erkrankt der Zahn an einer tiefen Karies, können Bakterien in die Pulpa eindringen und führen zu einer Entzündung im Zahninnern, die sich bis in den umliegenden Knochen ausbreiten kann.</p><p>Bei einer Wurzelbehandlung wird das entzündliche Zahnmark entfernt. Der Hohlraum in der Wurzel wird gereinigt, desinfiziert, erweitert und mit einem bakteriendichten Material verschlossen.</p><p>Wurzelbehandlungen werden in örtlicher Betäubung durchgeführt und sind daher in der Regel nicht schmerzhaft.</p>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "parodontitis",
@@ -77,7 +79,9 @@
       "titel": "Parodontitis - Zahnfleischbehandlung",
       "kurz": "Die Parodontitis ist eine entzündliche Erkrankung des Zahnhalteapparates, die durch Bakterien verursacht wird.",
       "icon": "/icons/parodontitis.svg",
-      "inhalt": "<p>Die Parodontitis ist eine entzündliche Erkrankung des Zahnhalteapparates, die durch Bakterien verursacht wird.</p><p>Zahnfleischerkrankungen können sich durch Zahnfleischbluten, schlechten Atem und Zahnfleischrückgang äußern. Eine Parodontitis kann aber lange Zeit auch symptomlos verlaufen.</p><p>Bakterien führen zunächst zu einer Entzündung des Zahnfleisches.</p><p>Wird die Infektion nicht behandelt, kommt es im Laufe der Zeit zur Bildung von Zahnfleischtaschen und letztlich zum Abbau des Kieferknochens. Dadurch kann es zum Verlust von Zähnen kommen.</p><p>Die Parodontitistherapie dient dem Erhalt der Knochenstruktur. Wesentliches Merkmal dabei ist die Herstellung entzündungsfreier Verhältnisse, die durch professionelle Zahnreinigungen und anschließend gezielte Behandlung tieferer Zahnfleischtaschen erfolgt.</p><p>Ein strukturiertes Programm mit regelmäßigen Nachuntersuchungen sichert das Ergebnis der Therapie.</p>"
+      "inhalt": "<p>Die Parodontitis ist eine entzündliche Erkrankung des Zahnhalteapparates, die durch Bakterien verursacht wird.</p><p>Zahnfleischerkrankungen können sich durch Zahnfleischbluten, schlechten Atem und Zahnfleischrückgang äußern. Eine Parodontitis kann aber lange Zeit auch symptomlos verlaufen.</p><p>Bakterien führen zunächst zu einer Entzündung des Zahnfleisches.</p><p>Wird die Infektion nicht behandelt, kommt es im Laufe der Zeit zur Bildung von Zahnfleischtaschen und letztlich zum Abbau des Kieferknochens. Dadurch kann es zum Verlust von Zähnen kommen.</p><p>Die Parodontitistherapie dient dem Erhalt der Knochenstruktur. Wesentliches Merkmal dabei ist die Herstellung entzündungsfreier Verhältnisse, die durch professionelle Zahnreinigungen und anschließend gezielte Behandlung tieferer Zahnfleischtaschen erfolgt.</p><p>Ein strukturiertes Programm mit regelmäßigen Nachuntersuchungen sichert das Ergebnis der Therapie.</p>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "zahnersatz",
@@ -87,7 +91,9 @@
       "titel": "Zahnersatz - Kronen, Brücken & Prothesen",
       "kurz": "Ist ein Zahn durch Karies so geschwächt, dass er nicht mehr mit einer Füllung zu rekonstruieren ist, muss er mit einer künstlichen Zahnkrone versorgt werden.",
       "icon": "/icons/zahnersatz.svg",
-      "inhalt": "<p>Ist ein Zahn durch Karies so geschwächt, dass er nicht mehr mit einer Füllung zu rekonstruieren ist, muss er mit einer künstlichen Zahnkrone versorgt werden. Die Kronen werden bei uns aus zahnfarbener Keramik hergestellt.</p><p>Beim Verlust von Zähnen dienen Brücken zum Ersatz fehlender Zähne. Die Zahnlücke wird durch das Brückenglied geschlossen und ist auf den jeweiligen Nachbarzähnen fest verankert.</p><p>Wenn nicht mehr genügend Zähne zur Versorgung mit einem festsitzenden Zahnersatz vorhanden sind, stehen herausnehmbare Prothesen oder kombiniert herausnehmbar/festsitzender Zahnersatz zur Verfügung, der zusätzlich mit Implantaten erweitert werden kann.</p>"
+      "inhalt": "<p>Ist ein Zahn durch Karies so geschwächt, dass er nicht mehr mit einer Füllung zu rekonstruieren ist, muss er mit einer künstlichen Zahnkrone versorgt werden. Die Kronen werden bei uns aus zahnfarbener Keramik hergestellt.</p><p>Beim Verlust von Zähnen dienen Brücken zum Ersatz fehlender Zähne. Die Zahnlücke wird durch das Brückenglied geschlossen und ist auf den jeweiligen Nachbarzähnen fest verankert.</p><p>Wenn nicht mehr genügend Zähne zur Versorgung mit einem festsitzenden Zahnersatz vorhanden sind, stehen herausnehmbare Prothesen oder kombiniert herausnehmbar/festsitzender Zahnersatz zur Verfügung, der zusätzlich mit Implantaten erweitert werden kann.</p>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "implantate",
@@ -97,7 +103,9 @@
       "titel": "Implantate",
       "kurz": "Ein Zahnimplantat ist eine künstliche Zahnwurzel aus Titan oder Keramik.",
       "icon": "/icons/implantate.svg",
-      "inhalt": "<p>Ein Zahnimplantat ist eine künstliche Zahnwurzel aus Titan oder Keramik.</p><p>Es entspricht bezüglich seiner Stabilität einer natürlichen Zahnwurzel und bildet das Fundament für festsitzenden Zahnersatz wie Kronen oder Brücken.</p><p>Die Einsatzmöglichkeiten reichen vom Ersatz einzelner Zähne mit einem Implantat, auf dem eine Krone befestigt wird, über das Schließen von größeren Zahnlücken, bis hin zur Versorgung des zahnlosen Kiefers mit implantatgetragener Brücke.</p><p>Auch herausnehmbarer Zahnersatz kann durch Implantate mehr Stabilität erhalten.</p><p>Durch Implantate wird der Kieferknochen erhalten und gestützt. Nachbarzähne werden als Brückenpfeiler nicht benötigt und dadurch geschont.</p><p>Der Behandlungsablauf beim Setzen eines Implantates ist für den Patienten nahezu schmerzfrei und erfolgt unter örtlicher Betäubung.</p>"
+      "inhalt": "<p>Ein Zahnimplantat ist eine künstliche Zahnwurzel aus Titan oder Keramik.</p><p>Es entspricht bezüglich seiner Stabilität einer natürlichen Zahnwurzel und bildet das Fundament für festsitzenden Zahnersatz wie Kronen oder Brücken.</p><p>Die Einsatzmöglichkeiten reichen vom Ersatz einzelner Zähne mit einem Implantat, auf dem eine Krone befestigt wird, über das Schließen von größeren Zahnlücken, bis hin zur Versorgung des zahnlosen Kiefers mit implantatgetragener Brücke.</p><p>Auch herausnehmbarer Zahnersatz kann durch Implantate mehr Stabilität erhalten.</p><p>Durch Implantate wird der Kieferknochen erhalten und gestützt. Nachbarzähne werden als Brückenpfeiler nicht benötigt und dadurch geschont.</p><p>Der Behandlungsablauf beim Setzen eines Implantates ist für den Patienten nahezu schmerzfrei und erfolgt unter örtlicher Betäubung.</p>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "3d-roentgen",
@@ -107,7 +115,9 @@
       "titel": "Dentale-Volumen-Tomographie",
       "kurz": "Die Dentale Volumentomographie (kurz DVT) ist ein modernes 3D Röntgen-Verfahren, das eine dreidimensionale Darstellung der Zahn- und …",
       "icon": "/icons/3d-roentgen.svg",
-      "inhalt": "<p>Die Dentale Volumentomographie (kurz DVT) ist ein modernes 3D Röntgen-Verfahren, das eine dreidimensionale Darstellung der Zahn- und Knochenstrukturen im Bereich des Gesichtsschädels ermöglicht. Insbesondere bei der Planung von Implantaten wird das frühzeitige Erkennen von gefährdeten Strukturen, wie die Begrenzung der Kieferhöhle, den Verlauf von Nervenstrukturen und die optimale Planung der Implantatposition ermöglicht.</p><p>Unsere Praxis verfügt über ein neues hochmodernes Gerät, mit dem wir diese Aufnahmen durchführen können.</p><p>Im Vergleich zur Computertomographie (CT) ist die Strahlendosis bei einem DVT gleicher Bildqualität deutlich geringer.</p>"
+      "inhalt": "<p>Die Dentale Volumentomographie (kurz DVT) ist ein modernes 3D Röntgen-Verfahren, das eine dreidimensionale Darstellung der Zahn- und Knochenstrukturen im Bereich des Gesichtsschädels ermöglicht. Insbesondere bei der Planung von Implantaten wird das frühzeitige Erkennen von gefährdeten Strukturen, wie die Begrenzung der Kieferhöhle, den Verlauf von Nervenstrukturen und die optimale Planung der Implantatposition ermöglicht.</p><p>Unsere Praxis verfügt über ein neues hochmodernes Gerät, mit dem wir diese Aufnahmen durchführen können.</p><p>Im Vergleich zur Computertomographie (CT) ist die Strahlendosis bei einem DVT gleicher Bildqualität deutlich geringer.</p>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "bleaching",
@@ -117,7 +127,9 @@
       "titel": "Bleaching - Zahnaufhellung",
       "kurz": "Nahrungs- und Genussmittel, insbesondere Kaffee, Tee, Rotwein oder Tabak, hinterlassen Farbpartikel an den Zahnoberflächen, die im Laufe der Zeit in …",
       "icon": "/icons/bleaching.svg",
-      "inhalt": "<p>Nahrungs- und Genussmittel, insbesondere Kaffee, Tee, Rotwein oder Tabak, hinterlassen Farbpartikel an den Zahnoberflächen, die im Laufe der Zeit in die Zahnsubstanz eindringen.</p><p>Bleaching bedeutet Bleichen und beschreibt das Prinzip, die dunklen Farbpigmente in der Zahnhartsubstanz mit wasserstoffperoxidhaltigen Substanzen aufzuhellen.</p><p> Für das Home-Bleaching wird zunächst eine passgenaue Schiene aus Kunststoff angefertigt. Den eigentlichen Bleichvorgang führen Sie nach genauer Anweisung &nbsp;selbstständig zu Hause durch: Die Zahnschiene wird mit dem Bleichmittel befüllt und je nach Präparat für mehrere Stunden getragen. Die Anwendungsdauer beträgt entsprechend dem individuell angestrebtem Helligkeitsgrad 2 bis 3 Wochen. Dabei kann mit Hilfe der für Sie angefertigten Schiene dieser Vorgang jederzeit wiederholt werden.</p><p>Beim sogenannten In-office-Bleaching wir der Bleichvorgang vollständig in der Zahnarztpraxis durchgeführt. Zu Beginn der Behandlung wird das Zahnfleisch abgedeckt. Anschließend wird das Bleichmittel äußerlich auf die Zähne aufgetragen und wirkt für eine gewisse Zeit ein. Je nach Ausgangssituation und gewünschtem Ergebnis sind eventuell mehrere Durchgänge oder Behandlungssitzungen erforderlich.</p><p>Um ein ideales Bleichergebnis zu erzielen, sollte vorher eine Professionelle Zahnreinigung durchgeführt werden.</p><p>Die in unserer Praxis durchgeführten Bleichmethoden sind für die Zähne unschädlich.</p><p>Weitere Informationen unter <a href=\"https://www.dgaez.de/\">www.dgaez.de</a></p>"
+      "inhalt": "<p>Nahrungs- und Genussmittel, insbesondere Kaffee, Tee, Rotwein oder Tabak, hinterlassen Farbpartikel an den Zahnoberflächen, die im Laufe der Zeit in die Zahnsubstanz eindringen.</p><p>Bleaching bedeutet Bleichen und beschreibt das Prinzip, die dunklen Farbpigmente in der Zahnhartsubstanz mit wasserstoffperoxidhaltigen Substanzen aufzuhellen.</p><p> Für das Home-Bleaching wird zunächst eine passgenaue Schiene aus Kunststoff angefertigt. Den eigentlichen Bleichvorgang führen Sie nach genauer Anweisung &nbsp;selbstständig zu Hause durch: Die Zahnschiene wird mit dem Bleichmittel befüllt und je nach Präparat für mehrere Stunden getragen. Die Anwendungsdauer beträgt entsprechend dem individuell angestrebtem Helligkeitsgrad 2 bis 3 Wochen. Dabei kann mit Hilfe der für Sie angefertigten Schiene dieser Vorgang jederzeit wiederholt werden.</p><p>Beim sogenannten In-office-Bleaching wir der Bleichvorgang vollständig in der Zahnarztpraxis durchgeführt. Zu Beginn der Behandlung wird das Zahnfleisch abgedeckt. Anschließend wird das Bleichmittel äußerlich auf die Zähne aufgetragen und wirkt für eine gewisse Zeit ein. Je nach Ausgangssituation und gewünschtem Ergebnis sind eventuell mehrere Durchgänge oder Behandlungssitzungen erforderlich.</p><p>Um ein ideales Bleichergebnis zu erzielen, sollte vorher eine Professionelle Zahnreinigung durchgeführt werden.</p><p>Die in unserer Praxis durchgeführten Bleichmethoden sind für die Zähne unschädlich.</p><p>Weitere Informationen unter <a href=\"https://www.dgaez.de/\">www.dgaez.de</a></p>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "intraoralscanner",
@@ -127,7 +139,9 @@
       "titel": "Intraoralscanner - Präzise digitale Abformung",
       "kurz": "Abformungen mit dem Abformlöffel gehören für viele Patienten zu den unangenehmen Erfahrungen beim Zahnarzt.",
       "icon": "/icons/intraoralscanner.svg",
-      "inhalt": "<p>Abformungen mit dem Abformlöffel gehören für viele Patienten zu den unangenehmen Erfahrungen beim Zahnarzt. Dank moderner Scantechnologie gibt es mittlerweile eine Alternative: die digitale Abformung.</p><p>Die digitale Abformung wird mit Hilfe eines Intraoralscanners durchgeführt, der auf dem Stand der neuesten Technik schnell und präzise in einem fließenden Aufnahmeprozess arbeitet.<br>Dabei werden berührungslos die Oberflächen im Mund des Patienten erfasst und auf dem Monitor als dreidimensionales Modell dargestellt.<br>Auch in der Kieferorthopädie kommen Intraoralscans zur Herstellung von (digitalen) Modellen und bei der Behandlung mit Zahnschienen, sog. Alignern, zur Anwendung.<br>Darüberhinaus profitieren Zahnarzt und Labor von zahlreichen Vorteilen der neuen Technologie, die einen digitalen Workflow ermöglicht.</p><p>Wir sehen in der digitalen Abformung daher eine sinnvolle Ergänzung zur konventionellen Methode und bieten alle Möglichkeiten und Schnittstellen zur Einbindung digitaler Abformungen in unsere Arbeitsprozesse.</p><p>Der Einsatz eines Intraoralscanners erfolgt nach Beurteilung der individuellen Patientensituation. Sprechen Sie uns gerne darauf an.</p>"
+      "inhalt": "<p>Abformungen mit dem Abformlöffel gehören für viele Patienten zu den unangenehmen Erfahrungen beim Zahnarzt. Dank moderner Scantechnologie gibt es mittlerweile eine Alternative: die digitale Abformung.</p><p>Die digitale Abformung wird mit Hilfe eines Intraoralscanners durchgeführt, der auf dem Stand der neuesten Technik schnell und präzise in einem fließenden Aufnahmeprozess arbeitet.<br>Dabei werden berührungslos die Oberflächen im Mund des Patienten erfasst und auf dem Monitor als dreidimensionales Modell dargestellt.<br>Auch in der Kieferorthopädie kommen Intraoralscans zur Herstellung von (digitalen) Modellen und bei der Behandlung mit Zahnschienen, sog. Alignern, zur Anwendung.<br>Darüberhinaus profitieren Zahnarzt und Labor von zahlreichen Vorteilen der neuen Technologie, die einen digitalen Workflow ermöglicht.</p><p>Wir sehen in der digitalen Abformung daher eine sinnvolle Ergänzung zur konventionellen Methode und bieten alle Möglichkeiten und Schnittstellen zur Einbindung digitaler Abformungen in unsere Arbeitsprozesse.</p><p>Der Einsatz eines Intraoralscanners erfolgt nach Beurteilung der individuellen Patientensituation. Sprechen Sie uns gerne darauf an.</p>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "kieferorthopaedie-kinder",
@@ -137,7 +151,9 @@
       "titel": "Kieferorthopädie für Kinder & Jugendliche",
       "kurz": "Wir empfehlen, früh mit regelmäßigen Kontrollen zu beginnen, um mögliche Probleme rechtzeitig zu erkennen.",
       "icon": "/icons/kieferorthopaedie-kinder.svg",
-      "inhalt": "<h3>Erste Kontrolle im Kindergartenalter</h3><p>Wir empfehlen, früh mit regelmäßigen Kontrollen zu beginnen, um mögliche Probleme rechtzeitig zu erkennen.</p><h3>Herausnehmbare Spangen für die Wachstumsphase</h3><p>Individuelle Spangen steuern sanft die Kieferentwicklung und fördern das natürliche Wachstum in diesen wichtigen Jahren.</p><h3>Vorbeugung künftiger Probleme</h3><p>Korrektur von Bissproblemen wie Über- oder Unterbiss verbessert die Kaueffizienz und beugt langfristig Kieferbelastungen vor.</p><p>‍</p><p>Einige unserer Leistungen im Überblick:</p><ul><li>Platzhalter bei frühzeitigem Milchzahnverlust</li><li>Mundvorhofplatten bei logopädischen Problemen</li><li>Lutschplatten</li><li>Herausnehmbare Apparaturen wie aktive Platten</li><li>Ganzheitliche myofunktionelle Bionatoren</li><li>Kopfkinnkappen bei starkem Unterkieferwachstum</li><li>Festsitzende Apparaturen, auf Wunsch auch mit optisch unauffälligen Keramikbrackets und weißen Bögen</li><li>Nahezu unsichtbare Alinger-Schienen<br></li></ul>"
+      "inhalt": "<h3>Erste Kontrolle im Kindergartenalter</h3><p>Wir empfehlen, früh mit regelmäßigen Kontrollen zu beginnen, um mögliche Probleme rechtzeitig zu erkennen.</p><h3>Herausnehmbare Spangen für die Wachstumsphase</h3><p>Individuelle Spangen steuern sanft die Kieferentwicklung und fördern das natürliche Wachstum in diesen wichtigen Jahren.</p><h3>Vorbeugung künftiger Probleme</h3><p>Korrektur von Bissproblemen wie Über- oder Unterbiss verbessert die Kaueffizienz und beugt langfristig Kieferbelastungen vor.</p><p>Einige unserer Leistungen im Überblick:</p><ul><li>Platzhalter bei frühzeitigem Milchzahnverlust</li><li>Mundvorhofplatten bei logopädischen Problemen</li><li>Lutschplatten</li><li>Herausnehmbare Apparaturen wie aktive Platten</li><li>Ganzheitliche myofunktionelle Bionatoren</li><li>Kopfkinnkappen bei starkem Unterkieferwachstum</li><li>Festsitzende Apparaturen, auf Wunsch auch mit optisch unauffälligen Keramikbrackets und weißen Bögen</li><li>Nahezu unsichtbare Aligner-Schienen</li></ul>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "kieferorthopaedie-erwachsene",
@@ -147,7 +163,9 @@
       "titel": "Kieferorthopädie für Erwachsene",
       "kurz": "Eine optisch unauffällige Lösung für gerade Zähne stellt die Behandlung mit dünnen Schienen, sogenannten Alignern, dar.",
       "icon": "/icons/kieferorthopaedie-erwachsene.svg",
-      "inhalt": "<p>Eine optisch unauffällige Lösung für gerade Zähne stellt die Behandlung mit dünnen Schienen, sogenannten Alignern, dar. Nach einem dreidimensionalen, digitalen Abdruck der Zähne (Scan) können durch eine computersimulierte Darstellung der Zähne in ihrer Anfangs- und Endposition Arzt und Patient schon vorab dreidimensional die therapeutisch gewünschte Zahnstellung betrachten und besprechen. </p><p>Die Aligner werden individuell angefertigt und dem Patienten im Verlauf der Behandlung in mehreren Schritten ausgehändigt. Der Patient muss diese Tag und Nacht 22 Stunden tragen und lediglich beim Essen und Trinken und zur Reinigung herausnehmen. Somit werden die Zähne nach und nach in die therapeutisch angestrebte Wunschposition gerückt.</p><p>Ob bei Ihnen eine Behandlung mit Alignern möglich ist, wie das Behandlungsergebnis aussehen könnte und wie lange eine mögliche Behandlung dauern würde, besprechen wir gerne ausführlich mit Ihnen in unserer Praxis.</p><p>Unser Ziel ist es, durch die entsprechende Wahl der Apparatur bei jedem Patienten individuell den bestmöglichen Behandlungserfolg mit Hilfe modernster Technik zu ermöglichen.</p><p>‍</p><p>Einige unserer Leistungen im Überblick:</p><ul><li>Nahezu unsichtbare Twin-Aligner (Schienen der Firma Orthocaps) oder herausnehmbare Apparaturen bei leichten Fehlstellungen</li><li>Festsitzende Apparaturen über einen Teilbereich der Zähne bei präprothetischen Korrekturen für eine geplante prothetische Versorgung</li><li>Bei ausgeprägter Fehlstellung auch eine kieferorthopädisch-kieferchirurgische Kombinations-therapie mit festsitzenden Apparaturen und chirurgischem Eingriff in Zusammenarbeit mit erfahrenen Kieferchirurgen</li><li>Schnarcherschienen bei nächtlichem Schnarchen</li><li>Festsitzende Apparaturen, auf Wunsch auch mit optisch unauffälligen Keramikbrackets<br>‍</li></ul><p>Ausführliche Beratung und Eingehen auf den individuellen Patientenwunsch sind für uns selbstverständlich.<br></p>"
+      "inhalt": "<p>Eine optisch unauffällige Lösung für gerade Zähne stellt die Behandlung mit dünnen Schienen, sogenannten Alignern, dar. Nach einem dreidimensionalen, digitalen Abdruck der Zähne (Scan) können durch eine computersimulierte Darstellung der Zähne in ihrer Anfangs- und Endposition Arzt und Patient schon vorab dreidimensional die therapeutisch gewünschte Zahnstellung betrachten und besprechen. </p><p>Die Aligner werden individuell angefertigt und dem Patienten im Verlauf der Behandlung in mehreren Schritten ausgehändigt. Der Patient muss diese Tag und Nacht 22 Stunden tragen und lediglich beim Essen und Trinken und zur Reinigung herausnehmen. Somit werden die Zähne nach und nach in die therapeutisch angestrebte Wunschposition gerückt.</p><p>Ob bei Ihnen eine Behandlung mit Alignern möglich ist, wie das Behandlungsergebnis aussehen könnte und wie lange eine mögliche Behandlung dauern würde, besprechen wir gerne ausführlich mit Ihnen in unserer Praxis.</p><p>Unser Ziel ist es, durch die entsprechende Wahl der Apparatur bei jedem Patienten individuell den bestmöglichen Behandlungserfolg mit Hilfe modernster Technik zu ermöglichen.</p><p>Einige unserer Leistungen im Überblick:</p><ul><li>Nahezu unsichtbare Twin-Aligner (Schienen der Firma Orthocaps) oder herausnehmbare Apparaturen bei leichten Fehlstellungen</li><li>Festsitzende Apparaturen über einen Teilbereich der Zähne bei präprothetischen Korrekturen für eine geplante prothetische Versorgung</li><li>Bei ausgeprägter Fehlstellung auch eine kieferorthopädisch-kieferchirurgische Kombinationstherapie mit festsitzenden Apparaturen und chirurgischem Eingriff in Zusammenarbeit mit erfahrenen Kieferchirurgen</li><li>Schnarcherschienen bei nächtlichem Schnarchen</li><li>Festsitzende Apparaturen, auf Wunsch auch mit optisch unauffälligen Keramikbrackets</li></ul><p>Ausführliche Beratung und Eingehen auf den individuellen Patientenwunsch sind für uns selbstverständlich.</p>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "beispielleistung",
@@ -157,17 +175,21 @@
       "titel": "Beispielleistung",
       "kurz": "Platzhalter — zeigt, wie eine weitere Leistung im Raster und als eigene Seite aussieht. Vor dem Start ersetzen oder auf „aktiv: false“ setzen.",
       "icon": "/icons/intraoralscanner.svg",
-      "inhalt": "<p>Dieser Eintrag ist ein Platzhalter. Er steht hier, damit sich prüfen lässt, wie sich eine zusätzliche Leistung im Kachelraster und auf einer eigenen Seite verhält.</p><p>Vor der Veröffentlichung entweder durch eine echte Leistung ersetzen oder über <em>aktiv</em> ausblenden.</p>"
+      "inhalt": "<p>Dieser Eintrag ist ein Platzhalter. Er steht hier, damit sich prüfen lässt, wie sich eine zusätzliche Leistung im Kachelraster und auf einer eigenen Seite verhält.</p><p>Vor der Veröffentlichung entweder durch eine echte Leistung ersetzen oder über <em>aktiv</em> ausblenden.</p>",
+      "knoepfe_text": "",
+      "knoepfe": []
     },
     {
       "id": "schnarchen-schlafapnoe",
       "aktiv": true,
       "position": 13,
-      "kategorie": "test",
+      "kategorie": "zahnaerztlich",
       "titel": "Schnarchen & Schlafapnoe",
       "kurz": "Lautes Schnarchen und nächtliche Atempausen stören nicht nur den Schlaf – eine maßgefertigte Zahnschiene hält die Atemwege nachts frei.",
       "icon": "/icons/eigene/schnarchen-icon.svg",
-      "inhalt": "<p>Lautes, unregelmäßiges Schnarchen und besonders nächtliche Atempausen (Apnoen) können nicht nur den Schlafpartner stören, sondern auch erhebliche gesundheitliche Folgen haben (siehe „Mundatmung und ihre Folgen“).</p><p>Im Schlaf erschlafft die Muskulatur im Rachen. Unterkiefer und Zunge sinken nach hinten und verengen die Atemwege. Der Schlaf ist dann nicht mehr erholsam. Tagesmüdigkeit, Konzentrationsstörungen und Bluthochdruck können die Folge sein.</p><p>Zur Behandlung setzen wir in unserer Praxis individuell angefertigte Zahnschienen ein, sogenannte Unterkieferprotrusionsschienen. Nachts getragen, halten sie den Unterkiefer sanft ein Stück nach vorn. So bleiben die Atemwege offen und die Luft strömt ungehindert.</p><p>Der Ablauf im Überblick:</p><ul><li>Abklärung im Schlaflabor</li><li>Untersuchung und Abformung in unserer Praxis</li><li>Anpassung und regelmäßige Kontrolle der Schiene</li></ul><p>Wir arbeiten dabei konsequent interdisziplinär mit Schlaflaboren, Lungenfachärzten, Kardiologen und Fachärzten für Hals-Nasen-Ohren-Heilkunde zusammen.</p>"
+      "inhalt": "<p>Lautes, unregelmäßiges Schnarchen und besonders nächtliche Atempausen (Apnoen) können nicht nur den Schlafpartner stören, sondern auch erhebliche gesundheitliche Folgen haben (siehe <a href=\"/dentosophie/#mundatmung\">„Mundatmung und ihre Folgen“</a>).</p><p>Im Schlaf erschlafft die Muskulatur im Rachen. Unterkiefer und Zunge sinken nach hinten und verengen die Atemwege. Der Schlaf ist dann nicht mehr erholsam. Tagesmüdigkeit, Konzentrationsstörungen und Bluthochdruck können die Folge sein.</p><p>Zur Behandlung setzen wir in unserer Praxis individuell angefertigte Zahnschienen ein, sogenannte Unterkieferprotrusionsschienen. Nachts getragen, halten sie den Unterkiefer sanft ein Stück nach vorn. So bleiben die Atemwege offen und die Luft strömt ungehindert.</p><p>Der Ablauf im Überblick:</p><ul><li>Abklärung im Schlaflabor</li><li>Untersuchung und Abformung in unserer Praxis</li><li>Anpassung und regelmäßige Kontrolle der Schiene</li></ul><p>Wir arbeiten dabei konsequent interdisziplinär mit Schlaflaboren, Lungenfachärzten, Kardiologen und Fachärzten für Hals-Nasen-Ohren-Heilkunde zusammen.</p>",
+      "knoepfe_text": "",
+      "knoepfe": []
     }
   ]
 }

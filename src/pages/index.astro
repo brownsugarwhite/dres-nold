@@ -1,47 +1,44 @@
 ---
-import { trennenHtml, trennenTitel } from '../lib/silben';
 /**
  * Startseite — One-Pager.
  *
- * Reihenfolge:
+ * Reihenfolge (Florian, Oktober 2026):
  *
- *   Einstieg (Begrüßung + Bilderband + Sprechstunden, fährt gemeinsam
- *   über das Logo herein)  →  freie Abschnitte  →  Leistungen  →
- *   Neuigkeiten  →  Team  →  Stellen  →  Kontakt  →  Fuß
+ *   Logo  →  Sprechstunden-Karte  →  die Blöcke aus dem Seitenplan  →  Fuß
  *
- * Begrüßung und Bilderband stehen seit dem 17. September 2026 IN der
- * Sprechstunden-Karte (Oeffnungszeiten.astro). Vorher waren sie eigene
- * Abschnitte im Fluss — und weil die Karte über das fest stehende Logo
- * fahren muss, stand sie zwangsläufig davor. Jetzt fährt alles
- * gemeinsam herein und die Reihenfolge stimmt.
+ * Logo und Karte stehen fest oben: Die Karte fährt über das fest
+ * stehende Logo herein (docs/entscheidungen.md, „Der Einstieg ist eine
+ * Karte"). Alles dazwischen — Begrüßung, Bilderband, Leistungen, eigene
+ * Bereiche, Team, Kontakt … — steht in der Reihenfolge von
+ * content/seitenaufbau.json, die die Praxis in der Redaktion verschiebt.
+ * Das Menü folgt derselben Reihenfolge (lib/aufbau.ts, `menueBauen`).
+ *
+ * Alle Blöcke stehen in `main` und tragen ihren Abstand unten — so passt
+ * jeder an jede Stelle, ohne dass ein Nachbar etwas über ihn wissen muss.
  */
 import Startbereich from '../components/Startbereich.astro';
 import Willkommen from '../components/Willkommen.astro';
 import Galerie from '../components/Galerie.astro';
 import Oeffnungszeiten from '../components/Oeffnungszeiten.astro';
-import Abschnitte from '../components/Abschnitte.astro';
+import Leistungen from '../components/Leistungen.astro';
+import Bereich from '../components/Bereich.astro';
 import Stellen from '../components/Stellen.astro';
-import Neuigkeiten from '../components/Neuigkeiten.astro';
 import Team from '../components/Team.astro';
 import Kontakt from '../components/Kontakt.astro';
 import Fussbereich from '../components/Fussbereich.astro';
 import Navigation from '../components/Navigation.astro';
 import Basis from '../layouts/Basis.astro';
 import Hinweis from '../components/Hinweis.astro';
-import LeistungKachel from '../components/LeistungKachel.astro';
-import leistungen from '../content/leistungen.json';
-import startseite from '../content/startseite.json';
+import { bloecke } from '../content/inhalte';
 
-const aktiv = leistungen.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
+/* Was auf der Startseite steht: reine Menüpunkte und Seiten ohne
+   Ankündigung halten nur ihren Platz im Menü */
+const sichtbar = bloecke.filter((b) => b.aufStartseite);
 
-/* Die Gruppen kommen aus den Kategorien der Inhaltsdatei, nicht aus
-   fest verdrahteten Namen — legt die Praxis dort eine an, erscheint
-   sie hier von selbst. Leere Kategorien bleiben aus. */
-const gruppen = (leistungen.kategorien ?? [])
-  .filter((k) => k.aktiv)
-  .sort((a, b) => a.position - b.position)
-  .map((k) => ({ ...k, eintraege: aktiv.filter((e) => e.kategorie === k.id) }))
-  .filter((k) => k.eintraege.length > 0);
+/* Ein unsichtbares h1, wenn die Begrüßung nicht vorn steht: Ihr
+   „Willkommen in unserer Praxis" ist sonst das h1 der Seite (WCAG:
+   Überschriften ohne Sprung). */
+const willkommenVorn = sichtbar[0]?.block.art === 'willkommen';
 ---
 
 <Basis>
@@ -58,7 +55,7 @@ const gruppen = (leistungen.kategorien ?? [])
     Seitenfluss und beginnt damit am Dokumentanfang. Nur so fährt die
     Karte über das fest stehende Logo hinweg herein. Der Logobereich
     selbst liegt fest im Fenster und nimmt keinen Platz im Fluss ein;
-    im Fluss folgt nach den 350vh des Einstiegs nur noch der Inhalt.
+    im Fluss folgt nach dem Einstieg nur noch der Inhalt.
   */}
   <Oeffnungszeiten />
 
@@ -67,70 +64,73 @@ const gruppen = (leistungen.kategorien ?? [])
   <Navigation />
 
   <main id="inhalt" class="seiteninhalt">
-    {/* Begrüßung und Bilderband folgen der Sprechstunden-Karte — auf
-        allen Größen (Florian, 27. September 2026; Oeffnungszeiten.astro) */}
-    <Willkommen />
-    <div class="ozband">
-      <Galerie />
-    </div>
+    {!willkommenVorn && <h1 class="nur-vorleser">Zahnarztpraxis und Kieferorthopädie Dres. Nold</h1>}
 
-    <Abschnitte />
-
-    <section id="leistungen" class="leistungen bereich bereich--ohne-oben">
-      <div class="bereich__inhalt">
-        <div class="kicker" data-rein>Behandlung</div>
-        <h2 class="bereich__titel" data-rein>{trennenTitel(startseite.leistungen.titel)}</h2>
-        {startseite.leistungen.text && (
-          <p class="bereich__einleitung" data-rein>{startseite.leistungen.text}</p>
-        )}
-
-        {gruppen.map((g) => (
-          <div class="gruppe">
-            <h3 class="gruppenzeile" id={`leistungen-${g.id}`} data-rein>
-              {g.icon && <img class="gruppenzeile__symbol" src={g.icon} alt="" width="34" height="34" />}
-              <span class="gruppenzeile__text">{g.titel}</span>
-              <span class="gruppenzeile__linie" aria-hidden="true"></span>
-            </h3>
-
-            {g.beschreibung && (
-              <div class="gruppe__text redaktionstext" data-rein set:html={trennenHtml(g.beschreibung)} />
-            )}
-
-            <div class="kacheln">
-              {g.eintraege.map((l) => <LeistungKachel {...l} />)}
-            </div>
-          </div>
-        ))}
+    {/* Jeder Block in einer schlichten Hülle — sie trägt die Regeln, die
+        von der Stelle im Plan abhängen (erster Block, Abstand oben),
+        damit die Blöcke selbst davon nichts wissen müssen */}
+    {sichtbar.map(({ block, bereich }) => (
+      <div class="startblock" data-block={block.art}>
+        {block.art === 'willkommen' && <Willkommen ueberschrift={willkommenVorn ? 'h1' : 'h2'} />}
+        {block.art === 'galerie' && <div class="ozband"><Galerie /></div>}
+        {block.art === 'leistungen' && <Leistungen />}
+        {block.art === 'team' && <Team />}
+        {block.art === 'stellen' && <Stellen />}
+        {block.art === 'kontakt' && <Kontakt />}
+        {block.art === 'bereich' && bereich && <Bereich bereich={bereich} />}
       </div>
-    </section>
+    ))}
   </main>
 
-  <Neuigkeiten />
-  <Team />
-  <Stellen />
-  <Kontakt />
   <Fussbereich />
 </Basis>
 
 <style>
+  /*
+    Abstände zwischen den Blöcken
+    ------------------------------------------------------------------
+    Jeder Block trägt seinen Abstand UNTEN, keiner oben — so ergibt
+    jede Reihenfolge denselben Rhythmus (Oktober 2026). Vorher hingen
+    die Abstände an den Nachbarn (`bereich--ohne-oben`, „Band vor
+    Leistungen"), weil die Folge fest war.
+
+    Bänder über die volle Breite (Bilderband, Team, Kontakt) beginnen
+    mit ihrer Kante und bringen ihr Innenmaß selbst mit.
+  */
+  .startblock > :global(.bereich) { padding-top: 0; }
+
+  /* Die Begrüßung hat ihre eigene Luft oben — mitten auf der Seite
+     reicht der Abstand des Blocks davor */
+  .startblock:not(:first-of-type) > :global(.willkommen) { padding-top: 0; }
+
+  /*
+    Der erste Block nach der Sprechstunden-Karte
+    ------------------------------------------------------------------
+    Oben so viel Luft, dass der Zipfel der Karte in Ruhelage über
+    leerem Weiß steht und der Block noch unter der Symbolleiste liegt —
+    die fährt beim Schnalz weg und gibt ihn frei. Bis Oktober 2026 stand
+    das in Willkommen.astro, weil die Begrüßung immer zuerst kam. Seit
+    der Sprechstunden-Knopf vorn im Menü steht, zeigt der Zipfel links
+    in den Bereich, wo Überschriften beginnen — der Freiraum ist damit
+    tragend. Als Außenabstand, damit die Sprungmarke den Block wie
+    überall unter die Kopfleiste setzt. `--block-oben` ist der eigene
+    Innenabstand oben, den ein Block mitbringt (die Begrüßung).
+  */
+  .startblock:first-of-type > :global(*) {
+    margin-top: calc(var(--zipfel-laenge, 154px) + var(--abstand-s) - var(--block-oben, 0px));
+  }
+
   /* Das Bilderband läuft über die volle Fensterbreite. `--fensterbreite`
      setzt Oeffnungszeiten.astro aus `clientWidth` — `100vw` ginge nicht,
      weil es die Rollleiste mitzählt und die Seite dann waagerecht
      überliefe. Ohne JavaScript bleibt es bei der Inhaltsbreite. */
   .ozband {
     width: var(--fensterbreite, 100%);
-    /* Direkt unter der Begrüßung — deren unterer Innenabstand ist der
-       ganze Abstand (Entwurf, 27. September 2026) */
-    margin-top: 0;
     margin-left: 50%;
     transform: translateX(-50%);
+    /* Wie jeder Block trägt das Band seinen Abstand unten */
+    padding-bottom: var(--abstand-abschnitt);
   }
-
-  /* Steht das Bilderband direkt vor den Leistungen (keine aktiven
-     freien Abschnitte), braucht der Abschnitt seinen oberen Abstand
-     wieder — er ist sonst „ohne oben", weil die Abschnitte davor ihn
-     mitbringen. */
-  .ozband + .leistungen { padding-top: var(--abstand-abschnitt); }
 
   /* Der Inhalt schiebt sich über den fixierten Startbereich. Ohne
      eigenen z-index — er machte den Inhalt zu einem Stapel, in dem
@@ -141,43 +141,5 @@ const gruppen = (leistungen.kategorien ?? [])
   .seiteninhalt {
     position: relative;
     background: var(--farbe-flaeche);
-  }
-
-  .gruppe { margin-top: var(--abstand-gruppe); }
-
-  /* Die Gruppenzeile ist zugleich Überschrift — ihre Gestaltung steht
-     als `.gruppenzeile` in styles/global.css, weil das Team dasselbe
-     Muster verwendet. */
-  .gruppe > .gruppenzeile { margin: 0; }
-
-  /* Erklärtext zwischen Gruppenzeile und Kacheln — aus der Redaktion
-     (leistungen.json → kategorien → beschreibung).
-
-     Breiter als die übliche Absatzbreite (34 rem): Der Text steht hier
-     unter einer Zeile, die über die ganze Inhaltsbreite läuft, und
-     wirkte daneben nach links gestaucht (Florian, 18. September 2026).
-     48 rem sind bei 16 px rund 90 Zeichen je Zeile — das Ende dessen,
-     was sich noch angenehm liest; weiter zu gehen ginge auf Kosten der
-     Lesbarkeit. */
-  .gruppe__text {
-    max-width: min(48rem, 100%);
-    margin-top: 20px;
-  }
-
-  .gruppe__text :global(p) {
-    max-width: none;
-    margin-bottom: var(--abstand-2xs);
-    color: var(--farbe-text-gedeckt);
-    font-size: 16px;
-    line-height: 1.65;
-  }
-
-  .gruppe__text :global(p:last-child) { margin-bottom: 0; }
-
-  .kacheln {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-    gap: 22px;
-    margin-top: 28px;
   }
 </style>

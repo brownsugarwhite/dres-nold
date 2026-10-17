@@ -13,34 +13,41 @@
  *
  * Die Varianten liegen neben dem Original (`name-600.jpg`), stehen in
  * .gitignore und entstehen bei jedem Build neu — aus genau den Bildern,
- * die in src/content/neuigkeiten.json eingetragen sind.
+ * die in src/content/bereiche.json eingetragen sind: Beitragsbilder der
+ * Blogs (600 px) und Titelbilder der eigenen Seiten, deren breite
+ * Ankündigungskarte eine 900er-Variante bekommt (Oktober 2026).
  */
 import { readFile, stat, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import sharp from 'sharp';
 
-const BREITE = 600;
 const wurzel = new URL('..', import.meta.url).pathname;
-const inhalt = JSON.parse(await readFile(path.join(wurzel, 'src/content/neuigkeiten.json'), 'utf8'));
-const beitraege = Array.isArray(inhalt) ? inhalt : (inhalt.beitraege ?? inhalt.eintraege ?? []);
+const inhalt = JSON.parse(await readFile(path.join(wurzel, 'src/content/bereiche.json'), 'utf8'));
 
-export function varianteFuer(bild) {
+/** [Bild, Breite] je Karte */
+const auftraege = inhalt.eintraege.flatMap((b) =>
+  b.typ === 'blog' ? (b.beitraege ?? []).map((p) => [p.bild, 600])
+    : b.typ === 'seite' ? [[b.titelbild, 900]]
+      : [],
+);
+
+export function varianteFuer(bild, breite) {
   const m = /^(.*)\.(jpe?g|png)$/i.exec(bild || '');
-  return m ? `${m[1]}-${BREITE}.${m[2]}` : null;
+  return m ? `${m[1]}-${breite}.${m[2]}` : null;
 }
 
 let erzeugt = 0;
-for (const b of beitraege) {
-  const ziel = varianteFuer(b.bild);
+for (const [bild, breite] of auftraege) {
+  const ziel = varianteFuer(bild, breite);
   if (!ziel) continue;
-  const quelle = path.join(wurzel, 'public', b.bild);
+  const quelle = path.join(wurzel, 'public', bild);
   const ausgabe = path.join(wurzel, 'public', ziel);
   let q, a;
-  try { q = await stat(quelle); } catch { console.warn(`bilder-varianten: ${b.bild} fehlt`); continue; }
+  try { q = await stat(quelle); } catch { console.warn(`bilder-varianten: ${bild} fehlt`); continue; }
   try { a = await stat(ausgabe); } catch { a = null; }
   if (a && a.mtimeMs >= q.mtimeMs) continue;
   await mkdir(path.dirname(ausgabe), { recursive: true });
-  const s = sharp(quelle).resize({ width: BREITE, withoutEnlargement: true });
+  const s = sharp(quelle).resize({ width: breite, withoutEnlargement: true });
   if (/\.png$/i.test(ziel)) await s.png({ compressionLevel: 9 }).toFile(ausgabe);
   else await s.jpeg({ quality: 78, mozjpeg: true }).toFile(ausgabe);
   erzeugt++;

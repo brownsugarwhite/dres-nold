@@ -1,8 +1,9 @@
 ---
-import { trennenHtml } from '../../lib/silben';
 /**
- * Einzelseite eines Beitrags — eigene Adresse, mit Morph-Übergang
- * aus der Übersicht heraus.
+ * Seitenrahmen für einen Beitrag oder eine eigene Seite — eigene
+ * Adresse, mit Morph-Übergang aus der Karte auf der Startseite heraus
+ * (BeitragKarte.astro). Bis Oktober 2026 stand das in
+ * pages/neuigkeiten/[id].astro und galt nur für die Neuigkeiten.
  *
  * Zum Übergang: Der Ausschnitt um das Bild trägt denselben Namen wie in
  * der Vorschaukarte und wandert dadurch wirklich an seinen Platz. Datum,
@@ -13,43 +14,70 @@ import { trennenHtml } from '../../lib/silben';
  * andere oben einblendet; nichts wandert durch das Bild
  * (styles/uebergaenge.css).
  */
-import Basis from '../../layouts/Basis.astro';
-import Navigation from '../../components/Navigation.astro';
-import Fussbereich from '../../components/Fussbereich.astro';
-import daten from '../../content/neuigkeiten.json';
-import seite from '../../content/seite.json';
+import { statSync } from 'node:fs';
+import Basis from './Basis.astro';
+import Navigation from '../components/Navigation.astro';
+import Fussbereich from '../components/Fussbereich.astro';
+import Abschnitte from '../components/bausteine/Abschnitte.astro';
+import seite from '../content/seite.json';
+import { morphName } from '../lib/aufbau';
+import { trennenTitel } from '../lib/silben';
+import type { Abschnitt } from '../content/schema';
 
-export function getStaticPaths() {
-  return daten.eintraege
-    .filter((e) => e.aktiv)
-    .map((e) => ({ params: { id: e.id }, props: { beitrag: e } }));
+interface Props {
+  /** Adresse dieser Seite — aus ihr entsteht der Übergangsname */
+  adresse: string;
+  titel: string;
+  beschreibung?: string;
+  datum?: string;
+  kicker?: string;
+  bild?: string;
+  bild_alt?: string;
+  abschnitte: Abschnitt[];
+  dateien?: { datei: string; titel: string; beschreibung: string }[];
+  /** „Alle Neuigkeiten" oder „Zur Startseite" */
+  zurueck: string;
+  breit?: boolean;
 }
 
-const { beitrag } = Astro.props;
+const { adresse, titel, beschreibung = '', datum = '', kicker = '', bild = '', bild_alt = '', abschnitte, dateien = [], zurueck, breit = false } = Astro.props;
+const name = morphName(adresse);
+
 const alsDatum = (iso: string) =>
   iso ? new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
-const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
+
+/** „PDF · 1,2 MB" — beim Bauen aus der Datei gelesen */
+function dateiArt(pfad: string): string {
+  const endung = (/\.([a-z0-9]+)$/i.exec(pfad)?.[1] ?? '').toUpperCase();
+  try {
+    const bytes = statSync(`public${pfad}`).size;
+    const groesse = bytes > 1e6 ? `${(bytes / 1e6).toFixed(1).replace('.', ',')} MB` : `${Math.max(1, Math.round(bytes / 1e3))} KB`;
+    return `${endung} · ${groesse}`;
+  } catch {
+    return endung;
+  }
+}
+const anhaenge = dateien.filter((d) => d.datei);
 ---
 
-<Basis titel={`${beitrag.titel} – ${seite.praxis.name}`} beschreibung={beitrag.kurz}>
+<Basis titel={`${titel} – ${seite.praxis.name}`} beschreibung={beschreibung}>
   <Navigation />
 
   <main id="inhalt" class="beitragsseite">
-    <article class="beitrag karte" transition:name={`beitrag-${beitrag.id}`}>
+    <article class:list={['beitrag', 'karte', { 'beitrag--breit': breit }]} transition:name={`beitrag-${name}`}>
       <span class="schliessen-wache" data-schliessen-wache aria-hidden="true"></span>
       <div class="schliessen-halter" data-schliessen-halter>
-        <a class="schliessen" href="/" data-zurueck aria-label="Beitrag schließen">
+        <a class="schliessen" href="/" data-zurueck aria-label={`${titel} schließen`}>
           <svg class="schliessen__kreis" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" /></svg>
         </a>
       </div>
       <a class="beitrag__zurueck" href="/" data-zurueck>
-        <span aria-hidden="true">←</span> Alle Neuigkeiten
+        <span aria-hidden="true">←</span> {zurueck}
       </a>
 
-      {beitrag.datum && (
-        <time class="beitrag__datum" datetime={beitrag.datum}>{alsDatum(beitrag.datum)}</time>
-      )}
-      <h1 class="beitrag__titel">{beitrag.titel}</h1>
+      {datum && <time class="beitrag__datum" datetime={datum}>{alsDatum(datum)}</time>}
+      {!datum && kicker && <span class="beitrag__kicker kicker">{kicker}</span>}
+      <h1 class="beitrag__titel">{trennenTitel(titel)}</h1>
 
       {/* Den Übergangsnamen trägt der Ausschnitt, nicht das Bild — wie
           auf der Karte. Ein nacktes <img> als eigene Übergangsebene legt
@@ -57,31 +85,32 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
           Inhalt erst ein Bild später: Das Bild war zu Beginn des Morphs
           für ein Bild weiß (Florian, 27. September 2026). Im Ausschnitt
           wird es wie jeder andere Inhalt gezeichnet. */}
-      {beitrag.bild && (
-        <span class="beitrag__ausschnitt" transition:name={`beitrag-bild-${beitrag.id}`}>
-          <img class="beitrag__bild" src={beitrag.bild} alt={beitrag.bild_alt || ''} width="900" height="500" decoding="sync" fetchpriority="high" />
+      {bild && (
+        <span class="beitrag__ausschnitt" transition:name={`beitrag-bild-${name}`}>
+          <img class="beitrag__bild" src={bild} alt={bild_alt} width="900" height="500" decoding="sync" fetchpriority="high" />
         </span>
       )}
 
       {/* Kein eigener Übergangsname: gehört zur Karte und wächst mit ihr */}
       <div class="beitrag__rest">
-      <div class="beitrag__inhalt redaktionstext" set:html={trennenHtml(beitrag.inhalt)} />
+        <Abschnitte abschnitte={abschnitte} ebene={2} anker={(a) => a.id} />
 
-      {anhaenge.length > 0 && (
-        <section class="anhaenge">
-          <h2 class="anhaenge__titel ohne-verlauf">Zum Herunterladen</h2>
-          <ul class="anhaenge__liste">
-            {anhaenge.map((d) => (
-              <li>
-                <a class="anhang" href={d.datei} download>
-                  <span class="anhang__name">{d.titel}</span>
-                  {d.beschreibung && <span class="anhang__text">{d.beschreibung}</span>}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+        {anhaenge.length > 0 && (
+          <section class="anhaenge">
+            <h2 class="anhaenge__titel ohne-verlauf">Zum Herunterladen</h2>
+            <ul class="anhaenge__liste">
+              {anhaenge.map((d) => (
+                <li>
+                  <a class="anhang" href={d.datei} download>
+                    <span class="anhang__name">{d.titel || d.datei.split('/').pop()}</span>
+                    {d.beschreibung && <span class="anhang__text">{d.beschreibung}</span>}
+                    <span class="anhang__art">{dateiArt(d.datei)}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </article>
   </main>
@@ -104,6 +133,12 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
     width: min(100% - 2 * var(--abstand-m), 58rem);
     margin-inline: auto;
   }
+
+  /* Eigene Seiten tragen Kacheln in drei Spalten — sie dürfen breiter
+     sein als ein Beitrag */
+  .beitrag--breit { width: min(100% - 2 * var(--abstand-m), 72rem); }
+
+  .beitrag__kicker { display: block; margin-bottom: 14px; }
 
   .beitrag {
     /* Gruppe für den Übergang, siehe styles/uebergaenge.css */
@@ -161,6 +196,14 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
     height: auto;
   }
 
+  /* Auf einer breiten Seite stünde das Titelbild sonst fast fensterhoch —
+     es bekommt das Format der Ankündigungskarte (16 : 9), aus der es
+     morpht */
+  .beitrag--breit .beitrag__bild {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
   /* Vom Redaktionssystem geliefertes HTML */
   .beitrag__inhalt :global(p) { margin-bottom: var(--abstand-s); }
   .beitrag__inhalt :global(ul),
@@ -193,4 +236,15 @@ const anhaenge = (beitrag.dateien || []).filter((d) => d.datei);
 
   .anhang__name { font-weight: var(--gewicht-halbfett); color: var(--farbe-primaer); }
   .anhang__text { font-size: var(--text-s); color: var(--farbe-text-gedeckt); }
+
+  /* Art und Größe der Datei, z. B. „PDF · 1,2 MB" */
+  .anhang__art {
+    font-size: var(--text-kicker-klein);
+    font-weight: var(--gewicht-halbfett);
+    letter-spacing: var(--sperrung-kicker-klein);
+    text-transform: uppercase;
+    color: var(--farbe-text-gedeckt);
+  }
+
+  .anhaenge__liste { display: grid; gap: var(--abstand-xs); }
 </style>

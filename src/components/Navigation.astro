@@ -21,59 +21,33 @@
  * Kategorien erscheinen darin als eigene Ebene (Florian, 26. September
  * 2026).
  */
-import navi from '../content/navigation.json';
-import leistungen from '../content/leistungen.json';
+import { menue as punkte } from '../content/inhalte';
 import seite from '../content/seite.json';
-import neuigkeiten from '../content/neuigkeiten.json';
 
 const { praxis } = seite;
+const telefonZiel = `tel:${praxis.telefon.replace(/\s/g, '')}`;
 
-const hatNeuigkeiten = neuigkeiten.eintraege.some((e) => e.aktiv);
-const punkte = navi.eintraege
-  .filter((e) => e.aktiv && (e.id !== 'neuigkeiten' || hatNeuigkeiten))
-  .sort((a, b) => a.position - b.position);
+/*
+  Das Menü kommt fertig aus dem Seitenaufbau (lib/aufbau.ts,
+  `menueBauen`): vorn die Sprechstunden, dann jeder Block mit Menüangaben
+  in der Reihenfolge der Seite. Alle Leisten zeigen dieselbe Folge
+  (Florian, Oktober 2026) — die eigene Ordnung der Symbolleiste und das
+  Ende-Stellen der Sprechstunden sind damit entfallen.
 
-/* Sprungmarken (`#team`) zeigen immer auf die Startseite — sonst
-   liefen sie auf einer Unterseite ins Leere. */
-const ziel = (e: { ziel: string }) => (e.ziel.startsWith('#') ? `/${e.ziel}` : e.ziel);
+  Jeder Punkt mit Unterpunkten klappt als Blase auf; Unterpunkte haben
+  kein Symbol, nur Hauptpunkte.
+*/
+type Punkt = (typeof punkte)[number];
 
-const kopf = punkte.filter((e) => e.in_kopfleiste);
+/* Auf Handys unten drei Knöpfe in derselben Folge: Sprechstunden,
+   Leistungen, ganz außen die Telefonnummer. Die Leistungen sind unten
+   ein schlichter Sprung — das Aufklappen gibt es dort nicht. */
+const telefon: Punkt = { id: 'telefon', titel: praxis.telefon, symbol: '/icons/navigation/telefon.svg', ziel: telefonZiel, unterpunkte: [] };
+const fussKlein = [punkte.find((e) => e.id === 'zeiten'), punkte.find((e) => e.id === 'leistungen'), telefon]
+  .filter((e): e is Punkt => Boolean(e));
 
-/* Das Handy-Menü führt alle Punkte außer der Telefonnummer — die steht
-   dort als Pille in der Kopfleiste zwischen Logo und Menüknopf und in
-   der Symbolleiste unten (Florian, 26. September 2026). */
-const menue = punkte.filter((e) => e.id !== 'telefon');
-/* Die Symbolleiste unten hat in der Vorlage eine eigene Reihenfolge —
-   und auf Handys eine andere als auf dem Desktop. Statt die Reihenfolge
-   per CSS zu verschieben (fehleranfällig bei den Trennpunkten) werden
-   beide Listen erzeugt und per Umbruchpunkt umgeschaltet. */
-const fussGross = punkte
-  /* Die Telefonnummer steht auf dem Desktop als Pille in der
-     Kopfleiste und in der Kontaktzeile oben — in der Symbolleiste nur
-     auf Handys. */
-  .filter((e) => e.in_fussleiste && e.id !== 'telefon')
-  .sort((a, b) => (a.position_fussleiste ?? 99) - (b.position_fussleiste ?? 99))
-  .filter((e) => e.id !== 'zeiten')
-  .concat(punkte.filter((e) => e.id === 'zeiten'));   // Öffnungszeiten ans Ende
-
-/* Reihenfolge fest: Die Telefonnummer gehört in die Mitte, links und
-   rechts je ein Sprungziel. Statt Kontakt stehen dort die Leistungen —
-   danach wird auf dem Handy am häufigsten gesucht (Florian,
-   18. September 2026); der Kontakt ist über die Telefonnummer daneben
-   ohnehin einen Griff entfernt. */
-const fussKlein = ['leistungen', 'telefon', 'zeiten']
-  .map((id) => punkte.find((e) => e.id === id))
-  .filter(Boolean);
-
-const dienste = leistungen.eintraege.filter((e) => e.aktiv).sort((a, b) => a.position - b.position);
-
-/* Die Kategorien kommen aus dem Inhaltsmodell — die Praxis kann dort
-   eigene anlegen. Leere Kategorien erscheinen nicht. */
-const kategorien = (leistungen.kategorien ?? [])
-  .filter((k) => k.aktiv)
-  .sort((a, b) => a.position - b.position)
-  .map((k) => ({ ...k, eintraege: dienste.filter((e) => e.kategorie === k.id) }))
-  .filter((k) => k.eintraege.length > 0);
+/** Kennung des Aufklappmenüs eines Punkts — je Leiste eine eigene */
+const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-${e.id}`;
 ---
 
 {/*
@@ -172,11 +146,11 @@ const kategorien = (leistungen.kategorien ?? [])
         beide an der Inhaltsbreite ausgerichtet (Entwurf, 17. September
         2026). Vorher saß der ganze Block mittig in 700 px. */}
     <div class="kopfleiste__rechts">
-    {kopf.map((e, i) => (
+    {punkte.map((e) => (
       <>
-        {e.id === 'leistungen' ? (
+        {e.unterpunkte.length > 0 ? (
           <div class="aufklapp" data-aufklapp data-richtung="runter">
-            <button class="menuepunkt menuepunkt--knopf" type="button" aria-expanded="false" aria-controls="leistungsmenue">
+            <button class="menuepunkt menuepunkt--knopf" type="button" aria-expanded="false" aria-controls={menueId(e, 'oben')} data-ziel={e.ziel}>
               <span class="menuepunkt__rolle">
                 <span class="menuepunkt__text">{e.titel}</span>
                 <span class="menuepunkt__text" aria-hidden="true">{e.titel}</span>
@@ -185,16 +159,15 @@ const kategorien = (leistungen.kategorien ?? [])
               <span class="menuepunkt__pfeil" aria-hidden="true"></span>
             </button>
 
-            <div class="aufklapp__inhalt" id="leistungsmenue" hidden>
+            <div class="aufklapp__inhalt" id={menueId(e, 'oben')} hidden>
               <span class="aufklapp__linie" aria-hidden="true"></span>
 
               <div class="aufklapp__spalten">
-                {kategorien.map((k, i) => (
-                  <a class="oberpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}; --stufe-hoch: ${kategorien.length - 1 - i}`}>
-                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="36" height="36" />}
+                {e.unterpunkte.map((u, i) => (
+                  <a class="oberpunkt" href={u.ziel} style={`--stufe: ${i}; --stufe-hoch: ${e.unterpunkte.length - 1 - i}`}>
                     <span class="oberpunkt__text">
-                      <span class="oberpunkt__titel">{k.titel}</span>
-                      {k.kurz && <span class="oberpunkt__kurz">{k.kurz}</span>}
+                      <span class="oberpunkt__titel">{u.titel}</span>
+                      {u.kurz && <span class="oberpunkt__kurz">{u.kurz}</span>}
                     </span>
                   </a>
                 ))}
@@ -202,7 +175,7 @@ const kategorien = (leistungen.kategorien ?? [])
             </div>
           </div>
         ) : (
-          <a class="menuepunkt" href={ziel(e)}>
+          <a class="menuepunkt" href={e.ziel}>
             <span class="menuepunkt__rolle">
               <span class="menuepunkt__text">{e.titel}</span>
               <span class="menuepunkt__text" aria-hidden="true">{e.titel}</span>
@@ -213,7 +186,7 @@ const kategorien = (leistungen.kategorien ?? [])
       </>
     ))}
 
-    <a class="kn kn--klein kopfleiste__telefon" href={`tel:${praxis.telefon.replace(/\s/g, '')}`}>
+    <a class="kn kn--klein kopfleiste__telefon" href={telefonZiel}>
       <span class="kn__f" aria-hidden="true"></span>{praxis.telefon}
     </a>
     </div>
@@ -233,37 +206,38 @@ const kategorien = (leistungen.kategorien ?? [])
       Rollkasten: Die Liste ist kompakt genug für jedes Handy.
     */}
     <div class="mobilmenue" id="mobilmenue" data-mobilmenue hidden>
-      {menue.map((e, i) => (
-        e.id === 'leistungen' ? (
+      {punkte.map((e, i) => (
+        e.unterpunkte.length > 0 ? (
           <>
-            <div class="mobilmenue__zeile mobilmenue__zeile--leistungen" style={`--stufe: ${i}; --stufe-hoch: ${menue.length - 1 - i}`}>
+            <div class="mobilmenue__zeile mobilmenue__zeile--mit-unter" data-gruppe={e.id} style={`--stufe: ${i}; --stufe-hoch: ${punkte.length - 1 - i}`}>
               <div class="mobilmenue__zelle">
                 <button
                   class="mobilmenue__punkt mobilmenue__punkt--knopf"
                   type="button"
-                  data-mobilleistungen
+                  data-ebene-knopf={e.id}
                   aria-expanded="false"
-                  aria-controls="mobil-leistungen"
+                  aria-controls={menueId(e, 'mobil')}
                 >
-                  <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
+                  <img class="mobilmenue__symbol" src={e.symbol} alt="" width="60" height="60" />
                   <span class="mobilmenue__text">{e.titel}</span>
                   <span class="mobilmenue__pfeil" aria-hidden="true"></span>
                   <span class="mobilmenue__zurueck" aria-hidden="true">Zurück</span>
                 </button>
               </div>
             </div>
-            {/* Die Kategorien: eigene Zeilen, in Ruhe auf Null geschlossen.
+            {/* Die Unterpunkte: eigene Zeilen, in Ruhe auf Null geschlossen.
                 `display: contents` — der Rahmen ist nur das Ziel von
-                `aria-controls`, die Zeilen bleiben Kinder des Menüs. */}
-            <div class="mobilmenue__ebene" id="mobil-leistungen" role="group" aria-label="Leistungen">
-              {kategorien.map((k, j) => (
-                <div class="mobilmenue__zeile mobilmenue__zeile--unter" style={`--stufe: ${j}`}>
+                `aria-controls`, die Zeilen bleiben Kinder des Menüs.
+                Die erste Zeile führt zum Hauptpunkt selbst — sonst wäre
+                er auf dieser Ebene nicht erreichbar (Oktober 2026). */}
+            <div class="mobilmenue__ebene" id={menueId(e, 'mobil')} role="group" aria-label={e.titel}>
+              {[{ titel: `${e.titel} – Übersicht`, kurz: '', ziel: e.ziel }, ...e.unterpunkte].map((u, j) => (
+                <div class="mobilmenue__zeile mobilmenue__zeile--unter" data-gruppe={e.id} style={`--stufe: ${j}`}>
                   <div class="mobilmenue__zelle">
-                    <a class="mobilmenue__punkt mobilmenue__unterpunkt" href={`/#leistungen-${k.id}`}>
-                      {k.icon && <img class="mobilmenue__symbol mobilmenue__symbol--klein" src={k.icon} alt="" width="40" height="40" />}
+                    <a class="mobilmenue__punkt mobilmenue__unterpunkt" href={u.ziel}>
                       <span class="mobilmenue__untertext">
-                        <span class="mobilmenue__text">{k.titel}</span>
-                        {k.kurz && <span class="mobilmenue__kurz">{k.kurz}</span>}
+                        <span class="mobilmenue__text">{u.titel}</span>
+                        {u.kurz && <span class="mobilmenue__kurz">{u.kurz}</span>}
                       </span>
                     </a>
                   </div>
@@ -272,10 +246,10 @@ const kategorien = (leistungen.kategorien ?? [])
             </div>
           </>
         ) : (
-          <div class="mobilmenue__zeile" style={`--stufe: ${i}; --stufe-hoch: ${menue.length - 1 - i}`}>
+          <div class="mobilmenue__zeile" style={`--stufe: ${i}; --stufe-hoch: ${punkte.length - 1 - i}`}>
             <div class="mobilmenue__zelle">
-              <a class="mobilmenue__punkt" href={ziel(e)}>
-                <img class="mobilmenue__symbol" src={e.icon} alt="" width="60" height="60" />
+              <a class="mobilmenue__punkt" href={e.ziel}>
+                <img class="mobilmenue__symbol" src={e.symbol} alt="" width="60" height="60" />
                 <span class="mobilmenue__text">{e.titel}</span>
               </a>
             </div>
@@ -295,25 +269,24 @@ const kategorien = (leistungen.kategorien ?? [])
 <div class="fussleiste-huelle" data-fusshuelle>
 <nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff">
   <div class="fussleiste__inhalt fussleiste__inhalt--gross">
-    {fussGross.map((e, i) => (
+    {punkte.map((e, i) => (
       <>
-        {e.id === 'leistungen' ? (
+        {e.unterpunkte.length > 0 ? (
           <div class="aufklapp" data-aufklapp data-richtung="hoch">
-            <button class="fussknopf fussknopf--knopf" type="button" aria-expanded="false" aria-controls="leistungsmenue-unten">
-              <img class="fussknopf__symbol" src={e.icon} alt="" width="60" height="60" />
+            <button class="fussknopf fussknopf--knopf" type="button" aria-expanded="false" aria-controls={menueId(e, 'unten')} data-ziel={e.ziel} data-punkt={e.id}>
+              <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" />
               <span class="fussknopf__text">{e.titel}</span>
             </button>
 
-            <div class="aufklapp__inhalt" id="leistungsmenue-unten" hidden>
+            <div class="aufklapp__inhalt" id={menueId(e, 'unten')} hidden>
               <span class="aufklapp__linie" aria-hidden="true"></span>
 
               <div class="aufklapp__spalten">
-                {kategorien.map((k, i) => (
-                  <a class="oberpunkt" href={`/#leistungen-${k.id}`} style={`--stufe: ${i}; --stufe-hoch: ${kategorien.length - 1 - i}`}>
-                    {k.icon && <img class="oberpunkt__symbol" src={k.icon} alt="" width="36" height="36" />}
+                {e.unterpunkte.map((u, i) => (
+                  <a class="oberpunkt" href={u.ziel} style={`--stufe: ${i}; --stufe-hoch: ${e.unterpunkte.length - 1 - i}`}>
                     <span class="oberpunkt__text">
-                      <span class="oberpunkt__titel">{k.titel}</span>
-                      {k.kurz && <span class="oberpunkt__kurz">{k.kurz}</span>}
+                      <span class="oberpunkt__titel">{u.titel}</span>
+                      {u.kurz && <span class="oberpunkt__kurz">{u.kurz}</span>}
                     </span>
                   </a>
                 ))}
@@ -321,12 +294,12 @@ const kategorien = (leistungen.kategorien ?? [])
             </div>
           </div>
         ) : (
-          <a class="fussknopf" href={ziel(e)} data-punkt={e.id}>
-            <img class="fussknopf__symbol" src={e.icon} alt="" width="60" height="60" />
+          <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
+            <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" />
             <span class="fussknopf__text">{e.titel}</span>
           </a>
         )}
-        {i < fussGross.length - 1 && <span class="punkt punkt--fuss" aria-hidden="true"></span>}
+        {i < punkte.length - 1 && <span class="punkt punkt--fuss" aria-hidden="true"></span>}
       </>
     ))}
   </div>
@@ -334,8 +307,8 @@ const kategorien = (leistungen.kategorien ?? [])
   <div class="fussleiste__inhalt fussleiste__inhalt--klein">
     {fussKlein.map((e, i) => (
       <>
-        <a class="fussknopf" href={ziel(e)} data-punkt={e.id}>
-          <img class="fussknopf__symbol" src={e.icon} alt="" width="60" height="60" />
+        <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
+          <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" />
           <span class="fussknopf__text">{e.titel}</span>
         </a>
         {i < fussKlein.length - 1 && <span class="punkt punkt--fuss" aria-hidden="true"></span>}
@@ -526,10 +499,15 @@ const kategorien = (leistungen.kategorien ?? [])
     height: 80px;
   }
 
+  /* 20 px zwischen Punkten und Trennern — auf schmalen Desktops bis
+     herab auf 12 px: Mit sieben Menüpunkten (seit der Dentosophie,
+     Oktober 2026) wurde es bei 992 px sonst zu eng für das Logo daneben
+     (gemessen: 871 px Bedarf bei 893 px Platz). Ab etwa 1100 px steht
+     alles wie bisher. */
   .kopfleiste__rechts {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: clamp(12px, calc((100vw - 992px) * 0.08 + 12px), 20px);
   }
 
   /* Die Telefonnummer steht als Knopf ganz außen — mit etwas mehr Luft
@@ -798,25 +776,25 @@ const kategorien = (leistungen.kategorien ?? [])
     transition-delay: 0ms, 0ms, 260ms, 0ms;
   }
 
-  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile:not(.mobilmenue__zeile--leistungen):not(.mobilmenue__zeile--unter) {
+  .mobilmenue[data-ebene] .mobilmenue__zeile:not([data-gewaehlt]) {
     grid-template-rows: 0fr;
     transition-delay: 0ms;
   }
 
-  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile:not(.mobilmenue__zeile--leistungen):not(.mobilmenue__zeile--unter) .mobilmenue__zelle {
+  .mobilmenue[data-ebene] .mobilmenue__zeile:not([data-gewaehlt]) .mobilmenue__zelle {
     opacity: 0;
     transform: scale(0);
     visibility: hidden;
     transition-delay: 0ms, 0ms, 320ms, 0ms;
   }
 
-  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile--unter {
+  .mobilmenue[data-ebene] .mobilmenue__zeile--unter[data-gewaehlt] {
     grid-template-rows: 1fr;
     transition-duration: 320ms, 320ms, 320ms;
     transition-delay: 0ms;
   }
 
-  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile--unter .mobilmenue__zelle {
+  .mobilmenue[data-ebene] .mobilmenue__zeile--unter[data-gewaehlt] .mobilmenue__zelle {
     opacity: 1;
     transform: none;
     visibility: visible;
@@ -827,11 +805,11 @@ const kategorien = (leistungen.kategorien ?? [])
   /* Auf der Ebene „Leistungen": Linien an den Kategorien, keine an den
      geschlossenen Hauptzeilen; „Leistungen" selbst behält seine Linie
      zum Hörer darüber */
-  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile--unter .mobilmenue__zelle {
+  .mobilmenue[data-ebene] .mobilmenue__zeile--unter[data-gewaehlt] .mobilmenue__zelle {
     border-top-color: var(--farbe-linie-leise);
   }
 
-  .mobilmenue[data-ebene='leistungen'] .mobilmenue__zeile:not(.mobilmenue__zeile--leistungen):not(.mobilmenue__zeile--unter) .mobilmenue__zelle {
+  .mobilmenue[data-ebene] .mobilmenue__zeile:not([data-gewaehlt]) .mobilmenue__zelle {
     border-top-color: transparent;
   }
 
@@ -919,8 +897,6 @@ const kategorien = (leistungen.kategorien ?? [])
     gap: var(--abstand-xs);
     padding: 8px 0;
   }
-
-  .mobilmenue__symbol--klein { width: 30px; height: 30px; }
 
   .mobilmenue__untertext { display: flex; flex-direction: column; }
   .mobilmenue__kurz { color: var(--farbe-text-gedeckt); font-size: var(--text-s); font-weight: var(--gewicht-normal); line-height: 1.35; }
@@ -1098,7 +1074,11 @@ const kategorien = (leistungen.kategorien ?? [])
     position: absolute;
     left: 0;
     z-index: var(--ebene-menue);
-    width: min(400px, 100vw - 2rem);
+    /* So breit wie der längste Unterpunkt, höchstens 400 px — die Blase
+       misst nach (Skript `geometrie`) */
+    width: max-content;
+    min-width: 220px;
+    max-width: min(400px, 100vw - 2rem);
     padding: 26px 36px;
   }
 
@@ -1187,7 +1167,8 @@ const kategorien = (leistungen.kategorien ?? [])
     gap: 6px;
   }
 
-  /* Ein Oberpunkt je Kategorie — Symbol links, Titel und Kurztext rechts */
+  /* Ein Oberpunkt je Unterpunkt — Titel, darunter der Kurztext.
+     Symbole tragen nur die Hauptpunkte (Florian, Oktober 2026). */
   .oberpunkt {
     display: flex;
     align-items: center;
@@ -1205,12 +1186,6 @@ const kategorien = (leistungen.kategorien ?? [])
   .oberpunkt:hover,
   .oberpunkt:focus-visible { background: rgb(255 255 255 / 60%); }
 
-  .oberpunkt__symbol {
-    flex: none;
-    width: 36px;
-    height: 36px;
-    object-fit: contain;
-  }
 
   .oberpunkt__text {
     display: flex;
@@ -1708,13 +1683,35 @@ const kategorien = (leistungen.kategorien ?? [])
     };
   }
 
+  /** Die gerade offene Blase je Leiste — zum Schließen, wenn eine andere aufgeht */
+  const offeneJeLeiste = new Map<HTMLElement, { huelle: HTMLElement; zu: () => void }>();
+
+  /**
+   * Zum Ziel eines Menüpunkts: Liegt es auf dieser Seite, gleitet sie
+   * hin (scripts/anker.ts); sonst wechselt die Seite, und die Sprungmarke
+   * wird nach dem Wechsel angefahren.
+   */
+  function zumZiel(ziel: string) {
+    if (!ziel) return;
+    const url = new URL(ziel, location.href);
+    if (url.pathname === location.pathname && url.hash && zuSprungmarke(url.hash)) {
+      /* Adresse mitführen, ohne neuen Verlaufseintrag — wie bei den
+         Sprungmarken in scripts/anker.ts. */
+      try { history.replaceState(history.state, '', url.hash); } catch { /* egal */ }
+      return;
+    }
+    if (url.origin === location.origin) navigate(url.pathname + url.hash);
+    else location.href = url.href;
+  }
+
   function aufklappmenuesAufbauen() {
-    // ---- Aufklappmenü „Leistungen" ----
+    // ---- Aufklappmenüs: jeder Menüpunkt mit Unterpunkten ----
     // Die Wölbung sitzt unter (oder über) dem Menüpunkt; ein kleiner
     // Pfeil an der Grundlinie zeigt auf ihn.
     document.querySelectorAll<HTMLElement>('[data-aufklapp]').forEach((huelle) => {
       if (huelle.dataset.bereit) return;
       huelle.dataset.bereit = 'ja';
+      let schliessTimer = 0;
 
       const knopf = huelle.querySelector<HTMLButtonElement>('button[aria-expanded]');
       const inhalt = huelle.querySelector<HTMLElement>('.aufklapp__inhalt');
@@ -1729,22 +1726,23 @@ const kategorien = (leistungen.kategorien ?? [])
       const ECKE = 40;             // Rundung am Ende — wie im Entwurf
 
       const geometrie: Geometrie = ({ breite, h, anteil, y0, s, k, f }) => {
-        const boxBreite = Math.min(400, breite - 32);
+        const boxBreite = Math.min(inhalt.offsetWidth || 400, breite - 32);
         const kr = knopf.getBoundingClientRect();
         const knopfX = kr.left + kr.width / 2;
         /*
-          Die Blase sitzt so, dass die SYMBOLE darin genau unter der
-          Mitte des Menüpunkts stehen — und damit auf derselben
-          Senkrechten wie der Pfeil und der Haken am Knopf darüber
-          (Florian, 18. September 2026).
+          Die Unterpunkte beginnen genau unter dem Wort des Menüpunkts:
+          linke Textkante der Blase = linke Kante der Beschriftung. Der
+          Pfeil an der Grundlinie bleibt auf der Mitte des Punkts.
 
-          Bis zur Mitte eines Symbols sind es vom linken Rand der Blase:
-          36 px Innenabstand (`.aufklapp__inhalt`) plus die halbe
-          Symbolbreite. Vorher stand hier ein geschätztes Verhältnis —
-          es traf beinahe, aber eben nur beinahe.
+          Bis zum 18. September 2026 standen hier die Kategorie-Symbole
+          unter der Knopfmitte (`knopfX − 54`). Seit Unterpunkte keine
+          Symbole mehr tragen (Florian, Oktober 2026), richtet sich die
+          Blase am Text aus — 36 px ist ihr Innenabstand
+          (`.aufklapp__inhalt`).
         */
-        const bisSymbolmitte = 36 + 18;
-        const links = Math.max(16, Math.min(breite - boxBreite - 16, knopfX - bisSymbolmitte));
+        const wort = knopf.querySelector<HTMLElement>('.menuepunkt__text, .fussknopf__text');
+        const textLinks = wort ? wort.getBoundingClientRect().left : knopfX;
+        const links = Math.max(16, Math.min(breite - boxBreite - 16, textLinks - 36));
         const mitte = links + boxBreite / 2;
 
         /* Sie wächst in Höhe UND Breite — die Linie fließt auf, statt
@@ -1830,17 +1828,25 @@ const kategorien = (leistungen.kategorien ?? [])
         },
       });
 
-      const setzen = (offen: boolean) => {
+      const setzen = (offen: boolean, sofort = false) => {
         if ((knopf.getAttribute('aria-expanded') === 'true') === offen) return;
         knopf.setAttribute('aria-expanded', String(offen));
         if (offen) {
+          /* Je Leiste ist nur eine Blase offen: Alle teilen sich die Maske
+             des Leistenumschlags (`--blase-form`). Die andere schließt
+             sofort, ohne Bewegung — die neue wächst an ihrer Stelle. */
+          const andere = offeneJeLeiste.get(linienTraeger);
+          if (andere && andere.huelle !== huelle) andere.zu();
+          offeneJeLeiste.set(linienTraeger, { huelle, zu: () => { window.clearTimeout(schliessTimer); setzen(false, true); } });
           inhalt.hidden = false;
           huelle.dataset.aktiv = 'ja';
           blase.oeffnen(inhalt.getBoundingClientRect().height);
           requestAnimationFrame(() => { huelle.dataset.offen = 'ja'; });
         } else {
+          if (offeneJeLeiste.get(linienTraeger)?.huelle === huelle) offeneJeLeiste.delete(linienTraeger);
           delete huelle.dataset.offen;
-          blase.schliessen();
+          blase.schliessen(sofort);
+          if (sofort) inhalt.hidden = true;
         }
       };
 
@@ -1860,12 +1866,7 @@ const kategorien = (leistungen.kategorien ?? [])
       knopf.addEventListener('click', () => {
         if (knopf.getAttribute('aria-expanded') !== 'true') { setzen(true); return; }
         setzen(false);
-        /* Auf einer Unterseite gibt es die Marke nicht — dann zur
-           Startseite, den Rest erledigt scripts/anker.ts. */
-        if (!zuSprungmarke('#leistungen')) { navigate('/#leistungen'); return; }
-        /* Adresse mitführen, ohne neuen Verlaufseintrag — wie bei den
-           Sprungmarken in scripts/anker.ts. */
-        try { history.replaceState(history.state, '', '#leistungen'); } catch { /* egal */ }
+        zumZiel(knopf.dataset.ziel ?? '');
       });
 
       /* Eine Kategorie in der Blase: sofort zu, nicht erst beim
@@ -1875,7 +1876,6 @@ const kategorien = (leistungen.kategorien ?? [])
       });
 
       // Auf Zeigegeräten öffnet auch das Überfahren — die Blase gehört dazu
-      let schliessTimer = 0;
       huelle.addEventListener('pointerenter', (e) => {
         if ((e as PointerEvent).pointerType !== 'mouse') return;
         window.clearTimeout(schliessTimer);
@@ -2029,22 +2029,35 @@ const kategorien = (leistungen.kategorien ?? [])
       return { woelbung, rueckwaerts };
     };
 
-    /* ---- Ebene „Leistungen" ---- */
-    const knopfLeistungen = menue.querySelector<HTMLButtonElement>('[data-mobilleistungen]');
-    const ebeneSetzen = (leistungen: boolean) => {
-      if (!knopfLeistungen) return;
-      knopfLeistungen.setAttribute('aria-expanded', String(leistungen));
-      if (leistungen) {
-        knopfLeistungen.setAttribute('aria-label', 'Zurück zum Menü');
-        menue.dataset.ebene = 'leistungen';
-      } else {
-        knopfLeistungen.removeAttribute('aria-label');
-        delete menue.dataset.ebene;
+    /* ---- Ebenen ----
+       Jeder Punkt mit Unterpunkten wechselt die Ebene: Die anderen
+       Zeilen schließen sich, seine Zeile rückt an den Kopf und wird zum
+       Zurück-Knopf, die Unterpunkte wachsen darunter (Florian,
+       26. September 2026 — damals nur „Leistungen"). Welche Zeilen dazu
+       gehören, sagt `data-gruppe`; das CSS sieht nur `data-gewaehlt`. */
+    const ebenenKnoepfe = [...menue.querySelectorAll<HTMLButtonElement>('[data-ebene-knopf]')];
+    /** Der Knopf der gerade offenen Ebene — für Escape und das Schließen */
+    let ebenenKnopf: HTMLButtonElement | null = null;
+    const ebeneSetzen = (knopf: HTMLButtonElement | null) => {
+      if (ebenenKnopf) {
+        ebenenKnopf.setAttribute('aria-expanded', 'false');
+        ebenenKnopf.removeAttribute('aria-label');
       }
+      menue.querySelectorAll('[data-gewaehlt]').forEach((z) => z.removeAttribute('data-gewaehlt'));
+      ebenenKnopf = knopf;
+      if (!knopf) {
+        delete menue.dataset.ebene;
+        return;
+      }
+      const gruppe = knopf.dataset.ebeneKnopf!;
+      knopf.setAttribute('aria-expanded', 'true');
+      knopf.setAttribute('aria-label', 'Zurück zum Menü');
+      menue.querySelectorAll(`[data-gruppe="${CSS.escape(gruppe)}"]`).forEach((z) => z.setAttribute('data-gewaehlt', ''));
+      menue.dataset.ebene = gruppe;
     };
-    knopfLeistungen?.addEventListener('click', () => {
-      ebeneSetzen(knopfLeistungen.getAttribute('aria-expanded') !== 'true');
-    });
+    for (const knopf of ebenenKnoepfe) {
+      knopf.addEventListener('click', () => ebeneSetzen(ebenenKnopf === knopf ? null : knopf));
+    }
 
     /* ---- Schleier ----
        Er steht außerhalb der persistierten Navigation und wird bei
@@ -2103,7 +2116,7 @@ const kategorien = (leistungen.kategorien ?? [])
         delete navigation.dataset.menueAktiv;
         menue.hidden = true;
         schleierVerstecken();
-        ebeneSetzen(false);
+        ebeneSetzen(null);
       },
     });
 
@@ -2239,7 +2252,7 @@ const kategorien = (leistungen.kategorien ?? [])
     // Escape: erst die Ebene zurück, dann das Menü zu
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape' || !istOffen()) return;
-      if (menue.dataset.ebene) { ebeneSetzen(false); knopfLeistungen?.focus(); return; }
+      if (ebenenKnopf) { const k = ebenenKnopf; ebeneSetzen(null); k.focus(); return; }
       menueSchliessen();
       menueknopf.focus();
     });

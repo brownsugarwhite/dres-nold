@@ -14,6 +14,7 @@
  * wird beim Speichern verworfen (`.strip()` ist Zod-Standard).
  */
 import { z } from 'zod';
+import { richtextPruefen, VERWEIS } from '../lib/richtext-pruefen';
 
 /* ---------- Bausteine ---------- */
 
@@ -36,13 +37,42 @@ export const kennung = z
 /** Freier Text, auch leer */
 const text = z.string();
 
-/** Redaktions-HTML (Absätze, Listen, Tabellen) */
-const richtext = z.string();
+/** Redaktions-HTML (Absätze, Listen, Tabellen, Verweise) — nur erlaubte
+    Elemente, siehe src/lib/richtext-pruefen.ts */
+const richtext = z.string().superRefine((html, ctx) => {
+  for (const problem of richtextPruefen(html)) ctx.addIssue({ code: 'custom', message: problem });
+});
+
+/**
+ * Wohin ein Knopf, Menüpunkt oder Textlink führt — oder leer.
+ *
+ *   /dentosophie/              eine Seite
+ *   /dentosophie/#mundatmung   ein Abschnitt darauf
+ *   /#leistungen               ein Abschnitt der Startseite
+ *   /dokumente/flyer.pdf       eine Datei
+ *   https://…, mailto:…, tel:… nach draußen
+ *
+ * Ob dorthin gescrollt oder die Seite gewechselt wird, entscheidet die
+ * Seite beim Klick selbst (scripts/anker.ts): Liegt das Ziel auf der
+ * Seite, auf der man gerade ist, gleitet sie hin.
+ */
+export const ziel = z.string().refine((w) => w === '' || VERWEIS.test(w), {
+  message: 'Ziel muss mit / beginnen oder mit https://, mailto: bzw. tel:',
+});
 
 const basisEintrag = {
   aktiv: z.boolean(),
   position: z.number(),
 };
+
+/** Ein Knopf: Beschriftung und Ziel (auch eine Datei zum Herunterladen) */
+const knopf = z.object({
+  text: text.min(1, 'Beschriftung fehlt'),
+  ziel: ziel.refine((w) => w !== '', 'Ziel fehlt'),
+});
+
+/** Höchstens drei Knöpfe — mehr stehen nicht mehr ruhig nebeneinander */
+const knoepfe = z.array(knopf).max(3, 'Höchstens drei Knöpfe').default([]);
 
 /* ---------- Die Dateien ---------- */
 
@@ -54,7 +84,7 @@ export const hinweisSchema = z.object({
   von: datum,
   bis: datum,
   mehr_erfahren_text: text,
-  mehr_erfahren_ziel: text,
+  mehr_erfahren_ziel: ziel,
   einmal_pro_besuch: z.boolean(),
 });
 
@@ -88,7 +118,6 @@ export const leistungenSchema = z.object({
       kurz: text,
       /** Erklärtext zwischen Kategorieüberschrift und den Kacheln */
       beschreibung: richtext.optional(),
-      icon: pfad,
     }),
   ),
   eintraege: z.array(
@@ -100,58 +129,9 @@ export const leistungenSchema = z.object({
       kurz: text,
       icon: pfad,
       inhalt: richtext,
-      /* Die Knopfzeile unter dem Text (components/Knopfzeile.astro) —
-         freiwillig, bestehende Einträge haben die Felder nicht
-         (Florian, 26. September 2026). */
-      knoepfe_text: text.optional(),
-      link_text: text.optional(),
-      link_ziel: text.optional(),
-      pdf_text: text.optional(),
-      pdf_datei: pfad.optional(),
-    }),
-  ),
-});
-
-export const neuigkeitenSchema = z.object({
-  _hinweis_fuer_die_redaktion: text.optional(),
-  titel: text.min(1),
-  einleitung: text,
-  eintraege: z.array(
-    z.object({
-      id: kennung,
-      ...basisEintrag,
-      datum,
-      titel: text.min(1),
-      kurz: text,
-      bild: pfad,
-      bild_alt: text,
-      inhalt: richtext,
-      dateien: z.array(
-        z.object({
-          datei: pfad,
-          titel: text,
-          beschreibung: text,
-        }),
-      ),
-    }),
-  ),
-});
-
-export const navigationSchema = z.object({
-  _hinweis_fuer_die_redaktion: text.optional(),
-  eintraege: z.array(
-    z.object({
-      id: kennung,
-      ...basisEintrag,
-      titel: text.min(1),
-      ziel: text.min(1),
-      aufklappen: text.optional(),
-      icon: pfad,
-      in_kopfleiste: z.boolean(),
-      in_fussleiste: z.boolean(),
-      position_fussleiste: z.number().optional(),
-      nur_klein: z.boolean().optional(),
-      in_fussleiste_klein: z.boolean(),
+      /* Die Knopfzeile unter dem Text (components/Knopfzeile.astro) */
+      knoepfe_text: text.default(''),
+      knoepfe: knoepfe,
     }),
   ),
 });
@@ -180,52 +160,6 @@ export const galerieSchema = z.object({
       ...basisEintrag,
       bild: pfad.min(1, 'Bild fehlt'),
       alt: text.min(1, 'Alternativtext ist Pflicht (Barrierefreiheit)'),
-    }),
-  ),
-});
-
-/**
- * Ein Bereich innerhalb eines freien Abschnitts: ein Bild NEBEN dem
- * Text, links oder rechts. Mehrere Bereiche ergeben einen langen
- * Abschnitt mit mehreren Bildern (Florian, 17. September 2026).
- *
- * Bis dahin hatte ein Abschnitt genau ein Bild, das über dem Text
- * stand. Das Feld `breite` (schmal / breit) ist damit entfallen: Der
- * Abschnitt nutzt immer die volle Inhaltsbreite, weil er zwei Spalten
- * trägt.
- */
-const abschnittsbereich = z
-  .object({
-    /** Zwischenüberschrift — meist nur ab dem zweiten Bereich sinnvoll */
-    titel: text,
-    text: richtext,
-    bild: pfad,
-    bild_alt: text,
-    bild_seite: z.enum(['links', 'rechts']).default('links'),
-    /** `format`: Das Bild behält sein Seitenverhältnis und ist dann
-        womöglich kürzer als der Text daneben. `voll`: Es füllt die
-        ganze Höhe des Bereichs und wird dafür beschnitten. */
-    bild_hoehe: z.enum(['format', 'voll']).default('format'),
-  })
-  .refine((b) => !b.bild || b.bild_alt.trim() !== '', {
-    path: ['bild_alt'],
-    message: 'Bildbeschreibung ist Pflicht, sobald ein Bild gewählt ist (Barrierefreiheit)',
-  });
-
-export const abschnitteSchema = z.object({
-  _hinweis_fuer_die_redaktion: text.optional(),
-  eintraege: z.array(
-    z.object({
-      id: kennung,
-      ...basisEintrag,
-      titel: text.min(1),
-      bereiche: z.array(abschnittsbereich).default([]),
-      /** Die Zeile über den Knöpfen — freiwillig, ältere Einträge haben sie nicht */
-      knoepfe_text: text.optional(),
-      link_text: text,
-      link_ziel: text,
-      pdf_text: text,
-      pdf_datei: pfad,
     }),
   ),
 });
@@ -283,60 +217,310 @@ export const seiteSchema = z.object({
   }),
 });
 
+/* ---------- Abschnitte: die Bausteine von Seiten, Beiträgen und Bereichen ---------- */
+
+/**
+ * Felder, die jeder Abschnitt hat. `id` wird beim Anlegen einmal aus dem
+ * Titel gebildet und bleibt dann fest — sie ist die Sprungmarke, auf die
+ * Menü-Unterpunkte und Verweise zeigen. `im_menue` macht den Abschnitt
+ * zum Unterpunkt des Menüpunkts, zu dem er gehört.
+ */
+const abschnittBasis = {
+  id: kennung,
+  titel: text,
+  im_menue: z.boolean().default(false),
+  knoepfe_text: text.default(''),
+  knoepfe,
+};
+
+/** Text, wahlweise mit einem Bild daneben (links oder rechts) */
+const textAbschnitt = z.object({
+  art: z.literal('text'),
+  ...abschnittBasis,
+  text: richtext,
+  bild: pfad.default(''),
+  bild_alt: text.default(''),
+  bild_seite: z.enum(['links', 'rechts']).default('links'),
+  /** `format`: Das Bild behält sein Seitenverhältnis und ist dann
+      womöglich kürzer als der Text daneben. `voll`: Es füllt die
+      ganze Höhe des Abschnitts und wird dafür beschnitten. */
+  bild_hoehe: z.enum(['format', 'voll']).default('format'),
+});
+
+/** Eine Kachel: Symbol (freiwillig), Titel, Text, Ziel (freiwillig) */
+const kachel = z.object({
+  symbol: pfad.default(''),
+  titel: text,
+  text: richtext.default(''),
+  ziel: ziel.default(''),
+});
+
+/** Mehrere Kacheln nebeneinander — z. B. „Atmen · Kauen · Schlucken“ */
+const kachelAbschnitt = z.object({
+  art: z.literal('kacheln'),
+  ...abschnittBasis,
+  einleitung: richtext.default(''),
+  kacheln: z.array(kachel).min(1, 'Mindestens eine Kachel'),
+});
+
+/** Kapitelüberschrift mit Haarlinie — gliedert lange Seiten */
+const kapitelAbschnitt = z.object({
+  art: z.literal('kapitel'),
+  ...abschnittBasis,
+  titel: text.min(1, 'Ein Kapitel braucht eine Überschrift'),
+  text: richtext.default(''),
+});
+
+export const abschnittSchema = z.discriminatedUnion('art', [textAbschnitt, kachelAbschnitt, kapitelAbschnitt]);
+const abschnitte = z.array(abschnittSchema).default([]);
+
+/** Eine Datei zum Herunterladen unter einer Seite oder einem Beitrag */
+const anhang = z.object({
+  datei: pfad.min(1, 'Datei fehlt'),
+  titel: text,
+  beschreibung: text.default(''),
+});
+
+/* ---------- Bereiche: Seiten, Blogs, Startseiten-Abschnitte ---------- */
+
+/**
+ * Kennungen, die schon vergeben sind: Ordner der Seite, feste Adressen
+ * und die Sprungmarken der eingebauten Abschnitte der Startseite.
+ */
+export const VERGEBEN = [
+  'admin', 'api', 'login', 'leistungen', 'impressum', 'datenschutz', 'bilder', 'dokumente',
+  'icons', 'fonts', 'lottie', '_astro', 'cdn-cgi', 'stand', 'sitemap-index', 'sitemap-0',
+  'start', 'oz_anchor', 'inhalt', 'praxis', 'galerie', 'team', 'stellen', 'contact', 'kontakt',
+  'information', 'willkommen', 'sprechstunden', 'abschnitte',
+];
+
+const bereichKennung = kennung.refine((id) => !VERGEBEN.includes(id) && !id.startsWith('leistungen-'), {
+  message: 'Diese Kennung ist schon vergeben — bitte eine andere wählen',
+});
+
+const bereichBasis = {
+  id: bereichKennung,
+  aktiv: z.boolean().default(true),
+  titel: text.min(1, 'Titel fehlt'),
+  /** Die kleine gesperrte Zeile über der Überschrift */
+  kicker: text.default(''),
+};
+
+/** Eine eigene Seite mit Adresse, z. B. /dentosophie/ */
+const seiteBereich = z.object({
+  typ: z.literal('seite'),
+  ...bereichBasis,
+  /** Kündigt eine Karte die Seite auf der Startseite an? Ohne Karte
+      hält der Block nur den Platz des Menüpunkts. */
+  auf_startseite: z.boolean().default(true),
+  /** Kurztext der Ankündigungskarte */
+  kurz: text.default(''),
+  titelbild: pfad.default(''),
+  titelbild_alt: text.default(''),
+  abschnitte,
+  dateien: z.array(anhang).default([]),
+});
+
+export const beitragSchema = z.object({
+  id: kennung,
+  aktiv: z.boolean().default(true),
+  datum,
+  titel: text.min(1, 'Titel fehlt'),
+  kurz: text.default(''),
+  bild: pfad.default(''),
+  bild_alt: text.default(''),
+  abschnitte,
+  dateien: z.array(anhang).default([]),
+});
+
+/** Beiträge wie die Neuigkeiten — jeder öffnet als eigene Seite */
+const blogBereich = z.object({
+  typ: z.literal('blog'),
+  ...bereichBasis,
+  einleitung: text.default(''),
+  beitraege: z.array(beitragSchema).default([]),
+});
+
+/** Text und Bilder direkt auf der Startseite */
+const abschnittBereich = z.object({
+  typ: z.literal('abschnitt'),
+  ...bereichBasis,
+  abschnitte,
+});
+
+/** Bildbeschreibung ist Pflicht, sobald ein Bild gewählt ist (Barrierefreiheit) */
+function bildbeschreibungen(b: { abschnitte?: unknown[]; titelbild?: string; titelbild_alt?: string;
+  beitraege?: { bild: string; bild_alt: string; abschnitte: unknown[] }[] }, ctx: z.RefinementCtx) {
+  const fehlt = (pfadTeile: (string | number)[]) =>
+    ctx.addIssue({ code: 'custom', path: pfadTeile, message: 'Bildbeschreibung ist Pflicht, sobald ein Bild gewählt ist (Barrierefreiheit)' });
+  const inAbschnitten = (liste: unknown[], vorne: (string | number)[]) =>
+    liste.forEach((a, i) => {
+      const t = a as { art: string; bild?: string; bild_alt?: string };
+      if (t.art === 'text' && t.bild && !t.bild_alt?.trim()) fehlt([...vorne, 'abschnitte', i, 'bild_alt']);
+    });
+  if (b.titelbild && !b.titelbild_alt?.trim()) fehlt(['titelbild_alt']);
+  if (b.abschnitte) inAbschnitten(b.abschnitte, []);
+  b.beitraege?.forEach((p, i) => {
+    if (p.bild && !p.bild_alt.trim()) fehlt(['beitraege', i, 'bild_alt']);
+    inAbschnitten(p.abschnitte, ['beitraege', i]);
+  });
+}
+
+export const bereichSchema = z
+  .discriminatedUnion('typ', [seiteBereich, blogBereich, abschnittBereich])
+  .superRefine(bildbeschreibungen);
+
+export const bereicheSchema = z.object({
+  _hinweis_fuer_die_redaktion: text.optional(),
+  eintraege: z.array(bereichSchema),
+});
+
+/* ---------- Seitenaufbau: Reihenfolge der Startseite und das Menü ---------- */
+
+/** Ein Unterpunkt im Menü — ohne Symbol, mit freiem Ziel */
+const unterpunkt = z.object({
+  titel: text.min(1, 'Bezeichnung fehlt'),
+  kurz: text.default(''),
+  ziel: ziel.refine((w) => w !== '', 'Ziel fehlt'),
+});
+
+/** Ein Hauptpunkt im Menü. Nur Hauptpunkte haben ein Symbol. */
+const menuePunkt = z.object({
+  titel: text.min(1, 'Bezeichnung fehlt'),
+  symbol: pfad,
+  unterpunkte: z.array(unterpunkt).default([]),
+});
+
+/** Höchstens so viele Hauptpunkte — mehr passen bei 992 px nicht in die Kopfleiste */
+export const MENUE_HOECHSTENS = 7;
+
+export const BLOCKARTEN = ['willkommen', 'galerie', 'leistungen', 'team', 'stellen', 'kontakt', 'bereich', 'verweis'] as const;
+
+const block = z.object({
+  /** Bei `bereich` die Kennung des Bereichs, sonst der Name der Blockart */
+  id: kennung,
+  art: z.enum(BLOCKARTEN),
+  aktiv: z.boolean().default(true),
+  /** Steht der Block im Menü? `null` = nein */
+  menue: menuePunkt.nullable().default(null),
+  /** Nur bei `verweis`: ein reiner Menüpunkt, der irgendwohin führt */
+  ziel: ziel.default(''),
+});
+
+export const seitenaufbauSchema = z.object({
+  _hinweis_fuer_die_redaktion: text.optional(),
+  /** Die Sprechstunden-Karte steht fest oben — und ihr Menüpunkt vorn */
+  sprechstunden: z.object({ menue: menuePunkt }),
+  /** Die Blöcke der Startseite in ihrer Reihenfolge, zwischen Karte und Fuß */
+  bloecke: z.array(block),
+});
+
 /**
  * Alle Dateien mit ihrem Schema. Der Schlüssel ist der Dateiname ohne
- * Endung — so spricht auch die Redaktion die Bereiche an.
+ * Endung — so spricht auch die Redaktion die Dateien an.
  */
 export const schemata = {
   hinweis: hinweisSchema,
   oeffnungszeiten: oeffnungszeitenSchema,
   leistungen: leistungenSchema,
-  neuigkeiten: neuigkeitenSchema,
-  navigation: navigationSchema,
   team: teamSchema,
   galerie: galerieSchema,
-  abschnitte: abschnitteSchema,
   stellen: stellenSchema,
   startseite: startseiteSchema,
   seite: seiteSchema,
+  seitenaufbau: seitenaufbauSchema,
+  bereiche: bereicheSchema,
 } as const;
 
-export type Bereich = keyof typeof schemata;
+/** Name einer Inhaltsdatei (ohne .json) */
+export type Datei = keyof typeof schemata;
 
-export const bereiche = Object.keys(schemata) as Bereich[];
+export const dateien = Object.keys(schemata) as Datei[];
 
-export function istBereich(wert: string): wert is Bereich {
-  return wert in schemata;
+export function istDatei(wert: string): wert is Datei {
+  return Object.hasOwn(schemata, wert);
 }
+
+export type Seitenaufbau = z.infer<typeof seitenaufbauSchema>;
+export type Block = Seitenaufbau['bloecke'][number];
+export type MenuePunkt = z.infer<typeof menuePunkt>;
+export type Bereich = z.infer<typeof bereichSchema>;
+export type Abschnitt = z.infer<typeof abschnittSchema>;
+export type Beitrag = z.infer<typeof beitragSchema>;
+export type Knopf = z.infer<typeof knopf>;
 
 /**
  * Prüft Inhalte gegen das Schema und liefert entweder die bereinigten
  * Daten oder eine Liste lesbarer Fehler („eintraege.3.titel: …").
  */
-export function pruefen(bereich: Bereich, daten: unknown):
+export function pruefen(datei: Datei, daten: unknown):
   | { ok: true; daten: unknown }
   | { ok: false; fehler: string[] } {
-  const ergebnis = schemata[bereich].safeParse(daten);
+  const ergebnis = schemata[datei].safeParse(daten);
   if (ergebnis.success) return { ok: true, daten: ergebnis.data };
   const fehler = ergebnis.error.issues.map((i) => `${i.path.join('.') || '(Wurzel)'}: ${i.message}`);
   return { ok: false, fehler };
 }
 
+/** Doppelte Kennungen in einer Liste */
+function doppelte(ids: string[]): string[] {
+  return [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))];
+}
+
 /**
- * Zusätzliche Regeln, die Zod allein nicht ausdrückt.
- * Liefert eine Fehlerliste (leer = alles gut).
+ * Zusätzliche Regeln innerhalb einer Datei, die Zod allein nicht
+ * ausdrückt. Liefert eine Fehlerliste (leer = alles gut).
  */
-export function zusatzregeln(bereich: Bereich, daten: unknown): string[] {
+export function zusatzregeln(datei: Datei, daten: unknown): string[] {
   const fehler: string[] = [];
   const d = daten as { eintraege?: { id: string }[] } | null;
   if (d?.eintraege) {
-    const ids = d.eintraege.map((e) => e.id);
-    const doppelt = ids.filter((id, i) => ids.indexOf(id) !== i);
-    if (doppelt.length) fehler.push(`Kennung mehrfach vergeben: ${[...new Set(doppelt)].join(', ')}`);
+    const doppelt = doppelte(d.eintraege.map((e) => e.id));
+    if (doppelt.length) fehler.push(`Kennung mehrfach vergeben: ${doppelt.join(', ')}`);
   }
-  if (bereich === 'hinweis') {
+  if (datei === 'hinweis') {
     const h = daten as { von: string; bis: string };
     if (h.von && h.bis && h.von > h.bis) fehler.push('„von" liegt nach „bis"');
+  }
+  if (datei === 'bereiche') {
+    for (const b of (daten as { eintraege: Bereich[] }).eintraege) {
+      const listen = b.typ === 'blog' ? b.beitraege.map((p) => [p.titel, p.abschnitte] as const) : [[b.titel, b.abschnitte] as const];
+      for (const [name, liste] of listen) {
+        const doppelt = doppelte(liste.map((a) => a.id));
+        if (doppelt.length) fehler.push(`„${name}“: Abschnitts-Kennung mehrfach vergeben: ${doppelt.join(', ')}`);
+      }
+      if (b.typ === 'blog') {
+        const doppelt = doppelte(b.beitraege.map((p) => p.id));
+        if (doppelt.length) fehler.push(`„${b.titel}“: Beitrags-Kennung mehrfach vergeben: ${doppelt.join(', ')}`);
+      }
+    }
+  }
+  if (datei === 'seitenaufbau') {
+    const s = daten as Seitenaufbau;
+    const doppelt = doppelte(s.bloecke.map((b) => b.id));
+    if (doppelt.length) fehler.push(`Block mehrfach im Seitenplan: ${doppelt.join(', ')}`);
+    for (const b of s.bloecke) {
+      if (b.art !== 'bereich' && b.art !== 'verweis' && b.id !== b.art) fehler.push(`Block „${b.id}“ muss „${b.art}“ heißen`);
+      if (b.art === 'verweis' && (!b.ziel || !b.menue)) fehler.push(`Menüpunkt „${b.id}“ braucht Bezeichnung und Ziel`);
+    }
+    const punkte = 1 + s.bloecke.filter((b) => b.aktiv && b.menue).length;
+    if (punkte > MENUE_HOECHSTENS) {
+      fehler.push(`Das Menü hat Platz für ${MENUE_HOECHSTENS} Punkte, eingetragen sind ${punkte}. Machen Sie einen davon zum Unterpunkt.`);
+    }
+  }
+  return fehler;
+}
+
+/**
+ * Regeln über Dateigrenzen hinweg: Jeder Bereich im Seitenplan muss es
+ * geben, jede Kennung darf nur einmal vorkommen.
+ */
+export function zusammenhangPruefen(seitenaufbau: Seitenaufbau, bereiche: { eintraege: Bereich[] }): string[] {
+  const fehler: string[] = [];
+  const vorhanden = new Map(bereiche.eintraege.map((b) => [b.id, b]));
+  for (const b of seitenaufbau.bloecke) {
+    if (b.art === 'bereich' && !vorhanden.has(b.id)) fehler.push(`Im Seitenplan steht „${b.id}“, den Bereich gibt es aber nicht`);
+    if (b.art === 'verweis' && vorhanden.has(b.id)) fehler.push(`Menüpunkt „${b.id}“ heißt wie ein Bereich`);
   }
   return fehler;
 }

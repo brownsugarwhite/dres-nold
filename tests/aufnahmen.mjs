@@ -104,7 +104,7 @@ for (const [name, groesse] of Object.entries(GROESSEN)) {
       await knopf.click();
       await seite.waitForTimeout(900);
       await foto('20-menue');
-      const leistungen = seite.locator('[data-mobilleistungen]').first();
+      const leistungen = seite.locator('[data-ebene-knopf]').first();
       if (await leistungen.count()) {
         await leistungen.click();
         await seite.waitForTimeout(900);
@@ -112,7 +112,7 @@ for (const [name, groesse] of Object.entries(GROESSEN)) {
       }
     }
   } else {
-    const punkt = seite.locator('.kopfleiste [aria-controls="leistungsmenue"]').first();
+    const punkt = seite.locator('.kopfleiste [aria-controls^="untermenue-oben"]').first();
     if (await punkt.count()) {
       await punkt.hover();
       await seite.waitForTimeout(900);

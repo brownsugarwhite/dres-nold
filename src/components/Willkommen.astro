@@ -29,6 +29,14 @@
 import startseite from '../content/startseite.json';
 import { trennen } from '../lib/silben';
 
+interface Props {
+  /** h1, solange die Begrüßung vorn steht — sonst h2 (index.astro) */
+  ueberschrift?: 'h1' | 'h2';
+}
+
+const { ueberschrift = 'h1' } = Astro.props;
+const Titel = ueberschrift;
+
 const texte = startseite.willkommen;
 
 const zeilen = texte.titel.split('\n').map((z) => z.trim()).filter(Boolean);
@@ -40,19 +48,19 @@ const klein = zeilen.slice(0, -1).join(' ');
 
 <section class="willkommen" id="praxis">
   <div class="willkommen__inhalt">
-    <h1 class="willkommen__titel" data-rein data-willkommentitel>
+    <Titel class="willkommen__titel" data-rein data-willkommentitel>
       {klein && <span class="willkommen__klein" data-zeile>{klein}</span>}
       <span class="willkommen__gross" data-zeile>{gross}</span>
-    </h1>
+    </Titel>
 
     <div class="willkommen__rechts" data-rein>
       {texte.text && <p class="willkommen__text">{trennen(texte.text)}</p>}
       <div class="willkommen__knoepfe">
-        <a class="kn kn--voll" href="#contact">
+        <a class="kn kn--voll" href="/#contact">
           <span class="kn__f" aria-hidden="true"></span>
           <span class="willkommen__lang">Termin vereinbaren</span><span class="willkommen__kurz" aria-hidden="true">Termin</span>
         </a>
-        <a class="kn" href="#leistungen">
+        <a class="kn" href="/#leistungen">
           <span class="kn__f" aria-hidden="true"></span>
           <span class="willkommen__lang">Unsere Leistungen</span><span class="willkommen__kurz" aria-hidden="true">Leistungen</span>
         </a>
@@ -64,13 +72,10 @@ const klein = zeilen.slice(0, -1).join(' ');
 <style>
   .willkommen {
     --oben: clamp(72px, 9vw, 124px);
-    /* Die Begrüßung folgt der Einstiegskarte. Oben so viel Luft, dass
-       der Zipfel der Karte in Ruhelage über leerem Weiß steht und die
-       Überschrift noch unter der Symbolleiste liegt — die fährt beim
-       Schnalz weg und gibt sie frei. Als Außenabstand, damit die
-       Sprungmarke „Praxis" den Titel wie überall unter die Kopfleiste
-       setzt. */
-    margin-top: calc(var(--zipfel-laenge, 154px) + var(--abstand-s) - var(--oben));
+    /* Steht die Begrüßung als erster Block direkt unter der Karte,
+       rechnet index.astro diesen Innenabstand aus dem Zipfelfreiraum
+       heraus */
+    --block-oben: var(--oben);
     padding-block: var(--oben) clamp(56px, 7vw, 96px);
     padding-inline: var(--abstand-seitenrand);
   }

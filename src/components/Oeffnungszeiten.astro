@@ -189,9 +189,12 @@ const texte = startseite.sprechstunden;
        noch ab — die Spitze zieht sich beim Weiterscrollen ein, und der
        Platz, den sie hatte, stünde sonst als leere Fläche zwischen
        Karte und nächstem Abschnitt (Florian, 17. September 2026).
-       Während sie sich einzieht, reicht sie kurz in den Innenabstand
-       des nächsten Abschnitts hinein; sie sitzt aber weit rechts, wo
-       dort nichts steht. */
+       Während sie sich einzieht, reicht sie kurz in den Raum über dem
+       ersten Block hinein. Bis Oktober 2026 saß sie dabei weit rechts,
+       wo nichts steht; seit der Sprechstunden-Knopf vorn im Menü steht,
+       links — dort, wo Überschriften beginnen. Darum hält der erste
+       Block oben den Zipfelfreiraum ein (index.astro, „Der erste Block
+       nach der Sprechstunden-Karte"). */
     height: calc(var(--oz-ende) - 110px - var(--zipfel-laenge));
     background: var(--farbe-flaeche);
   }
@@ -701,9 +704,15 @@ const texte = startseite.sprechstunden;
     let spitzeX = 0;       // x der Spitze = Mitte des Sprechstunden-Knopfs
     let versatzOben = 0;   // Grundlinie in der Mitte, unter der Blasenkante
     let ruhelage = 264;    // bottom-Wert der Blase in Ruhe
+    /* Gespiegelt (−1), wenn der Knopf in der linken Hälfte steht: Der
+       Zipfel der Vorlage lehnt nach rechts und die Grundlinie fällt nach
+       links ab — beides für einen Knopf ganz rechts. Seit der
+       Sprechstunden-Knopf vorn im Menü steht (Florian, Oktober 2026),
+       zeigt der Zipfel nach links, und alles läuft spiegelbildlich. */
+    let spiegel = 1;
 
     /** y der Grundlinie an Stelle x (SVG-Koordinaten, 0 = Blasenkante) */
-    const grundlinie = (x: number) => versatzOben + (breite / 2 - x) * VORLAGE.neigung;
+    const grundlinie = (x: number) => versatzOben + spiegel * (breite / 2 - x) * VORLAGE.neigung;
 
     const vermessen = () => {
       breite = document.documentElement.clientWidth;
@@ -715,7 +724,10 @@ const texte = startseite.sprechstunden;
       const kr = [...document.querySelectorAll<HTMLElement>('.fussknopf[data-punkt="zeiten"]')]
         .map((k) => k.getBoundingClientRect())
         .find((r) => r.width > 0);
-      spitzeX = kr ? kr.left + kr.width / 2 : breite * 0.8667;
+      /* Ohne Knopf (kein JavaScript-Menü, Fehler): dort, wo er stünde —
+         vorn im Menü */
+      spitzeX = kr ? kr.left + kr.width / 2 : breite * 0.1333;
+      spiegel = spitzeX < breite / 2 ? -1 : 1;
 
       /* Die Linie darf rechts nicht über die Blasenkante steigen:
          Versatz so wählen, dass der höchste Punkt 2 px darunter liegt. */
@@ -752,9 +764,12 @@ const texte = startseite.sprechstunden;
       const anteil = aus * schnalz;
       const f = laenge / VORLAGE.laenge;
       const zw = (m: { zu: number; auf: number }) => (m.zu + (m.auf - m.zu) * anteil) * f;
-      const xL = spitzeX + zw(VORLAGE.basisLinks);
-      const xS = spitzeX + VORLAGE.spitze.zu * (1 - schnalz) * f;
-      const xR = spitzeX + zw(VORLAGE.basisRechts);
+      /* Gespiegelt tauschen die beiden Basispunkte die Seiten — die
+         Linie läuft trotzdem von links nach rechts */
+      const a = spitzeX + spiegel * zw(VORLAGE.basisLinks);
+      const b = spitzeX + spiegel * zw(VORLAGE.basisRechts);
+      const [xL, xR] = spiegel > 0 ? [a, b] : [b, a];
+      const xS = spitzeX + spiegel * VORLAGE.spitze.zu * (1 - schnalz) * f;
       const yL = grundlinie(xL);
       const yR = grundlinie(xR);
       const yS = grundlinie(xS) + anteil * laenge;

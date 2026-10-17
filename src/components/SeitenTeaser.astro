@@ -1,0 +1,33 @@
+---
+/**
+ * Die Ankündigung einer eigenen Seite auf der Startseite — eine breite
+ * Beitragskarte, die beim Klick in die Seite morpht (Florian, Oktober
+ * 2026: „wie ein Neuigkeiten-Beitrag aufgemacht"). Die Sprungmarke des
+ * Blocks ist die Kennung der Seite.
+ */
+import BeitragKarte from './BeitragKarte.astro';
+import { seitenAdresse } from '../lib/aufbau';
+import type { Bereich } from '../content/schema';
+
+interface Props {
+  bereich: Extract<Bereich, { typ: 'seite' }>;
+}
+
+const { bereich } = Astro.props;
+---
+
+<section class="seitenteaser bereich" id={bereich.id} aria-label={bereich.titel}>
+  <div class="bereich__inhalt">
+    <BeitragKarte
+      href={seitenAdresse(bereich)}
+      bild={bereich.titelbild}
+      bild_alt={bereich.titelbild_alt}
+      kicker={bereich.kicker}
+      titel={bereich.titel}
+      kurz={bereich.kurz}
+      mehr="Mehr erfahren"
+      ebene="h2"
+      breit
+    />
+  </div>
+</section>

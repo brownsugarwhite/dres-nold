@@ -1,0 +1,31 @@
+---
+/**
+ * Eine eigene Seite: /<seite>/, etwa /dentosophie/ — aus
+ * content/bereiche.json (Art „seite", Florian, Oktober 2026). Auf der
+ * Startseite kündigt sie eine Karte an, aus der sie sich ins Vollbild
+ * morpht; aus dem Menü heraus öffnet sie mit dem gewöhnlichen
+ * Seitenwechsel.
+ */
+import Inhaltsseite from '../../layouts/Inhaltsseite.astro';
+import { seiten } from '../../content/inhalte';
+import { seitenAdresse } from '../../lib/aufbau';
+
+export function getStaticPaths() {
+  return seiten.map((seite) => ({ params: { seite: seite.id }, props: { seite } }));
+}
+
+const { seite } = Astro.props;
+---
+
+<Inhaltsseite
+  adresse={seitenAdresse(seite)}
+  titel={seite.titel}
+  beschreibung={seite.kurz}
+  kicker={seite.kicker}
+  bild={seite.titelbild}
+  bild_alt={seite.titelbild_alt}
+  abschnitte={seite.abschnitte}
+  dateien={seite.dateien}
+  zurueck="Zur Startseite"
+  breit
+/>

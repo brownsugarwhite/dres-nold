@@ -1,5 +1,6 @@
 ---
-import { trennenHtml, trennenTitel } from '../../lib/silben';
+import { trennenTitel } from '../../lib/silben';
+import { redaktionsHtml } from '../../lib/verweise';
 /**
  * Einzelseite einer Leistung.
  *
@@ -27,11 +28,6 @@ export function getStaticPaths() {
 }
 
 const { leistung } = Astro.props;
-/* Die Knopfzeile ist in der Redaktion freiwillig — bestehende Einträge
-   haben die Felder noch nicht (content/schema.ts lässt sie offen). */
-const knoepfe = leistung as typeof leistung & {
-  knoepfe_text?: string; link_text?: string; link_ziel?: string; pdf_text?: string; pdf_datei?: string;
-};
 const alle = daten.eintraege.filter((e) => e.aktiv);
 const i = alle.findIndex((e) => e.id === leistung.id);
 const vorherige = alle[i - 1];
@@ -66,11 +62,11 @@ const naechste = alle[i + 1];
           Momentaufnahme der Karte und wächst mit ihr, statt separat
           hereinzugleiten (styles/uebergaenge.css). */}
       <div class="leistung__rest">
-        <div class="leistung__text redaktionstext" set:html={trennenHtml(leistung.inhalt)} />
+        <div class="leistung__text redaktionstext" set:html={redaktionsHtml(leistung.inhalt)} />
 
         {/* Satz und Knöpfe aus der Redaktion — ohne eigenen Übergangsnamen,
             sie gehören zur Karte und wachsen mit ihr */}
-        <Knopfzeile satz={knoepfe.knoepfe_text} linkText={knoepfe.link_text} linkZiel={knoepfe.link_ziel} pdfText={knoepfe.pdf_text} pdfDatei={knoepfe.pdf_datei} />
+        <Knopfzeile satz={leistung.knoepfe_text} knoepfe={leistung.knoepfe} />
 
         <nav class="leistung__nachbarn" aria-label="Weitere Leistungen">
           {vorherige && (

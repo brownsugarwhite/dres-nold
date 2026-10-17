@@ -1,0 +1,99 @@
+{
+  "_hinweis_fuer_die_redaktion": "Reihenfolge der Startseite und das Menü. Startbereich, Sprechstunden-Karte und Fuß stehen fest; die Blöcke dazwischen erscheinen in dieser Reihenfolge, und das Menü folgt ihr. Ein Block mit „menue“ steht im Menü — mit Bezeichnung, Symbol und Unterpunkten.",
+  "sprechstunden": {
+    "menue": {
+      "titel": "Sprechstunden",
+      "symbol": "/icons/navigation/oeffnungszeiten.svg",
+      "unterpunkte": []
+    }
+  },
+  "bloecke": [
+    {
+      "id": "willkommen",
+      "art": "willkommen",
+      "aktiv": true,
+      "menue": null,
+      "ziel": ""
+    },
+    {
+      "id": "galerie",
+      "art": "galerie",
+      "aktiv": true,
+      "menue": {
+        "titel": "Praxis",
+        "symbol": "/icons/navigation/praxis.svg",
+        "unterpunkte": []
+      },
+      "ziel": ""
+    },
+    {
+      "id": "kieferorthopaedie-unter-einem-dach",
+      "art": "bereich",
+      "aktiv": true,
+      "menue": null,
+      "ziel": ""
+    },
+    {
+      "id": "leistungen",
+      "art": "leistungen",
+      "aktiv": true,
+      "menue": {
+        "titel": "Leistungen",
+        "symbol": "/icons/navigation/leistungen.svg",
+        "unterpunkte": []
+      },
+      "ziel": ""
+    },
+    {
+      "id": "dentosophie",
+      "art": "bereich",
+      "aktiv": true,
+      "ziel": "",
+      "menue": {
+        "titel": "Dentosophie",
+        "symbol": "/icons/navigation/dentosophie.svg",
+        "unterpunkte": []
+      }
+    },
+    {
+      "id": "neuigkeiten",
+      "art": "bereich",
+      "aktiv": true,
+      "menue": {
+        "titel": "Neuigkeiten",
+        "symbol": "/icons/navigation/neuigkeiten.svg",
+        "unterpunkte": []
+      },
+      "ziel": ""
+    },
+    {
+      "id": "team",
+      "art": "team",
+      "aktiv": true,
+      "menue": {
+        "titel": "Team",
+        "symbol": "/icons/navigation/team.svg",
+        "unterpunkte": []
+      },
+      "ziel": ""
+    },
+    {
+      "id": "stellen",
+      "art": "stellen",
+      "aktiv": true,
+      "menue": null,
+      "ziel": ""
+    },
+    {
+      "id": "kontakt",
+      "art": "kontakt",
+      "aktiv": true,
+      "menue": {
+        "titel": "Kontakt",
+        "symbol": "/icons/navigation/kontakt.svg",
+        "unterpunkte": []
+      },
+      "ziel": ""
+    }
+  ]
+}

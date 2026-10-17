@@ -1,0 +1,52 @@
+---
+/**
+ * Ein Blog auf der Startseite — die Beiträge als Karten, neueste
+ * zuerst. „Neuigkeiten" ist der erste; die Praxis kann in der Redaktion
+ * weitere anlegen (Florian, Oktober 2026).
+ *
+ * Jeder Beitrag hat eine eigene Adresse (/<blog>/<beitrag>/) und öffnet
+ * sich mit demselben Morph-Übergang wie die Leistungen. Ohne aktiven
+ * Beitrag erscheint der Block gar nicht — samt Menüpunkt (lib/aufbau.ts).
+ */
+import BeitragKarte from './BeitragKarte.astro';
+import { aktiveBeitraege, beitragAdresse } from '../lib/aufbau';
+import { trennenTitel } from '../lib/silben';
+import type { Bereich } from '../content/schema';
+
+interface Props {
+  bereich: Bereich;
+}
+
+const { bereich } = Astro.props;
+const beitraege = aktiveBeitraege(bereich);
+const einleitung = bereich.typ === 'blog' ? bereich.einleitung : '';
+---
+
+<section class="blog bereich" id={bereich.id}>
+  <div class="bereich__inhalt">
+    {bereich.kicker && <div class="kicker" data-rein>{bereich.kicker}</div>}
+    <h2 class="bereich__titel" data-rein>{trennenTitel(bereich.titel)}</h2>
+    {einleitung && <p class="bereich__einleitung" data-rein>{einleitung}</p>}
+
+    <div class="blog__liste">
+      {beitraege.map((b) => (
+        <BeitragKarte href={beitragAdresse(bereich, b)} bild={b.bild} bild_alt={b.bild_alt} datum={b.datum} titel={b.titel} kurz={b.kurz} />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .blog__liste {
+    display: grid;
+    /* `min(320px, 100%)`: Auf sehr schmalen Handys ist die Spalte
+       breiter als der Platz — ohne die Schranke schob die Liste die
+       ganze Seite waagerecht auf (320-px-Geräte, 18. September 2026). */
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+    /* Auf breiten Schirmen deutlich mehr Luft zwischen den Beiträgen —
+       nebeneinander standen sie zu dicht (Florian, 18. September 2026).
+       Untereinander bleibt es beim engeren Maß. */
+    gap: 34px clamp(24px, 4.5vw, 72px);
+    margin-top: 44px;
+  }
+</style>

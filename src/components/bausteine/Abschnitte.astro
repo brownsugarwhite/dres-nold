@@ -1,0 +1,299 @@
+---
+/**
+ * Die Abschnitte einer Seite, eines Beitrags oder eines Bereichs auf der
+ * Startseite — drei Arten (Florian, Oktober 2026):
+ *
+ *   text      Text, wahlweise mit einem Bild daneben (links oder rechts)
+ *   kacheln   mehrere Kacheln nebeneinander, mit oder ohne Symbol
+ *   kapitel   eine Kapitelüberschrift mit Haarlinie — gliedert lange Seiten
+ *
+ * Jeder Abschnitt kann Knöpfe tragen (Knopfzeile.astro) und eine
+ * Sprungmarke haben, auf die Menü-Unterpunkte und Verweise zeigen.
+ *
+ * Überschriftenebenen ergeben sich von selbst (WCAG: keine Sprünge):
+ * Abschnitte stehen eine Ebene unter dem Titel darüber; nach einem
+ * Kapitel rücken sie eine weitere Ebene ein, bis das nächste kommt.
+ *
+ * Die Gestaltung von Text-mit-Bild (`.block`) stammt aus den früheren
+ * freien Abschnitten (17./18. September 2026): Bild NEBEN dem Text, die
+ * Reihenfolge im HTML bleibt Bild, dann Text, damit Vorleseprogramme
+ * immer dasselbe hören.
+ */
+import Knopfzeile from '../Knopfzeile.astro';
+import { trennenTitel } from '../../lib/silben';
+import { redaktionsHtml } from '../../lib/verweise';
+import type { Abschnitt } from '../../content/schema';
+
+interface Props {
+  abschnitte: Abschnitt[];
+  /** Ebene der Abschnittsüberschriften: 2 auf einer Seite (unter dem h1),
+      3 auf der Startseite (unter dem h2 des Bereichs) */
+  ebene: 2 | 3;
+  /** Sprungmarke eines Abschnitts */
+  anker: (a: Abschnitt) => string;
+}
+
+const { abschnitte, ebene, anker } = Astro.props;
+
+/** Ebene jedes Abschnitts — nach einem Kapitel eine tiefer */
+let imKapitel = false;
+const ebenen = abschnitte.map((a) => {
+  if (a.art === 'kapitel') {
+    imKapitel = true;
+    return ebene;
+  }
+  return Math.min(6, ebene + (imKapitel ? 1 : 0));
+});
+
+const tag = (n: number) => `h${n}` as 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+
+/** Ohne Bild steht der Text allein — dann braucht es keine zwei Spalten. */
+const seite = (a: { bild?: string; bild_seite?: string }) =>
+  a.bild ? (a.bild_seite === 'rechts' ? 'rechts' : 'links') : 'ohne';
+---
+
+{abschnitte.map((a, i) => {
+  const Titel = tag(ebenen[i]);
+  return (
+    <section class:list={['abschnitt', `abschnitt--${a.art}`]} id={anker(a)} aria-label={a.titel ? undefined : 'Abschnitt'}>
+      {a.art === 'kapitel' && (
+        <div class="kapitel" data-rein>
+          <Titel class="kapitel__titel">{trennenTitel(a.titel)}</Titel>
+          {a.text && <div class="kapitel__text redaktionstext" set:html={redaktionsHtml(a.text)} />}
+        </div>
+      )}
+
+      {a.art === 'text' && (
+        <div class="block" data-bild={seite(a)} data-hoehe={a.bild_hoehe === 'voll' ? 'voll' : 'format'} data-rein>
+          {a.bild && (
+            <div class="block__bild">
+              {/* Der Läufer wächst über den Scrollweg (scripts/bildlauf.ts),
+                  der Rahmen darum schneidet ab — wie die Beitragsbilder */}
+              <span class="block__lauf" data-bildlauf>
+                <img src={a.bild} alt={a.bild_alt} width="900" height="675" loading="lazy" />
+              </span>
+            </div>
+          )}
+
+          <div class="block__text">
+            {a.titel && <Titel class="block__titel">{trennenTitel(a.titel)}</Titel>}
+            {a.text && <div class="redaktionstext" set:html={redaktionsHtml(a.text)} />}
+            <Knopfzeile satz={a.knoepfe_text} knoepfe={a.knoepfe} allein={!a.text} />
+          </div>
+        </div>
+      )}
+
+      {a.art === 'kacheln' && (
+        <div class="kachelblock">
+          {a.titel && <Titel class="block__titel" data-rein>{trennenTitel(a.titel)}</Titel>}
+          {a.einleitung && <div class="kachelblock__einleitung redaktionstext" data-rein set:html={redaktionsHtml(a.einleitung)} />}
+          <div class:list={['kachelblock__raster', { 'kachelblock__raster--zwei': a.kacheln.length === 2 || a.kacheln.length === 4 }]}>
+            {a.kacheln.map((k) => {
+              const Kacheltitel = tag(Math.min(6, ebenen[i] + (a.titel ? 1 : 0)));
+              return (
+                <div class:list={['symbolkachel', { 'symbolkachel--mit-symbol': k.symbol }]} data-rein>
+                  {k.symbol && <img class="symbolkachel__symbol" src={k.symbol} alt="" width="56" height="56" loading="lazy" />}
+                  {k.titel && <Kacheltitel class="symbolkachel__titel">{k.titel}</Kacheltitel>}
+                  {k.text && <div class="symbolkachel__text redaktionstext" set:html={redaktionsHtml(k.text)} />}
+                  {k.ziel && (
+                    <a class="tl symbolkachel__mehr" href={k.ziel}>
+                      Mehr erfahren
+                      <span class="tl__pfeil" aria-hidden="true">
+                        <svg viewBox="0 0 9 14" focusable="false">
+                          <polyline fill="none" stroke="currentColor" stroke-miterlimit="10" points="2 2 7 7 2 12" />
+                        </svg>
+                      </span>
+                      {k.titel && <span class="nur-vorleser">: {k.titel}</span>}
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <Knopfzeile satz={a.knoepfe_text} knoepfe={a.knoepfe} rein />
+        </div>
+      )}
+
+      {a.art === 'kapitel' && <Knopfzeile satz={a.knoepfe_text} knoepfe={a.knoepfe} rein />}
+    </section>
+  );
+})}
+
+<style>
+  /* Abstand zwischen den Abschnitten: der erste steht direkt unter dem
+     Titel darüber, jeder weitere mit Luft; ein Kapitel setzt deutlich ab */
+  .abschnitt { margin-top: 48px; }
+  .abschnitt:first-child { margin-top: 40px; }
+  .abschnitt--kapitel { margin-top: clamp(64px, 8vw, 104px); }
+  .abschnitt--kapitel:first-child { margin-top: 40px; }
+
+  /* ---------- Kapitel ---------- */
+  .kapitel {
+    padding-top: 28px;
+    border-top: 1px solid var(--farbe-linie);
+  }
+
+  /* So groß wie die Titel der Abschnitte auf der Startseite — ein
+     Kapitel ist eine neue Überschrift, kein Zwischentitel */
+  .kapitel__titel {
+    margin: 0;
+    color: var(--farbe-primaer);
+    font-size: var(--text-titel);
+    font-weight: var(--gewicht-titel);
+    line-height: 1.12;
+    letter-spacing: -0.010em;
+  }
+
+  .kapitel__text {
+    max-width: 46rem;
+    margin-top: 20px;
+  }
+
+  /* ---------- Text, wahlweise mit Bild ---------- */
+  .block {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(32px, 4vw, 64px);
+    align-items: start;
+  }
+
+  .block[data-bild='rechts'] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  }
+
+  .block[data-bild='rechts'] .block__bild { grid-column: 2; grid-row: 1; }
+  .block[data-bild='rechts'] .block__text { grid-column: 1; grid-row: 1; }
+
+  /* Ohne Bild: nur Text, auf Lesebreite */
+  .block[data-bild='ohne'] { grid-template-columns: minmax(0, 1fr); }
+  .block[data-bild='ohne'] .block__text { max-width: 46rem; }
+
+  /* Ohne abgerundete Ecken — das Bild steht als Fläche, nicht als
+     Kachel (Florian, 18. September 2026). */
+  .block__bild { overflow: hidden; }
+
+  /* Ablauf a-3 wie bei den Beitragsbildern: Über den Scrollweg wächst
+     das Bild; den Wert setzt scripts/bildlauf.ts, er läuft dort schon
+     weich nach — deshalb hier keine Überblendung. */
+  .block__lauf {
+    display: block;
+    height: 100%;
+    transform: scale(var(--bild-groesse, 1));
+  }
+
+  .block__bild img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  /* Das Bild füllt die ganze Höhe: Die Zeile zieht beide Spalten auf
+     dieselbe Höhe, die bestimmt die höhere von beiden (18. September
+     2026). */
+  .block[data-hoehe='voll'] { align-items: stretch; }
+  .block[data-hoehe='voll'] .block__bild img { height: 100%; }
+
+  .block__text { min-width: 0; }
+
+  .block__titel {
+    margin: 0 0 var(--abstand-m);
+    color: var(--farbe-primaer);
+    font-size: var(--text-titel-klein);
+    font-weight: var(--gewicht-titel);
+    line-height: 1.22;
+    letter-spacing: -0.009em;
+  }
+
+  /* Die Spalte ist schon schmal genug — der Absatz braucht keine
+     eigene Höchstbreite mehr. */
+  .block__text :global(p) {
+    max-width: none;
+    margin-bottom: var(--abstand-m);
+    font-size: var(--text-flies);
+    line-height: var(--zeilenhoehe-lese);
+  }
+
+  .block__text :global(p:last-child) { margin-bottom: 0; }
+
+  /* ---------- Kacheln ---------- */
+  .kachelblock__einleitung { max-width: 46rem; margin-bottom: 8px; }
+
+  /* Drei nebeneinander, bei zwei oder vier je zwei; schmaler werdend
+     von selbst untereinander */
+  .kachelblock__raster {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: 36px clamp(28px, 4vw, 56px);
+    margin-top: 28px;
+  }
+
+  .kachelblock__raster--zwei {
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  }
+
+  @media (min-width: 1100px) {
+    .kachelblock__raster:not(.kachelblock__raster--zwei) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .kachelblock__raster--zwei { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  /* Eine Kachel: Haarlinie oben, darunter Symbol, Titel und Text — kein
+     Kasten, wie die Spalten der Broschüre */
+  .symbolkachel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 24px;
+    border-top: 1px solid var(--farbe-linie);
+  }
+
+  .symbolkachel__symbol {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 18px;
+    object-fit: contain;
+  }
+
+  .symbolkachel__titel {
+    margin: 0 0 12px;
+    color: var(--farbe-primaer);
+    font-size: 21px;
+    font-weight: var(--gewicht-titel);
+    line-height: 1.3;
+    letter-spacing: -0.012em;
+  }
+
+  .symbolkachel__text { width: 100%; }
+
+  .symbolkachel__mehr { margin-top: 16px; }
+
+  /* Schmale Schirme: untereinander, Bild immer zuerst. Über dem Text
+     gibt es keine „Höhe des Bereichs", an der sich etwas ausrichten
+     könnte — dort gilt immer das Format des Bildes. */
+  @media (max-width: 800px) {
+    .block,
+    .block[data-bild='rechts'] {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--abstand-m);
+    }
+
+    .abschnitt { margin-top: 36px; }
+
+    .block[data-hoehe='voll'] { align-items: start; }
+    .block[data-hoehe='voll'] .block__bild img { height: auto; }
+
+    .block[data-bild='rechts'] .block__bild,
+    .block[data-bild='rechts'] .block__text {
+      grid-column: auto;
+      grid-row: auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .block__lauf { transform: none; }
+  }
+</style>
+
+<script>
+  import '../../scripts/bildlauf';
+</script>

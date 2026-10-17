@@ -1,0 +1,38 @@
+---
+/**
+ * Ein eigener Bereich auf der Startseite — je nach Art:
+ *
+ *   abschnitt  Überschrift und Abschnitte direkt auf der Startseite
+ *              (früher „freie Abschnitte", components/Abschnitte.astro)
+ *   blog       die Beiträge als Karten (Blog.astro)
+ *   seite      die Ankündigungskarte einer eigenen Seite (SeitenTeaser.astro)
+ *
+ * Wo er steht, bestimmt der Seitenplan (content/seitenaufbau.json).
+ */
+import Blog from './Blog.astro';
+import SeitenTeaser from './SeitenTeaser.astro';
+import Abschnitte from './bausteine/Abschnitte.astro';
+import { abschnittAnker } from '../lib/aufbau';
+import { trennenTitel } from '../lib/silben';
+import type { Bereich } from '../content/schema';
+
+interface Props {
+  bereich: Bereich;
+}
+
+const { bereich } = Astro.props;
+---
+
+{bereich.typ === 'blog' && <Blog bereich={bereich} />}
+
+{bereich.typ === 'seite' && bereich.auf_startseite && <SeitenTeaser bereich={bereich} />}
+
+{bereich.typ === 'abschnitt' && (
+  <section class="eigener-bereich bereich" id={bereich.id}>
+    <div class="bereich__inhalt">
+      {bereich.kicker && <div class="kicker" data-rein>{bereich.kicker}</div>}
+      <h2 class="bereich__titel" data-rein>{trennenTitel(bereich.titel)}</h2>
+      <Abschnitte abschnitte={bereich.abschnitte} ebene={3} anker={(a) => abschnittAnker(bereich, a)} />
+    </div>
+  </section>
+)}

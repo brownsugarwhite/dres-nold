@@ -1,116 +1,102 @@
 ---
-import { trennen } from '../lib/silben';
-import { existsSync } from 'node:fs';
-
-/* Die 600-px-Variante der Karte (scripts/bilder-varianten.mjs) — wenn
-   sie da ist; sonst das Original (etwa im Entwicklungsmodus vor dem
-   ersten Build) */
-const bildKlein = (bild: string) => {
-  const m = /^(.*)\.(jpe?g|png)$/i.exec(bild);
-  if (!m) return bild;
-  const variante = `${m[1]}-600.${m[2]}`;
-  return existsSync(`public${variante}`) ? variante : bild;
-};
 /**
- * Neuigkeiten — Übersicht auf der Startseite.
+ * Eine Beitragskarte: Bild, darunter Zeile, Überschrift, Anriss und
+ * „Beitrag lesen" — ohne Rahmen und ohne Kasten (Florian, 17. September
+ * 2026). Ein Klick morpht sie in die Seite, die sie ankündigt.
  *
- * Neu gegenüber der Vorlage. Blendet sich samt Menüpunkt aus, wenn kein
- * Beitrag aktiv ist. Jeder Beitrag hat eine eigene Adresse und öffnet
- * sich mit demselben Morph-Übergang wie die Leistungen.
+ * Genutzt von den Blogs (Blog.astro, früher Neuigkeiten.astro) und von
+ * der Ankündigung einer eigenen Seite auf der Startseite
+ * (SeitenTeaser.astro) — dort in der breiten Form: Bild links, Text
+ * rechts, auf Handys untereinander.
  *
  * Beim Zeigen vergrößert sich das Bild innerhalb seines Ausschnitts
  * (Handoff, 17. September 2026). Den Übergangsnamen trägt deshalb der
  * Ausschnitt und nicht das Bild: Seine Kante steht still, also beginnt
  * der Morph genau dort, wo das Bild gerade steht — ohne Sprung
- * (Florian, 18. September 2026).
+ * (Florian, 18. September 2026). Die Zielseite trägt dieselben Namen
+ * (layouts/Inhaltsseite.astro); beide bildet `morphName()`.
  *
- * Beim Scrollen wächst das Bild zusätzlich langsam von 1 auf 1,1 —
- * dieselbe Bewegung wie das Gruppenfoto im Team-Abschnitt (Ablauf a-3,
- * Skript unten; Florian, 17. September 2026).
+ * Beim Scrollen wächst das Bild zusätzlich langsam — dieselbe Bewegung
+ * wie das Gruppenfoto im Team-Abschnitt (Ablauf a-3, scripts/bildlauf.ts).
  */
-import daten from '../content/neuigkeiten.json';
+import { existsSync } from 'node:fs';
+import { trennen } from '../lib/silben';
+import { morphName } from '../lib/aufbau';
 
-const beitraege = daten.eintraege
-  .filter((e) => e.aktiv)
-  .sort((a, b) => (b.datum || '').localeCompare(a.datum || ''));
+interface Props {
+  href: string;
+  bild?: string;
+  bild_alt?: string;
+  /** Datum (JJJJ-MM-TT) — erscheint als kleine Zeile über dem Titel */
+  datum?: string;
+  /** Statt eines Datums: eine kleine Zeile über dem Titel */
+  kicker?: string;
+  titel: string;
+  kurz?: string;
+  mehr?: string;
+  /** Die Überschriftenebene: h3 in einer Liste, h2 als Ankündigung */
+  ebene?: 'h2' | 'h3';
+  breit?: boolean;
+}
+
+const { href, bild = '', bild_alt = '', datum = '', kicker = '', titel, kurz = '', mehr = 'Beitrag lesen', ebene = 'h3', breit = false } = Astro.props;
+const Titel = ebene;
+const name = morphName(href);
+
+/* Die 600-px-Variante der Karte (scripts/bilder-varianten.mjs) — wenn
+   sie da ist; sonst das Original (etwa im Entwicklungsmodus vor dem
+   ersten Build). Die breite Karte nimmt die 900er. */
+const bildKlein = (pfad: string) => {
+  const m = /^(.*)\.(jpe?g|png)$/i.exec(pfad);
+  if (!m) return pfad;
+  const variante = `${m[1]}-${breit ? 900 : 600}.${m[2]}`;
+  return existsSync(`public${variante}`) ? variante : pfad;
+};
 
 const alsDatum = (iso: string) =>
   iso ? new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
 ---
 
-{beitraege.length > 0 && (
-  <section class="neuigkeiten bereich bereich--ohne-oben" id="neuigkeiten" data-verlauf>
-    <div class="bereich__inhalt">
-      <div class="kicker" data-rein>Aktuelles</div>
-      <h2 class="bereich__titel" data-rein>{daten.titel}</h2>
-      {daten.einleitung && <p class="bereich__einleitung" data-rein>{daten.einleitung}</p>}
-
-      <div class="neuigkeiten__liste">
-        {beitraege.map((b) => (
-          <article class="beitrag" data-rein>
-            <a class="beitrag__link" data-karte href={`/neuigkeiten/${b.id}/`} transition:name={`beitrag-${b.id}`}>
-              {b.bild && (
-                <span class="beitrag__ausschnitt" transition:name={`beitrag-bild-${b.id}`}>
-                  {/* Drei Ebenen, damit sich die Bewegungen nicht ins
-                      Gehege kommen: Der Ausschnitt steht still, der Lauf
-                      trägt die Skalierung beim Scrollen, das Bild die
-                      beim Zeigen. Zwei `transform` auf einem Element
-                      ließen sich nicht getrennt überblenden. */}
-                  <span class="beitrag__lauf" data-bildlauf>
-                    {/* Die kleine Variante (600 px) und `decoding="sync"`: Safari
-                        dekodiert große Bilder asynchron und legt beim Seitenwechsel
-                        die Ebene des Bildes neu an — die Karte blitzte dabei für ein
-                        Bild weiß auf, vor dem Morph und nach dem Rückweg (Florian,
-                        27. September 2026). Klein und synchron dekodiert gibt es
-                        dieses Bild nicht; die Leistungskacheln mit ihren kleinen
-                        SVG-Symbolen kannten es nie. */}
-                    <img class="beitrag__bild" src={bildKlein(b.bild)} alt={b.bild_alt || ''} width="600" height="338" loading="lazy" decoding="sync" />
-                  </span>
-                </span>
-              )}
-              <span class="beitrag__text">
-                {b.datum && <time class="beitrag__datum kicker kicker--klein" datetime={b.datum}>{alsDatum(b.datum)}</time>}
-                <h3 class="beitrag__titel">{b.titel}</h3>
-                {b.kurz && <span class="beitrag__kurz">{trennen(b.kurz)}</span>}
-                <span class="beitrag__mehr">
-                  <span class="tl">
-                    Beitrag lesen
-                    <span class="tl__pfeil" aria-hidden="true">
-                      <svg viewBox="0 0 9 14" focusable="false">
-                        <polyline fill="none" stroke="currentColor" stroke-miterlimit="10" points="2 2 7 7 2 12" />
-                      </svg>
-                    </span>
-                  </span>
-                </span>
-              </span>
-            </a>
-          </article>
-        ))}
-      </div>
-    </div>
-  </section>
-)}
+<article class:list={['beitrag', { 'beitrag--breit': breit }]} data-rein>
+  <a class="beitrag__link" data-karte href={href} transition:name={`beitrag-${name}`}>
+    {bild && (
+      <span class="beitrag__ausschnitt" transition:name={`beitrag-bild-${name}`}>
+        {/* Drei Ebenen, damit sich die Bewegungen nicht ins
+            Gehege kommen: Der Ausschnitt steht still, der Lauf
+            trägt die Skalierung beim Scrollen, das Bild die
+            beim Zeigen. Zwei `transform` auf einem Element
+            ließen sich nicht getrennt überblenden. */}
+        <span class="beitrag__lauf" data-bildlauf>
+          {/* Die kleine Variante und `decoding="sync"`: Safari dekodiert
+              große Bilder asynchron und legt beim Seitenwechsel die Ebene
+              des Bildes neu an — die Karte blitzte dabei für ein Bild weiß
+              auf, vor dem Morph und nach dem Rückweg (Florian,
+              27. September 2026). Klein und synchron dekodiert gibt es
+              dieses Bild nicht. */}
+          <img class="beitrag__bild" src={bildKlein(bild)} alt={bild_alt} width={breit ? 900 : 600} height={breit ? 506 : 338} loading="lazy" decoding="sync" />
+        </span>
+      </span>
+    )}
+    <span class="beitrag__text">
+      {datum && <time class="beitrag__datum kicker kicker--klein" datetime={datum}>{alsDatum(datum)}</time>}
+      {!datum && kicker && <span class="beitrag__datum kicker kicker--klein">{kicker}</span>}
+      <Titel class="beitrag__titel ohne-verlauf">{titel}</Titel>
+      {kurz && <span class="beitrag__kurz">{trennen(kurz)}</span>}
+      <span class="beitrag__mehr">
+        <span class="tl">
+          {mehr}
+          <span class="tl__pfeil" aria-hidden="true">
+            <svg viewBox="0 0 9 14" focusable="false">
+              <polyline fill="none" stroke="currentColor" stroke-miterlimit="10" points="2 2 7 7 2 12" />
+            </svg>
+          </span>
+        </span>
+      </span>
+    </span>
+  </a>
+</article>
 
 <style>
-  .neuigkeiten {
-    position: relative;
-    z-index: 40;
-    background: var(--farbe-flaeche);
-  }
-
-  .neuigkeiten__liste {
-    display: grid;
-    /* `min(320px, 100%)`: Auf sehr schmalen Handys ist die Spalte
-       breiter als der Platz — ohne die Schranke schob die Liste die
-       ganze Seite waagerecht auf (320-px-Geräte, 18. September 2026). */
-    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
-    /* Auf breiten Schirmen deutlich mehr Luft zwischen den Beiträgen —
-       nebeneinander standen sie zu dicht (Florian, 18. September 2026).
-       Untereinander bleibt es beim engeren Maß. */
-    gap: 34px clamp(24px, 4.5vw, 72px);
-    margin-top: 44px;
-  }
-
   .beitrag { margin: 0; }
 
   /* Ohne Rahmen und ohne Kasten: Die Karte ist das Bild mit dem Text
@@ -255,11 +241,48 @@ const alsDatum = (iso: string) =>
     .beitrag__link:hover .beitrag__bild,
     .beitrag__link:focus-visible .beitrag__bild { transform: none; }
   }
+
+  /* ---- Die breite Karte: Ankündigung einer eigenen Seite ----
+     Eine einzelne Karte im Raster der Beiträge ließe zwei Drittel der
+     Zeile leer. Breit steht das Bild links über gut die Hälfte, der
+     Text rechts daneben, unten bündig (Oktober 2026). */
+  .beitrag--breit .beitrag__link {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(28px, 4vw, 64px);
+    align-items: center;
+  }
+
+  .beitrag--breit .beitrag__text {
+    padding: 0;
+    gap: 14px;
+  }
+
+  .beitrag--breit .beitrag__titel {
+    font-size: var(--text-titel);
+    line-height: 1.12;
+    letter-spacing: -0.010em;
+  }
+
+  .beitrag--breit .beitrag__kurz {
+    font-size: 17px;
+    line-height: var(--zeilenhoehe-lese);
+  }
+
+  .beitrag--breit .beitrag__mehr { margin-top: 8px; }
+
+  @media (max-width: 800px) {
+    .beitrag--breit .beitrag__link {
+      display: flex;
+      gap: 0;
+    }
+
+    .beitrag--breit .beitrag__text { padding-top: 22px; gap: 11px; }
+  }
 </style>
 
 <script>
   /* Ablauf a-3 auf den Beitragsbildern: das gemeinsame Skript
-     scripts/bildlauf.ts (seit dem 27. September 2026 auch für die
-     Bilder der eigenen Abschnitte). */
+     scripts/bildlauf.ts */
   import '../scripts/bildlauf';
 </script>

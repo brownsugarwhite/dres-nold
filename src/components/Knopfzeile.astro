@@ -1,51 +1,50 @@
 ---
 /**
  * Die Knopfzeile unter einem Redaktionstext: ein kurzer Satz, darunter
- * bis zu zwei Knöpfe — ein Verweis und ein PDF-Knopf. Genutzt von den
- * eigenen Abschnitten (Abschnitte.astro) und den Leistungsseiten
- * (pages/leistungen/[id].astro); die Felder dazu stehen in
- * content/schema.ts und admin/bereiche.ts (Florian, 26. September 2026).
+ * bis zu drei Knöpfe. Jeder Knopf führt irgendwohin — auf eine Seite,
+ * zu einem Abschnitt, nach draußen oder zu einer Datei. Genutzt von den
+ * Abschnitten (bausteine/Abschnitte.astro) und den Leistungsseiten
+ * (pages/leistungen/[id].astro). Bis Oktober 2026 waren es höchstens
+ * zwei: ein Verweis und ein PDF-Knopf.
  *
  * Ohne eingetragenen Knopf steht hier nichts — auch kein Satz. Die
  * Gestaltung (`.knopfzeile`) liegt in styles/global.css.
  */
+import type { Knopf } from '../content/schema';
+import { verweisArt } from '../lib/verweise';
+
 interface Props {
   /** Die Zeile über den Knöpfen, z. B. „Mehr dazu erfahren Sie hier:" */
   satz?: string;
-  linkText?: string;
-  linkZiel?: string;
-  pdfText?: string;
-  pdfDatei?: string;
+  knoepfe?: Knopf[];
   /** Steht die Zeile für sich (ohne Text darüber), bekommt sie mehr Luft */
   allein?: boolean;
   /** Blendet beim Hereinscrollen ein (scripts/einblenden.ts) */
   rein?: boolean;
 }
 
-const { satz = '', linkText = '', linkZiel = '', pdfText = '', pdfDatei = '', allein = false, rein = false } = Astro.props;
-
-/* Sprungmarken zeigen immer auf die Startseite: `#contact` wird zu
-   `/#contact`. So führen sie auch von einer Leistungsseite dorthin; auf
-   der Startseite bleibt es derselbe Pfad, und scripts/anker.ts gleitet. */
-const ziel = linkZiel.startsWith('#') ? `/${linkZiel}` : linkZiel;
-const extern = /^https?:/.test(linkZiel);
-const hatKnopf = Boolean(linkZiel || pdfDatei);
+const { satz = '', knoepfe = [], allein = false, rein = false } = Astro.props;
 ---
 
-{hatKnopf && (
+{knoepfe.length > 0 && (
   <div class:list={['knopfzeile', { 'knopfzeile--allein': allein }]} data-rein={rein ? '' : undefined}>
     {satz.trim() !== '' && <p class="knopfzeile__satz">{satz}</p>}
     <div class="knopfzeile__knoepfe">
-      {linkZiel && (
-        <a class="kn" href={ziel} rel={extern ? 'noopener' : undefined}>
-          <span class="kn__f" aria-hidden="true"></span>{linkText || 'Mehr erfahren'}
-        </a>
-      )}
-      {pdfDatei && (
-        <a class="kn" href={pdfDatei} download>
-          <span class="kn__f" aria-hidden="true"></span>{pdfText || 'PDF herunterladen'}
-        </a>
-      )}
+      {knoepfe.map((k) => {
+        const art = verweisArt(k.ziel);
+        return (
+          <a
+            class="kn"
+            href={k.ziel}
+            download={art === 'datei' ? '' : undefined}
+            target={art === 'extern' ? '_blank' : undefined}
+            rel={art === 'extern' ? 'noopener' : undefined}
+          >
+            <span class="kn__f" aria-hidden="true"></span>{k.text}
+            {art === 'extern' && <span class="nur-vorleser"> (öffnet in neuem Fenster)</span>}
+          </a>
+        );
+      })}
     </div>
   </div>
 )}

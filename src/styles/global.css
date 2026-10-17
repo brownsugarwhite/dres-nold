@@ -392,6 +392,17 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
   margin-inline: auto;
 }
 
+/* Nur für Vorleseprogramme: unsichtbar, aber vorgelesen — z. B.
+   „(öffnet in neuem Fenster)" an Verweisen nach draußen */
+.nur-vorleser {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /*
   AUFBAU EINES ABSCHNITTS
   ==================================================================
@@ -924,11 +935,14 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
 }
 
 /* Abschnittsüberschriften der Startseite: kräftig gesetzt und
-   linksbündig. Die frühere mittige Ausrichtung ist mit dem Handoff
-   vom 17. September 2026 entfallen — nur Willkommen bleibt zentriert
-   (die Komponente setzt das selbst). */
-main.seiteninhalt h2:not(.ohne-verlauf),
-[data-verlauf] .bereich__titel {
+   linksbündig. Die frühere mittige Ausrichtung ist mit dem Handoff vom
+   17. September 2026 entfallen — nur Willkommen bleibt zentriert (die
+   Komponente setzt das selbst).
+
+   Die Regel hängt an der Klasse, nicht mehr an `main h2` (Oktober
+   2026): Seit alle Blöcke der Startseite in `main` stehen, hätte sie
+   sonst auch eigene Überschriften wie die im Kontakt überschrieben. */
+.bereich__titel {
   margin-inline: 0;
   font-size: var(--text-titel);
   font-weight: var(--gewicht-titel);

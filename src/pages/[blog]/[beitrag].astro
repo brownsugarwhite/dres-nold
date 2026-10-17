@@ -1,0 +1,30 @@
+---
+/**
+ * Einzelseite eines Beitrags: /<blog>/<beitrag>/, etwa
+ * /neuigkeiten/neue-behandlungseinheit/ — für jeden Blog aus
+ * content/bereiche.json (Oktober 2026; vorher nur die Neuigkeiten).
+ */
+import Inhaltsseite from '../../layouts/Inhaltsseite.astro';
+import { blogs } from '../../content/inhalte';
+import { aktiveBeitraege, beitragAdresse } from '../../lib/aufbau';
+
+export function getStaticPaths() {
+  return blogs.flatMap((blog) =>
+    aktiveBeitraege(blog).map((beitrag) => ({ params: { blog: blog.id, beitrag: beitrag.id }, props: { blog, beitrag } })),
+  );
+}
+
+const { blog, beitrag } = Astro.props;
+---
+
+<Inhaltsseite
+  adresse={beitragAdresse(blog, beitrag)}
+  titel={beitrag.titel}
+  beschreibung={beitrag.kurz}
+  datum={beitrag.datum}
+  bild={beitrag.bild}
+  bild_alt={beitrag.bild_alt}
+  abschnitte={beitrag.abschnitte}
+  dateien={beitrag.dateien}
+  zurueck={`Alle ${blog.titel}`}
+/>
