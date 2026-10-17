@@ -329,6 +329,7 @@ const { praxis } = seite;
   /* Der Scroll-Hinweis schrumpft, sinkt und blendet aus — in der
      Vorlage sind das die Schritte auf `a766a871` in Ablauf a-7. */
   .scrollhinweis {
+    --hinweis-abstand: var(--abstand-m);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -347,22 +348,24 @@ const { praxis } = seite;
        Fensterhöhe 61 px, der Hinweis rückt 33 px; bei 1120 px 76 / 48).
        Über `top`, nicht über einen Abstand: Der würde die Mitte
        verschieben und mit ihr das Logo. */
+    /* Florian, 17. Oktober 2026: „etwas weiter unter das Logo" — 24 px. */
     position: relative;
-    top: calc(28px - var(--logo-hoehe) * 0.17);
+    top: calc(28px + var(--hinweis-abstand) - var(--logo-hoehe) * 0.17);
     margin-top: 0;
     opacity: var(--hinweis-deckkraft, 1);
     transform: scale(var(--hinweis-groesse, 1)) translateY(var(--hinweis-versatz, 0px));
   }
 
   /* `.text-block` der Vorlage: 250 px breit, 16 px, 10 px über dem Pfeil.
-     Etwas kräftiger als die Vorlage (400 statt 300) und mit engerem
-     Zeilenabstand, damit die zwei Zeilen zusammengehören. */
+     Gewicht 350 — zwischen der Vorlage (300) und dem Fließtext (400),
+     „minimal feiner" (Florian, 17. Oktober 2026). Enger Zeilenabstand,
+     damit die zwei Zeilen zusammengehören. */
   .scrollhinweis__text {
     max-width: 250px;
     margin: 0 0 10px;
     font-family: var(--schrift-titel);
     font-size: 1rem;
-    font-weight: var(--gewicht-normal);
+    font-weight: var(--gewicht-fein);
     line-height: 1.25;
     text-align: center;
   }
@@ -376,6 +379,25 @@ const { praxis } = seite;
     width: 44px;
     height: 22px;
     overflow: visible;
+  }
+
+  /* Der Pfeil schwebt ruhig auf und ab (Florian, 17. Oktober 2026). Nur
+     der Pfeil — `.scrollhinweis` selbst bewegt das Skript. Sobald
+     gescrollt wurde, steht er still; der Hinweis blendet dann ohnehin
+     aus. */
+  @media (prefers-reduced-motion: no-preference) {
+    .scrollhinweis__pfeil {
+      animation: pfeil-schweben 2.4s ease-in-out infinite;
+    }
+
+    :global(body[data-gescrollt]) .scrollhinweis__pfeil {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes pfeil-schweben {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(6px); opacity: 0.55; }
   }
 
   @media (prefers-reduced-motion: reduce) {

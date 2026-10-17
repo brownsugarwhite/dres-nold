@@ -182,6 +182,15 @@ const alsDatum = (iso: string) =>
     view-transition-name: none;
   }
 
+  /* Die breite Ankündigungskarte einer eigenen Seite: Nur das Bild
+     wandert. Text und Rest der Karte blenden und schrumpfen mit der
+     übrigen Seite (Florian, 17. Oktober 2026) — als Ganzes gestreckt
+     verzerrte die Karte auf dem Weg ins hohe Seitenformat. Die Seite
+     selbst trägt dafür keinen Kartennamen (Inhaltsseite.astro). */
+  .beitrag--breit .beitrag__link {
+    view-transition-name: none;
+  }
+
   /* Beim Klick bleibt alles stehen, wie es steht: Der Ausschnitt trägt
      den Übergangsnamen und ändert seine Größe durch Zeigen und Scrollen
      ohnehin nicht — der Morph beginnt also genau am sichtbaren Bild.

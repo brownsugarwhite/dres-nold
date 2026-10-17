@@ -26,6 +26,7 @@
  */
 import { navigate } from 'astro:transitions/client';
 import { durchlauf, A3_ZUWACHS } from './scrollwege';
+import { bildlaufAnhalten } from './bildlauf';
 
 const MERKER = 'uebergang-ziel';
 
@@ -33,6 +34,7 @@ type Vorbereitung = Event & {
   sourceElement?: Element | null;
   loader: () => Promise<void>;
   direction: string;
+  from: URL;
   to: URL;
 };
 
@@ -60,6 +62,31 @@ function kennzeichenAbraeumen() {
   delete document.documentElement.dataset.rueckmorph;
   document.documentElement.style.removeProperty('--morph-zoom');
   for (const k of document.querySelectorAll('[data-morph]')) k.removeAttribute('data-morph');
+  for (const e of document.querySelectorAll<HTMLElement>('[data-eingefroren]')) {
+    e.style.removeProperty('transform');
+    e.style.removeProperty('transition');
+    delete e.dataset.eingefroren;
+  }
+}
+
+/**
+ * Hält die Karte genau so fest, wie sie gerade aussieht.
+ *
+ * `data-morph` schaltet die Überblendungen der Karte ab. Lief beim Klick
+ * aber noch eine — das Bild wächst beim Zeigen 0,55 s lang auf 1,07, die
+ * Karte hebt sich —, sprang sie dadurch auf ihren Endwert, kurz bevor
+ * das Abbild entstand: Das Bild zuckte vor dem Morph (Florian,
+ * 17. Oktober 2026). Jetzt wird der Zwischenstand als fester Wert
+ * gesetzt, bevor die Überblendung endet.
+ */
+function karteEinfrieren(karte: Element) {
+  const teile = [karte, ...karte.querySelectorAll('.beitrag__lauf, .beitrag__bild')] as HTMLElement[];
+  const stand = teile.map((t) => getComputedStyle(t).transform);
+  teile.forEach((t, i) => {
+    t.style.transform = stand[i] === 'none' ? 'none' : stand[i];
+    t.style.transition = 'none';
+    t.dataset.eingefroren = 'ja';
+  });
 }
 
 /**
@@ -138,6 +165,8 @@ document.addEventListener('astro:before-preparation', (ereignis) => {
      Übergangsgruppe „karte" und liegt damit über ihren Nachbarn
      (styles/uebergaenge.css). */
   const karte = quelle?.closest?.('[data-karte]');
+  bildlaufAnhalten();
+  if (karte?.matches('.beitrag__link')) karteEinfrieren(karte);
   karte?.setAttribute('data-morph', '');
 
   /* Das Bild der Karte vor dem Wechsel fertig dekodieren lassen: Safari
@@ -174,10 +203,23 @@ document.addEventListener('astro:before-preparation', (ereignis) => {
      styles/uebergaenge.css). */
   let zurueckZurUebersicht = false;
   try { zurueckZurUebersicht = !!sessionStorage.getItem(MERKER); } catch { /* egal */ }
+  zielMittig = zurueckZurUebersicht;
   if (zurueckZurUebersicht || e.direction === 'back') {
     document.documentElement.dataset.rueckmorph = 'ja';
   }
+  /* Mit dem Zurück-Knopf des Browsers gibt es keinen Merker — die Karte
+     der Seite, von der man kommt, ist trotzdem das Ziel des Morphs.
+     Ohne sie blieb das Titelbild als Ebene ohne Gegenstück über der
+     Startseite stehen (Florian, 17. Oktober 2026). Mittig gestellt wird
+     sie dann nicht: Der Browser stellt die Scrolltiefe von vorhin
+     wieder her. */
+  if (!zurueckZurUebersicht && e.direction === 'back') {
+    try { sessionStorage.setItem(MERKER, e.from.pathname); } catch { /* egal */ }
+  }
 });
+
+/** Soll die Zielkarte des Rückwegs mittig gestellt werden? (Schließen-Kreuz) */
+let zielMittig = false;
 
 /* Nach dem Tausch: die Karte der zuletzt offenen Leistung mittig
    stellen — noch bevor der Browser das neue Bild aufnimmt, damit der
@@ -208,6 +250,11 @@ document.addEventListener('astro:after-swap', () => {
   if (bild) {
     bild.loading = 'eager';
     if (typeof bild.decode === 'function') bild.decode().catch(() => undefined);
+  }
+
+  if (!zielMittig) {
+    zoomMerken(document.documentElement, Math.max(1, bildZoomDanach(karte)));
+    return;
   }
 
   /* Mittig stellen — SOFORT, nicht als Mikroaufgabe: Die Leisten
@@ -268,7 +315,7 @@ document.addEventListener('astro:page-load', () => {
          dann nachstellen, aber nur bei echtem Versatz */
       const r = karte.getBoundingClientRect();
       const mitte = (window.innerHeight - r.height) / 2;
-      if (Math.abs(r.top - mitte) > 4) karteMittigStellen(karte);
+      if (zielMittig && Math.abs(r.top - mitte) > 4) karteMittigStellen(karte);
     }
   }
 

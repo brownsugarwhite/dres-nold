@@ -8,9 +8,15 @@
  * darunter „Praxis Dres. Nold" groß —, rechts, durch eine Haarlinie
  * getrennt, der kurze Text und darunter die beiden Knöpfe. Die rechte
  * Spalte ist genau so breit wie die beiden Knöpfe nebeneinander (der
- * Text bricht in dieser Breite um) und genau so hoch wie die
- * Überschrift: Text oben, Knöpfe unten. Der Block steht linksbündig in
- * der Inhaltsbreite.
+ * Text bricht in dieser Breite um). Ist sie niedriger als die
+ * Überschrift, reicht sie bis zu deren Unterkante: Text oben, Knöpfe
+ * unten. Ist sie höher, stehen beide oben (Florian, 17. Oktober 2026).
+ * Der Block steht linksbündig in der Inhaltsbreite.
+ *
+ * Wird es eng, verkleinert sich die große Zeile, bis beide Spalten
+ * nebeneinander passen — vorher lief die rechte Spalte rechts aus dem
+ * Bild (Florian, 17. Oktober 2026). Unter 992 px stehen die Spalten
+ * untereinander, getrennt durch eine waagerechte Haarlinie.
  *
  * Auf Handys (bis 767 px) steht alles untereinander: Beide Zeilen der
  * Überschrift füllen genau die Breite des Bildschirms (das Skript unten
@@ -80,21 +86,22 @@ const klein = zeilen.slice(0, -1).join(' ');
     padding-inline: var(--abstand-seitenrand);
   }
 
-  /* Zwei Spalten, gleich hoch; linksbündig in der Inhaltsbreite */
+  /* Zwei Spalten, linksbündig in der Inhaltsbreite. Beide beginnen
+     oben; die rechte reicht mindestens bis zur Unterkante der
+     Überschrift (siehe dort). */
   .willkommen__inhalt {
-    display: flex;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: start;
+    align-items: start;
     width: min(100%, var(--breite-inhalt));
     margin-inline: auto;
   }
 
-  /* Die beiden Zeilen rücken so weit auseinander, dass die Überschrift
-     die Höhe der rechten Spalte hat (Florian, 27. September 2026) */
   .willkommen__titel {
     display: flex;
-    flex: none;
     flex-direction: column;
-    justify-content: space-between;
+    min-width: 0;
     margin: 0;
     line-height: 1.05;
   }
@@ -119,15 +126,17 @@ const klein = zeilen.slice(0, -1).join(' ');
     white-space: nowrap;
   }
 
-  /* Rechts: Text oben, Knöpfe unten, dazwischen so viel Raum, dass die
-     Spalte die Höhe der Überschrift hat. Ihre Breite ist die der Knöpfe
-     nebeneinander (`max-content`); der Text zählt dafür nicht mit
-     (`width: 0; min-width: 100%`) und bricht in eben dieser Breite um. */
+  /* Rechts: Text oben, Knöpfe unten. Die Spalte ist so hoch wie die
+     Zeile des Rasters (`stretch`) — mindestens so hoch wie die
+     Überschrift, dann stehen die Knöpfe auf deren Unterkante. Ihre
+     Breite ist die der Knöpfe nebeneinander (`max-content`); der Text
+     zählt dafür nicht mit (`width: 0; min-width: 100%`) und bricht in
+     eben dieser Breite um. */
   .willkommen__rechts {
     display: flex;
-    flex: none;
     flex-direction: column;
     justify-content: space-between;
+    align-self: stretch;
     width: max-content;
     margin-left: clamp(24px, 3vw, 48px);
     padding-left: clamp(24px, 3vw, 48px);
@@ -158,11 +167,32 @@ const klein = zeilen.slice(0, -1).join(' ');
 
   .willkommen__kurz { display: none; }
 
+  /* Tablets: untereinander, die Überschrift in ihrer Größe, darunter
+     eine waagerechte Haarlinie, dann Text und Knöpfe. Die Spalte ist so
+     breit wie das Breiteste davon — meist der kurze Satz, der so in
+     einer Zeile steht, statt im Blocksatz große Lücken zu reißen. */
+  @media (max-width: 991px) {
+    .willkommen__inhalt { grid-template-columns: minmax(0, max-content); }
+
+    .willkommen__text {
+      width: auto;
+      min-width: 0;
+    }
+
+    .willkommen__rechts {
+      width: auto;
+      margin: var(--abstand-m) 0 0;
+      padding: var(--abstand-m) 0 0;
+      border-left: 0;
+      border-top: 1px solid var(--farbe-linie);
+    }
+  }
+
   /* Handys: untereinander. Beide Zeilen der Überschrift füllen die
      Breite (Skript); die Knöpfe teilen sich eine Zeile und tragen die
      kurzen Beschriftungen. */
   @media (max-width: 767px) {
-    .willkommen__inhalt { flex-direction: column; }
+    .willkommen__inhalt { grid-template-columns: minmax(0, 1fr); }
 
     .willkommen__titel { line-height: 1.02; }
 
@@ -176,6 +206,7 @@ const klein = zeilen.slice(0, -1).join(' ');
       margin: 16px 0 0;
       padding: 0;
       border-left: 0;
+      border-top: 0;
     }
 
     .willkommen__text {
@@ -231,7 +262,21 @@ const klein = zeilen.slice(0, -1).join(' ');
       return;
     }
 
+    /* Wird es eng, verkleinert sich die große Zeile, bis die rechte
+       Spalte daneben Platz hat (ab 992 px; darunter stehen sie
+       untereinander und die Überschrift hat die ganze Breite) */
+    const gross = titel.querySelector<HTMLElement>('.willkommen__gross');
+    const rechts = titel.parentElement?.querySelector<HTMLElement>('.willkommen__rechts');
+    const inhalt = titel.parentElement;
     const klein = titel.querySelector<HTMLElement>('.willkommen__klein');
+    if (gross && inhalt) {
+      if (klein) klein.style.fontSize = '1px';
+      const nebeneinander = rechts && !window.matchMedia('(max-width: 991px)').matches;
+      const daneben = nebeneinander ? rechts.getBoundingClientRect().width + (parseFloat(getComputedStyle(rechts).marginLeft) || 0) : 0;
+      const frei = Math.floor(inhalt.clientWidth - daneben);
+      if (gross.scrollWidth > frei && frei > 0) einpassen(gross, frei);
+    }
+
     if (!klein) return;
     klein.style.fontSize = '1px';
     const platz = titel.clientWidth;

@@ -2835,3 +2835,88 @@ mehr nur durch Tippen.
 - Speichern meldet einen Konflikt nur, wenn seither **dieselbe** Datei
   geändert wurde.
 - Bewusst später: Entwürfe im Browser sichern, Live-Vorschau.
+
+## Feinschliff nach dem ersten Blick auf die neue Fassung (17. Oktober 2026, abends)
+
+Florian auf dres-nold.pages.dev, zwölf Punkte. **Überholt damit** aus dem
+Oktober-Abschnitt oben: „Sprechstunden ist der erste Punkt in allen
+Leisten" gilt nur noch für **Kopfleiste und Handy-Menü**. In der
+**Symbolleiste unten** stehen die Sprechstunden wieder **ganz rechts**,
+und der Zipfel zeigt ungespiegelt dorthin. Die feste Handy-Leiste mit drei
+Symbolen ist entfallen.
+
+- **Scroll-Hinweis:** 24 px tiefer unter dem Logo (`--hinweis-abstand`),
+  Gewicht 350 (`--gewicht-fein`). Der Pfeil schwebt ruhig auf und ab:
+  2,4 s, 6 px, Deckkraft bis 0,55. Er steht still, sobald gescrollt wurde
+  und bei reduzierter Bewegung. Animiert wird nur der Pfeil im eigenen
+  Rahmen des Hinweises, der Saum am Logo bleibt weg.
+- **Sprechstunden auf dem Desktop 200 px früher:** `ozVorlauf()` gibt
+  350 px auf dem Desktop und 150 px bis 991 px zurück (`--oz-vorlauf`
+  ebenso). Gemessen kam die Karte vorher über die Leiste, wenn sich das
+  Logo zu 95–99 % aufgelöst hatte. Jetzt sind es 68 % bei 1280 × 720,
+  78 % bei 1440 × 900 und 82 % bei 1920 × 1080, Handys unverändert.
+- **Symbolleiste: so viele Symbole, wie Platz haben** (`leisteEinpassen`
+  in Navigation.astro). Es gibt eine Liste für alle Breiten: die
+  Seitenreihenfolge ohne Sprechstunden, auf Handys die Telefonnummer,
+  dann die Sprechstunden.
+  - **Einpassen:** Ein ResizeObserver misst die natürlichen Breiten.
+    Zwischen zwei Symbolen steht ein Punkt mit mindestens 22 px Luft zu
+    jeder Seite.
+  - **Wegfallen:** Passt das nicht, fällt von hinten weg, was nicht
+    `data-immer` trägt. Immer bleiben Leistungen, Telefon und
+    Sprechstunden.
+  - **Gemessene Folgen:**
+    - 375 px: Leistungen · Telefon · Sprechstunden
+    - 600 px: dazu Praxis
+    - 768 px: bis Neuigkeiten
+    - 991 px: bis Team
+    - ab 992 px: alle sieben
+  - Die Beschriftungen brechen nie um.
+  - **Unterpunkte unten:** Bis 991 px springt ein Punkt mit Unterpunkten
+    in der unteren Leiste direkt, wie früher die Handy-Leiste. Ab 992 px
+    klappt er als Blase auf.
+  - **Zipfel:** Danach misst er neu (`leiste:eingepasst`).
+- **Begrüßung:** Ein Raster statt einer starren Flex-Zeile, beide Spalten
+  beginnen oben.
+  - **Rechte Spalte:** Ist sie niedriger als die Überschrift, reicht sie
+    bis zu deren Unterkante. Die Knöpfe stehen dann unten, wie bisher.
+  - **Wenn es eng wird:** Die große Zeile wird kleiner, bis die rechte
+    Spalte daneben Platz hat (64 px bei 992 px, 78 px ab etwa 1220 px).
+    Vorher lief die rechte Spalte rechts aus dem Bild.
+  - **Unter 992 px** stehen die Spalten untereinander, mit einer
+    waagerechten Haarlinie. Die Spalte ist so breit wie der kurze Satz,
+    der so in einer Zeile steht statt im Blocksatz zu klaffen.
+- **Kein Scrollbalken** auf der öffentlichen Seite (`uebergaenge.css`,
+  `scrollbar-width: none`). Beim Morph in kürzere oder längere Seiten kam
+  und ging er und verschob alles. Die Redaktion lädt diese Datei nicht und
+  behält ihre Balken.
+- **Handy-Menü:**
+  - **Spalte:** Die Symbolspalte steht höchstens 40 px (`--abstand-l`)
+    von der Wand der Blase. Bis etwa 400 px ändert sich nichts. Auf
+    breiten Handys stand sie vorher in der Mitte, bei 800 px 224 px von
+    der Wand entfernt.
+  - **Unterpunkte:** 12 statt 8 px Luft.
+  - **Hörer:** Bei geschlossenem Menü rückt er nur so weit nach links,
+    dass die Nummer vor dem Punkt Platz hat. Bei offenem Menü steht er
+    bündig mit den Symbolen.
+- **Morph der Karten:**
+  - **Kein Zucken mehr vor dem Morph:** Ein laufender Hover-Übergang
+    wird eingefroren, statt auf seinen Endwert zu springen
+    (`karteEinfrieren`). Die Scroll-Vergrößerung (a-3) steht während des
+    Wechsels still (`bildlaufAnhalten`), sonst war das Abbild ein Stück
+    anders groß als gemessen.
+  - **Breite Ankündigungskarte einer eigenen Seite:** Nur das Bild
+    wandert. Karte und Seite tragen keinen Kartennamen, der Text blendet
+    und schrumpft mit dem Rest.
+  - **Rückweg mit dem Zurück-Knopf des Browsers:** Die Karte, von der
+    man kam, ist jetzt auch das Ziel (`e.from`). Sie wird aber nicht
+    mittig gestellt, der Browser stellt die Scrolltiefe wieder her.
+  - **Bild ohne Gegenstück** (Seite ohne Karte): Es blendet mit seiner
+    Seite (`:only-child`), statt die ganze Dauer über dem anderen Inhalt
+    stehen zu bleiben.
+- **Punktlinie über der offenen Blase:** Beim Wechsel zwischen zwei
+  Aufklappmenüs räumte die schließende Blase den gemeinsamen Zustand der
+  Leiste (`data-ohne-linie`, Maske) ab, nachdem die neue ihn gesetzt
+  hatte. Jetzt gehört er der zuletzt geöffneten Blase, und nur sie räumt
+  ihn ab. Geht eine Blase auf, verschwindet jede andere derselben Leiste
+  sofort, auch eine, die gerade zuklappt.

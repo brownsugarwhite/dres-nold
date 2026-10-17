@@ -145,6 +145,12 @@ const anhaenge = dateien.filter((d) => d.datei);
     view-transition-class: karte;
   }
 
+  /* Eigene Seiten: Nur das Titelbild morpht aus der Ankündigungskarte
+     — der Rest kommt mit der Seite (BeitragKarte.astro, „breit") */
+  .beitrag.beitrag--breit {
+    view-transition-name: none;
+  }
+
   /* Schließen-Kreuz: klebt beim Scrollen unter der Leiste, dann
      zeichnet sich ein Kreis darum. Dreht sich beim Zeigen wie das
      Kreuz der Hinweis-Blase (Abläufe a-34 / a-35).

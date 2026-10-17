@@ -25,8 +25,9 @@ Website der Zahnarzt- und Kieferorthopädie-Praxis **Dres. Nold**, Rosenstraße 
 >   Knöpfe, dazwischen eine Haarlinie.
 > - **Kein Briefumschlag** im Kontakt.
 > - **Das Menü folgt der Reihenfolge der Seite** (`seitenaufbau.json`),
->   Sprechstunden immer vorn, höchstens sieben Hauptpunkte; Unterpunkte
->   ohne Symbole (Oktober 2026).
+>   Sprechstunden vorn, höchstens sieben Hauptpunkte; Unterpunkte ohne
+>   Symbole (Oktober 2026). **Unten** in der Symbolleiste stehen die
+>   Sprechstunden ganz rechts (17. Oktober 2026).
 
 > - **Gar keine eingebettete Google-Karte mehr.** Der Kontaktbereich
 >   liegt auf einem eigenen Kartenbild; „Karte anzeigen" und „Route
@@ -256,7 +257,7 @@ docs/
 Die Leistungs-Adressen stehen fest und dürfen nicht mehr geändert werden:
 `prophylaxe` · `zahnerhaltung` · `wurzelkanalbehandlung` · `parodontitis` · `zahnersatz` · `implantate` · `3d-roentgen` · `bleaching` · `intraoralscanner` · `kieferorthopaedie-kinder` · `kieferorthopaedie-erwachsene`
 
-**Navigation** — folgt der Reihenfolge der Seite, Sprechstunden immer vorn (Oktober 2026): Sprechstunden · Praxis · Leistungen ▾ · Dentosophie ▾ · Neuigkeiten · Team · Kontakt · Telefon 07245 7171 (als Pille; auf Handys ein Hörer-Symbol, das die Nummer auf Tipp daneben ausklappt). Höchstens sieben Hauptpunkte. Die Symbolleiste unten zeigt dieselbe Folge, auf Handys nur Sprechstunden · Leistungen · Telefon; der Zipfel zeigt gespiegelt auf den Sprechstunden-Knopf.
+**Navigation** — folgt der Reihenfolge der Seite, Sprechstunden immer vorn (Oktober 2026): Sprechstunden · Praxis · Leistungen ▾ · Dentosophie ▾ · Neuigkeiten · Team · Kontakt · Telefon 07245 7171 (als Pille; auf Handys ein Hörer-Symbol, das die Nummer auf Tipp daneben ausklappt). Höchstens sieben Hauptpunkte. Die Symbolleiste unten zeigt dieselbe Folge, aber mit den Sprechstunden **ganz rechts** (dorthin zeigt der Zipfel) und auf Handys der Telefonnummer davor; sie zeigt so viele Symbole, wie ohne Quetschen Platz haben — von hinten fallen Punkte weg, Leistungen, Telefon und Sprechstunden bleiben immer (17. Oktober 2026).
 
 Jeder Punkt mit Unterpunkten klappt als Blase aus der Punktlinie auf (erster Klick öffnet, zweiter springt; nie zwei offen). Unterpunkte entstehen von selbst — die Kategorien aus `leistungen.json`, Abschnitte mit „im Menü" — oder werden in der Redaktion angelegt; sie haben keine Symbole. Auf Handys öffnet das ganze Menü als dieselbe Blase — zum rechten Rand hin offen, mit Schleier über der Seite —, und ein Punkt mit Unterpunkten wechselt darin die Ebene: Die anderen Zeilen schließen sich, „‹Titel› – Übersicht" und die Unterpunkte wachsen darunter (`Navigation.astro`). Die Telefonnummer steht als Pille in der Kopfleiste, nicht im Menü; Datenschutz und Impressum nur im Fußbereich.
 

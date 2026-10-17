@@ -21,6 +21,8 @@ const werte = new Map<HTMLElement, number>();
 let laeuft = false;
 let zuletzt = 0;
 let angemeldet = false;
+/* Während eines Seitenwechsels steht alles still (`bildlaufAnhalten`) */
+let angehalten = false;
 
 const zeichnen = () => {
   for (const el of bilder) {
@@ -30,6 +32,7 @@ const zeichnen = () => {
 };
 
 const schritt = (jetzt: number) => {
+  if (angehalten) { laeuft = false; return; }
   const dt = zuletzt ? Math.min(100, jetzt - zuletzt) : 16.7;
   zuletzt = jetzt;
 
@@ -48,14 +51,27 @@ const schritt = (jetzt: number) => {
 };
 
 const anstossen = () => {
-  if (laeuft) return;
+  if (laeuft || angehalten) return;
   laeuft = true;
   zuletzt = 0;
   requestAnimationFrame(schritt);
 };
 
+/**
+ * Anhalten, sobald ein Seitenwechsel beginnt: Der Wert läuft dem
+ * Scrollen nach und änderte sich sonst noch, während der Wechsel die
+ * Vergrößerung schon gemessen hat und die Seite lädt — das Abbild der
+ * Karte war dann ein Stück anders groß als gemessen, und das Bild
+ * zuckte zu Beginn des Morphs (Florian, 17. Oktober 2026). Nach dem
+ * Wechsel läuft es mit `bildlaufAufbauen` weiter.
+ */
+export function bildlaufAnhalten(): void {
+  angehalten = true;
+}
+
 /** Neue Läufer aufnehmen — beim Laden und nach jedem Seitenwechsel. */
 export function bildlaufAufbauen(): void {
+  angehalten = false;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   /* Nach einem Seitenwechsel sind die alten Elemente fort */

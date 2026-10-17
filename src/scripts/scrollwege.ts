@@ -31,7 +31,7 @@ import { ausStuetzstellen, type Stuetzstelle } from './easing';
  * kommen früher").
  *
  * Seit dem 27. September 2026 läuft der ganze Ablauf zusätzlich
- * `OZ_VORLAUF` (150 px) früher. Gemessen erreicht die Karte die
+ * `ozVorlauf()` (150 px, auf dem Desktop seit Oktober 350) früher. Gemessen erreicht die Karte die
  * Unterkante des Logos dann 30 px (375 × 667) bis 330 px (1440 × 900)
  * Scrollweg, nachdem es ganz fort ist — sie schiebt sich also weiter
  * nie darüber.
@@ -46,14 +46,21 @@ export function ozWeg(): number {
  * rücken gemeinsam nach vorn (Florian, 27. September 2026: „150 px
  * früher ins Bild — es ist zu lange weiß, wenn sich das Logo
  * ausgezeichnet hat"). Geschwindigkeit und Wege bleiben, wie sie sind.
+ *
+ * Auf dem Desktop seit dem 17. Oktober 2026 weitere 200 px, also 350
+ * (Florian: „Das Logo ist schon ganz ausgefadet, wenn die Karte von
+ * unten hereinscrollt"). Handys bleiben bei 150 — dort steht die Karte
+ * schon heute knapp hinter dem Logo.
  * Muss zu `--oz-vorlauf` in Oeffnungszeiten.astro passen.
  */
-export const OZ_VORLAUF = 150;
+export function ozVorlauf(): number {
+  return window.matchMedia('(max-width: 991px)').matches ? 150 : 350;
+}
 
 /** Fortschritt von Ablauf a-19 für einen Bereich, dessen Oberkante
     `oben` Bildpunkte unter dem Fensteroberrand steht — samt Vorlauf. */
 export function ozFortschritt(oben: number): number {
-  return beimScrollenSichtbar(ozWeg(), oben - OZ_VORLAUF);
+  return beimScrollenSichtbar(ozWeg(), oben - ozVorlauf());
 }
 
 /** Bei diesem Anteil von Ablauf a-19 steht die Blase mit voll
@@ -77,7 +84,7 @@ export const SCHNALZ_DAUER = 300;
  * Ablauf a-19, umgerechnet in Scrolltiefe (siehe beimScrollenSichtbar).
  */
 export function schnalzWeg(): number {
-  return OZ_RAST * (ozWeg() + 1) - 1 - OZ_VORLAUF / window.innerHeight;
+  return OZ_RAST * (ozWeg() + 1) - 1 - ozVorlauf() / window.innerHeight;
 }
 
 /**
@@ -142,7 +149,7 @@ export function ozAnteilFuer(ziel: number, stellen: Stuetzstelle[]): number {
 
 /** Scrolltiefe in Bildpunkten, bei der der Ablauf den Anteil `p` hat. */
 export function ozTiefeAus(p: number): number {
-  return Math.max(0, Math.round((p * (ozWeg() + 1) - 1) * window.innerHeight - OZ_VORLAUF));
+  return Math.max(0, Math.round((p * (ozWeg() + 1) - 1) * window.innerHeight - ozVorlauf()));
 }
 
 /**

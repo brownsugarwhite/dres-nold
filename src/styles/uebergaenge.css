@@ -74,6 +74,19 @@
   mix-blend-mode: normal;
 }
 
+/* Kein Scrollbalken auf der öffentlichen Seite (Florian, 17. Oktober
+   2026): Beim Morph in eine kürzere oder längere Seite kam und ging er
+   und schob alles um seine Breite zur Seite. Scrollen per Rad, Trackpad,
+   Tastatur und Finger bleibt. Steht hier, weil nur die öffentliche Seite
+   diese Datei lädt — die Redaktion behält ihre Balken. */
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
 /* Nichts darf über den Fensterrand hinaus sichtbar bleiben — wichtig
    fürs seitliche Durchschieben beim Blättern. */
 ::view-transition {
@@ -298,6 +311,18 @@ html[data-rueckmorph]::view-transition-new(.bild) {
 html[data-rueckmorph]::view-transition-old(.bild) {
   animation: uebergang-bild-nach var(--dauer-uebergang) var(--verlauf-betont) both;
   opacity: 1;
+}
+
+/* Ohne Gegenstück — die Seite hat keine Karte auf der Startseite, oder
+   man kommt aus dem Menü statt von der Karte: Das Bild steht dann nur
+   auf einer Seite und blendet mit ihr, statt die ganze Dauer still
+   über dem anderen Inhalt zu stehen (Florian, 17. Oktober 2026). */
+html::view-transition-old(.bild):only-child {
+  animation: uebergang-rest-aus calc(var(--dauer-uebergang) * 0.45) var(--verlauf-betont) both;
+}
+
+html::view-transition-new(.bild):only-child {
+  animation: uebergang-rest-ein var(--dauer-uebergang) var(--verlauf-betont) both;
 }
 
 /* --- Die Leisten bleiben scharf und still ------------------------

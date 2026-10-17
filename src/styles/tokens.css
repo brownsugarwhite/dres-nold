@@ -124,6 +124,9 @@
 
   /* Nur noch die große Telefonnummer im Kontakt ist leicht gesetzt */
   --gewicht-leicht: 300;
+  /* Eine Spur feiner als Fließtext — der Scroll-Hinweis unter dem Logo
+     (Florian, 17. Oktober 2026) */
+  --gewicht-fein: 350;
   /* Gewicht ALLER Überschriften an einer Stelle. Die Praxis wollte die
      kräftigen Überschriften zurück (Florian, 26. September 2026): Die
      alte Webflow-Seite setzte sie in 600 und 700, hier eine Spur

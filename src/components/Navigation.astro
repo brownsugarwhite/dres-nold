@@ -30,21 +30,26 @@ const telefonZiel = `tel:${praxis.telefon.replace(/\s/g, '')}`;
 /*
   Das Menü kommt fertig aus dem Seitenaufbau (lib/aufbau.ts,
   `menueBauen`): vorn die Sprechstunden, dann jeder Block mit Menüangaben
-  in der Reihenfolge der Seite. Alle Leisten zeigen dieselbe Folge
-  (Florian, Oktober 2026) — die eigene Ordnung der Symbolleiste und das
-  Ende-Stellen der Sprechstunden sind damit entfallen.
+  in der Reihenfolge der Seite. Kopfleiste und Handy-Menü zeigen genau
+  diese Folge (Florian, Oktober 2026).
 
   Jeder Punkt mit Unterpunkten klappt als Blase auf; Unterpunkte haben
   kein Symbol, nur Hauptpunkte.
 */
 type Punkt = (typeof punkte)[number];
 
-/* Auf Handys unten drei Knöpfe in derselben Folge: Sprechstunden,
-   Leistungen, ganz außen die Telefonnummer. Die Leistungen sind unten
-   ein schlichter Sprung — das Aufklappen gibt es dort nicht. */
+/*
+  Die Symbolleiste unten: dieselbe Folge, aber die Sprechstunden ganz
+  rechts — dorthin zeigt der Zipfel der Karte (Florian, 17. Oktober 2026).
+  Davor auf Handys die Telefonnummer. Wie viele Symbole stehen, hängt am
+  Platz (Skript `leisteEinpassen`): Von hinten fallen Punkte weg, bis der
+  Rest nicht gequetscht wirkt. Leistungen, Telefon und Sprechstunden
+  bleiben immer.
+*/
 const telefon: Punkt = { id: 'telefon', titel: praxis.telefon, symbol: '/icons/navigation/telefon.svg', ziel: telefonZiel, unterpunkte: [] };
-const fussKlein = [punkte.find((e) => e.id === 'zeiten'), punkte.find((e) => e.id === 'leistungen'), telefon]
-  .filter((e): e is Punkt => Boolean(e));
+const zeiten = punkte.find((e) => e.id === 'zeiten');
+const fussPunkte = [...punkte.filter((e) => e.id !== 'zeiten'), telefon, ...(zeiten ? [zeiten] : [])];
+const IMMER = new Set(['leistungen', 'telefon', 'zeiten']);
 
 /** Kennung des Aufklappmenüs eines Punkts — je Leiste eine eigene */
 const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-${e.id}`;
@@ -106,10 +111,10 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       {/* Der Hörer — das Telefon-Symbol der Navigation, mit Kreis wie die
           Symbole im Menü. Er steht absolut in der Zeile und hat drei
           Plätze (Skript `telefonStellen`): zu rechts neben dem Punkt vor
-          dem Menüknopf; allein geöffnet mit der Nummer daneben genau
-          zwischen Logo und Menüknopf; bei offenem Menü als dessen erste
+          dem Menüknopf; allein geöffnet nur so weit links davon, dass die
+          Nummer daneben Platz hat; bei offenem Menü als dessen erste
           Zeile, bündig mit den Symbolen darunter (Florian, 27. September
-          2026). */}
+          und 17. Oktober 2026). */}
       <div class="kopftelefon" data-kopftelefon>
         <button
           class="kopftelefon__knopf"
@@ -268,11 +273,12 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
 */}
 <div class="fussleiste-huelle" data-fusshuelle>
 <nav class="fussleiste" data-leiste="fuss" aria-label="Schnellzugriff">
-  <div class="fussleiste__inhalt fussleiste__inhalt--gross">
-    {punkte.map((e, i) => (
+  <div class="fussleiste__inhalt" data-fussinhalt>
+    {fussPunkte.map((e, i) => (
       <>
+        {i > 0 && <span class="punkt punkt--fuss" aria-hidden="true" data-trenner></span>}
         {e.unterpunkte.length > 0 ? (
-          <div class="aufklapp" data-aufklapp data-richtung="hoch">
+          <div class="aufklapp fusspunkt" data-aufklapp data-richtung="hoch" data-fusspunkt={e.id} data-immer={IMMER.has(e.id) ? '' : undefined}>
             <button class="fussknopf fussknopf--knopf" type="button" aria-expanded="false" aria-controls={menueId(e, 'unten')} data-ziel={e.ziel} data-punkt={e.id}>
               {e.symbol ? <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" /> : <span class="fussknopf__symbol symbol-leer" aria-hidden="true"></span>}
               <span class="fussknopf__text">{e.titel}</span>
@@ -294,24 +300,11 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
             </div>
           </div>
         ) : (
-          <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
+          <a class:list={['fussknopf', 'fusspunkt', { 'fusspunkt--handy': e.id === 'telefon' }]} href={e.ziel} data-punkt={e.id} data-fusspunkt={e.id} data-immer={IMMER.has(e.id) ? '' : undefined}>
             {e.symbol ? <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" /> : <span class="fussknopf__symbol symbol-leer" aria-hidden="true"></span>}
             <span class="fussknopf__text">{e.titel}</span>
           </a>
         )}
-        {i < punkte.length - 1 && <span class="punkt punkt--fuss" aria-hidden="true"></span>}
-      </>
-    ))}
-  </div>
-
-  <div class="fussleiste__inhalt fussleiste__inhalt--klein">
-    {fussKlein.map((e, i) => (
-      <>
-        <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
-          {e.symbol ? <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" /> : <span class="fussknopf__symbol symbol-leer" aria-hidden="true"></span>}
-          <span class="fussknopf__text">{e.titel}</span>
-        </a>
-        {i < fussKlein.length - 1 && <span class="punkt punkt--fuss" aria-hidden="true"></span>}
       </>
     ))}
   </div>
@@ -669,12 +662,11 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     z-index: var(--ebene-menue);
     display: flex;
     flex-direction: column;
-    /* Links beginnt die Spalte genau unter dem Hörer in der Kopfleiste
-       (`--menue-spalte`, vom Skript gemessen: der Hörer steht mit der
-       Nummer mittig zwischen Logo und Kreuz, die Symbole der Zeilen
-       bündig darunter — Florians Entwurf, 27. September 2026); ohne
-       Messung an der Wand der Blase (`--menue-wand`) plus Luft. Rechts
-       der Seitenrand. */
+    /* Links beginnt die Spalte unter dem Hörer in der Kopfleiste
+       (`--menue-spalte`, vom Skript gemessen: mittig zwischen Logo und
+       Kreuz, aber höchstens 40 px von der Wand der Blase — Florian,
+       27. September und 17. Oktober 2026); ohne Messung an der Wand der
+       Blase (`--menue-wand`) plus Luft. Rechts der Seitenrand. */
     padding: var(--abstand-2xs) var(--abstand-seitenrand) var(--abstand-s)
              var(--menue-spalte, calc(var(--menue-wand, var(--abstand-seitenrand)) + var(--abstand-m)));
   }
@@ -902,9 +894,11 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
      lesbar, ohne abgehängt zu wirken */
   .mobilmenue__zeile--unter { margin-left: 22px; }
 
+  /* Ohne Symbole brauchen die Unterpunkte mehr Luft untereinander
+     (Florian, 17. Oktober 2026: 12 statt 8 px) */
   .mobilmenue__unterpunkt {
     gap: var(--abstand-xs);
-    padding: 8px 0;
+    padding: var(--abstand-xs) 0;
   }
 
   .mobilmenue__untertext { display: flex; flex-direction: column; }
@@ -1251,8 +1245,13 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     height: 110px;
   }
 
-  /* Die kurze Fassung gilt erst ab der Handybreite (siehe unten) */
-  .fussleiste__inhalt--klein { display: none; }
+  /* Was nicht passt, blendet `leisteEinpassen` aus — samt Trenner */
+  .fussleiste .fussleiste__inhalt > [data-weg][data-weg] { display: none; }
+
+  /* Die Telefonnummer steht unten nur auf Handys; auf dem Desktop steht
+     sie als Pille in der Kopfleiste */
+  .fussleiste__inhalt > .fusspunkt--handy,
+  .fussleiste__inhalt > .punkt--fuss:has(+ .fusspunkt--handy) { display: none; }
 
   .fussknopf--knopf {
     border: 0;
@@ -1310,6 +1309,8 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     font-size: 14px;
     font-weight: 400;
     text-align: center;
+    /* Nie umbrechen — passt ein Punkt nicht, fällt er ganz weg */
+    white-space: nowrap;
   }
 
   /* .nav-bottom-button-icon: 60 × 60 px, 5 px Abstand nach unten */
@@ -1372,9 +1373,9 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       width: min(100% - 2 * var(--abstand-seitenrand), var(--breite-inhalt));
     }
 
-    /* Auf Handys die kurze Leiste statt der langen */
-    .fussleiste__inhalt--gross { display: none; }
-    .fussleiste__inhalt--klein { display: flex; }
+    /* Auf Handys auch die Telefonnummer unten */
+    .fussleiste__inhalt > .fusspunkt--handy { display: flex; }
+    .fussleiste__inhalt > .punkt--fuss:has(+ .fusspunkt--handy) { display: block; }
 
     /* Ohne Telefonnummer — die steht als Pille in der Kopfleiste und
        unten als eigener Knopf */
@@ -1388,15 +1389,11 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
 
   }
 
-  /* Schmale Handys: die Kontaktzeile muss in eine Zeile passen; die
-     drei Knöpfe unten teilen sich die Breite gleichmäßig (Vorlage:
-     `.nav-bottom-button { flex: 1 }`), so stehen die Punkte genau
-     zwischen den Symbolen */
+  /* Schmale Handys: die Kontaktzeile muss in eine Zeile passen */
   @media (max-width: 479px) {
     .kontaktzeile__inhalt { gap: var(--abstand-2xs); }
     .kontaktzeile__text { font-size: var(--text-xs); }
     .fussleiste__inhalt { width: 94%; }
-    .fussleiste__inhalt--klein .fussknopf { flex: 1; }
   }
 
 </style>
@@ -1432,10 +1429,72 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     if (!leistenwechselBereit) {
       leistenwechselBereit = true;
       leistenwechselAufbauen();
+      leisteEinpassenAufbauen();
     }
     aufklappmenuesAufbauen();
     rollenAufbauen();
     mobilmenueAufbauen();
+  }
+
+  /**
+   * Die Symbolleiste unten zeigt so viele Punkte, wie Platz haben, ohne
+   * gequetscht zu wirken (Florian, 17. Oktober 2026). Vorher sprang sie
+   * bei 991 px von allen auf drei.
+   *
+   * Gemessen wird die natürliche Breite jedes Punkts; dazwischen soll je
+   * ein Trennpunkt mit mindestens `LUFT` Platz zu beiden Seiten stehen.
+   * Passt das nicht, fällt der hinterste Punkt weg, der nicht immer
+   * bleiben muss (`data-immer`: Leistungen, Telefon, Sprechstunden) —
+   * so lange, bis es passt. Die Trennpunkte stehen nur zwischen
+   * sichtbaren Punkten. Danach misst die Sprechstunden-Karte den Knopf
+   * für ihren Zipfel neu (Ereignis `leiste:eingepasst`).
+   */
+  function leisteEinpassenAufbauen() {
+    const inhalt = document.querySelector<HTMLElement>('[data-fussinhalt]');
+    if (!inhalt) return;
+    const LUFT = 22;
+    const kinder = [...inhalt.children] as HTMLElement[];
+    const punkte = kinder.filter((k) => k.hasAttribute('data-fusspunkt'));
+
+    const einpassen = () => {
+      for (const k of kinder) k.removeAttribute('data-weg');
+      const verfuegbar = inhalt.clientWidth;
+      if (!verfuegbar) return;
+      /* Was das CSS ohnehin verbirgt (Telefon auf dem Desktop), zählt nicht */
+      const da = punkte.filter((p) => getComputedStyle(p).display !== 'none');
+      const breite = new Map(da.map((p) => [p, p.getBoundingClientRect().width]));
+      const trenner = 3 + 2 * LUFT;
+      const bedarf = (liste: HTMLElement[]) => liste.reduce((n, p) => n + (breite.get(p) ?? 0), 0) + Math.max(0, liste.length - 1) * trenner;
+      const sichtbar = [...da];
+      while (bedarf(sichtbar) > verfuegbar) {
+        const weg = [...sichtbar].reverse().find((p) => !p.hasAttribute('data-immer'));
+        if (!weg) break;
+        sichtbar.splice(sichtbar.indexOf(weg), 1);
+      }
+      for (const p of punkte) if (!sichtbar.includes(p) && da.includes(p)) {
+        p.setAttribute('data-weg', '');
+      }
+      /* Trennpunkte nur zwischen zwei sichtbaren Punkten */
+      let davor = false;
+      let offen: HTMLElement | null = null;
+      for (const k of kinder) {
+        if (k.hasAttribute('data-trenner')) {
+          k.setAttribute('data-weg', '');
+          if (davor) offen = k;
+          continue;
+        }
+        if (!sichtbar.includes(k)) continue;
+        if (offen) offen.removeAttribute('data-weg');
+        offen = null;
+        davor = true;
+      }
+      window.dispatchEvent(new Event('leiste:eingepasst'));
+    };
+
+    new ResizeObserver(einpassen).observe(inhalt);
+    /* Die Schrift ändert die Breiten — nach dem Laden noch einmal */
+    document.fonts?.ready.then(einpassen);
+    einpassen();
   }
 
   function leistenwechselAufbauen() {
@@ -1557,6 +1616,18 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
   /** Weiche Kurve (ease-in-out quad) für das Breiterwerden der Blase */
   const weich = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
+  /*
+    Alle Blasen einer Leiste teilen sich den Umschlag: seine Maske
+    (`--blase-form`) und das Ausblenden der Punktlinie (`data-ohne-linie`).
+    Diesen Zustand schreibt und räumt nur die zuletzt geöffnete Blase.
+    Geht eine neue auf, verschwindet jede andere sofort — auch eine, die
+    gerade noch zuklappt. Vorher räumte die schließende Blase am Ende
+    ihrer Bewegung den Zustand der neuen mit ab, und die Punktlinie lag
+    quer über der offenen Blase (Florian, 17. Oktober 2026).
+  */
+  const blasenJeTraeger = new WeakMap<HTMLElement, Set<{ beenden: () => void }>>();
+  const blasenBesitzer = new WeakMap<HTMLElement, object>();
+
   function blaseAnlegen(opt: {
     /** Trägt die Zeichnung (`.kopfleiste` / `.fussleiste`) */
     leiste: HTMLElement;
@@ -1585,6 +1656,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     let anteil = 0;        // 0 = Linie, 1 = voll aufgewölbt
     let ziel = 0;
     let laeuft = false;
+    let lauf = 0;          // zählt Bewegungen; eine abgebrochene läuft nicht weiter
     let hoehe = 0;         // Höhe der Wölbung in px
     let start = 0, von = 0, dauer = 520;
     const s = hoch ? -1 : 1;   // Richtung: nach oben oder unten
@@ -1621,6 +1693,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
          in den Koordinaten des Umschlags. Der reicht per Innenabstand
          (`--blase-hoehe`) über die Leiste hinaus — gemessen wird die
          Leiste selbst, also ohne diesen Abstand. */
+      if (!istBesitzer()) return;
       const lr = linienTraeger.getBoundingClientRect();
       const cs = getComputedStyle(linienTraeger);
       const leisteH = lr.height - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
@@ -1646,19 +1719,28 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       }
     };
 
-    const schritt = (jetzt: number) => {
+    const ich = {};
+    const istBesitzer = () => blasenBesitzer.get(linienTraeger) === ich;
+    const zustandRaeumen = () => {
+      if (!istBesitzer()) return;
+      blasenBesitzer.delete(linienTraeger);
+      linienTraeger.style.removeProperty('--blase-form');
+      linienTraeger.style.removeProperty('--blase-hoehe');
+      delete linienTraeger.dataset.ohneLinie;
+    };
+
+    const schritt = (jetzt: number, mein: number) => {
+      if (mein !== lauf) return;
       const t = Math.min(1, (jetzt - start) / dauer);
       const kurve = ziel === 1 ? kurveAuf : kurveZu;
       anteil = von + (ziel - von) * kurve(t);
       zeichnen();
-      if (t < 1) { requestAnimationFrame(schritt); return; }
+      if (t < 1) { requestAnimationFrame((n) => schritt(n, mein)); return; }
       laeuft = false;
       anteil = ziel;
       if (ziel === 0) {
         svg.style.display = 'none';
-        linienTraeger.style.removeProperty('--blase-form');
-        linienTraeger.style.removeProperty('--blase-hoehe');
-        delete linienTraeger.dataset.ohneLinie;
+        zustandRaeumen();
         beimZu();
       }
     };
@@ -1669,12 +1751,31 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       start = performance.now();
       dauer = nachZiel === 1 ? 520 : 400;
       if (wenigerBewegung || sofort) { anteil = ziel; zeichnen(); dauer = 0; start = -1e9; }
-      if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
+      if (!laeuft) { laeuft = true; const mein = ++lauf; requestAnimationFrame((n) => schritt(n, mein)); }
     };
+
+    /* Sofort weg, ohne Bewegung — wenn eine andere Blase derselben
+       Leiste aufgeht */
+    const beenden = () => {
+      if (svg.style.display === 'none') return;
+      lauf++;
+      laeuft = false;
+      anteil = 0;
+      ziel = 0;
+      svg.style.display = 'none';
+      zustandRaeumen();
+      beimZu();
+    };
+    const geschwister = blasenJeTraeger.get(linienTraeger) ?? new Set();
+    blasenJeTraeger.set(linienTraeger, geschwister);
+    const eintrag = { beenden };
+    geschwister.add(eintrag);
 
     return {
       /** Aufwölben auf die gegebene Inhaltshöhe */
       oeffnen(h: number) {
+        for (const andere of geschwister) if (andere !== eintrag) andere.beenden();
+        blasenBesitzer.set(linienTraeger, ich);
         hoehe = h;
         linienTraeger.dataset.ohneLinie = 'ja';
         svg.style.display = 'block';
@@ -1872,7 +1973,13 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
         öffnet der erste Druck, der zweite springt. So kommt man auf
         jedem Weg an beides.
       */
+      /* Unten auf Handys und Tablets springt ein Punkt mit Unterpunkten
+         gleich — dort gibt es das Menü mit seinen Ebenen, eine Blase
+         über der Symbolleiste wäre zu viel (wie bisher bei „Leistungen") */
+      const nurSprung = () => hoch && window.matchMedia('(max-width: 991px)').matches;
+
       knopf.addEventListener('click', () => {
+        if (nurSprung()) { zumZiel(knopf.dataset.ziel ?? ''); return; }
         if (knopf.getAttribute('aria-expanded') !== 'true') { setzen(true); return; }
         setzen(false);
         zumZiel(knopf.dataset.ziel ?? '');
@@ -1886,7 +1993,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
 
       // Auf Zeigegeräten öffnet auch das Überfahren — die Blase gehört dazu
       huelle.addEventListener('pointerenter', (e) => {
-        if ((e as PointerEvent).pointerType !== 'mouse') return;
+        if ((e as PointerEvent).pointerType !== 'mouse' || nurSprung()) return;
         window.clearTimeout(schliessTimer);
         setzen(true);
       });
@@ -2136,9 +2243,9 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     let menueGewollt = false;
 
     /* ---- Der Hörer in der Kopfleiste ----
-       Drei Plätze (Florian, 27. September 2026): zu — rechts neben dem
-       Punkt vor dem Menüknopf; allein geöffnet — mit der Nummer daneben
-       genau in der Mitte zwischen Logo und Menüknopf; bei offenem Menü —
+       Drei Plätze (Florian, 27. September 2026 / 17. Oktober 2026): zu —
+       rechts neben dem Punkt vor dem Menüknopf; allein geöffnet — nur so
+       weit links davon, dass die Nummer Platz hat; bei offenem Menü —
        als dessen erste Zeile, sein Symbol bündig mit den Symbolen der
        Zeilen darunter. Der Platz ist eine `left`-Angabe in der
        Kopfleiste, die das Skript misst; das CSS fährt dorthin. */
@@ -2157,19 +2264,32 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       const knopfBreite = telefonKnopf.getBoundingClientRect().width || 44;
       const luft = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--abstand-xs')) * 16 || 12;
       const abstand = parseFloat(getComputedStyle(kopfleisteMobil.querySelector('.kopfleiste__handyrechts') as Element).columnGap) || 16;
+      /* Die Symbolspalte des Menüs: mittig zwischen Logo und Menüknopf,
+         aber nie weiter als 40 px (`--abstand-l`) von der Wand der Blase.
+         Auf breiten Handys stand sie sonst weit in der Mitte, mit viel
+         leerer Blase links davon (Florian, 17. Oktober 2026). Bis etwa
+         400 px bleibt alles, wie es war. */
+      const wand = parseFloat(menue.style.getPropertyValue('--menue-wand')) || logo.getBoundingClientRect().right + 12;
+      const randL = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--abstand-l')) * 16 || 40;
+      const gruppe = knopfBreite + luft + (nummer?.scrollWidth ?? 0);
+      const mittig = (logo.getBoundingClientRect().right + b.left) / 2 - gruppe / 2 + (knopfBreite - 40) / 2;
+      const spalte = Math.min(mittig, wand + randL);
+      menue.style.setProperty('--menue-spalte', `${Math.round(spalte)}px`);
+
       let x: number;
-      if (telefonOffen || menueGewollt) {
-        /* Geöffnet — allein wie mit Menü — steht die Gruppe mittig
-           zwischen Logo und Menüknopf; mit Menü rückt die Symbolspalte
-           des Menüs unter das Symbol des Hörers (Florians Entwurf,
-           27. September 2026). Der Hörer-Knopf ist 44 px, sein Symbol
-           40: die Spalte beginnt 2 px innerhalb des Knopfs. */
-        const breite = knopfBreite + luft + (nummer?.scrollWidth ?? 0);
-        x = (logo.getBoundingClientRect().right + b.left) / 2 - breite / 2 - k.left;
-        menue.style.setProperty('--menue-spalte', `${Math.round(k.left + x + (knopfBreite - 40) / 2)}px`);
+      if (menueGewollt) {
+        /* Mit Menü ist der Hörer dessen erste Zeile: sein Symbol bündig
+           mit den Symbolen darunter. Der Knopf ist 44 px, das Symbol 40 —
+           die Spalte beginnt 2 px innerhalb des Knopfs. */
+        x = spalte - (knopfBreite - 40) / 2 - k.left;
       } else {
+        /* Zu: rechts neben dem Punkt vor dem Menüknopf. Allein geöffnet
+           rückt er nur so weit nach links, dass die Nummer zwischen ihm
+           und dem Punkt Platz hat (Florian, 17. Oktober 2026) — vorher
+           fuhr die Gruppe bis in die Mitte. */
         const p = punkt?.getBoundingClientRect();
         x = (p && p.width ? p.left : b.left) - abstand - knopfBreite - k.left;
+        if (telefonOffen) x -= luft + (nummer?.scrollWidth ?? 0);
       }
       telefon.style.setProperty('--telefon-x', `${Math.round(x)}px`);
       telefon.dataset.gestellt = 'ja';
