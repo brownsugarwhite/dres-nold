@@ -11,7 +11,11 @@ body {
 .dialog [hidden] { display: none !important; }
 
 .redaktion {
-  width: min(100% - 2 * var(--abstand-m), 86rem);
+  /* Nutzt die Breite des Fensters; nur auf sehr breiten Schirmen gedeckelt.
+     Der Rand ist auf Handys schmal, damit das Formular Platz hat. */
+  --redaktion-rand: clamp(var(--abstand-2xs), 2vw, var(--abstand-l));
+  --redaktion-breite: 120rem;
+  width: min(100% - 2 * var(--redaktion-rand), var(--redaktion-breite));
   margin-inline: auto;
   padding-block: 0 var(--abstand-2xl);
 }
@@ -330,7 +334,7 @@ body {
 
 .arbeitsplatz {
   display: grid;
-  grid-template-columns: minmax(17rem, 21rem) minmax(0, 1fr);
+  grid-template-columns: clamp(20rem, 30vw, 30rem) minmax(0, 1fr);
   gap: var(--abstand-m);
   align-items: start;
 }
@@ -560,7 +564,7 @@ body {
   gap: var(--abstand-s);
   align-items: center;
   justify-content: flex-end;
-  padding: var(--abstand-xs) max(var(--abstand-m), calc((100vw - 86rem) / 2));
+  padding: var(--abstand-xs) max(clamp(var(--abstand-2xs), 2vw, var(--abstand-l)), calc((100vw - 120rem) / 2));
   background: var(--farbe-flaeche);
   border-top: 1px solid var(--farbe-linie);
   box-shadow: 0 -8px 30px -20px rgb(0 0 0 / 30%);
@@ -636,6 +640,23 @@ body {
   .ansicht__ansehen { margin-left: 0; }
   .teil { padding: var(--abstand-s); }
   .feldreihe { flex-direction: column; }
+}
+
+/* ---------- Handys: Kästen ineinander kosten Breite — Ränder knapp ---------- */
+@media (max-width: 600px) {
+  .redaktion__kopf { margin-inline: calc(-1 * var(--redaktion-rand)); padding: var(--abstand-xs) var(--redaktion-rand); }
+  .plan { padding: var(--abstand-2xs); }
+  .plan__verweis { grid-template-columns: 44px minmax(0, 1fr); column-gap: var(--abstand-2xs); }
+  .plan__skizze .skizze { width: 44px; }
+  .plan__griff, .plan__schloss { width: 18px; }
+  .plan__neu { padding-left: 22px; }
+  .teil { padding: var(--abstand-xs) var(--abstand-2xs); }
+  .gruppe { padding: var(--abstand-xs) var(--abstand-2xs); }
+  .eintrag__kopf { padding: var(--abstand-2xs) var(--abstand-xs); }
+  .eintrag__inhalt { padding: var(--abstand-xs) var(--abstand-2xs); }
+  .eintrag__inhalt > .eintraege { margin-inline: calc(-1 * var(--abstand-2xs) + 1px); padding: var(--abstand-xs) var(--abstand-2xs); border-left-width: 3px; }
+  .dialog__kopf, .dialog__fuss { padding-inline: var(--abstand-s); }
+  .dialog__koerper { padding: var(--abstand-s); }
 }
 
 /* Der Kopf einer Karte darf schmaler werden als seine Unterzeile — sonst
