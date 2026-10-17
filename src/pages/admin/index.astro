@@ -1,29 +1,58 @@
 ---
 /**
- * Übersicht der Redaktion: ein Kasten je Bereich.
+ * Die Redaktion — eine einzige Seite (Oktober 2026). Links der
+ * Seitenplan, rechts das Formular des gewählten Blocks, unten
+ * „Veröffentlichen". Alles Weitere baut src/admin/redaktion.ts im
+ * Browser auf.
+ *
+ * Die Symbole der Seite werden hier beim Bauen eingelesen und als Liste
+ * mitgegeben — die Auswahl „Symbol wählen" zeigt sie an.
  */
+import { readdirSync } from 'node:fs';
 import Redaktion from '../../layouts/Redaktion.astro';
-import { bereiche, reihenfolge } from '../../admin/bereiche';
+
+/** Alle SVG-Symbole unter public/icons, nach Ordnern */
+const ORDNER: [string, string][] = [
+  ['navigation', 'Menü'],
+  ['symbole', 'Kacheln'],
+  ['', 'Leistungen'],
+  ['eigene', 'Eigene'],
+];
+const symbole = ORDNER.flatMap(([ordner]) => {
+  try {
+    return readdirSync(`public/icons/${ordner}`)
+      .filter((d) => d.endsWith('.svg') && d !== 'logo.svg')
+      .sort()
+      .map((d) => ({ pfad: `/icons/${ordner ? `${ordner}/` : ''}${d}`, name: d.replace(/\.svg$/, '').replace(/-/g, ' ') }));
+  } catch {
+    return [];
+  }
+});
 ---
 
-<Redaktion titel="Übersicht">
-  <h1>Was möchten Sie ändern?</h1>
-  <p class="redaktion__einleitung">
-    Nach dem Speichern ist eine Änderung nach etwa einer Minute im Internet
-    sichtbar. Jeder Stand wird gesichert und lässt sich wiederherstellen.
-  </p>
+<Redaktion titel="Redaktion">
+  <p class="laden" data-laden>Die Inhalte werden geladen …</p>
 
-  <ul class="bereiche">
-    {reihenfolge.map((id) => (
-      <li>
-        <a class="bereich" href={`/admin/${id}/`} data-astro-prefetch="false">
-          <img src={bereiche[id].symbol} alt="" width="44" height="44" />
-          <span>
-            <span class="bereich__titel">{bereiche[id].titel}</span>
-            <span class="bereich__text">{bereiche[id].beschreibung}</span>
-          </span>
-        </a>
-      </li>
-    ))}
-  </ul>
+  <div class="arbeitsplatz" data-arbeitsplatz hidden>
+    <aside class="plan" aria-label="Seitenplan">
+      <div class="menuevorschau" data-menuevorschau></div>
+      <nav data-plan aria-label="Blöcke der Seite"></nav>
+    </aside>
+
+    <section class="editor" data-editor aria-live="off"></section>
+  </div>
+
+  <div class="veroeffentlichen" data-veroeffentlichen data-offen="false">
+    <p class="meldung" data-meldung role="status" aria-live="polite"></p>
+    <button class="knopf knopf--leise" type="button" data-verwerfen hidden>Verwerfen</button>
+    <button class="knopf knopf--haupt" type="button" data-knopf disabled>Veröffentlichen</button>
+  </div>
+
+  <p class="nur-vorleser" data-ansage aria-live="assertive"></p>
+
+  <script type="application/json" data-symbole set:html={JSON.stringify(symbole)} />
 </Redaktion>
+
+<script>
+  import '../../admin/redaktion';
+</script>

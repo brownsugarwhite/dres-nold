@@ -6,8 +6,12 @@ body {
   background: var(--farbe-flaeche-gedeckt);
 }
 
+/* `hidden` gilt immer — auch dort, wo eine Klasse `display` setzt */
+.redaktion [hidden],
+.dialog [hidden] { display: none !important; }
+
 .redaktion {
-  width: min(100% - 2 * var(--abstand-m), 60rem);
+  width: min(100% - 2 * var(--abstand-m), 86rem);
   margin-inline: auto;
   padding-block: 0 var(--abstand-2xl);
 }
@@ -63,38 +67,6 @@ body {
   max-width: none;
   color: var(--farbe-text-gedeckt);
 }
-
-/* Übersicht */
-.bereiche {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-  gap: var(--abstand-s);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.bereich {
-  display: flex;
-  gap: var(--abstand-s);
-  align-items: flex-start;
-  height: 100%;
-  padding: var(--abstand-s);
-  background: var(--farbe-flaeche);
-  border: 1px solid var(--farbe-linie);
-  border-radius: var(--radius-m);
-  color: inherit;
-  text-decoration: none;
-  transition: border-color var(--dauer-schnell) var(--verlauf);
-}
-
-.bereich:hover,
-.bereich:focus-visible { border-color: var(--farbe-primaer); }
-
-.bereich img { flex: none; width: 44px; height: 44px; }
-
-.bereich__titel { display: block; color: var(--farbe-primaer); font-weight: var(--gewicht-halbfett); }
-.bereich__text { font-size: var(--text-s); color: var(--farbe-text-gedeckt); }
 
 /* Formular */
 .formular {
@@ -350,3 +322,325 @@ body {
 .meldung ul { margin: var(--abstand-3xs) 0 0; padding-left: 1.2em; }
 
 .laden { color: var(--farbe-text-gedeckt); }
+
+/* ==================================================================
+   ARBEITSPLATZ (Oktober 2026)
+   Links der Seitenplan, rechts das Formular des gewählten Blocks.
+   ================================================================== */
+
+.arbeitsplatz {
+  display: grid;
+  grid-template-columns: minmax(17rem, 21rem) minmax(0, 1fr);
+  gap: var(--abstand-m);
+  align-items: start;
+}
+
+/* Der Plan bleibt beim Scrollen sichtbar — er ist zugleich die Navigation */
+.plan {
+  position: sticky;
+  top: 86px;
+  max-height: calc(100vh - 86px - 96px);
+  overflow-y: auto;
+  padding: var(--abstand-s);
+  background: var(--farbe-flaeche);
+  border: 1px solid var(--farbe-linie);
+  border-radius: var(--radius-m);
+}
+
+.plan__ueberschrift {
+  margin: var(--abstand-s) 0 var(--abstand-2xs);
+  font-size: var(--text-kicker);
+  font-weight: var(--gewicht-halbfett);
+  letter-spacing: var(--sperrung-kicker);
+  text-transform: uppercase;
+  color: var(--farbe-text-gedeckt);
+}
+
+.plan__liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+
+.plan__block {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--radius-s);
+  background: var(--farbe-flaeche);
+}
+
+.plan__block[data-zieht] { box-shadow: 0 6px 24px -8px rgb(60 10 40 / 35%); background: var(--farbe-flaeche-hell); z-index: 2; }
+.plan__block[data-aus] .plan__verweis { opacity: 0.55; }
+.plan__block[data-nur-menue] .plan__verweis { border-style: dashed; }
+
+.plan__griff,
+.plan__schloss {
+  flex: none;
+  width: 22px;
+  text-align: center;
+  color: var(--farbe-text-gedeckt);
+  font-size: 16px;
+  user-select: none;
+}
+
+.plan__griff { cursor: grab; touch-action: none; }
+.plan__block[data-zieht] .plan__griff { cursor: grabbing; }
+.plan__schloss { display: grid; place-items: center; opacity: 0.55; }
+.plan__schloss svg { width: 12px; height: 14px; }
+
+.plan__verweis {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid var(--farbe-linie);
+  border-radius: var(--radius-s);
+  color: inherit;
+  text-decoration: none;
+}
+
+.plan__verweis:hover { border-color: var(--farbe-primaer-hell); }
+.plan__verweis[aria-current='page'] { border-color: var(--farbe-primaer); background: var(--farbe-flaeche-hell); box-shadow: inset 3px 0 0 var(--farbe-primaer); }
+
+.plan__skizze { grid-row: 1 / 3; color: var(--farbe-primaer); }
+.plan__skizze .skizze { width: 56px; height: auto; display: block; }
+.plan__text { display: flex; flex-direction: column; min-width: 0; }
+.plan__titel { font-weight: var(--gewicht-halbfett); color: var(--farbe-primaer); line-height: 1.25; overflow-wrap: anywhere; hyphens: auto; }
+.plan__art { font-size: var(--text-xs); color: var(--farbe-text-gedeckt); line-height: 1.3; }
+.plan__marken { grid-column: 2; display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+.plan__marken:empty { display: none; }
+
+.plan__menue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px 1px 3px;
+  border-radius: var(--radius-rund);
+  background: var(--farbe-flaeche-kachel);
+  font-size: var(--text-xs);
+  color: var(--farbe-primaer);
+}
+
+.plan__menue img { width: 16px; height: 16px; }
+
+.plan__schritte { display: flex; flex-direction: column; }
+
+.plan__schritt {
+  width: 26px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: none;
+  color: var(--farbe-text-gedeckt);
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.plan__schritt:hover, .plan__schritt:focus-visible { background: var(--farbe-flaeche-gedeckt); color: var(--farbe-primaer); }
+
+.plan__neu { padding: 6px 0 6px 26px; }
+.plan__neuknopf { width: 100%; border-style: dashed; }
+
+.plan__erklaerung { margin: var(--abstand-s) 0 0; font-size: var(--text-xs); color: var(--farbe-text-gedeckt); max-width: none; }
+
+/* ---------- Menüvorschau ---------- */
+.menuevorschau { margin-bottom: var(--abstand-xs); padding-bottom: var(--abstand-xs); border-bottom: 1px solid var(--farbe-linie-leise); }
+.menuevorschau__titel { display: block; margin-bottom: 6px; font-size: var(--text-kicker); font-weight: var(--gewicht-halbfett); letter-spacing: var(--sperrung-kicker); text-transform: uppercase; color: var(--farbe-text-gedeckt); }
+.menuevorschau__liste { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.menuevorschau__punkt { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs); color: var(--farbe-primaer); }
+.menuevorschau__punkt img { width: 18px; height: 18px; }
+.menuevorschau__ohne { width: 18px; height: 18px; border: 1px dashed var(--farbe-formlinie); border-radius: 50%; }
+.menuevorschau__zahl { color: var(--farbe-text-gedeckt); }
+
+/* ---------- Editor ---------- */
+.editor { min-width: 0; padding-bottom: 120px; }
+
+.ansicht__kopf { display: flex; align-items: center; gap: var(--abstand-s); margin-bottom: var(--abstand-m); }
+.ansicht__kopf h1 { margin: 6px 0 0; font-size: var(--text-xl); }
+.ansicht__kopf h1:focus { outline: none; }
+.ansicht__skizze { flex: none; width: 96px; padding: 6px; border-radius: var(--radius-m); background: var(--farbe-flaeche); color: var(--farbe-primaer); border: 1px solid var(--farbe-linie); }
+.ansicht__skizze:empty { display: none; }
+.ansicht__skizze .skizze { display: block; width: 100%; height: auto; }
+.ansicht__ansehen { margin-left: auto; white-space: nowrap; text-decoration: none; }
+.ansicht__fuss { margin-top: var(--abstand-l); padding-top: var(--abstand-s); border-top: 1px solid var(--farbe-linie); }
+
+.teil {
+  margin-bottom: var(--abstand-m);
+  padding: var(--abstand-m);
+  background: var(--farbe-flaeche);
+  border: 1px solid var(--farbe-linie);
+  border-radius: var(--radius-m);
+}
+
+.teil__titel { margin: 0 0 var(--abstand-2xs); font-size: var(--text-l); color: var(--farbe-primaer); }
+.teil__hilfe { margin: 0 0 var(--abstand-s); max-width: none; font-size: var(--text-s); color: var(--farbe-text-gedeckt); }
+
+.schritte { display: grid; gap: var(--abstand-xs); max-width: 44rem; margin: 0 0 var(--abstand-m); padding-left: 1.4em; }
+.schritte li { padding-left: 4px; }
+
+.feld--leise .feld__eingabe[readonly] { border-style: dashed; }
+.feld__info { color: var(--farbe-text-gedeckt); font-size: var(--text-s); }
+.feld--schalter { align-items: flex-start; }
+.feld--schalter .feld__hilfe { margin-top: 2px; }
+.schalter { flex: none; margin-top: 3px; }
+
+.gruppe__titel { margin: 0 0 var(--abstand-3xs); font-size: var(--text-m); color: var(--farbe-primaer); }
+.gruppe__hilfe { margin: 0 0 var(--abstand-s); max-width: none; font-size: var(--text-xs); color: var(--farbe-text-gedeckt); }
+.gruppe--menue { background: var(--farbe-flaeche-hell); }
+.menue__innen { margin-top: var(--abstand-s); }
+.menue__auto { margin-bottom: var(--abstand-s); padding: var(--abstand-xs) var(--abstand-s); border-left: 3px solid var(--farbe-primaer-hell); background: var(--farbe-flaeche); }
+.menue__auto ul { margin: 4px 0 0; padding-left: 1.2em; font-size: var(--text-s); }
+
+.eintraege__titel { margin: 0 0 var(--abstand-3xs); font-size: var(--text-m); color: var(--farbe-primaer); }
+.eintraege__liste { display: grid; gap: var(--abstand-xs); margin: var(--abstand-xs) 0; }
+.eintraege__liste > .eintrag { margin: 0; }
+.eintrag__leiste { display: flex; align-items: stretch; }
+.eintrag__leiste .eintrag__kopf { flex: 1; }
+.eintrag__griff { display: grid; place-items: center; width: 28px; color: var(--farbe-text-gedeckt); cursor: grab; touch-action: none; user-select: none; background: var(--farbe-flaeche-gedeckt); border-radius: var(--radius-m) 0 0 var(--radius-m); }
+.eintrag[data-zieht] { box-shadow: 0 8px 28px -10px rgb(60 10 40 / 40%); }
+.eintrag__skizze { flex: none; width: 54px; color: var(--farbe-primaer); }
+.eintrag__skizze .skizze { display: block; width: 100%; height: auto; }
+.eintrag__beschriftung { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.eintrag__unter { font-size: var(--text-xs); color: var(--farbe-text-gedeckt); font-weight: var(--gewicht-normal); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eintrag__kopf .eintrag__titel { flex: none; }
+
+.marke { display: inline-block; padding: 0 7px; border-radius: var(--radius-rund); background: var(--farbe-linie); font-size: var(--text-xs); color: var(--farbe-text); }
+
+.knopf--gefahr { color: var(--farbe-fehler); }
+
+/* ---------- Bild, Symbol, Ziel ---------- */
+.bild { display: flex; flex-wrap: wrap; gap: var(--abstand-s); align-items: center; }
+.bild__rahmen { display: grid; place-items: center; width: 168px; aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--radius-s); background: var(--farbe-flaeche-gedeckt); border: 1px solid var(--farbe-linie); }
+.bild__vorschau { width: 100%; height: 100%; object-fit: cover; }
+.bild__leer { font-size: var(--text-xs); color: var(--farbe-text-gedeckt); }
+.bild__knoepfe { display: flex; flex-wrap: wrap; gap: var(--abstand-2xs); }
+.bild__alt { margin-top: var(--abstand-s); }
+
+.symbol { display: flex; flex-wrap: wrap; gap: var(--abstand-xs); align-items: center; }
+.symbol__rahmen { display: grid; place-items: center; width: 64px; height: 64px; border-radius: var(--radius-s); border: 1px solid var(--farbe-linie); background: var(--farbe-flaeche); }
+.symbol__bild { width: 48px; height: 48px; object-fit: contain; }
+
+.ziel { display: flex; flex-wrap: wrap; gap: var(--abstand-xs); align-items: center; padding: var(--abstand-2xs) var(--abstand-xs); border: 1px solid var(--farbe-linie); border-radius: var(--radius-s); background: var(--farbe-flaeche-hell); }
+.ziel__art { padding: 0 7px; border-radius: var(--radius-rund); background: var(--farbe-flaeche-kachel); font-size: var(--text-xs); color: var(--farbe-primaer); }
+.ziel__text { flex: 1; min-width: 8rem; color: var(--farbe-dunkel); }
+.ziel .knopf { margin-left: auto; }
+
+.feld__hilfe[data-art='fehler'] { color: var(--farbe-fehler); }
+
+/* ---------- Segmentknöpfe (Bild links / rechts …) ---------- */
+.segment { display: flex; flex-wrap: wrap; gap: var(--abstand-2xs); }
+.segment__wahl { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--farbe-linie); border-radius: var(--radius-s); background: var(--farbe-flaeche); cursor: pointer; font-size: var(--text-s); }
+.segment__wahl input { position: absolute; opacity: 0; pointer-events: none; }
+.segment__wahl:has(input:checked) { border-color: var(--farbe-primaer); color: var(--farbe-primaer); background: var(--farbe-flaeche-hell); box-shadow: inset 0 0 0 1px var(--farbe-primaer); }
+.segment__wahl:has(input:focus-visible) { outline: 2px solid var(--farbe-primaer); outline-offset: 2px; }
+.segment__skizze { width: 44px; color: var(--farbe-primaer); }
+.segment__skizze .skizze { display: block; width: 100%; height: auto; }
+.skizze--gespiegelt { transform: scaleX(-1); }
+
+/* ---------- Skizzen ---------- */
+.skizze__flaeche { fill: var(--farbe-flaeche-kachel); stroke: none; }
+
+/* ---------- Texteditor ---------- */
+.richtext__inhalt--klein { min-height: 5em; }
+.richtext__inhalt a { color: var(--farbe-primaer); text-decoration: underline; }
+.richtext__ziel { margin: 0; padding: 4px var(--abstand-xs); border-top: 1px solid var(--farbe-linie); font-size: var(--text-xs); color: var(--farbe-text-gedeckt); max-width: none; }
+.richtext__ziel[data-fehlt='true'] { color: var(--farbe-fehler); }
+.feldreihe { display: flex; gap: var(--abstand-s); }
+
+/* ---------- Veröffentlichen ---------- */
+.veroeffentlichen {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--abstand-s);
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--abstand-xs) max(var(--abstand-m), calc((100vw - 86rem) / 2));
+  background: var(--farbe-flaeche);
+  border-top: 1px solid var(--farbe-linie);
+  box-shadow: 0 -8px 30px -20px rgb(0 0 0 / 30%);
+}
+
+.veroeffentlichen[data-offen='true'] { border-top-color: var(--farbe-primaer); }
+.veroeffentlichen .knopf--haupt[disabled] { opacity: 0.45; cursor: default; }
+.meldung[data-art='arbeit'] { color: var(--farbe-primaer); }
+
+/* ---------- Dialoge ---------- */
+.dialog {
+  width: min(100% - 2rem, 34rem);
+  max-height: min(100% - 2rem, 46rem);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-m);
+  background: var(--farbe-flaeche);
+  color: var(--farbe-text);
+  box-shadow: 0 30px 80px -20px rgb(40 0 25 / 45%);
+}
+
+.dialog--breit { width: min(100% - 2rem, 52rem); }
+.dialog::backdrop { background: rgb(40 10 30 / 40%); backdrop-filter: blur(3px); }
+.dialog[open] { display: flex; flex-direction: column; }
+.dialog__kopf { display: flex; align-items: center; justify-content: space-between; gap: var(--abstand-s); padding: var(--abstand-s) var(--abstand-m); border-bottom: 1px solid var(--farbe-linie); }
+.dialog__titel { margin: 0; font-size: var(--text-l); color: var(--farbe-primaer); }
+.dialog__zu { width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--farbe-flaeche-gedeckt); font-size: 22px; line-height: 1; color: var(--farbe-text); cursor: pointer; }
+.dialog__koerper { flex: 1; overflow-y: auto; padding: var(--abstand-m); }
+.dialog__fuss { display: flex; flex-wrap: wrap; gap: var(--abstand-xs); justify-content: flex-end; align-items: center; padding: var(--abstand-s) var(--abstand-m); border-top: 1px solid var(--farbe-linie); }
+.dialog__fuss:empty { display: none; }
+.dialog__fuss .meldung { flex: 1; }
+.dialog__einleitung { margin: 0 0 var(--abstand-s); max-width: none; color: var(--farbe-text-gedeckt); }
+
+.reiter { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: var(--abstand-s); border-bottom: 1px solid var(--farbe-linie); }
+.reiter__knopf { padding: 8px 12px; border: 0; border-bottom: 2px solid transparent; background: none; font: inherit; font-size: var(--text-s); color: var(--farbe-text); cursor: pointer; }
+.reiter__knopf[aria-selected='true'] { border-bottom-color: var(--farbe-primaer); color: var(--farbe-primaer); font-weight: var(--gewicht-halbfett); }
+
+.zielliste { display: grid; gap: 2px; margin-top: var(--abstand-s); }
+.zielliste__gruppe { margin: var(--abstand-s) 0 4px; font-size: var(--text-kicker); font-weight: var(--gewicht-halbfett); letter-spacing: var(--sperrung-kicker); text-transform: uppercase; color: var(--farbe-text-gedeckt); }
+.zielliste__punkt { display: flex; justify-content: space-between; gap: var(--abstand-xs); padding: 8px 10px; border: 1px solid transparent; border-radius: var(--radius-s); background: none; font: inherit; text-align: left; color: var(--farbe-primaer); cursor: pointer; }
+.zielliste__punkt--1 { padding-left: 30px; color: var(--farbe-text); font-size: var(--text-s); }
+.zielliste__punkt:hover, .zielliste__punkt:focus-visible { background: var(--farbe-flaeche-hell); border-color: var(--farbe-linie); }
+.zielliste__punkt[aria-pressed='true'] { border-color: var(--farbe-primaer); background: var(--farbe-flaeche-hell); }
+
+.bilderliste { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--abstand-xs); }
+.bilderliste--symbole { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
+.bilderliste__bild { display: flex; flex-direction: column; gap: 4px; align-items: center; padding: 6px; border: 1px solid var(--farbe-linie); border-radius: var(--radius-s); background: var(--farbe-flaeche); font: inherit; font-size: var(--text-xs); color: var(--farbe-text-gedeckt); cursor: pointer; }
+.bilderliste__bild img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 2px; }
+.bilderliste--symbole .bilderliste__bild img { width: 52px; height: 52px; object-fit: contain; aspect-ratio: auto; }
+.bilderliste__bild span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bilderliste__bild:hover, .bilderliste__bild:focus-visible, .bilderliste__bild[aria-pressed='true'] { border-color: var(--farbe-primaer); }
+
+.dateiliste { display: grid; gap: 4px; }
+.dateiliste__datei { display: flex; justify-content: space-between; gap: var(--abstand-xs); padding: 8px 10px; border: 1px solid var(--farbe-linie); border-radius: var(--radius-s); background: var(--farbe-flaeche); font: inherit; text-align: left; cursor: pointer; }
+.dateiliste__datei:hover, .dateiliste__datei:focus-visible { border-color: var(--farbe-primaer); }
+.dateiliste__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--farbe-primaer); }
+
+.dateiauswahl .datei__hochladen { display: inline-block; }
+
+.auswahlkarten { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: var(--abstand-s); }
+.auswahlkarte { display: flex; flex-direction: column; gap: 8px; padding: var(--abstand-s); border: 1px solid var(--farbe-linie); border-radius: var(--radius-m); background: var(--farbe-flaeche); font: inherit; text-align: left; color: var(--farbe-text); cursor: pointer; transition: border-color var(--dauer-schnell) var(--verlauf), transform var(--dauer-schnell) var(--verlauf); }
+.auswahlkarte:hover, .auswahlkarte:focus-visible { border-color: var(--farbe-primaer); transform: translateY(-2px); }
+.auswahlkarte__skizze { display: block; padding: 10px; border-radius: var(--radius-s); background: var(--farbe-flaeche-hell); color: var(--farbe-primaer); }
+.auswahlkarte__skizze .skizze { display: block; width: 100%; height: auto; }
+.auswahlkarte__titel { font-weight: var(--gewicht-halbfett); color: var(--farbe-primaer); }
+.auswahlkarte__text { font-size: var(--text-s); color: var(--farbe-text-gedeckt); }
+
+/* ---------- Schmale Schirme: Plan oben, Formular darunter ---------- */
+@media (max-width: 900px) {
+  .arbeitsplatz { grid-template-columns: minmax(0, 1fr); }
+  .plan { position: static; max-height: none; }
+  .ansicht__kopf { flex-wrap: wrap; }
+  .ansicht__ansehen { margin-left: 0; }
+  .teil { padding: var(--abstand-s); }
+  .feldreihe { flex-direction: column; }
+}
+
+/* Der Kopf einer Karte darf schmaler werden als seine Unterzeile — sonst
+   schöbe sie auf Handys das ganze Formular über den Rand */
+.eintrag__leiste .eintrag__kopf { min-width: 0; }
+.eintrag__inhalt, .formular__felder, .teil { min-width: 0; }
+.eintraege__liste, .plan__liste, .zielliste, .dateiliste { grid-template-columns: minmax(0, 1fr); }
+.eintrag__titel { overflow-wrap: anywhere; }

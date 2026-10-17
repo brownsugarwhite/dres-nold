@@ -13,7 +13,8 @@
     "pruefen": "node scripts/pruefe-externe-ressourcen.mjs && node scripts/pruefe-aufbau.mjs",
     "aufnahmen": "node tests/aufnahmen.mjs",
     "postbuild": "node scripts/stand-schreiben.mjs",
-    "test": "node tests/einheiten.mjs"
+    "test": "node tests/einheiten.mjs",
+    "redaktion": "node scripts/redaktion-lokal.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.3.0",

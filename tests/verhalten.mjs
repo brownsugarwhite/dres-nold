@@ -81,7 +81,7 @@ const markenLage = (seite, id) =>
 
   // Zweiter Klick auf einen Punkt mit Unterpunkten springt
   await seite.locator('.kopfleiste [aria-controls="untermenue-oben-leistungen"]').click(); // öffnet (Überfahren) bzw. springt
-  await seite.waitForTimeout(1600);
+  await seite.waitForTimeout(3000);
   const leistLage = await markenLage(seite, 'leistungen');
   pruefen(leistLage !== null && leistLage > 60 && leistLage < 140, 'Klick auf „Leistungen“ springt zu den Leistungen', `${leistLage} px`);
 
