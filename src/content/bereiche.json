@@ -23,13 +23,13 @@
               "id": "text",
               "titel": "",
               "im_menue": false,
+              "knoepfe_text": "",
+              "knoepfe": [],
               "text": "<p>Seit dieser Woche steht in Zimmer 2 eine neue Behandlungseinheit. Sie arbeitet spürbar leiser als die bisherige und lässt sich feiner auf Ihre Sitzposition einstellen.</p><p>Was sich für Sie ändert:</p><ul><li>Ruhigerer Lauf der Instrumente</li><li>Bequemere Liegeposition, besonders bei längeren Behandlungen</li><li>Ein Monitor, auf dem wir Ihnen Aufnahmen direkt zeigen können</li></ul><p>Wenn Sie Fragen dazu haben, sprechen Sie uns gerne beim nächsten Termin an.</p>",
               "bild": "",
               "bild_alt": "",
               "bild_seite": "links",
-              "bild_hoehe": "format",
-              "knoepfe_text": "",
-              "knoepfe": []
+              "bild_hoehe": "format"
             }
           ],
           "dateien": []
@@ -48,13 +48,13 @@
               "id": "text",
               "titel": "",
               "im_menue": false,
+              "knoepfe_text": "",
+              "knoepfe": [],
               "text": "<p>Unsere Praxis bleibt vom 17. August bis einschließlich 4. September geschlossen. Damit Sie in dieser Zeit nicht ohne Ansprechpartner sind, haben wir folgendes eingerichtet:</p><table><thead><tr><th>Anliegen</th><th>So erreichen Sie uns</th></tr></thead><tbody><tr><td>Akute Beschwerden</td><td>Anrufbeantworter nennt die Vertretungspraxis</td></tr><tr><td>Terminwünsche</td><td>E-Mail an info@dres-nold.de</td></tr><tr><td>Rezepte und Unterlagen</td><td>ab dem 5. September wieder in der Praxis</td></tr></tbody></table><p>Bitte beachten Sie, dass E-Mails erst nach unserer Rückkehr beantwortet werden. Bei akuten Beschwerden rufen Sie bitte an.</p>",
               "bild": "",
               "bild_alt": "",
               "bild_seite": "links",
-              "bild_hoehe": "format",
-              "knoepfe_text": "",
-              "knoepfe": []
+              "bild_hoehe": "format"
             }
           ],
           "dateien": []
@@ -73,13 +73,13 @@
               "id": "text",
               "titel": "",
               "im_menue": false,
+              "knoepfe_text": "",
+              "knoepfe": [],
               "text": "<p>Fließtext des Beitrags. <strong>Hervorhebungen</strong>, Aufzählungen und Tabellen sind möglich.</p>",
               "bild": "",
               "bild_alt": "",
               "bild_seite": "links",
-              "bild_hoehe": "format",
-              "knoepfe_text": "",
-              "knoepfe": []
+              "bild_hoehe": "format"
             }
           ],
           "dateien": []
@@ -98,11 +98,6 @@
           "id": "teil-1",
           "titel": "",
           "im_menue": false,
-          "text": "<p>An unsere Zahnarztpraxis ist eine kieferorthopädische Fachzahnarztpraxis angeschlossen. Neben der zahnärztlichen Versorgung führen wir daher auch kieferorthopädische Behandlungen durch – fachärztlich und mit langjähriger Erfahrung, bei Kindern und Jugendlichen ebenso wie bei Erwachsenen.</p><p>Die Kieferorthopädie befasst sich mit der Erkennung, Vorbeugung und Behandlung von Zahn- und Kieferfehlstellungen. Wir nutzen dabei das breite Spektrum der modernen Kieferorthopädie: von der klassischen Funktionskieferorthopädie über nahezu unsichtbare Kunststoffschienen (Aligner) bis hin zu festsitzenden Apparaturen.</p>",
-          "bild": "",
-          "bild_alt": "",
-          "bild_seite": "links",
-          "bild_hoehe": "format",
           "knoepfe_text": "Mehr zu den kieferorthopädischen Leistungen für Kinder, Jugendliche und Erwachsene:",
           "knoepfe": [
             {
@@ -113,7 +108,12 @@
               "text": "Dentosophie",
               "ziel": "/dentosophie/"
             }
-          ]
+          ],
+          "text": "<p>An unsere Zahnarztpraxis ist eine kieferorthopädische Fachzahnarztpraxis angeschlossen. Neben der zahnärztlichen Versorgung führen wir daher auch kieferorthopädische Behandlungen durch – fachärztlich und mit langjähriger Erfahrung, bei Kindern und Jugendlichen ebenso wie bei Erwachsenen.</p><p>Die Kieferorthopädie befasst sich mit der Erkennung, Vorbeugung und Behandlung von Zahn- und Kieferfehlstellungen. Wir nutzen dabei das breite Spektrum der modernen Kieferorthopädie: von der klassischen Funktionskieferorthopädie über nahezu unsichtbare Kunststoffschienen (Aligner) bis hin zu festsitzenden Apparaturen.</p>",
+          "bild": "/bilder/bereiche/kieferorthopadie.png",
+          "bild_alt": "Bildschirm mit Röntgenaufnahmen eines Kiefers",
+          "bild_seite": "links",
+          "bild_hoehe": "format"
         }
       ]
     },
@@ -133,19 +133,21 @@
           "id": "einfuehrung",
           "titel": "",
           "im_menue": false,
+          "knoepfe_text": "",
+          "knoepfe": [],
           "text": "<p>Dentosophie ist ein ganzheitlicher Ansatz, der Zahnmedizin, Kieferorthopädie und funktionelle Therapien verbindet. Mit gezielten Übungen und individuellen Behandlungen werden Fehlfunktionen wie falsches Atmen, Schlucken oder Kauen korrigiert.</p><p>Dabei geht es in erster Linie um die Reedukation, das Wiedererlernen natürlicher Mechanismen: um bei Kindern das volle Potenzial der natürlichen Kiefer- und Körperentwicklung zu unterstützen und bei Erwachsenen pathologische Gewohnheiten zu durchbrechen und Symptome ursächlich zu behandeln.</p>",
           "bild": "",
           "bild_alt": "",
           "bild_seite": "links",
-          "bild_hoehe": "format",
-          "knoepfe_text": "",
-          "knoepfe": []
+          "bild_hoehe": "format"
         },
         {
           "art": "kacheln",
           "id": "atmen-kauen-schlucken",
           "titel": "Atmen, Kauen, Schlucken",
           "im_menue": true,
+          "knoepfe_text": "",
+          "knoepfe": [],
           "einleitung": "",
           "kacheln": [
             {
@@ -166,15 +168,15 @@
               "text": "<p>Schlucken hängt eng mit der Mundmuskulatur, der Zungenlage und der Kieferentwicklung zusammen. Ein korrektes Schluckmuster fördert die richtige Stellung der Zähne, die Ausrichtung des Kiefers und die Harmonisierung der gesamten Gesichtsmuskulatur.</p><p>Fehlfunktionen beim Schlucken können Zahnfehlstellungen, Kieferprobleme und sogar Haltungsschäden begünstigen.</p>",
               "ziel": ""
             }
-          ],
-          "knoepfe_text": "",
-          "knoepfe": []
+          ]
         },
         {
           "art": "kacheln",
           "id": "indikationen",
           "titel": "Indikationen",
           "im_menue": true,
+          "knoepfe_text": "",
+          "knoepfe": [],
           "einleitung": "",
           "kacheln": [
             {
@@ -189,37 +191,37 @@
               "text": "<ul><li>Bruxismus (Zähneknirschen)</li><li>Kiefergelenksbeschwerden (CMD)</li><li>Mundatmung</li><li>Schlafstörungen und Schnarchen</li><li>Tinnitus</li><li>Migräne</li><li>Rücken- und Nackenschmerzen</li></ul>",
               "ziel": ""
             }
-          ],
-          "knoepfe_text": "",
-          "knoepfe": []
+          ]
         },
         {
           "art": "kapitel",
           "id": "mundatmung",
           "titel": "Mundatmung und ihre Folgen",
           "im_menue": true,
-          "text": "<p>Wird durch den Mund geatmet, kann das weitreichende Folgen für die Gesundheit haben – von der Kieferentwicklung bis zur Konzentrationsfähigkeit. Hier erklären wir die Zusammenhänge.</p>",
           "knoepfe_text": "",
-          "knoepfe": []
+          "knoepfe": [],
+          "text": "<p>Wird durch den Mund geatmet, kann das weitreichende Folgen für die Gesundheit haben – von der Kieferentwicklung bis zur Konzentrationsfähigkeit. Hier erklären wir die Zusammenhänge.</p>"
         },
         {
           "art": "text",
           "id": "mittelgesichtsregion",
           "titel": "Die Mittelgesichtsregion",
           "im_menue": false,
+          "knoepfe_text": "",
+          "knoepfe": [],
           "text": "<p>Die Mittelgesichtsregion ist entscheidend für gesundes Atmen, Schlafen und Wachsen. Geformt wird sie dadurch, wie ein Kind atmet und schluckt. Während der frühen Kindheit schaffen Nasenatmung und korrekte Zungenhaltung Belüftung und Druck, die notwendig sind, damit das Mittelgesicht wächst. Das hilft dabei, den Oberkiefer zu erweitern, den harten Gaumen zu formen und den Raum für die Atemwege zu schaffen.</p><p>Entwickelt sich das mittlere Drittel des Gesichts nicht weit genug nach vorn und in die Breite, verringert sich der Platz für wichtige Strukturen wie die Atemwege, die Nasennebenhöhlen und den Oberkiefer.</p>",
           "bild": "",
           "bild_alt": "",
           "bild_seite": "links",
-          "bild_hoehe": "format",
-          "knoepfe_text": "",
-          "knoepfe": []
+          "bild_hoehe": "format"
         },
         {
           "art": "kacheln",
           "id": "zungenlage",
           "titel": "Zungenlage und Kieferentwicklung",
           "im_menue": false,
+          "knoepfe_text": "",
+          "knoepfe": [],
           "einleitung": "",
           "kacheln": [
             {
@@ -234,15 +236,15 @@
               "text": "<p>Bei offener Mundhaltung sinkt die Zunge ab. Der Gaumen wird nicht mehr geformt und verengt sich. Die Folgen:</p><ul><li>Schmaler, hoher Gaumen</li><li>Unterentwickelter Oberkiefer und Nasennebenhöhlen</li><li>Schmales Mittelgesicht</li><li>Engstand der Zähne</li><li>Rücklage des Unterkiefers</li><li>Trockener Mund und erhöhte Kariesanfälligkeit durch verminderte Speichelumspülung</li></ul>",
               "ziel": ""
             }
-          ],
-          "knoepfe_text": "",
-          "knoepfe": []
+          ]
         },
         {
           "art": "kacheln",
           "id": "schmaler-kiefer",
           "titel": "Was ein schmaler Kiefer bedeutet",
           "im_menue": false,
+          "knoepfe_text": "",
+          "knoepfe": [],
           "einleitung": "",
           "kacheln": [
             {
@@ -263,15 +265,15 @@
               "text": "<p>Die Atmung kann eingeschränkt sein, vor allem nachts.</p>",
               "ziel": ""
             }
-          ],
-          "knoepfe_text": "",
-          "knoepfe": []
+          ]
         },
         {
           "art": "kacheln",
           "id": "nervensystem",
           "titel": "Atmung und Nervensystem",
           "im_menue": false,
+          "knoepfe_text": "",
+          "knoepfe": [],
           "einleitung": "",
           "kacheln": [
             {
@@ -286,28 +288,28 @@
               "text": "<p>Mundatmung aktiviert den Sympathikus, den Stressmodus des Körpers. Die Folgen:</p><ul><li>Unruhiger, nicht erholsamer Schlaf</li><li>Konzentrationsprobleme tagsüber</li><li>ADHS-ähnliche Symptome bei Kindern</li><li>Erhöhte Reizbarkeit</li><li>Chronische Müdigkeit</li></ul><p>Nasenatmung hingegen aktiviert den Parasympathikus und fördert Ruhe, Konzentration und Regeneration.</p>",
               "ziel": ""
             }
-          ],
-          "knoepfe_text": "",
-          "knoepfe": []
+          ]
         },
         {
           "art": "text",
           "id": "fruehe-hinweise",
           "titel": "Mögliche frühe Hinweise",
           "im_menue": false,
+          "knoepfe_text": "",
+          "knoepfe": [],
           "text": "<ul><li>Atmung vorwiegend durch den Mund, offener Mund</li><li>Unruhiger Schlaf, Tagesmüdigkeit</li><li>Schnarchen</li><li>Häufig verstopfte Nase, viele Infekte, Allergien</li><li>Schmale Zahnbögen, Engstände</li><li>Nächtliches Zähneknirschen</li><li>Dunkle Schatten unter den Augen</li><li>Bettnässen</li><li>Trockener Mund, rissige Lippen, erhöhte Kariesanfälligkeit</li><li>Kurzes Zungenband</li><li>Verhältnismäßig große Zunge</li></ul><p>Ein einzelner Hinweis allein muss noch nichts bedeuten. Treten jedoch mehrere zusammen auf, sollte genauer hingeschaut werden.</p>",
           "bild": "",
           "bild_alt": "",
           "bild_seite": "links",
-          "bild_hoehe": "format",
-          "knoepfe_text": "",
-          "knoepfe": []
+          "bild_hoehe": "format"
         },
         {
           "art": "kacheln",
           "id": "mehr-als-gerade-zaehne",
           "titel": "Es geht um mehr als gerade Zähne",
           "im_menue": false,
+          "knoepfe_text": "",
+          "knoepfe": [],
           "einleitung": "<p>Auch Atmung, Schlaf und Entwicklung spielen eine wichtige Rolle. Ganzheitlich denken heißt: nicht nur an die Zahnstellung, sondern an das gesamte Wohlbefinden Ihres Kindes.</p>",
           "kacheln": [
             {
@@ -328,27 +330,25 @@
               "text": "<p>Kieferwachstum, Haltung und Immunsystem hängen eng mit der Atmung zusammen.</p>",
               "ziel": ""
             }
-          ],
-          "knoepfe_text": "",
-          "knoepfe": []
+          ]
         },
         {
           "art": "text",
           "id": "frueh-hinschauen",
           "titel": "Früh hinschauen kann viel bewirken",
           "im_menue": false,
-          "text": "<p>Je früher eine Mundatmung erkannt wird, desto besser lässt sich gegensteuern. Schon kleine Veränderungen im Alltag können einen großen Unterschied machen:</p><ul><li>Abklärung von Hindernissen in den Atemwegen (HNO)</li><li>Ausschluss oraler Restriktionen, z. B. eines verkürzten Zungenbands</li><li>Abgewöhnen ungünstiger Angewohnheiten wie Schnuller oder Daumenlutschen</li><li>Wiedererlernen gesunder, natürlicher Verhaltensmuster: Nasenatmung, Schluckmuster, Kauverhalten</li></ul>",
-          "bild": "",
-          "bild_alt": "",
-          "bild_seite": "links",
-          "bild_hoehe": "format",
           "knoepfe_text": "Wir begleiten Sie und Ihr Kind gerne auf diesem Weg. Sprechen Sie uns an – wir nehmen uns Zeit für Ihre Fragen.",
           "knoepfe": [
             {
               "text": "Termin vereinbaren",
               "ziel": "/#contact"
             }
-          ]
+          ],
+          "text": "<p>Je früher eine Mundatmung erkannt wird, desto besser lässt sich gegensteuern. Schon kleine Veränderungen im Alltag können einen großen Unterschied machen:</p><ul><li>Abklärung von Hindernissen in den Atemwegen (HNO)</li><li>Ausschluss oraler Restriktionen, z. B. eines verkürzten Zungenbands</li><li>Abgewöhnen ungünstiger Angewohnheiten wie Schnuller oder Daumenlutschen</li><li>Wiedererlernen gesunder, natürlicher Verhaltensmuster: Nasenatmung, Schluckmuster, Kauverhalten</li></ul>",
+          "bild": "",
+          "bild_alt": "",
+          "bild_seite": "links",
+          "bild_hoehe": "format"
         }
       ],
       "dateien": []
