@@ -12,18 +12,18 @@
       "id": "willkommen",
       "art": "willkommen",
       "aktiv": true,
-      "menue": null,
+      "menue": {
+        "titel": "Praxis",
+        "symbol": "/icons/navigation/praxis.svg",
+        "unterpunkte": []
+      },
       "ziel": ""
     },
     {
       "id": "galerie",
       "art": "galerie",
       "aktiv": true,
-      "menue": {
-        "titel": "Praxis",
-        "symbol": "/icons/navigation/praxis.svg",
-        "unterpunkte": []
-      },
+      "menue": null,
       "ziel": ""
     },
     {
