@@ -162,7 +162,7 @@
     },
     {
       "id": "petra",
-      "aktiv": true,
+      "aktiv": false,
       "position": 13,
       "gruppe": "team",
       "name": "Petra",
@@ -177,7 +177,7 @@
     },
     {
       "id": "verena",
-      "aktiv": true,
+      "aktiv": false,
       "position": 14,
       "gruppe": "team",
       "name": "Verena",
@@ -216,19 +216,28 @@
         "Abrechnung & Verwaltung"
       ],
       "foto": "",
-      "foto_alt": "Porträtfoto von Sarah"
+      "foto_alt": ""
     },
     {
-      "id": "heidi",
+      "id": "rosa",
       "aktiv": true,
       "position": 17,
       "gruppe": "team",
-      "name": "Heidi",
-      "funktion": "Helferin",
-      "taetigkeiten": [
-        "dfsfsdfsfdfsdd"
-      ],
-      "foto": "/bilder/team/heidi.png",
+      "name": "Rosa",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "taetigkeiten": [],
+      "foto": "/bilder/team/rosa.jpg",
+      "foto_alt": ""
+    },
+    {
+      "id": "rebecca",
+      "aktiv": true,
+      "position": 18,
+      "gruppe": "team",
+      "name": "Rebecca",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "taetigkeiten": [],
+      "foto": "/bilder/team/rebecca.jpg",
       "foto_alt": ""
     }
   ]
