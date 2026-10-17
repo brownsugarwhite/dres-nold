@@ -290,6 +290,13 @@ document.addEventListener('astro:before-swap', (ereignis) => {
      muss den Tausch aber überleben: Die Bewegung läuft erst danach. */
   const zoom = document.documentElement.style.getPropertyValue('--morph-zoom');
   if (zoom) e.newDocument.documentElement.style.setProperty('--morph-zoom', zoom);
+  /* Ebenso die Kontur einer gerade zuklappenden Blase: An ihr endet der
+     Weichzeichner der Leisten im Übergang (Navigation.astro) — sonst
+     stünde er für ein Bild als Kasten da */
+  for (const name of ['--nav-oben-form', '--nav-unten-form']) {
+    const form = document.documentElement.style.getPropertyValue(name);
+    if (form) e.newDocument.documentElement.style.setProperty(name, form);
+  }
 
   /* Aufräumen erst, wenn die Bewegung vorbei ist — siehe
      `kennzeichenAbraeumen()`. */

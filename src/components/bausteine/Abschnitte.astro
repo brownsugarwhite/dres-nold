@@ -153,7 +153,9 @@ const seite = (a: { bild?: string; bild_seite?: string }) =>
   .block {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    gap: clamp(32px, 4vw, 64px);
+    /* Mehr Luft zwischen Bild und Text (Florian, 17. Oktober 2026:
+       „etwas zu gestaucht") */
+    gap: clamp(40px, 6vw, 96px);
     align-items: start;
   }
 
@@ -224,7 +226,8 @@ const seite = (a: { bild?: string; bild_seite?: string }) =>
   .kachelblock__raster {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
-    gap: 36px clamp(28px, 4vw, 56px);
+    /* Spalten und Zeilen mit mehr Luft (Florian, 17. Oktober 2026) */
+    gap: clamp(40px, 4vw, 56px) clamp(36px, 5.5vw, 88px);
     margin-top: 28px;
   }
 

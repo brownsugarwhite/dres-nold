@@ -62,13 +62,20 @@ const markenLage = (seite, id) =>
   // Unterpunkt auf eine andere Seite: Wechsel und Landung an der Marke
   await dento.hover();
   await seite.waitForTimeout(600);
+  await seite.evaluate(() => document.addEventListener('astro:after-swap', () => {
+    window.__nachTausch = {
+      hoehe: document.querySelector('.navigation').style.getPropertyValue('--blase-hoehe'),
+      kontur: document.documentElement.style.getPropertyValue('--nav-oben-form'),
+    };
+  }, { once: true }));
   await seite.locator('#untermenue-oben-dentosophie .oberpunkt', { hasText: 'Indikationen' }).click();
   await seite.waitForURL(/\/dentosophie\/#indikationen$/);
-  /* Die Blase ist mit Beginn des Wechsels ganz fort — sonst reicht der
-     Umschlag der Kopfleiste im Übergang um ihre Höhe hinab, und sein
-     Weichzeichner liegt als Kasten über der Seite */
-  const blasenhoehe = await seite.$eval('.navigation', (n) => n.style.getPropertyValue('--blase-hoehe'));
-  pruefen(blasenhoehe === '', 'Seitenwechsel aus der Blase: Kopfleiste ohne Blasenhöhe', blasenhoehe || 'leer');
+  /* Die Blase klappt im Übergang weiter zu. Solange der Umschlag der
+     Kopfleiste dafür höher ist, endet ihr Weichzeichner an der Kontur
+     der Blase (`--nav-oben-form` am <html>) — sonst lag er als Kasten
+     über der Seite */
+  const { hoehe: blasenhoehe, kontur } = await seite.evaluate(() => window.__nachTausch ?? { hoehe: '', kontur: '' });
+  pruefen(!blasenhoehe || kontur.startsWith('path('), 'Seitenwechsel aus der Blase: Weichzeichner folgt der Blase', blasenhoehe ? `Höhe ${blasenhoehe}, Kontur ${kontur ? 'gesetzt' : 'fehlt'}` : 'Blase schon zu');
   await seite.waitForTimeout(1200);
   const lage = await markenLage(seite, 'indikationen');
   pruefen(lage !== null && lage > 60 && lage < 140, 'Unterpunkt öffnet die Seite und landet an der Marke', `${lage} px`);

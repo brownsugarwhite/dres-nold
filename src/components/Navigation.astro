@@ -1791,6 +1791,13 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
         ? `M0 ${f(gesamt + leisteH)} L0 ${f(yM)} ${form.woelbung(dy, auf)}L${breite} ${f(yM)} L${breite} ${f(gesamt + leisteH)} Z`
         : `M0 0 L${breite} 0 L${breite} ${f(yM)} ${form.rueckwaerts(dy, auf)}L0 ${f(yM)} Z`;
       linienTraeger.style.setProperty('--blase-form', `path("${maske}")`);
+      /* Dieselbe Form für den Übergang: Dort trägt die Gruppe der Leiste
+         einen eigenen milchigen Weichzeichner, und der muss an der Kontur
+         von Leiste und Blase enden — als Rechteck um den hohen Umschlag
+         lag er sonst als harter Kasten über der Seite (Florian,
+         17. Oktober 2026). Am <html>, weil dort die Übergangsebenen
+         hängen; nach dem Tausch setzt es das nächste Bild neu. */
+      document.documentElement.style.setProperty(hoch ? '--nav-unten-form' : '--nav-oben-form', `path("${maske}")`);
 
       if (form.pfeil) {
         pfeil.setAttribute('d', form.pfeil.d);
@@ -1806,6 +1813,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       if (!istBesitzer()) return;
       blasenBesitzer.delete(linienTraeger);
       linienTraeger.style.removeProperty('--blase-form');
+      document.documentElement.style.removeProperty(hoch ? '--nav-unten-form' : '--nav-oben-form');
       linienTraeger.style.removeProperty('--blase-hoehe');
       delete linienTraeger.dataset.ohneLinie;
     };
@@ -2151,25 +2159,14 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
         if (!huelle.contains(e.target as Node)) setzen(false);
       });
 
-      /* Beginnt ein Seitenwechsel, ist die Blase sofort fort — auch eine,
-         die gerade zuklappt. Sonst reichte der Umschlag der Kopfleiste im
-         Abbild des Übergangs noch um ihre Höhe nach unten, und der
-         milchige Weichzeichner der Leiste (styles/uebergaenge.css) lag
-         als scharf begrenzter Kasten über den Überschriften der Seite
-         (Florian, 17. Oktober 2026). */
+      /* Beim Seitenwechsel schließen — mit Bewegung, sie läuft im
+         Übergang weiter (Florian, 17. Oktober 2026: „es muss trotzdem
+         animiert schließen"). Der milchige Weichzeichner der Kopfleiste
+         folgt dabei der Form der Blase (`--nav-oben-form`, siehe
+         `blaseAnlegen`), statt als Kasten über der Seite zu liegen. */
       document.addEventListener('astro:before-preparation', () => {
         if (!huelle.isConnected) return;
-        window.clearTimeout(schliessTimer);
-        if (knopf.getAttribute('aria-expanded') === 'true') {
-          knopf.setAttribute('aria-expanded', 'false');
-          if (offeneJeLeiste.get(linienTraeger)?.huelle === huelle) offeneJeLeiste.delete(linienTraeger);
-        }
-        delete huelle.dataset.offen;
-        delete huelle.dataset.uebergabe;
-        delete huelle.dataset.ausblenden;
-        blase.beenden();
-        inhalt.hidden = true;
-        delete huelle.dataset.aktiv;
+        setzen(false);
       });
 
       // Schließen mit Escape, Fokus zurück auf den Knopf
@@ -2558,11 +2555,10 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     });
 
     // Beim Seitenwechsel zu — noch vor dem Tausch, damit die Sperre an
-    // der Wurzel nicht mit dem neuen Dokument verloren geht. Sofort, ohne
-    // Bewegung: Eine zuklappende Blase hielte den Umschlag der Kopfleiste
-    // im Übergang hoch, und ihr milchiger Weichzeichner läge als Kasten
-    // über der Seite (wie bei den Aufklappmenüs, siehe dort).
-    document.addEventListener('astro:before-preparation', () => menueSchliessen(true));
+    // der Wurzel nicht mit dem neuen Dokument verloren geht. Mit
+    // Bewegung; der Weichzeichner im Übergang folgt der Form der Blase
+    // (wie bei den Aufklappmenüs, siehe dort).
+    document.addEventListener('astro:before-preparation', () => menueSchliessen());
 
     // Wird das Fenster breiter als ein Handy, gibt es das Menü nicht mehr:
     // sofort zu, ohne Bewegung — die Form misst das dann versteckte Logo

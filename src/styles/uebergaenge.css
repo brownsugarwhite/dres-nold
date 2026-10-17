@@ -263,11 +263,22 @@ html[data-rueckmorph]::view-transition-old(.symbol) { animation: none; opacity: 
   overflow: hidden;
 }
 
+/* Beide Aufnahmen nach der BREITE eingepasst und senkrecht mittig —
+   nicht mit `cover`. Karte (16 : 9) und Titelbild (2 : 1) haben
+   verschiedene Formate, das Foto darin aber dieselbe Größe im Verhältnis
+   zur Breite (beide schneiden nur oben und unten ab). Mit `cover` war die
+   flachere Aufnahme im höheren Rahmen vergrößert: Das Bild sprang vor dem
+   Morph ein wenig und nach dem Rückweg deutlich auf eine kleinere Größe
+   (Florian, 17. Oktober 2026). So deckt die flache Aufnahme den
+   mittleren Streifen, und die höhere darunter füllt oben und unten. */
 ::view-transition-old(.bild),
 ::view-transition-new(.bild) {
+  top: 50%;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  inline-size: 100%;
+  block-size: auto;
+  translate: 0 -50%;
 }
 
 @keyframes uebergang-bild-heran {
@@ -301,14 +312,17 @@ html:not([data-rueckmorph])::view-transition-new(.bild) {
   opacity: 1;
 }
 
-/* Rückweg: spiegelbildlich. Die Aufnahme der Karte entfällt wieder,
-   die der Beitragsseite wandert zurück in den Rahmen der Karte und
-   nimmt dabei deren Vergrößerung an. */
+/* Rückweg: spiegelbildlich. Die Aufnahme der Beitragsseite wandert
+   zurück in den Rahmen der Karte und nimmt dabei deren Vergrößerung an;
+   sie liegt oben. Die Aufnahme der Karte steht still darunter und füllt
+   oben und unten, was das flachere Titelbild nicht abdeckt. */
 html[data-rueckmorph]::view-transition-new(.bild) {
-  display: none;
+  animation: none;
+  opacity: 1;
 }
 
 html[data-rueckmorph]::view-transition-old(.bild) {
+  z-index: 1;
   animation: uebergang-bild-nach var(--dauer-uebergang) var(--verlauf-betont) both;
   opacity: 1;
 }
@@ -350,12 +364,19 @@ html::view-transition-new(.bild):only-child {
   z-index: 100;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  /* Ist eine Blase oder das Handy-Menü offen (oder klappt zu), ist der
+     Umschlag der Leiste viel höher als die Leiste. Der Weichzeichner
+     endet dann an derselben Kontur wie der milchige Grund (gespiegelt
+     aus `blaseAnlegen`) — sonst lag er als Kasten mit harter Kante
+     über den Überschriften der Seite (Florian, 17. Oktober 2026). */
+  clip-path: var(--nav-oben-form, none);
 }
 
 ::view-transition-group(nav-unten) {
   z-index: 80;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  clip-path: var(--nav-unten-form, none);
 }
 
 /* Das stehende alte Abbild der Leisten wird nicht gezeigt: Die neuen

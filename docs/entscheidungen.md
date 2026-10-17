@@ -3013,3 +3013,25 @@ Symbolen ist entfallen.
     Florians Bild.
   - **Die Lösung:** Mit Beginn eines Seitenwechsels sind alle Blasen und
     das Handy-Menü sofort fort (`astro:before-preparation`, `beenden`).
+- **Nachtrag zum Nachtrag:**
+  - **Parallaxe:** deutlich stärker, bis zu 14 % der Bildbreite, das Bild
+    ist um 30 % vergrößert.
+  - **Blasen schließen beim Seitenwechsel wieder mit Bewegung.**
+    - **Weichzeichner:** Der Weichzeichner der Leisten im Übergang endet
+      an der Kontur von Leiste und Blase (`clip-path: var(--nav-oben-form)`
+      an der Übergangsgruppe). `blaseAnlegen` spiegelt die Maske dafür an
+      das `<html>`, `uebergaenge.ts` trägt sie über den Tausch.
+    - **Damit:** Kein Kasten mehr über der Seite, und trotzdem kein
+      hartes Zuschnappen.
+  - **Spalten:** Kacheln und Bild/Text mit mehr Luft (Spalten bis 88 px
+    bzw. 96 px).
+  - **Titelbild im Morph:**
+    - **Einpassen:** Karte (16 : 9) und Titelbild (2 : 1) werden im
+      Übergang nach der Breite eingepasst statt mit `cover`.
+    - **Füllen:** Die jeweils höhere Aufnahme liegt still darunter und
+      füllt oben und unten.
+    - **Vorher:** Mit `cover` war die flachere Aufnahme vergrößert. Das
+      Bild sprang vor dem Morph leicht und nach dem Rückweg deutlich
+      kleiner.
+    - **Gemessen:** erstes und letztes Bild des Übergangs gegen das
+      Standbild, 1–2 px Versatz.

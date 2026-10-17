@@ -103,8 +103,9 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
 
   /* Feste Höhe wie `.swiper` der Vorlage, im Format 3 : 2 — etwas
      breiter als die Fotos selbst (Florian, 17. Oktober 2026). Das Bild
-     ist darin ein Stück größer als sein Rahmen und wandert beim
-     Durchlaufen leicht gegen das Band (Parallaxe, Skript unten). */
+     ist darin um 30 % größer als sein Rahmen und wandert beim
+     Durchlaufen deutlich gegen das Band (Parallaxe, Skript unten;
+     Florian, 17. Oktober 2026: „deutlich mehr"). */
   .galerie__bild {
     flex: none;
     margin: 0;
@@ -119,7 +120,7 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
     height: 100%;
     max-width: none;
     object-fit: cover;
-    transform: translateX(var(--parallaxe, 0px)) scale(1.12);
+    transform: translateX(var(--parallaxe, 0px)) scale(1.3);
     /* Sonst nimmt der Browser das Bild selbst als Ziehgut auf */
     -webkit-user-drag: none;
     user-select: none;
@@ -283,8 +284,9 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
        sind im Band dieselbe Stelle, auf der Leiste aber nicht */
     let amEnde = false;
 
-    /* Parallaxe: Jedes Bild wandert in seinem Rahmen ein Stück gegen die
-       Laufrichtung — um bis zu 6 % seiner Breite, je nachdem, wie weit
+    /* Parallaxe: Jedes Bild wandert in seinem Rahmen deutlich gegen die
+       Laufrichtung — um bis zu 14 % seiner Breite (es ist um 30 %
+       vergrößert, damit der Rahmen immer gefüllt bleibt), je nachdem, wie weit
        sein Rahmen von der Fenstermitte entfernt ist. Berechnet aus dem
        Stand der Animation und der Lage im Band, ohne zu messen. */
     const rahmen = [...band.children] as HTMLElement[];
@@ -298,8 +300,8 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
         /* Die Lage des Rahmens im Fenster: das Band ist um `versatz`
            nach links verschoben (Animation `galerie-lauf`) */
         const mitte = fx + r.offsetLeft - versatz + w / 2;
-        const d = Math.max(-1.2, Math.min(1.2, (mitte - breite / 2) / breite));
-        r.style.setProperty('--parallaxe', `${(-d * 0.06 * w).toFixed(1)}px`);
+        const d = Math.max(-1, Math.min(1, (mitte - breite / 2) / breite));
+        r.style.setProperty('--parallaxe', `${(-d * 0.14 * w).toFixed(1)}px`);
       }
     };
 
