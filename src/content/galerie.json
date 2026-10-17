@@ -16,23 +16,30 @@
       "alt": "Blick in die Praxisräume"
     },
     {
-      "id": "bild-4",
+      "id": "zahnarztstuhl-mit-aussicht",
       "aktiv": true,
       "position": 3,
+      "bild": "/bilder/galerie/praxisbild.png",
+      "alt": "Zahnarztstuhl mit Aussicht"
+    },
+    {
+      "id": "bild-4",
+      "aktiv": true,
+      "position": 4,
       "bild": "/bilder/galerie/gallery04.jpg",
       "alt": "Blick in die Praxisräume"
     },
     {
       "id": "bild-5",
       "aktiv": true,
-      "position": 4,
+      "position": 5,
       "bild": "/bilder/galerie/gallery05.jpg",
       "alt": "Blick in die Praxisräume"
     },
     {
       "id": "bild-6",
       "aktiv": true,
-      "position": 5,
+      "position": 6,
       "bild": "/bilder/galerie/gallery06.jpg",
       "alt": "Blick in die Praxisräume"
     }
