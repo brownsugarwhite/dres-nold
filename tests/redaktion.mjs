@@ -57,6 +57,23 @@ pruefen(gezogen.indexOf('team') > gezogen.indexOf('neuigkeiten'), 'Ziehen am Gri
 await seite.locator('.plan__block[data-id="dentosophie"] a').click();
 await seite.waitForSelector('.teil');
 await foto('redaktion-dentosophie');
+
+// Eine Seite hat zwei Teile, die in denselben Eintrag schreiben — der
+// zweite darf die Änderung des ersten nicht zurücksetzen
+const kicker = () => seite.getByRole('textbox', { name: 'Kleine Zeile über der Überschrift (freiwillig)' }).first();
+await kicker().fill('Ganzheitlich');
+await seite.waitForTimeout(600);
+await seite.locator('.plan__block[data-id="team"] a').click();
+await seite.locator('.plan__block[data-id="dentosophie"] a').click();
+await seite.waitForSelector('.teil');
+pruefen((await kicker().inputValue()) === 'Ganzheitlich', 'Änderung auf einer eigenen Seite bleibt erhalten', await kicker().inputValue());
+const zungenlage = seite.locator('.eintrag', { hasText: 'Zungenlage und Kieferentwicklung' }).first();
+await zungenlage.locator('.eintrag__kopf').first().click();
+const leer = zungenlage.locator('.richtext__inhalt').first();
+await leer.click();
+await seite.keyboard.type('Eine Einleitung');
+await seite.waitForTimeout(600);
+pruefen((await leer.innerHTML()) === '<p>Eine Einleitung</p>', 'Leeres Textfeld nimmt Text im Absatz auf', await leer.innerHTML());
 const karte = seite.locator('.eintrag', { hasText: 'Die Mittelgesichtsregion' }).first();
 await karte.locator('.eintrag__kopf').click();
 const editor = karte.locator('.richtext__inhalt').first();

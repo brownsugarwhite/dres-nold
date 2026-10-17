@@ -155,20 +155,40 @@ function ansichtFuer(route: string): Ansicht | null {
 }
 
 /** Die offenen Formulare — „übernehmen" schreibt sie in den Speicher */
-let offen: { teil: Teil; lesen: () => Eintrag }[] = [];
+let offen: { teil: Teil; lesen: () => Eintrag; zuletzt: unknown }[] = [];
 let eingegeben = false;
+
+/*
+ * Übernimmt, was in den offenen Formularen geändert wurde.
+ *
+ * Mehrere Teile können in denselben Eintrag schreiben (eine Seite: „Inhalt"
+ * und „Ankündigung"; der Fußbereich: Praxis und Suchmaschinen). Jeder Teil
+ * liefert den ganzen Eintrag, aber mit dem Stand vom Öffnen in den Feldern,
+ * die nicht ihm gehören. Deshalb zählt nur, was sich in einem Teil seit dem
+ * letzten Übernehmen geändert hat — sonst schrieb der zweite Teil die
+ * Änderung des ersten wieder zurück (Florian, 17. Oktober 2026).
+ */
+const istObjekt = (w: unknown): w is Record<string, unknown> => !!w && typeof w === 'object' && !Array.isArray(w);
 
 function uebernehmen() {
   if (!eingegeben) return;
   eingegeben = false;
-  for (const { teil, lesen } of offen) {
-    const pfad = teil.pfad();
+  for (const o of offen) {
+    const pfad = o.teil.pfad();
     if (!pfad) continue;
-    const vorher = JSON.stringify(holen(teil.datei, pfad));
-    const neu = lesen();
-    if (JSON.stringify(neu) === vorher) continue;
-    setzen(teil.datei, pfad, neu);
-    zustand.beruehrt.add(teil.datei);
+    const neu = o.lesen();
+    const aktuell = holen(o.teil.datei, pfad);
+    let ergebnis: unknown = neu;
+    if (istObjekt(neu) && istObjekt(aktuell) && istObjekt(o.zuletzt)) {
+      const zuletzt = o.zuletzt;
+      const geaendert = Object.keys(neu).filter((k) => JSON.stringify(neu[k]) !== JSON.stringify(zuletzt[k]));
+      if (!geaendert.length) continue;
+      ergebnis = { ...aktuell, ...Object.fromEntries(geaendert.map((k) => [k, neu[k]])) };
+    }
+    o.zuletzt = neu;
+    if (JSON.stringify(ergebnis) === JSON.stringify(aktuell)) continue;
+    setzen(o.teil.datei, pfad, ergebnis);
+    zustand.beruehrt.add(o.teil.datei);
   }
 }
 
@@ -233,7 +253,7 @@ function oeffnen() {
     const pfad = teil.pfad();
     if (!pfad) continue;
     const formular = formularBauen(teil.felder, (holen(teil.datei, pfad) ?? {}) as Eintrag, umfeld);
-    offen.push({ teil, lesen: formular.lesen });
+    offen.push({ teil, lesen: formular.lesen, zuletzt: formular.lesen() });
     teile.push(el('section', { class: 'teil' }, [
       teil.titel ? el('h2', { class: 'teil__titel', text: teil.titel }) : null,
       teil.hilfe ? el('p', { class: 'teil__hilfe', text: teil.hilfe }) : null,

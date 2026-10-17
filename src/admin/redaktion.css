@@ -159,9 +159,20 @@ body {
 }
 
 .richtext__inhalt {
+  position: relative;
   min-height: 10em;
   padding: var(--abstand-xs);
   line-height: 1.5;
+  cursor: text;
+}
+
+/* Leeres Feld: ein Hinweis zeigt, dass man hier schreiben kann */
+.richtext__inhalt[data-leer]::before {
+  content: attr(data-platzhalter);
+  position: absolute;
+  inset: var(--abstand-xs) var(--abstand-xs) auto;
+  color: var(--farbe-text-gedeckt);
+  pointer-events: none;
 }
 
 .richtext__inhalt p { margin: 0 0 0.6em; max-width: none; }

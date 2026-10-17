@@ -183,7 +183,27 @@ export function texteditor(wert: string, optionen: TextOptionen): { el: HTMLElem
   inhalt.contentEditable = 'true';
   inhalt.setAttribute('role', 'textbox');
   inhalt.setAttribute('aria-multiline', 'true');
-  inhalt.innerHTML = htmlBereinigen(wert ?? '') || '<p></p>';
+  inhalt.dataset.platzhalter = 'Hier schreiben …';
+
+  /*
+   * Ein leeres Feld braucht einen Absatz mit Zeile (`<p><br></p>`). Ein
+   * nacktes `<p></p>` hat keine Höhe: Safari setzte dort keinen Cursor,
+   * Chromium schrieb neben den Absatz (Florian, 17. Oktober 2026).
+   */
+  const LEER = '<p><br></p>';
+  const istLeer = () => !inhalt.textContent?.trim() && !inhalt.querySelector('img, table, li');
+  const leerZeigen = () => { inhalt.toggleAttribute('data-leer', istLeer()); };
+  const cursorAnsEnde = () => {
+    const ziel = inhalt.lastElementChild ?? inhalt;
+    const bereich = document.createRange();
+    bereich.selectNodeContents(ziel);
+    bereich.collapse(false);
+    const auswahl = window.getSelection();
+    auswahl?.removeAllRanges();
+    auswahl?.addRange(bereich);
+  };
+  inhalt.innerHTML = htmlBereinigen(wert ?? '') || LEER;
+  leerZeigen();
 
   const melden = () => inhalt.dispatchEvent(new Event('input', { bubbles: true }));
 
@@ -378,8 +398,21 @@ export function texteditor(wert: string, optionen: TextOptionen): { el: HTMLElem
     zustandZeigen();
   };
   document.addEventListener('selectionchange', beiAuswahl);
-  inhalt.addEventListener('input', zustandZeigen);
+  inhalt.addEventListener('input', () => {
+    // Alles gelöscht: wieder einen Absatz hineinsetzen, sonst schreibt der Browser ohne
+    if (!inhalt.firstElementChild && !inhalt.textContent) { inhalt.innerHTML = LEER; cursorAnsEnde(); }
+    leerZeigen();
+    zustandZeigen();
+  });
   inhalt.addEventListener('focus', zustandZeigen);
+  // Ein Klick in die freie Fläche unter dem Text setzt den Cursor ans Ende
+  inhalt.addEventListener('mousedown', (e) => {
+    const letzter = inhalt.lastElementChild?.getBoundingClientRect();
+    if (e.target !== inhalt || (letzter && e.clientY < letzter.bottom && !istLeer())) return;
+    e.preventDefault();
+    inhalt.focus();
+    cursorAnsEnde();
+  });
   // Ein Klick auf einen Verweis im Editor öffnet ihn nicht, sondern wählt ihn
   inhalt.addEventListener('click', (e) => { if ((e.target as Element).closest('a')) e.preventDefault(); });
 
