@@ -162,7 +162,7 @@
     },
     {
       "id": "petra",
-      "aktiv": true,
+      "aktiv": false,
       "position": 13,
       "gruppe": "team",
       "name": "Petra",
@@ -177,7 +177,7 @@
     },
     {
       "id": "verena",
-      "aktiv": true,
+      "aktiv": false,
       "position": 14,
       "gruppe": "team",
       "name": "Verena",
