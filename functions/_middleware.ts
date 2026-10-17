@@ -18,7 +18,7 @@ type Kontext = {
   data: Record<string, unknown>;
 };
 
-const GESCHUETZT = [/^\/admin(\/|$)/, /^\/api\/(inhalt|save|hochladen)(\/|$)/];
+const GESCHUETZT = [/^\/admin(\/|$)/, /^\/api\/(inhalt|alles|save|hochladen|dateien)(\/|$)/];
 
 export async function onRequest({ request, env, next, data }: Kontext): Promise<Response> {
   const pfad = new URL(request.url).pathname;

@@ -11,7 +11,9 @@
     "preview": "astro preview",
     "check": "astro check",
     "pruefen": "node scripts/pruefe-externe-ressourcen.mjs && node scripts/pruefe-aufbau.mjs",
-    "aufnahmen": "node tests/aufnahmen.mjs"
+    "aufnahmen": "node tests/aufnahmen.mjs",
+    "postbuild": "node scripts/stand-schreiben.mjs",
+    "test": "node tests/einheiten.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.3.0",

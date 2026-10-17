@@ -35,3 +35,9 @@
 # zwischenspeichern, damit es den ersten Aufbau nicht aufhält.
 /laden.js
   Cache-Control: public, max-age=86400
+
+# Wann der Stand online ging — die Redaktion fragt danach, um nach dem
+# Speichern „Online ✓" zu melden (scripts/stand-schreiben.mjs)
+/stand.json
+  Cache-Control: no-store
+

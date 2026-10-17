@@ -1,3 +1,6 @@
 # Die Praxis merkt sich "dres-nold.de/login" — das ist die Redaktion.
 /login  /admin/  302
 /login/ /admin/  302
+# Die Redaktion hat seit Oktober 2026 nur noch eine Adresse; alte
+# Lesezeichen auf einzelne Bereiche führen dorthin
+/admin/:bereich/  /admin/  302
