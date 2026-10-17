@@ -2698,3 +2698,140 @@ die Karte über der Leiste 140 bis 150 px früher sichtbar — auf Handys
 schon, während sich das Logo noch auflöst —, und sie erreicht die
 Unterkante des Logos 30 px (375 × 667) bis 330 px (1440 × 900)
 Scrollweg, nachdem es ganz fort ist.
+
+---
+
+## Seitenaufbau, Dentosophie, neue Redaktion (Oktober 2026)
+
+Wünsche der Praxis (Dokument und Nachricht) und Florians Vorgaben für
+eine visuellere Redaktion. **Dieser Abschnitt überholt ausdrücklich
+diese früheren Festlegungen:**
+
+| Früher | Jetzt |
+|---|---|
+| Sprechstunden-Knopf **rechts außen**, mobil als letzter (Öffnungszeiten, 13./14. September) | Sprechstunden ist **der erste** Punkt in allen Leisten, mobil: Sprechstunden · Leistungen · Telefon |
+| Der Zipfel zeigt „weit rechts" (Einstieg, 17. September) | Er zeigt gespiegelt auf den Knopf links; `Oeffnungszeiten.astro` spiegelt Grundlinie und Basis, sobald die Spitze in der linken Hälfte liegt |
+| Symbole in der Leistungen-Blase, Ausrichtung `knopfX − 54` (18. September) | Unterpunkte haben **keine Symbole**; der Text der Unterpunkte steht unter dem Wort (`textLinks − 36`), die Breite wird gemessen (220–400 px) |
+| Freie Abschnitte **ohne eigenen Menüeintrag** | Jeder Block kann einen Menüpunkt haben, jeder Abschnitt mit Überschrift einen Unterpunkt |
+| Team, Neuigkeiten, Kontakt mit `z-index: 40` außerhalb von `main` (27. September) | **Alle Blöcke stehen in `main`**, ohne eigenen z-index — sonst verdeckte ein solcher Block als erster die Karte samt Zipfel. Nur `.fuss` behält seinen Wert |
+| Knopfzeile mit höchstens zwei Knöpfen (Verweis, PDF) | `knoepfe[]` mit bis zu drei Knöpfen, jeder mit einem Ziel (Seite, Abschnitt, Datei, Website, E-Mail, Telefon) |
+| Kleine Bildvarianten nur für Beitragskarten | Für alle Karten- und Titelbilder aus `bereiche.json`, dazu eine 900-px-Variante für die breite Ankündigungskarte |
+| Kategorie-Symbole bei den Leistungen | Entfallen — im Menü und in den Gruppenzeilen der Leistungen (`public/icons/kategorien/` ist weg) |
+
+### Die Startseite ist eine Folge von Blöcken
+
+`src/content/seitenaufbau.json` legt die Reihenfolge fest; die Redaktion
+zeigt sie als Seitenplan zum Verschieben. **Startbereich, Sprechstunden
+und Fußbereich stehen fest** und sind nicht Teil der Liste. Bewusst ohne
+`position`: Die Reihenfolge der Liste ist die Reihenfolge der Seite.
+
+- Blockarten: `willkommen`, `galerie`, `leistungen`, `team`, `stellen`,
+  `kontakt`, `bereich` (ein eigener Bereich aus `bereiche.json`) und
+  `verweis` (ein reiner Menüpunkt mit festem Platz, ohne Inhalt auf der
+  Seite).
+- Jeder Block trägt seinen Abstand **nur unten**. Der erste Block nach
+  der Karte bekommt den Freiraum für den Zipfel (`index.astro`,
+  `.startblock:first-of-type`) — dieser Freiraum ist jetzt tragend,
+  gleich welcher Block vorn steht.
+- Steht die Begrüßung nicht vorn, gibt es ein unsichtbares `h1`, und
+  sie wird `h2`.
+- Die Überschriften-Regel ist klassenbasiert (`.bereich__titel`), nicht
+  mehr `main h2` — sonst hätte sie den Kontakt-Titel überschrieben.
+
+### Das Menü folgt der Seite
+
+Das Menü wird aus dem Seitenaufbau gebaut (`src/lib/aufbau.ts`,
+`menueBauen`) — Kopfleiste, Symbolleiste, Handy-Menü in derselben Folge.
+Sprechstunden immer zuerst, weil die Karte das Erste ist.
+
+- **Höchstens sieben Hauptpunkte**, Sprechstunden mitgezählt. Mehr
+  passt bei 992 px nicht in die Kopfleiste; die Prüfung lehnt das
+  Speichern sonst ab. Der Abstand zwischen den Punkten schrumpft von
+  1200 bis 992 px gleitend auf 12 px
+  (`clamp(12px, calc((100vw - 992px) * 0.08 + 12px), 20px)`); ab 1200 px
+  ist die Optik unverändert.
+- **Ziel eines Hauptpunkts** ergibt sich aus dem Block (Sprungmarke bzw.
+  Adresse der Seite). Frei wählbar nur bei Unterpunkten und `verweis`.
+- **Unterpunkte**: zuerst die automatischen (Leistungskategorien;
+  Abschnitte mit „Als Unterpunkt im Menü zeigen"), dann die selbst
+  angelegten. Liegt das Ziel auf der aktuellen Seite, gleitet sie hin;
+  sonst ein weicher Seitenwechsel, danach steht die Seite an der Marke.
+- Jeder Punkt mit Unterpunkten klappt als Blase auf; **nie zwei offen**
+  (ein Koordinator je Leiste — alle Blasen teilen sich `--blase-form`).
+  Erster Klick öffnet, zweiter springt.
+- **Handy-Menü:** Der Ebenenwechsel von „Leistungen" gilt jetzt für
+  jeden Punkt. Als erste Unterzeile steht „‹Titel› – Übersicht", sonst
+  wäre das Ziel des Hauptpunkts selbst nicht erreichbar. Escape führt
+  eine Ebene zurück.
+- Ein ausgeblendeter Block nimmt seinen Menüpunkt mit.
+
+### Eigene Bereiche: Seite, Beiträge, Abschnitt
+
+`src/content/bereiche.json` ersetzt `neuigkeiten.json` und
+`abschnitte.json` — alles in **einer** Datei, damit die Redaktion mit
+wenigen GitHub-Abrufen auskommt.
+
+| Typ | Adresse | Auf der Startseite |
+|---|---|---|
+| `seite` | `/<id>/` | Ankündigungskarte (breit, Bild 7/12 links), morpht in die Seite; abschaltbar (`auf_startseite`) |
+| `blog` | `/<id>/<beitrag>/` | Kartenreihe wie die Neuigkeiten |
+| `abschnitt` | — | Der Inhalt selbst |
+
+Seiten, Beiträge und Startseiten-Abschnitte bestehen aus **Abschnitten**
+dreier Arten: `text` (Bild links, rechts oder ohne), `kacheln` (kurze
+Texte nebeneinander, mit oder ohne Symbol) und `kapitel` (große
+Überschrift mit Haarlinie, gliedert lange Seiten und hebt die
+Überschriftenebene der folgenden Abschnitte).
+
+- **Sprungmarken:** auf einer Seite die Kennung des Abschnitts
+  (`/dentosophie/#mundatmung`), auf der Startseite `#<bereich>-<abschnitt>`.
+- **Gesperrte Kennungen** für Bereiche: alles, was schon eine Adresse
+  oder Sprungmarke ist (`VERGEBEN` in `schema.ts`, dazu `leistungen-*`).
+- Die Adressen `/neuigkeiten/<id>/` bleiben, weil Neuigkeiten jetzt der
+  Blog mit der Kennung `neuigkeiten` ist.
+- Das Schließkreuz einer Seite ohne Karte geht zurück, wenn man von
+  dieser Website kam, sonst auf `/`.
+
+### Dentosophie
+
+Eigene Seite `/dentosophie/`, Menüpunkt neben den Leistungen mit den
+Unterpunkten „Atmen, Kauen, Schlucken" · „Indikationen" · „Mundatmung
+und ihre Folgen" (ein Kapitel der Seite, `#mundatmung`). Texte allein
+aus dem Dokument der Kundin; die Seite der Kollegin
+(zahnarzt-sundern.de) war von hier aus nicht erreichbar — ihre Punkte
+zu Ablauf und Indikationen kommen später. Titelbild vorläufig ein
+Praxisfoto.
+
+**Symbole vorläufig:** `public/icons/symbole/*.svg` (Linien 1,5) und
+`public/icons/navigation/dentosophie.svg` im Kreis-Stil des Menüs sind
+von mir gezeichnet; Florian ersetzt sie später.
+
+### Inhalte nebenbei
+
+- „Schnarchen & Schlafapnoe" steht unter den zahnärztlichen Leistungen;
+  „Mundatmung und ihre Folgen" darin ist ein Verweis auf die Seite.
+- Kategorie „Test" ausgeblendet, Knopf „hallo" und der Abschnitt
+  „Digitale Abformung statt Abformlöffel" entfernt. „Beispielleistung"
+  und „Beispielbeitrag" bleiben.
+- Der Kieferorthopädie-Abschnitt ist sachlich neu formuliert, eng an der
+  alten Seite; Tippfehler „Alinger" korrigiert.
+
+### Die Redaktion
+
+Ein Arbeitsplatz unter `/admin/`: links der Seitenplan (Ziehen am Griff
+oder ▲ ▼, jede Bewegung wird angesagt), rechts das Formular des Blocks,
+unten **ein** Knopf „Veröffentlichen" für alle Änderungen — ein Commit.
+Erkannt wird jede Änderung durch Vergleich mit dem geladenen Stand, nicht
+mehr nur durch Tippen.
+
+- **Ein Ziel-Dialog** für Knöpfe, Menüpunkte und Textverweise: diese
+  Website (mit Suche), Datei, andere Website, E-Mail, Telefon. Im Feld
+  steht lesbar „Dentosophie › Mundatmung", nicht die Adresse.
+- **Dateien** in mehr Formaten (PDF, Word, Excel, PowerPoint,
+  OpenOffice, Text, CSV, Bilder); geprüft werden Endung **und**
+  Dateianfang, gleiche Namen bekommen eine Nummer, Hochladen allein baut
+  nicht neu (`[skip ci]`).
+- „Online ✓" kommt aus `/stand.json`, das der Build schreibt.
+- Speichern meldet einen Konflikt nur, wenn seither **dieselbe** Datei
+  geändert wurde.
+- Bewusst später: Entwürfe im Browser sichern, Live-Vorschau.

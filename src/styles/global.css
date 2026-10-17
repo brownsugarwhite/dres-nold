@@ -472,13 +472,6 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
   gap: 18px;
 }
 
-.gruppenzeile__symbol {
-  flex: none;
-  width: 34px;
-  height: 34px;
-  object-fit: contain;
-}
-
 .gruppenzeile__text {
   font-size: var(--text-kicker);
   font-weight: var(--gewicht-halbfett);

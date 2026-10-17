@@ -218,7 +218,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
                   aria-expanded="false"
                   aria-controls={menueId(e, 'mobil')}
                 >
-                  <img class="mobilmenue__symbol" src={e.symbol} alt="" width="60" height="60" />
+                  {e.symbol ? <img class="mobilmenue__symbol" src={e.symbol} alt="" width="60" height="60" /> : <span class="mobilmenue__symbol symbol-leer" aria-hidden="true"></span>}
                   <span class="mobilmenue__text">{e.titel}</span>
                   <span class="mobilmenue__pfeil" aria-hidden="true"></span>
                   <span class="mobilmenue__zurueck" aria-hidden="true">Zurück</span>
@@ -249,7 +249,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
           <div class="mobilmenue__zeile" style={`--stufe: ${i}; --stufe-hoch: ${punkte.length - 1 - i}`}>
             <div class="mobilmenue__zelle">
               <a class="mobilmenue__punkt" href={e.ziel}>
-                <img class="mobilmenue__symbol" src={e.symbol} alt="" width="60" height="60" />
+                {e.symbol ? <img class="mobilmenue__symbol" src={e.symbol} alt="" width="60" height="60" /> : <span class="mobilmenue__symbol symbol-leer" aria-hidden="true"></span>}
                 <span class="mobilmenue__text">{e.titel}</span>
               </a>
             </div>
@@ -274,7 +274,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
         {e.unterpunkte.length > 0 ? (
           <div class="aufklapp" data-aufklapp data-richtung="hoch">
             <button class="fussknopf fussknopf--knopf" type="button" aria-expanded="false" aria-controls={menueId(e, 'unten')} data-ziel={e.ziel} data-punkt={e.id}>
-              <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" />
+              {e.symbol ? <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" /> : <span class="fussknopf__symbol symbol-leer" aria-hidden="true"></span>}
               <span class="fussknopf__text">{e.titel}</span>
             </button>
 
@@ -295,7 +295,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
           </div>
         ) : (
           <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
-            <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" />
+            {e.symbol ? <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" /> : <span class="fussknopf__symbol symbol-leer" aria-hidden="true"></span>}
             <span class="fussknopf__text">{e.titel}</span>
           </a>
         )}
@@ -308,7 +308,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     {fussKlein.map((e, i) => (
       <>
         <a class="fussknopf" href={e.ziel} data-punkt={e.id}>
-          <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" />
+          {e.symbol ? <img class="fussknopf__symbol" src={e.symbol} alt="" width="60" height="60" /> : <span class="fussknopf__symbol symbol-leer" aria-hidden="true"></span>}
           <span class="fussknopf__text">{e.titel}</span>
         </a>
         {i < fussKlein.length - 1 && <span class="punkt punkt--fuss" aria-hidden="true"></span>}
@@ -831,6 +831,15 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     width: 40px;
     height: 40px;
     object-fit: contain;
+  }
+
+  /* Ein Hauptpunkt ohne eigenes Symbol: ein leerer Kreis an seiner
+     Stelle, damit die Zeilen und Knöpfe bündig bleiben */
+  .symbol-leer {
+    display: block;
+    box-sizing: border-box;
+    border: 1px solid var(--farbe-primaer);
+    border-radius: 50%;
   }
 
   .mobilmenue__text {
@@ -1409,7 +1418,7 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
    *    Escape, Klick nach außen oder wenn der Fokus den Bereich verlässt.
    *
    * 3. Handy-Menü: dieselbe Blase, zum rechten Rand hin offen; darin
-   *    die Ebene „Leistungen" mit den Kategorien. Solange es offen ist,
+   *    die Ebene eines Menüpunkts mit seinen Unterpunkten. Solange es offen ist,
    *    liegt ein Schleier über der Seite und sie steht still.
    *
    * 4. Die Text-Rolle der Menüpunkte läuft immer zu Ende (`data-rollt`).

@@ -8,110 +8,142 @@
 
 Die Anmeldung gilt 24 Stunden. „Abmelden" steht oben rechts.
 
-## Die Übersicht
+## So ist die Redaktion aufgebaut
 
-Ein Kasten je Bereich. Anklicken öffnet das Formular mit dem aktuellen
-Stand. Unten steht immer **Speichern und veröffentlichen** — erst damit
-geht etwas online, etwa eine Minute später.
-
-| Bereich | Das ändern Sie dort |
+| Wo | Was |
 |---|---|
-| Hinweis | Urlaubs-, Vertretungs- oder Notfallhinweis mit Zeitraum. Erscheint und verschwindet von selbst. |
-| Sprechstunden | Die drei Listen in der Sprechstunden-Blase. |
-| Neuigkeiten | Beiträge mit Bild, Text, PDF-Anhängen. |
-| Leistungen | Text und Kurztext jeder Leistung. |
-| Team | Personen, Fotos, Funktion, Tätigkeiten. |
-| Praxisbilder | Das durchlaufende Bildband. |
-| Eigene Abschnitte | Zusätzliche Texte im Praxis-Bereich. |
-| Stellenanzeigen | Offene Stellen; leer = Bereich unsichtbar. |
-| Angaben für Google und Kontakt | Seitentitel, Beschreibung, Adresse, Telefon. |
-| Menü | Beschriftungen der Menüpunkte. |
+| **Links: der Seitenplan** | Die Startseite von oben nach unten, jeder Block als kleine Skizze. Ein Klick öffnet ihn. |
+| **Darüber: das Menü** | So sieht das Menü gerade aus. Es folgt der Reihenfolge im Plan. |
+| **Rechts: das Formular** | Alles, was sich im geöffneten Block ändern lässt. |
+| **Unten: Veröffentlichen** | Erst damit geht etwas online — alle Änderungen auf einmal, etwa eine Minute später. |
+
+Solange nicht veröffentlicht ist, steht unten „Ungespeicherte Änderungen".
+Man kann in Ruhe zwischen den Blöcken wechseln; nichts geht verloren.
+„Verwerfen" setzt alles auf den letzten veröffentlichten Stand zurück.
+
+Nach dem Veröffentlichen meldet die Redaktion „Online ✓", sobald die
+Seite neu gebaut ist.
+
+## Die Reihenfolge der Startseite ändern
+
+- **Ziehen:** Einen Block am Griff **⠿** links fassen und an die neue
+  Stelle ziehen — mit der Maus oder dem Finger.
+- **Oder Schritt für Schritt:** mit **▲** und **▼** rechts am Block.
+
+Startbereich (Logo), Sprechstunden und Fußbereich stehen fest (Schloss).
+Das Menü ordnet sich von selbst mit um; die Sprechstunden stehen darin
+immer vorn, weil die Karte das Erste auf der Seite ist.
+
+## Etwas Neues anlegen: „+ Neuer Bereich"
+
+Unten im Seitenplan. Zur Wahl stehen drei Arten:
+
+| Art | Wofür | Auf der Seite |
+|---|---|---|
+| **Eigene Seite** | Ein Thema mit eigener Adresse, z. B. dres-nold.de/dentosophie | Eine Karte auf der Startseite kündigt sie an; ein Klick öffnet die Seite |
+| **Beiträge (Blog)** | Mehrere Beiträge mit Datum, wie die Neuigkeiten | Eine Kartenreihe; jeder Beitrag öffnet als eigene Seite |
+| **Abschnitt auf der Startseite** | Text und Bilder direkt auf der Startseite | Ein Abschnitt an der gewählten Stelle |
+
+Danach: Überschrift eingeben (die Adresse zeigt sich darunter), den Platz
+auf der Startseite wählen und entscheiden, ob es einen eigenen Menüpunkt
+bekommt. Das Menü hat Platz für **sieben** Punkte.
+
+## Abschnitte: Text, Kacheln, Kapitel
+
+Seiten, Beiträge und Startseiten-Abschnitte bestehen aus Abschnitten.
+„+ Neuer Abschnitt" fragt, welche Art:
+
+- **Text** — wahlweise mit einem Bild links oder rechts daneben.
+- **Kacheln** — mehrere kurze Texte nebeneinander, mit oder ohne Symbol
+  (z. B. „Atmen · Kauen · Schlucken" auf der Dentosophie-Seite).
+- **Kapitel** — eine große Überschrift mit Linie, die ein neues Kapitel
+  beginnt (z. B. „Mundatmung und ihre Folgen").
+
+Jeder Abschnitt kann **Knöpfe** bekommen (bis zu drei) und — wenn er eine
+Überschrift hat — **als Unterpunkt im Menü** erscheinen. Ein Klick auf den
+Unterpunkt führt genau zu diesem Abschnitt.
+
+Reihenfolge der Abschnitte: wie im Seitenplan — am Griff ziehen oder ▲ ▼.
+
+## Wohin soll das führen? (Knöpfe, Verweise, Menüpunkte)
+
+Überall, wo ein Ziel nötig ist, öffnet „Ziel wählen …" dasselbe Fenster:
+
+- **Auf dieser Website** — alle Seiten und Abschnitte zum Anklicken, mit Suche.
+- **Datei** — ein Dokument hochladen oder ein schon hochgeladenes wählen.
+- **Andere Website**, **E-Mail**, **Telefon**.
+
+Ob die Seite beim Klick hinscrollt oder umblättert, entscheidet sie selbst.
+
+**Verweis im Text:** Wörter markieren, „Verweis …" drücken, Ziel wählen.
+Steht der Cursor in einem Verweis, zeigt die Zeile unter dem Feld, wohin
+er führt; „Verweis entfernen" nimmt ihn wieder heraus.
+
+## Das Menü
+
+Jeder Block kann einen Menüpunkt haben: im Block unten **„Im Menü zeigen"**
+einschalten, Bezeichnung und Symbol wählen. Nur Hauptpunkte haben ein
+Symbol. **Unterpunkte** entstehen von selbst (die Gruppen der Leistungen,
+Abschnitte mit „Als Unterpunkt im Menü zeigen"); weitere lassen sich mit
+„+ Neuer Unterpunkt" auf ein beliebiges Ziel legen.
+
+Soll ein Menüpunkt irgendwohin führen, der kein Block der Seite ist, ist
+das ein Fall für die Betreuung (Blockart „Menüpunkt").
 
 ## Einträge (Personen, Beiträge, Leistungen …)
 
 - **Aufklappen:** auf den Namen des Eintrags klicken.
-- **Reihenfolge:** „▲ nach oben" / „▼ nach unten".
+- **Reihenfolge:** am Griff ⠿ ziehen oder „▲ nach oben" / „▼ nach unten".
 - **Ausblenden statt löschen:** „Auf der Seite zeigen" ausschalten. Der
   Eintrag bleibt erhalten — praktisch, wenn jemand zurückkommt.
-- **Neu:** „+ Neuer Eintrag". Die Kennung wird aus dem Titel gebildet
-  und ist danach fest (sie steht in der Adresse).
+- **Kennung:** wird beim ersten Speichern aus dem Titel gebildet und ist
+  danach fest (sie steht in der Adresse).
 
-## Bilder und PDFs
+## Bilder und Dateien
 
-„Hochladen …" neben dem Feld. Erlaubt: JPG, PNG, WebP (bis 8 MB) und PDF
-(bis 15 MB). Danach **Speichern** nicht vergessen. Bilder werden beim
-Bauen der Seite automatisch verkleinert und optimiert.
+„Bild wählen …" bzw. „Datei wählen …": neu hochladen oder etwas schon
+Hochgeladenes nehmen.
 
-**Symbole** (bei Leistungen, Bereichen und Menüpunkten) dürfen zusätzlich
-SVG sein (bis 512 KB) — das ist sogar die beste Wahl, weil sie in jeder
-Größe scharf bleiben. Eine SVG mit Skripten oder Verweisen auf fremde
-Server wird abgelehnt; ein normaler Export aus Illustrator oder Figma
-enthält so etwas nicht.
+- **Bilder:** JPG, PNG, WebP bis 8 MB. Sie werden beim Bauen der Seite
+  automatisch verkleinert.
+- **Dateien zum Herunterladen:** meist PDF; auch Word, Excel, PowerPoint,
+  OpenOffice, Text, CSV und Bilder — bis 15 MB. Gibt es den Namen schon,
+  bekommt die neue Datei eine Nummer; überschrieben wird nichts.
+- **Symbole:** am besten SVG in der Hausfarbe. Eine SVG mit Skripten oder
+  Verweisen auf fremde Server wird abgelehnt.
 
-Bitte jedes Bild kurz beschreiben („Bildbeschreibung") — das lesen
-blinde Besucher vor, und Google versteht die Seite besser.
+**Was ist auf dem Bild zu sehen?** — diese Zeile ist Pflicht. Sie wird
+Menschen vorgelesen, die das Bild nicht sehen, und hilft auch Google.
+
+Hochgeladenes ist erst nach dem Veröffentlichen online.
 
 ## Text mit Gestaltung
 
-Bei „Text"-Feldern gibt es eine kleine Leiste: Absatz, Zwischentitel,
-Fett, Kursiv, Listen, Verweis, Tabelle. Alles andere (Farben,
-Schriftarten) ist mit Absicht nicht vorgesehen — die Seite bleibt so
-einheitlich.
+Die Leiste über einem Textfeld: Absatz, Zwischentitel, Fett, Kursiv,
+Listen, Verweis, Tabelle (wo sinnvoll). Farben und Schriftarten gibt es
+mit Absicht nicht — die Seite bleibt so einheitlich.
 
-**Text aus Word oder von einer Webseite einfügen** geht ganz normal mit
-Strg+V (Mac: Cmd+V). Dabei kommt nur der Aufbau mit: Absätze, Listen,
-Verweise und Tabellen. Fett, Kursiv, Schriftart und Farbe der Quelle
-bleiben draußen — sonst schleppte jeder eingefügte Text die Gestaltung
-von woanders mit herein. Was hervorgehoben sein soll, markieren Sie
-danach und drücken **Fett**.
+**Einfügen aus Word oder einer Webseite:** Absätze, Listen, Verweise und
+Tabellen bleiben, Fett und Überschriften fallen weg — danach bewusst neu
+setzen. Steht plötzlich alles fett: markieren und **Absatz** drücken.
 
-Steht eine Zeile versehentlich als Zwischentitel da: hineinklicken und
-**Absatz** drücken. **Format löschen** nimmt Hervorhebungen innerhalb
-einer Zeile wieder weg.
+## Der Urlaubshinweis Schritt für Schritt
 
-## Eigene Abschnitte
+1. Im Seitenplan ganz oben **Hinweis** anklicken.
+2. Überschrift und Text eintragen, z. B. „Praxis im Urlaub" und die Vertretung.
+3. **Sichtbar ab** und **Sichtbar bis einschließlich** wählen.
+4. „Hinweis eingeschaltet" anhaken, **Veröffentlichen**.
 
-Ein Abschnitt hat eine Überschrift und darunter einen oder mehrere
-**Bereiche** — je ein Bild neben einem Text (ohne Bild steht der Text
-allein auf Lesebreite). Mehrere Bereiche stehen untereinander.
-
-## Knöpfe unter einem Text
-
-Bei den eigenen Abschnitten und bei jeder Leistung können am Ende des
-Textes bis zu zwei Knöpfe stehen:
-
-- **Verweis** — Beschriftung und Adresse. Eine vollständige Adresse
-  (`https://…`) oder eine Sprungmarke der Startseite wie `#contact` oder
-  `#leistungen-kieferorthopaedie`; Sprungmarken funktionieren auch von
-  einer Leistungsseite aus.
-- **PDF-Knopf** — Beschriftung und Datei (Hochladen wie oben).
-
-Der **Satz über den Knöpfen** ist eine einzelne Zeile direkt darüber
-(„Mehr dazu erfahren Sie hier:“). Er erscheint nur, wenn mindestens ein
-Knopf eingetragen ist. Ohne Knöpfe bleibt alles leer — dann steht dort
-nichts.
-
-## Der Urlaubshinweis, Schritt für Schritt
-
-1. Bereich **Hinweis** öffnen.
-2. Überschrift und Text eintragen.
-3. **Sichtbar ab** und **Sichtbar bis** setzen.
-4. **Hinweis eingeschaltet** anhaken, speichern.
-
-Am ersten Tag erscheint die Blase von selbst, am Tag nach dem Enddatum
-ist sie weg. Die Daten für das nächste Jahr können jederzeit schon
-eingetragen werden.
+Der Hinweis erscheint am ersten Tag von selbst und verschwindet nach dem
+letzten. Im Seitenplan steht, ob er gerade an, geplant oder abgelaufen ist.
 
 ## Wenn eine Meldung kommt
 
-- **„Nicht gespeichert. Bitte prüfen: …"** — darunter steht, welches
-  Feld fehlt oder falsch ist (z. B. eine Bildbeschreibung). Korrigieren,
-  erneut speichern.
-- **„… von jemand anderem geändert"** — jemand hat zwischenzeitlich
-  gespeichert. Seite neu laden und die Änderung noch einmal machen.
-- **„Anmeldung erforderlich"** — die Sitzung ist abgelaufen; über
-  `/login` erneut anmelden.
-
-Nichts, was hier passiert, kann die Seite kaputt machen: Fehlerhafte
-Eingaben werden gar nicht erst gespeichert, und jeder gespeicherte Stand
-lässt sich wiederherstellen (siehe `docs/betrieb.md`).
+| Meldung | Was tun |
+|---|---|
+| „Bitte zuerst ergänzen: …" | Die Meldung nennt die Stelle, z. B. „Eigene Bereiche › Dentosophie › Bildbeschreibung". Ergänzen, noch einmal veröffentlichen. |
+| „Die Anmeldung ist abgelaufen" | In einem neuen Tab /login öffnen, anmelden, hier noch einmal „Veröffentlichen". Nichts geht verloren. |
+| „Inzwischen hat jemand anderes dasselbe geändert" | Jemand hat gleichzeitig gearbeitet. Die eigenen Texte kopieren, Seite neu laden, Änderung noch einmal machen. |
+| „Das Menü hat Platz für 7 Punkte" | Einen Menüpunkt ausschalten oder ihn als Unterpunkt eines anderen anlegen. |
+| „Dieses Ziel gibt es nicht (mehr)" | Ein Verweis zeigt auf etwas Gelöschtes. Neues Ziel wählen. |
+| Etwas anderes | Bitte die Meldung abfotografieren und an die Betreuung schicken. |

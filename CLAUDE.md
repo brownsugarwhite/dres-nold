@@ -24,6 +24,9 @@ Website der Zahnarzt- und Kieferorthopädie-Praxis **Dres. Nold**, Rosenstraße 
 >   Florians Entwurf: links die zweizeilige Überschrift, rechts Text und
 >   Knöpfe, dazwischen eine Haarlinie.
 > - **Kein Briefumschlag** im Kontakt.
+> - **Das Menü folgt der Reihenfolge der Seite** (`seitenaufbau.json`),
+>   Sprechstunden immer vorn, höchstens sieben Hauptpunkte; Unterpunkte
+>   ohne Symbole (Oktober 2026).
 
 > - **Gar keine eingebettete Google-Karte mehr.** Der Kontaktbereich
 >   liegt auf einem eigenen Kartenbild; „Karte anzeigen" und „Route
@@ -171,24 +174,25 @@ Alle Inhalte liegen als JSON unter `src/content/`. Jede Datei entspricht einem B
 |---|---|---|
 | `hinweis.json` | Hinweis-Sprechblase (Urlaub, Vertretung, Notfall) | Zeitgesteuert über `von`/`bis` — erscheint und verschwindet automatisch |
 | `oeffnungszeiten.json` | 3 Listen: zahnärztlich, kieferorthopädisch, telefonisch | |
-| `leistungen.json` | Die Leistungen mit Icon, Titel, Kurztext, Rich-Text — dazu die Kategorien mit Titel, Symbol und Erklärtext | Kategorien: `zahnaerztlich`, `kieferorthopaedie`, `sonstige`; `id` = Adresse, **unveränderlich** |
-| `neuigkeiten.json` | Beiträge mit Datum, Bild, Text, PDF-Anhängen | `id` = Adresse; Text erlaubt Absätze, Aufzählungen, Tabellen |
-| `navigation.json` | Menüpunkte und Reihenfolge | Leistungen klappen automatisch auf |
+| `seitenaufbau.json` | Reihenfolge der Startseiten-Blöcke und ihre Menüpunkte | **Die Reihenfolge der Liste ist die der Seite und des Menüs** (kein `position`); Start, Sprechstunden und Fuß stehen fest und fehlen darin. Blockarten: `willkommen`, `galerie`, `leistungen`, `team`, `stellen`, `kontakt`, `bereich`, `verweis` |
+| `bereiche.json` | Alle eigenen Bereiche: `seite` (eigene Adresse, Ankündigungskarte), `blog` (Beiträge, z. B. die Neuigkeiten), `abschnitt` (Inhalt direkt auf der Startseite) | `id` = Adresse, gesperrte Kennungen in `VERGEBEN` (`schema.ts`); Inhalt aus Abschnitten der Arten `text`, `kacheln`, `kapitel`, je mit bis zu drei Knöpfen |
+| `leistungen.json` | Die Leistungen mit Icon, Titel, Kurztext, Rich-Text, Knöpfen — dazu die Kategorien mit Titel und Erklärtext | Kategorien: `zahnaerztlich`, `kieferorthopaedie`, `sonstige`; `id` = Adresse, **unveränderlich** |
 | `team.json` | Personen mit Foto, Name, Funktion, Tätigkeiten | `gruppe`: `aerzte` oder `team`; `taetigkeiten` ist eine Liste und klappt auf der Seite auf |
 | `galerie.json` | Praxisbilder | Alternativtexte sind **Pflicht** (Barrierefreiheit) |
-| `abschnitte.json` | Frei anlegbare Abschnitte im Praxis-Bereich | Ohne eigenen Menüeintrag; je Abschnitt ein oder mehrere `bereiche` mit Bild **neben** dem Text (`bild_seite`: `links`/`rechts`, `bild_hoehe`: `format`/`voll`) |
 | `stellen.json` | Stellenanzeigen | Bereich blendet sich aus, wenn leer |
 | `startseite.json` | Überschriften und Einleitungstexte der Startseiten-Abschnitte | Ein Abschnitt je Bereich: `willkommen`, `sprechstunden`, `galerie`, `leistungen`, `team`, `kontakt`, `formular` |
 | `seite.json` | Seitentitel, Beschreibung, Vorschaubild, Praxisadresse | |
 
-PDF-Downloads hängen an Beiträgen (`neuigkeiten.json` → `dateien`), Abschnitten und Stellen; eine eigene `dokumente.json` gibt es nicht.
+Downloads (PDF, Word, Excel, PowerPoint, OpenOffice, RTF, Text, CSV, Bilder) hängen an Seiten und Beiträgen (`bereiche.json` → `dateien`) und an Stellen, oder sind Ziel eines Knopfs oder Textverweises; eine eigene `dokumente.json` gibt es nicht.
+
+**Ziele** (Knöpfe, Menü-Unterpunkte, Verweise im Text) stehen als `/pfad/#marke`, `https://…`, `mailto:` oder `tel:`. Liegt das Ziel auf der aktuellen Seite, gleitet sie hin, sonst wechselt sie weich. Die gemeinsame Logik für Adressen, Sprungmarken und Menü steht in `src/lib/aufbau.ts`.
 
 **Konventionen für alle Inhaltsdateien:**
 - Jeder Eintrag hat `aktiv: true|false` — Ausblenden statt Löschen
-- Jeder Eintrag hat `position: <Zahl>` für die Reihenfolge
+- Jeder Eintrag hat `position: <Zahl>` für die Reihenfolge — außer in `seitenaufbau.json` und bei Abschnitten, Kacheln und Knöpfen: dort zählt die Reihenfolge der Liste
 - Datumsangaben im Format `JJJJ-MM-TT`
 - Bildpfade relativ zu `public/`, z. B. `/bilder/team/paul.jpg`
-- Bei Änderungen am Schema: `src/content/schema.ts` mitziehen, sonst schlägt der Build fehl — das ist Absicht. Neue Felder außerdem in `src/admin/bereiche.ts` eintragen, sonst sieht die Redaktion sie nicht
+- Bei Änderungen am Schema: `src/content/schema.ts` mitziehen, sonst schlägt der Build fehl — das ist Absicht. Neue Felder außerdem in `src/admin/formulare.ts` (bzw. `felder.ts` für Abschnitte) eintragen, sonst sieht die Redaktion sie nicht
 
 ---
 
@@ -200,24 +204,28 @@ src/
   components/   Wiederverwendbare Bausteine (eine Datei pro Abschnitt)
   layouts/      Seitenrahmen (Basis, Textseite, Redaktion)
   pages/        Seiten und Routen; pages/admin/ = Redaktionsoberfläche
-  admin/        Feldbeschreibungen und Skript der Redaktion
+  admin/        Die Redaktion: Seitenplan (plan.ts), Formulare je Block (formulare.ts, felder.ts), Ziel-Dialog, Texteditor
   server/       Gemeinsamer Code der Functions (GitHub-API, Access-Prüfung)
-  lib/          Hilfen für den Build (Silbentrennung der Lesetexte)
+  lib/          Gemeinsame Logik: Seitenaufbau und Menü (aufbau.ts), Verweise, Textprüfung, Silbentrennung
   styles/       tokens.css (Gestaltungswerte) + globale Stile + Übergänge
   scripts/      Animationen, Übergänge, sanftes Scrollen, Bildlauf — ohne Bibliotheken
 public/
   bilder/       Fotos (werden beim Build automatisch optimiert)
-  dokumente/    PDFs zum Download
+  dokumente/    Dateien zum Download
+  icons/        Menü-Symbole (navigation/), Kachel-Symbole (symbole/), hochgeladene (eigene/)
   fonts/        Selbst gehostete Schriften
   lottie/       Lottie-Animationen (Logo, Menüknopf)
   _headers      Sicherheits-Header, _redirects: /login → /admin/
 functions/      Cloudflare Pages Functions:
   _middleware.ts   Zugangsschutz (Cloudflare-Access-Token prüfen)
-  api/inhalt.ts    liefert der Redaktion den Stand aus dem Repo
-  api/save.ts      speichert Redaktionsänderungen als Commit
-  api/hochladen.ts Bilder und PDFs
+  api/alles.ts     liefert der Redaktion alle Inhalte samt Stand aus dem Repo
+  api/save.ts      speichert alle Redaktionsänderungen als einen Commit
+  api/hochladen.ts Bilder, Symbole und Dateien (Endung und Dateianfang geprüft, [skip ci])
+  api/dateien.ts   listet Hochgeladenes zur Wiederverwendung
   api/kontakt.ts   nimmt das Kontaktformular entgegen (Resend)
-scripts/        Prüf- und Vorbereitungsskripte für den Build (u. a. kleine Bildvarianten der Beitragskarten, läuft als `prebuild`)
+scripts/        Prüf- und Vorbereitungsskripte für den Build (kleine Bildvarianten als `prebuild`, stand.json als `postbuild`,
+                tote Verweise: pruefe-aufbau.mjs), redaktion-lokal.mjs (Redaktion ohne GitHub ausprobieren)
+tests/          Playwright (nur Chromium): verhalten.mjs, redaktion.mjs, Vergleichsaufnahmen; einheiten.mjs = `npm test`
 .github/workflows/veroeffentlichen.yml   Bauen und Aufspielen, täglich 03:00 UTC
 docs/
   betrieb.md    Konten, Secrets, Wiederherstellen, Störungen
@@ -231,7 +239,7 @@ docs/
 
 **Startseite** (`/`) ist und bleibt ein One-Pager mit Ankern:
 
-`#start` · `#praxis` (Begrüßung) · `#galerie` · `#oz_anchor` (Sprechstunden) · `#abschnitte` · `#leistungen` (Kachelübersicht) · `#neuigkeiten` · `#team` · `#stellen` · `#contact` · `#information` (Hinweis)
+`#start` · `#oz_anchor` (Sprechstunden) · dann die Blöcke in der Reihenfolge von `seitenaufbau.json`: `#praxis` (Begrüßung) · `#galerie` · `#leistungen` (Kachelübersicht, Gruppen `#leistungen-<kategorie>`) · `#team` · `#stellen` · `#contact` · eigene Bereiche unter ihrer Kennung (`#neuigkeiten`, `#dentosophie`, Abschnitte als `#<bereich>-<abschnitt>`) · `#information` (Hinweis)
 
 `#oz_anchor` ist die Einstiegskarte, die scrollgesteuert hereinfährt; sie steht nicht an einer festen Stelle im Dokument — `scripts/anker.ts` rechnet Marken in ihr in eine Scrolltiefe um (`tiefeInKarte`), statt sie zu messen. `#praxis` und `#galerie` folgen der Karte als gewöhnliche Abschnitte und werden normal gemessen.
 
@@ -240,16 +248,17 @@ docs/
 | Adresse | Inhalt |
 |---|---|
 | `/leistungen/<id>` | 11 Leistungen, je eine Seite |
-| `/neuigkeiten/<id>` | Beiträge |
+| `/<seite>/` | Eigene Seiten, z. B. `/dentosophie/` (Kapitel als `#mundatmung`) |
+| `/<blog>/<id>` | Beiträge, z. B. `/neuigkeiten/<id>` |
 | `/impressum`, `/datenschutz` | Rechtsseiten |
 | `/admin/…` | Redaktion (nur angemeldet); `/login` leitet dorthin |
 
 Die Leistungs-Adressen stehen fest und dürfen nicht mehr geändert werden:
 `prophylaxe` · `zahnerhaltung` · `wurzelkanalbehandlung` · `parodontitis` · `zahnersatz` · `implantate` · `3d-roentgen` · `bleaching` · `intraoralscanner` · `kieferorthopaedie-kinder` · `kieferorthopaedie-erwachsene`
 
-**Navigation:** Praxis · Leistungen ▾ · Team · Neuigkeiten · Kontakt · Sprechstunden · Telefon 07245 7171 (als Pille; auf Handys ein Hörer-Symbol, das die Nummer auf Tipp daneben ausklappt)
+**Navigation** — folgt der Reihenfolge der Seite, Sprechstunden immer vorn (Oktober 2026): Sprechstunden · Praxis · Leistungen ▾ · Dentosophie ▾ · Neuigkeiten · Team · Kontakt · Telefon 07245 7171 (als Pille; auf Handys ein Hörer-Symbol, das die Nummer auf Tipp daneben ausklappt). Höchstens sieben Hauptpunkte. Die Symbolleiste unten zeigt dieselbe Folge, auf Handys nur Sprechstunden · Leistungen · Telefon; der Zipfel zeigt gespiegelt auf den Sprechstunden-Knopf.
 
-Der Punkt *Leistungen* klappt als Blase aus der Punktlinie auf und listet die Kategorien aus `leistungen.json`. Auf Handys öffnet das ganze Menü als dieselbe Blase — zum rechten Rand hin offen, mit Schleier über der Seite —, und *Leistungen* wechselt darin die Ebene: Die anderen Zeilen schließen sich, die Kategorien wachsen darunter (`Navigation.astro`, 26. September 2026). Die Telefonnummer steht als Pille in der Kopfleiste, nicht im Menü; Datenschutz und Impressum nur im Fußbereich.
+Jeder Punkt mit Unterpunkten klappt als Blase aus der Punktlinie auf (erster Klick öffnet, zweiter springt; nie zwei offen). Unterpunkte entstehen von selbst — die Kategorien aus `leistungen.json`, Abschnitte mit „im Menü" — oder werden in der Redaktion angelegt; sie haben keine Symbole. Auf Handys öffnet das ganze Menü als dieselbe Blase — zum rechten Rand hin offen, mit Schleier über der Seite —, und ein Punkt mit Unterpunkten wechselt darin die Ebene: Die anderen Zeilen schließen sich, „‹Titel› – Übersicht" und die Unterpunkte wachsen darunter (`Navigation.astro`). Die Telefonnummer steht als Pille in der Kopfleiste, nicht im Menü; Datenschutz und Impressum nur im Fußbereich.
 
 **Kontakt:** Rosenstraße 1, 76467 Bietigheim · Tel. 07245 7171 · Fax 07245 939269 · info@dres-nold.de
 
@@ -334,8 +343,9 @@ npm run preview   # Build lokal prüfen
 
 ### Vor jedem Commit
 
-1. `npm run build` läuft ohne Fehler
-2. `node scripts/pruefe-externe-ressourcen.mjs` meldet keine fremden Ressourcen
+1. `npm run build` läuft ohne Fehler und `npm test` ist grün
+2. `npm run pruefen` meldet keine fremden Ressourcen und keine toten internen Verweise
+   — bei Änderungen an Menü, Startseite oder Redaktion zusätzlich `node tests/verhalten.mjs` und `node tests/redaktion.mjs`
 3. Optik gegen die Referenz in `docs/referenz/` geprüft
 4. Tastaturbedienung des geänderten Bereichs getestet
 

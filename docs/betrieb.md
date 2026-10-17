@@ -17,10 +17,19 @@ zum Kopieren gedacht.
 ## Wie eine Änderung online geht
 
 1. Anmelden unter **dres-nold.de/login** (E-Mail-Adresse, Code aus der E-Mail).
-2. Bereich wählen, ändern, **Speichern und veröffentlichen**.
-3. Das Speichern legt einen Eintrag im GitHub-Verlauf an („Redaktion: … geändert").
+2. Im Seitenplan links einen Block wählen, ändern — beliebig viele
+   Blöcke nacheinander —, dann unten **Veröffentlichen**.
+3. Das Veröffentlichen legt **einen** Eintrag im GitHub-Verlauf an
+   („Redaktion: … geändert"), auch wenn mehrere Dateien betroffen sind.
 4. GitHub baut die Seite neu und spielt sie auf Cloudflare auf (Workflow
    „Veröffentlichen", etwa eine Minute).
+5. Der Build schreibt `/stand.json` (Commit und Zeit). Die Redaktion
+   fragt sie ab und meldet „Online ✓", sobald der neue Stand ausgeliefert
+   wird.
+
+**Hochladen allein baut nicht neu.** Bilder und Dateien landen sofort im
+Repo, aber mit `[skip ci]` im Commit — online gehen sie mit dem nächsten
+Veröffentlichen. So löst nicht jedes Bild einen eigenen Neubau aus.
 
 Außerdem baut GitHub die Seite **jede Nacht um 03:00 UTC** neu — nur so
 schaltet die Hinweis-Blase am Stichtag um.
@@ -68,8 +77,10 @@ Jede Änderung ist ein Commit im GitHub-Repo. Auf github.com unter
 
 | Symptom | Ursache | Abhilfe |
 |---|---|---|
-| Redaktion meldet „Nicht gespeichert … von jemand anderem geändert" | zwei Personen gleichzeitig | Seite neu laden, Änderung erneut vornehmen |
-| Redaktion meldet „Anmeldung erforderlich" | Access-Sitzung abgelaufen | erneut über `/login` anmelden |
+| Redaktion meldet „Inzwischen hat jemand anderes dasselbe geändert" (409) | Seit dem Laden wurde **dieselbe** Inhaltsdatei geändert — von einer anderen Person oder direkt im Repo. Uploads und andere Dateien lösen das nicht aus | eigene Texte kopieren, Seite neu laden, Änderung erneut vornehmen |
+| Redaktion meldet „Die Anmeldung ist abgelaufen" | Access-Sitzung abgelaufen | in einem neuen Tab `/login` öffnen, anmelden, in der Redaktion noch einmal „Veröffentlichen" — die Eingaben stehen noch da |
+| Redaktion meldet „Redaktion wurde erneuert – bitte neu laden" (410) | ein alter Tab von vor der Umstellung (Oktober 2026) | Seite neu laden |
+| „Online ✓" kommt nicht, obwohl der Workflow grün ist | `/stand.json` wird zwischengespeichert | `public/_headers` muss für `/stand.json` `no-store` setzen |
 | Nach dem Anmelden wirft der erste Klick zurück auf den Anmeldebildschirm | Ein Verweis auf `/cdn-cgi/access/logout` wird vorgeholt und meldet dabei ab | Alle Verweise der Redaktion brauchen `data-astro-prefetch="false"` (siehe `src/layouts/Redaktion.astro`) |
 | Speichern schlägt mit „GitHub: … (401)" fehl | `GITHUB_TOKEN` abgelaufen | Token erneuern (oben) |
 | Änderung nach 5 Minuten nicht online | Workflow fehlgeschlagen | GitHub → Actions → letzten Lauf öffnen; meist eine kaputte Inhaltsdatei (steht dort im Klartext) |
@@ -82,6 +93,33 @@ Jede Änderung ist ein Commit im GitHub-Repo. Auf github.com unter
   (Dependabot) vorschlägt — Pull Request öffnen, prüfen, mergen.
 - **Jährlich:** GitHub-Token erneuern (siehe oben); Resend-Konto und
   Domain-Rechnung im Blick behalten.
+
+## Die Umstellung auf den Seitenplan nach `main` bringen (einmalig)
+
+Die Arbeit vom Oktober 2026 (Zweig `claude/keen-galileo-qn7mvi`) ersetzt
+`navigation.json`, `neuigkeiten.json` und `abschnitte.json` durch
+`seitenaufbau.json` und `bereiche.json`. Bis sie zusammengeführt ist,
+pflegt die Praxis mit der alten Redaktion auf `main` weiter. Deshalb:
+
+1. Die Praxis pausiert die Pflege für etwa eine halbe Stunde.
+2. Auf dem Zweig die beiden neuen Dateien entfernen und den aktuellen
+   Inhalt von `main` holen — **nur die JSON-Dateien**, sonst kämen auch
+   `schema.ts` und `laden.ts` in der alten Fassung mit:
+   ```bash
+   git fetch origin main
+   rm src/content/seitenaufbau.json src/content/bereiche.json
+   git checkout origin/main -- 'src/content/*.json' public/bilder public/dokumente
+   ```
+3. `node scripts/umzug-seitenaufbau.mjs` — baut die beiden Dateien neu
+   aus dem Stand von `main` und setzt die Inhaltsänderungen der Kundin
+   (Dentosophie, Schnarchen, Kieferorthopädie-Text …). Ein zweiter Lauf
+   ändert nichts mehr. (Am 17. Oktober 2026 probeweise durchgespielt:
+   ergibt Byte für Byte den Stand des Zweigs.)
+4. `npm run build && npm run pruefen && npm test`, dazu
+   `node tests/verhalten.mjs` und `node tests/redaktion.mjs`.
+5. Commit „Umzug der Inhalte", dann zusammenführen.
+6. Nach dem Aufspielen einmal live in der Redaktion etwas speichern —
+   damit sind Anmeldung, GitHub-Token und „Online ✓" geprüft.
 
 ## Lokal arbeiten (für Technik-Helfer)
 
@@ -96,3 +134,17 @@ Für die Functions lokal eine `.dev.vars` anlegen (Vorlage `.dev.vars.example`).
 Mit `ENTWICKLUNG=1` ist die Redaktion lokal ohne Anmeldung erreichbar;
 `GITHUB_BRANCH=redaktion-test` sorgt dafür, dass Testspeicherungen nicht
 auf `main` landen.
+
+**Die Redaktion ohne GitHub ausprobieren:**
+
+```bash
+npm run build
+npm run redaktion -- --kopie    # http://localhost:4400/admin/ — schreibt in eine Kopie
+```
+
+`scripts/redaktion-lokal.mjs` liefert die gebaute Seite aus und spielt
+die Schnittstellen nach, mit denselben Prüfregeln wie der Server. Ohne
+`--kopie` schreibt es direkt in `src/content/`. `KONFLIKT=1` bzw.
+`ABGEMELDET=1` stellen einen Konflikt oder eine abgelaufene Anmeldung
+nach. Die Browser-Prüfungen dazu: `node tests/redaktion.mjs` und
+`node tests/verhalten.mjs` (Playwright, nur Chromium).
