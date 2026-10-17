@@ -101,22 +101,39 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
     animation: galerie-lauf 70s linear infinite;
   }
 
-  /* Feste Höhe wie `.swiper` der Vorlage; die Breite ergibt sich aus
-     dem Seitenverhältnis der Datei. */
+  /* Feste Höhe wie `.swiper` der Vorlage, im Format 3 : 2 — etwas
+     breiter als die Fotos selbst (Florian, 17. Oktober 2026). Das Bild
+     ist darin ein Stück größer als sein Rahmen und wandert beim
+     Durchlaufen leicht gegen das Band (Parallaxe, Skript unten). */
   .galerie__bild {
     flex: none;
     margin: 0;
     height: clamp(230px, 32vw, 430px);
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
   }
 
   .galerie__bild img {
     display: block;
-    width: auto;
+    width: 100%;
     height: 100%;
     max-width: none;
+    object-fit: cover;
+    transform: translateX(var(--parallaxe, 0px)) scale(1.12);
     /* Sonst nimmt der Browser das Bild selbst als Ziehgut auf */
     -webkit-user-drag: none;
     user-select: none;
+  }
+
+  /* Handys: ein Bild über die ganze Breite, hochkant 4 : 5 (Florian,
+     17. Oktober 2026). `--fensterbreite` ohne Rollleiste setzt
+     Oeffnungszeiten.astro. */
+  @media (max-width: 767px) {
+    .galerie__bild {
+      width: var(--fensterbreite, 100vw);
+      height: auto;
+      aspect-ratio: 4 / 5;
+    }
   }
 
   /* Das Band ist doppelt bestückt — nach der halben Strecke
@@ -136,6 +153,7 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
      einem Mausklick auf die Leiste stehen, weil der Knopf den Fokus
      behält. */
   .galerie[data-zieht] .galerie__band,
+  .galerie[data-angehalten] .galerie__band,
   .galerie:has(.fortschritt:focus-visible) .galerie__band {
     animation-play-state: paused;
   }
@@ -205,6 +223,7 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
 
   @media (prefers-reduced-motion: reduce) {
     .galerie__band { animation: none; }
+    .galerie__bild img { transform: none; }
     .galerie__fenster { overflow-x: auto; }
     /* Ohne laufendes Band hat die Leiste nichts anzuzeigen */
     .galerie__leiste { display: none; }
@@ -260,10 +279,34 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
 
     let laeuft = false;
     let zuletzt = -1;
+    /* Steht der Reiter am Ende, bleibt er dort — Rundenende und -anfang
+       sind im Band dieselbe Stelle, auf der Leiste aber nicht */
+    let amEnde = false;
+
+    /* Parallaxe: Jedes Bild wandert in seinem Rahmen ein Stück gegen die
+       Laufrichtung — um bis zu 6 % seiner Breite, je nachdem, wie weit
+       sein Rahmen von der Fenstermitte entfernt ist. Berechnet aus dem
+       Stand der Animation und der Lage im Band, ohne zu messen. */
+    const rahmen = [...band.children] as HTMLElement[];
+    const parallaxe = (a: number) => {
+      const breite = document.documentElement.clientWidth;
+      const fx = fenster?.getBoundingClientRect().left ?? 0;
+      const r1 = runde();
+      const versatz = r1 * a;
+      for (const r of rahmen) {
+        const w = r.offsetWidth;
+        /* Die Lage des Rahmens im Fenster: das Band ist um `versatz`
+           nach links verschoben (Animation `galerie-lauf`) */
+        const mitte = fx + r.offsetLeft - versatz + w / 2;
+        const d = Math.max(-1.2, Math.min(1.2, (mitte - breite / 2) / breite));
+        r.style.setProperty('--parallaxe', `${(-d * 0.06 * w).toFixed(1)}px`);
+      }
+    };
 
     const zeichnen = () => {
       if (!laeuft) return;
-      const a = anteil();
+      parallaxe(anteil());
+      const a = amEnde ? 1 : anteil();
       balken?.style.setProperty('transform', `scaleX(${a.toFixed(4)})`);
       if (reiter) reiter.style.left = `${(a * 100).toFixed(2)}%`;
 
@@ -302,11 +345,20 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
     const anhalten = () => { bereich.dataset.zieht = 'ja'; };
     const weiterlaufen = () => { delete bereich.dataset.zieht; };
 
-    /** Stand aus einer Stelle auf der Leiste. */
+    /** Stand aus einer Stelle auf der Leiste. Ganz rechts bleibt der
+        Reiter rechts stehen, statt an den Anfang zu springen (Florian,
+        17. Oktober 2026). */
     const ausPunkt = (x: number) => {
       const r = leiste.getBoundingClientRect();
-      springen(Math.min(1, Math.max(0, (x - r.left) / r.width)));
+      const a = Math.min(1, Math.max(0, (x - r.left) / r.width));
+      amEnde = a >= 0.999;
+      springen(amEnde ? 0 : a);
     };
+
+    /* Wer das Band über die Leiste bewegt hat, will es so sehen, wie er
+       es gestellt hat: Es bleibt danach stehen (Florian, 17. Oktober
+       2026). Ziehen am Band selbst lässt es weiterlaufen. */
+    const festhalten = () => { bereich.dataset.angehalten = 'ja'; };
 
     const loslassen = (e: PointerEvent) => {
       if (!anBand && !anLeiste) return;
@@ -321,6 +373,7 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
        beim Zupacken. */
     fenster?.addEventListener('pointerdown', (e) => {
       if (e.button !== 0 || !lauf()) return;
+      amEnde = false;
       fenster.setPointerCapture(e.pointerId);
       anBand = true;
       griffX = e.clientX;
@@ -346,6 +399,7 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
       leiste.setPointerCapture(e.pointerId);
       anLeiste = true;
       anhalten();
+      festhalten();
       ausPunkt(e.clientX);
     });
 
@@ -365,6 +419,8 @@ const zweistellig = (n: number) => String(n).padStart(2, '0');
                     : 0;
       if (schritt === 0 && e.key !== 'Home' && e.key !== 'End') return;
       e.preventDefault();
+      festhalten();
+      amEnde = false;
       if (e.key === 'Home') springen(0);
       else if (e.key === 'End') springen((anzahl - 1) / anzahl);
       else springen(Math.round(anteil() * anzahl) / anzahl + schritt / anzahl);

@@ -64,6 +64,11 @@ const markenLage = (seite, id) =>
   await seite.waitForTimeout(600);
   await seite.locator('#untermenue-oben-dentosophie .oberpunkt', { hasText: 'Indikationen' }).click();
   await seite.waitForURL(/\/dentosophie\/#indikationen$/);
+  /* Die Blase ist mit Beginn des Wechsels ganz fort — sonst reicht der
+     Umschlag der Kopfleiste im Übergang um ihre Höhe hinab, und sein
+     Weichzeichner liegt als Kasten über der Seite */
+  const blasenhoehe = await seite.$eval('.navigation', (n) => n.style.getPropertyValue('--blase-hoehe'));
+  pruefen(blasenhoehe === '', 'Seitenwechsel aus der Blase: Kopfleiste ohne Blasenhöhe', blasenhoehe || 'leer');
   await seite.waitForTimeout(1200);
   const lage = await markenLage(seite, 'indikationen');
   pruefen(lage !== null && lage > 60 && lage < 140, 'Unterpunkt öffnet die Seite und landet an der Marke', `${lage} px`);

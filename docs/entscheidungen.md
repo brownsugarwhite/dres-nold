@@ -2984,3 +2984,32 @@ Symbolen ist entfallen.
   (`flex: 1 1 0`). Die äußeren Symbole stehen damit gleich weit vom
   Rand, gemessen auf ±1 px. `leisteEinpassen` misst dafür die
   natürliche Breite von Symbol und Beschriftung.
+
+### Nachtrag: Galerie und Unschärfe im Seitenwechsel (17. Oktober 2026, nachts)
+
+- **Praxisbilder:**
+  - **Rahmen:** Die Bilder stehen in Rahmen im Format 3 : 2, etwas
+    breiter als die Fotos selbst. Darin sind sie um 12 % vergrößert und
+    wandern beim Durchlaufen um bis zu 6 % ihrer Breite gegen das Band
+    (Parallaxe aus dem Stand der Animation, `parallaxe()` in
+    Galerie.astro).
+  - **Handys:** ein Bild über die ganze Breite, hochkant 4 : 5.
+- **Regler unter der Galerie:**
+  - **Ende:** Ganz rechts bleibt er rechts stehen. Vorher sprang er an
+    den Anfang, weil Rundenende und -anfang im doppelt bestückten Band
+    dieselbe Stelle sind.
+  - **Anhalten:** Wer das Band über den Regler oder die Pfeiltasten
+    bewegt hat, dem bleibt es danach stehen (`data-angehalten`). Ziehen
+    am Band selbst lässt es weiterlaufen.
+- **Kante beim Weichzeichnen der Seiten:**
+  - **Kein Wechsel der Methode nötig:** Die Seiten werden mit einem
+    echten `filter: blur` ein- und ausgeblendet, nicht mit einem
+    Hintergrund-Weichzeichner.
+  - **Die Ursache:** Die Kopfleiste trägt im Übergang einen eigenen
+    milchigen Hintergrund-Weichzeichner (20 px). War beim Klick noch eine
+    Aufklappblase offen oder am Zugehen, reichte der Umschlag der Leiste
+    um deren Höhe nach unten. Der Weichzeichner lag dann als scharf
+    begrenzter Kasten über den Überschriften der Seite, die Kante auf
+    Florians Bild.
+  - **Die Lösung:** Mit Beginn eines Seitenwechsels sind alle Blasen und
+    das Handy-Menü sofort fort (`astro:before-preparation`, `beenden`).

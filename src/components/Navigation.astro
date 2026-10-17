@@ -1884,6 +1884,8 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
         return false;
       },
       schliessen(sofort = false) { animieren(0, sofort); },
+      /** Sofort und ganz weg — samt Maske und Höhe am Umschlag */
+      beenden,
       /** Der Inhalt ist anders hoch geworden — die Blase folgt sofort */
       hoeheSetzen(h: number) {
         if (svg.style.display === 'none') return;
@@ -2149,6 +2151,27 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
         if (!huelle.contains(e.target as Node)) setzen(false);
       });
 
+      /* Beginnt ein Seitenwechsel, ist die Blase sofort fort — auch eine,
+         die gerade zuklappt. Sonst reichte der Umschlag der Kopfleiste im
+         Abbild des Übergangs noch um ihre Höhe nach unten, und der
+         milchige Weichzeichner der Leiste (styles/uebergaenge.css) lag
+         als scharf begrenzter Kasten über den Überschriften der Seite
+         (Florian, 17. Oktober 2026). */
+      document.addEventListener('astro:before-preparation', () => {
+        if (!huelle.isConnected) return;
+        window.clearTimeout(schliessTimer);
+        if (knopf.getAttribute('aria-expanded') === 'true') {
+          knopf.setAttribute('aria-expanded', 'false');
+          if (offeneJeLeiste.get(linienTraeger)?.huelle === huelle) offeneJeLeiste.delete(linienTraeger);
+        }
+        delete huelle.dataset.offen;
+        delete huelle.dataset.uebergabe;
+        delete huelle.dataset.ausblenden;
+        blase.beenden();
+        inhalt.hidden = true;
+        delete huelle.dataset.aktiv;
+      });
+
       // Schließen mit Escape, Fokus zurück auf den Knopf
       huelle.addEventListener('keydown', (e) => {
         if ((e as KeyboardEvent).key === 'Escape') {
@@ -2160,8 +2183,6 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
       window.addEventListener('resize', () => {
         if (huelle.dataset.aktiv) blase.hoeheSetzen(inhalt.getBoundingClientRect().height);
       }, { passive: true });
-      // Beim Seitenwechsel schließen
-      document.addEventListener('astro:before-preparation', () => setzen(false));
     });
   }
 
@@ -2537,8 +2558,11 @@ const menueId = (e: Punkt, wo: 'oben' | 'unten' | 'mobil') => `untermenue-${wo}-
     });
 
     // Beim Seitenwechsel zu — noch vor dem Tausch, damit die Sperre an
-    // der Wurzel nicht mit dem neuen Dokument verloren geht
-    document.addEventListener('astro:before-preparation', () => menueSchliessen());
+    // der Wurzel nicht mit dem neuen Dokument verloren geht. Sofort, ohne
+    // Bewegung: Eine zuklappende Blase hielte den Umschlag der Kopfleiste
+    // im Übergang hoch, und ihr milchiger Weichzeichner läge als Kasten
+    // über der Seite (wie bei den Aufklappmenüs, siehe dort).
+    document.addEventListener('astro:before-preparation', () => menueSchliessen(true));
 
     // Wird das Fenster breiter als ein Handy, gibt es das Menü nicht mehr:
     // sofort zu, ohne Bewegung — die Form misst das dann versteckte Logo
