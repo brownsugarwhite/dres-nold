@@ -4,7 +4,7 @@
     {
       "typ": "blog",
       "id": "neuigkeiten",
-      "aktiv": true,
+      "aktiv": false,
       "titel": "Neuigkeiten",
       "kicker": "Aktuelles",
       "einleitung": "Aktuelles aus unserer Praxis.",
@@ -82,6 +82,17 @@
               "bild_hoehe": "format"
             }
           ],
+          "dateien": []
+        },
+        {
+          "id": "4",
+          "aktiv": true,
+          "datum": "2026-10-25",
+          "titel": "4o Jahre Zahnarztpraxis Dres. Nold !",
+          "kurz": "40 Jahre gemeinsames Engagement und Leidenschaft! \n\nDabei gilt unser ganz besonderer Dank unserem Team:\nMit ihrer Loyalität, ihrem Engagement und ihrem täglichen Einsatz sind sie ein entscheidender Teil dessen, was unsere Praxis ausmacht – und ein wichtiger Grund für die Qualität und die Leistung, auf die wir heute zurückblicken können. Das ist keineswegs selbstverständlich und dafür sind wir sehr dankbar.\n\nDanke auch an unsere Patientinnen und Patienten für das Vertrauen, die Treue und die vielen gemeinsamen Jahre.\n\nAuf 40 Jahre – und auf alles, was noch kommt!",
+          "bild": "/bilder/bereiche/img-4223.jpg",
+          "bild_alt": "Jubiläum in Heidelberg",
+          "abschnitte": [],
           "dateien": []
         }
       ]
