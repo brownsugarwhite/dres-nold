@@ -18,10 +18,10 @@
       "position": 2,
       "gruppe": "aerzte",
       "name": "Dr. Sarah Buchgeister-Nold",
-      "funktion": "Zahnärztin Tätigkeitsschwerpunkt Kieferorthopädie",
+      "funktion": "Zahnärztin",
       "taetigkeiten": [
+        "Tätigkeitsschwerpunkt Kieferorthopädie",
         "Atemwegs- und schlafbezogene Zahnmedizin",
-        "Kieferorthopädie",
         "Dentosophie"
       ],
       "foto": "/bilder/team/sarah.jpg",
@@ -99,9 +99,20 @@
       "foto_alt": "Porträtfoto von Dzeni"
     },
     {
-      "id": "francesca",
+      "id": "elif",
       "aktiv": true,
       "position": 8,
+      "gruppe": "team",
+      "name": "Elif",
+      "funktion": "Auszubildende",
+      "taetigkeiten": [],
+      "foto": "",
+      "foto_alt": ""
+    },
+    {
+      "id": "francesca",
+      "aktiv": true,
+      "position": 9,
       "gruppe": "team",
       "name": "Francesca",
       "funktion": "Zahnärztliche Assistenz",
@@ -115,7 +126,7 @@
     {
       "id": "jessica",
       "aktiv": true,
-      "position": 9,
+      "position": 10,
       "gruppe": "team",
       "name": "Jessica",
       "funktion": "Zahnmedizinische Fachangestellte",
@@ -127,9 +138,24 @@
       "foto_alt": "Porträtfoto von Jessica"
     },
     {
+      "id": "karolin",
+      "aktiv": true,
+      "position": 11,
+      "gruppe": "team",
+      "name": "Karolin",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "taetigkeiten": [
+        "Zahnärztliche Assistenz",
+        "Prophylaxe",
+        "Qualitätsmanagement"
+      ],
+      "foto": "",
+      "foto_alt": ""
+    },
+    {
       "id": "lisa",
       "aktiv": true,
-      "position": 10,
+      "position": 12,
       "gruppe": "team",
       "name": "Lisa",
       "funktion": "Auszubildende",
@@ -142,7 +168,7 @@
     {
       "id": "martina",
       "aktiv": true,
-      "position": 11,
+      "position": 13,
       "gruppe": "team",
       "name": "Martina",
       "funktion": "Zahnärztliche & kieferorthopädische Laborarbeiten",
@@ -153,7 +179,7 @@
     {
       "id": "olga",
       "aktiv": true,
-      "position": 12,
+      "position": 14,
       "gruppe": "team",
       "name": "Olga",
       "funktion": "Zahnmedizinische Fachangestellte",
@@ -167,7 +193,7 @@
     {
       "id": "petra",
       "aktiv": false,
-      "position": 13,
+      "position": 15,
       "gruppe": "team",
       "name": "Petra",
       "funktion": "Zahnmedizinische Fachangestellte",
@@ -182,7 +208,7 @@
     {
       "id": "verena",
       "aktiv": false,
-      "position": 14,
+      "position": 16,
       "gruppe": "team",
       "name": "Verena",
       "funktion": "Zahnmedizinische Fachangestellte",
@@ -195,22 +221,9 @@
       "foto_alt": "Porträtfoto von Verena"
     },
     {
-      "id": "vlora",
-      "aktiv": true,
-      "position": 15,
-      "gruppe": "team",
-      "name": "Vlora",
-      "funktion": "Zahnmedizinische Fachangestellte",
-      "taetigkeiten": [
-        "Zahnärztliche & kieferorthopädische Assistenz"
-      ],
-      "foto": "/bilder/team/vlora.jpg",
-      "foto_alt": "Porträtfoto von Vlora"
-    },
-    {
       "id": "sarah-zfa",
       "aktiv": false,
-      "position": 16,
+      "position": 17,
       "gruppe": "team",
       "name": "Sarah",
       "funktion": "Zahnmedizinische Fachangestellte",
@@ -225,18 +238,20 @@
     {
       "id": "rosa",
       "aktiv": true,
-      "position": 17,
+      "position": 18,
       "gruppe": "team",
       "name": "Rosa",
       "funktion": "Zahnmedizinische Fachangestellte",
-      "taetigkeiten": [],
+      "taetigkeiten": [
+        "Prohpylaxe"
+      ],
       "foto": "/bilder/team/rosa.jpg",
       "foto_alt": ""
     },
     {
       "id": "rebecca",
       "aktiv": true,
-      "position": 18,
+      "position": 19,
       "gruppe": "team",
       "name": "Rebecca",
       "funktion": "Rezeption",
@@ -247,30 +262,18 @@
       "foto_alt": ""
     },
     {
-      "id": "karolin",
-      "aktiv": true,
-      "position": 19,
-      "gruppe": "team",
-      "name": "Karolin",
-      "funktion": "Zahnmedizinische Fachangestellte",
-      "taetigkeiten": [
-        "Zahnärztliche Assistenz",
-        "Prophylaxe",
-        "Qualitätsmanagement"
-      ],
-      "foto": "",
-      "foto_alt": ""
-    },
-    {
-      "id": "elif",
+      "id": "vlora",
       "aktiv": true,
       "position": 20,
       "gruppe": "team",
-      "name": "Elif",
-      "funktion": "Auszubildende",
-      "taetigkeiten": [],
-      "foto": "",
-      "foto_alt": ""
+      "name": "Vlora",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "taetigkeiten": [
+        "Zahnärztliche & kieferorthopädische Assistenz",
+        "Kieferorthopädische Abrechnung"
+      ],
+      "foto": "/bilder/team/vlora.jpg",
+      "foto_alt": "Porträtfoto von Vlora"
     }
   ]
 }
