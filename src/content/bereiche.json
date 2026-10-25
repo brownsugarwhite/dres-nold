@@ -13,8 +13,8 @@
           "id": "neue-behandlungseinheit",
           "aktiv": true,
           "datum": "2026-08-29",
-          "titel": "Unsere neue Behandlungseinheit",
-          "kurz": "Seit dieser Woche behandeln wir in Zimmer 2 an einer neuen Einheit — leiser, bequemer und mit besserer Sicht für Sie auf dem Monitor.",
+          "titel": "Unser neues Behandlungszimmre",
+          "kurz": "",
           "bild": "/bilder/galerie/gallery03.jpg",
           "bild_alt": "Behandlungszimmer der Praxis",
           "abschnitte": [
@@ -122,7 +122,7 @@
       "id": "dentosophie",
       "aktiv": true,
       "titel": "Dentosophie",
-      "kicker": "Ganzheitliche Kieferorthopädie",
+      "kicker": "Ganzheitliche myofunktionelle Kieferorthopädie",
       "auf_startseite": true,
       "kurz": "Ein ganzheitlicher Ansatz, der Zahnmedizin, Kieferorthopädie und funktionelle Therapien verbindet – damit Atmen, Kauen und Schlucken wieder natürlich gelingen.",
       "titelbild": "/bilder/bereiche/praxisbild-redish.png",
@@ -135,7 +135,7 @@
           "im_menue": false,
           "knoepfe_text": "",
           "knoepfe": [],
-          "text": "<p>Dentosophie ist ein ganzheitlicher Ansatz, der Zahnmedizin, Kieferorthopädie und funktionelle Therapien verbindet. Mit gezielten Übungen und individuellen Behandlungen werden Fehlfunktionen wie falsches Atmen, Schlucken oder Kauen korrigiert.</p><p>Dabei geht es in erster Linie um die Reedukation, das Wiedererlernen natürlicher Mechanismen: um bei Kindern das volle Potenzial der natürlichen Kiefer- und Körperentwicklung zu unterstützen und bei Erwachsenen pathologische Gewohnheiten zu durchbrechen und Symptome ursächlich zu behandeln.</p>",
+          "text": "<p>Dentosophie ist ein ganzheitlicher Ansatz, der Zahnmedizin, Kieferorthopädie und funktionelle Therapien verbindet. Mit gezielten Übungen und individuellen Behandlungen werden Fehlfunktionen wie falsches Atmen, Schlucken oder Kauen korrigiert.</p><p>Dabei geht es in erster Linie um die Reedukation, das Wiedererlernen, natürlicher Mechanismen - um bei Kindern das volle Potenzial der natürlichen Kiefer- und Körperentwicklung zu unterstützen und bei Erwachsenen pathologische Gewohnheiten zu durchbrechen und Symptome ursächlich zu behandeln.</p>",
           "bild": "",
           "bild_alt": "",
           "bild_seite": "links",
@@ -165,7 +165,7 @@
             {
               "symbol": "/icons/symbole/schlucken.svg",
               "titel": "Schlucken",
-              "text": "<p>Schlucken hängt eng mit der Mundmuskulatur, der Zungenlage und der Kieferentwicklung zusammen. Ein korrektes Schluckmuster fördert die richtige Stellung der Zähne, die Ausrichtung des Kiefers und die Harmonisierung der gesamten Gesichtsmuskulatur.</p><p>Fehlfunktionen beim Schlucken können Zahnfehlstellungen, Kieferprobleme und sogar Haltungsschäden begünstigen.</p>",
+              "text": "<p>Schlucken hängt eng mit der Mundmuskulatur, der Zungenlage und der Kieferentwicklung zusammen. Wir schlucken bis zu 2.000 Mal am Tag.&nbsp;</p><p>Ein korrektes Schluckmuster fördert die richtige Stellung der Zähne, die Ausrichtung des Kiefers und die Harmonisierung der gesamten Gesichtsmuskulatur.</p><p>Fehlfunktionen beim Schlucken können Zahnfehlstellungen, Kieferprobleme und sogar Haltungsschäden begünstigen.</p>",
               "ziel": ""
             }
           ]
