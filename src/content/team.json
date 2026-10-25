@@ -18,8 +18,12 @@
       "position": 2,
       "gruppe": "aerzte",
       "name": "Dr. Sarah Buchgeister-Nold",
-      "funktion": "Zahnärztin",
-      "taetigkeiten": [],
+      "funktion": "Zahnärztin Tätigkeitsschwerpunkt Kieferorthopädie",
+      "taetigkeiten": [
+        "Atemwegs- und schlafbezogene Zahnmedizin",
+        "Kieferorthopädie",
+        "Dentosophie"
+      ],
       "foto": "/bilder/team/sarah.jpg",
       "foto_alt": "Porträtfoto von Dr. Sarah Buchgeister-Nold"
     },
@@ -35,9 +39,24 @@
       "foto_alt": "Porträtfoto von Dr. Inge Wilhelm-Nold"
     },
     {
-      "id": "adriana",
+      "id": "anne",
       "aktiv": true,
       "position": 4,
+      "gruppe": "team",
+      "name": "Anne",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "taetigkeiten": [
+        "Zahnärztliche & kieferorthopädische Assistenz",
+        "Prophylaxe",
+        "Praxismanagement"
+      ],
+      "foto": "/bilder/team/anne.jpg",
+      "foto_alt": "Porträtfoto von Anne"
+    },
+    {
+      "id": "adriana",
+      "aktiv": true,
+      "position": 5,
       "gruppe": "team",
       "name": "Adriana",
       "funktion": "Zahnmedizinische Fachangestellte",
@@ -49,21 +68,6 @@
       ],
       "foto": "/bilder/team/adriana.jpg",
       "foto_alt": "Porträtfoto von Adriana"
-    },
-    {
-      "id": "anne",
-      "aktiv": true,
-      "position": 5,
-      "gruppe": "team",
-      "name": "Anne",
-      "funktion": "Zahnmedizinische Fachangestellte",
-      "taetigkeiten": [
-        "Zahnärztliche & kieferorthopädische Assistenz",
-        "Prophylaxe",
-        "Praxismanagement"
-      ],
-      "foto": "/bilder/team/anne.jpg",
-      "foto_alt": "Porträtfoto von Anne"
     },
     {
       "id": "carmen",
@@ -235,9 +239,37 @@
       "position": 18,
       "gruppe": "team",
       "name": "Rebecca",
-      "funktion": "Zahnmedizinische Fachangestellte",
-      "taetigkeiten": [],
+      "funktion": "Rezeption",
+      "taetigkeiten": [
+        "Zahmedizinische und kieferorthopädische Verwaltung"
+      ],
       "foto": "/bilder/team/rebecca.jpg",
+      "foto_alt": ""
+    },
+    {
+      "id": "karolin",
+      "aktiv": true,
+      "position": 19,
+      "gruppe": "team",
+      "name": "Karolin",
+      "funktion": "Zahnmedizinische Fachangestellte",
+      "taetigkeiten": [
+        "Zahnärztliche Assistenz",
+        "Prophylaxe",
+        "Qualitätsmanagement"
+      ],
+      "foto": "",
+      "foto_alt": ""
+    },
+    {
+      "id": "elif",
+      "aktiv": true,
+      "position": 20,
+      "gruppe": "team",
+      "name": "Elif",
+      "funktion": "Auszubildende",
+      "taetigkeiten": [],
+      "foto": "",
       "foto_alt": ""
     }
   ]
